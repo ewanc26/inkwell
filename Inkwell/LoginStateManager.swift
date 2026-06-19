@@ -51,6 +51,8 @@ final class LoginStateManager {
     // MARK: - Public State
     private(set) var isAuthenticated = false
     private(set) var currentHandle: String?
+    private(set) var displayName: String?
+    private(set) var avatarURL: URL?
     private(set) var errorMessage: String?
 
     // MARK: - Storage
@@ -121,6 +123,26 @@ final class LoginStateManager {
                         self.errorMessage = nil
                         self.defaults.set(trimmed, forKey: self.storedHandleKey)
                     }
+
+                    // Best-effort, non-blocking: don't hold up sign-in completion
+                    // (or the timeout race above) on a second network round-trip.
+                    // Uses ATProtoKit's own getProfile(for:) rather than a hand-rolled
+                    // request, so it picks up everything the AppView knows about the
+                    // account (display name, avatar, etc.) in one call.
+                    Task {
+                        do {
+                            let profile = try await proto.getProfile(for: identity.did)
+                            let trimmedName = profile.displayName?.trimmingCharacters(in: .whitespacesAndNewlines)
+                            await MainActor.run {
+                                self.displayName = (trimmedName?.isEmpty == false) ? trimmedName : nil
+                                self.avatarURL = profile.avatarImageURL
+                            }
+                        } catch {
+                            // Profile metadata is cosmetic — leave displayName/avatarURL
+                            // as nil and let the UI fall back accordingly.
+                        }
+                    }
+
                     return true
                 } catch {
                     let message = error.localizedDescription
@@ -166,6 +188,8 @@ final class LoginStateManager {
     private func clearSession(clearStoredAccount: Bool = false) {
         self.isAuthenticated = false
         self.currentHandle = nil
+        self.displayName = nil
+        self.avatarURL = nil
         self.config = nil
         self.atProto = nil
 
