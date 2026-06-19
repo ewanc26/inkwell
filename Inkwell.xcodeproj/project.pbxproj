@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXContainerItemProxy section */
+		40E065442FE4D6D200D5874B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 40FF21AE2FE4CA3100B4A027 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 40FF21B52FE4CA3100B4A027;
+			remoteInfo = Inkwell;
+		};
 		40FF21C82FE4CA3300B4A027 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 40FF21AE2FE4CA3100B4A027 /* Project object */;
@@ -119,7 +126,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				40FF21F12FE4CA3400B4A027,
+				40FF21F12FE4CA3400B4A027 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				40FF21B82FE4CA3100B4A027 /* Inkwell */,
@@ -280,23 +287,11 @@
 			target = 40FF21B52FE4CA3100B4A027 /* Inkwell */;
 			targetProxy = 40FF21D22FE4CA3300B4A027 /* PBXContainerItemProxy */;
 		};
-		40FF21F02FE4CA3400B4A027 /* ATProtoKit Package */ = {
-			isa = PBXPackageReference;
-			repositoryURL = "https://github.com/MasterJ93/ATProtoKit.git";
-			requirement = {
-				branch = "main";
-			};
-			packageProduct = "ATProtoKit";
-			packageVersion = "";
-		};
-		40FF21F12FE4CA3400B4A027 /* ATProtoKit Target Dependency */ = {
+		40FF21F12FE4CA3400B4A027 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 40FF21B52FE4CA3100B4A027 /* Inkwell */;
-			productName = "ATProtoKit";
-			packageProduct = "ATProtoKit";
-			packageReference = 40FF21F02FE4CA3400B4A027;
+			targetProxy = 40E065442FE4D6D200D5874B /* PBXContainerItemProxy */;
 		};
-
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */

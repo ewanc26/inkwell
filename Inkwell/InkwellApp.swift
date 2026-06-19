@@ -10,6 +10,8 @@ import SwiftData
 
 @main
 struct InkwellApp: App {
+    @StateObject private var loginStateManager = LoginStateManager()
+
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Item.self,
@@ -26,6 +28,7 @@ struct InkwellApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(loginStateManager)
         }
         .modelContainer(sharedModelContainer)
     }
