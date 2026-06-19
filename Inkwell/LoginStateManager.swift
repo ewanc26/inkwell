@@ -8,8 +8,42 @@
 import Foundation
 import Observation
 import ATProtoKit
-import ATProtoBluesky
-import ATIdentityTools
+
+/// Minimal identity record returned by Slingshot's `resolveMiniDoc` endpoint.
+/// Mirrors the shape used by the website's `@ewanc26/atproto` package
+/// (`ResolvedIdentity { did, pds }`), with `handle` included for convenience.
+private struct SlingshotMiniDoc: Decodable {
+    let did: String
+    let handle: String
+    let pds: String
+}
+
+/// Resolves a handle (or DID) straight to its DID + PDS endpoint via
+/// Slingshot (microcosm.blue), in a single request. This replaces doing
+/// our own DNS/.well-known handle resolution followed by a separate PLC
+/// directory lookup — both of which can be slow or flaky in the iOS
+/// Simulator's network stack. Slingshot is purpose-built for exactly this
+/// "resolve a login handle fast" use case and already does its own caching.
+private func resolveIdentityViaSlingshot(identifier: String) async throws -> SlingshotMiniDoc {
+    var components = URLComponents(string: "https://slingshot.microcosm.blue/xrpc/com.bad-example.identity.resolveMiniDoc")!
+    components.queryItems = [URLQueryItem(name: "identifier", value: identifier)]
+
+    guard let url = components.url else {
+        throw URLError(.badURL)
+    }
+
+    let sessionConfig = URLSessionConfiguration.ephemeral
+    sessionConfig.timeoutIntervalForRequest = 8
+    sessionConfig.timeoutIntervalForResource = 8
+    let session = URLSession(configuration: sessionConfig)
+
+    let (data, response) = try await session.data(from: url)
+    guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+        throw URLError(.badServerResponse)
+    }
+
+    return try JSONDecoder().decode(SlingshotMiniDoc.self, from: data)
+}
 
 @MainActor
 @Observable
@@ -19,10 +53,17 @@ final class LoginStateManager {
     private(set) var currentHandle: String?
     private(set) var errorMessage: String?
 
+    // MARK: - Storage
+    @ObservationIgnored private let defaults: UserDefaults
+    private let storedHandleKey = "storedAccountHandle"
+
     // MARK: - Internal Session
     private var config: ATProtocolConfiguration?
     private var atProto: ATProtoKit?
-    private var bluesky: ATProtoBluesky?
+
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+    }
 
     // MARK: - Authentication
     /// Resolves the handle to a DID, discovers the PDS endpoint, and logs in.
@@ -33,57 +74,103 @@ final class LoginStateManager {
     func signIn(handle: String, password: String) async -> Bool {
         let trimmed = handle.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty, !password.isEmpty else {
+            clearSession()
             errorMessage = "Enter a handle and password."
-            resetState()
             return false
         }
-        do {
-            // 1️⃣ Resolve handle → DID using ATIdentityTools
-            let resolver = HandleResolver()
-            guard let did = try await resolver.resolve(handle: trimmed) else {
-                errorMessage = "Unable to resolve DID for handle."
-                resetState()
+
+        let timeoutSeconds: UInt64 = 15
+
+        // Race authentication against a timeout.
+        // group.addTask closures are nonisolated, so all @MainActor state
+        // must be accessed via `await MainActor.run { … }`.
+        return await withTaskGroup(of: Bool.self) { group in
+            // Authentication task
+            group.addTask {
+                do {
+                    // Resolve handle -> DID + PDS in a single request via Slingshot,
+                    // rather than doing our own DNS/.well-known + PLC directory
+                    // lookups (slow/unreliable in the Simulator, and the website
+                    // hits the same problem class server-side, hence the shared
+                    // approach via @ewanc26/atproto's resolveIdentity).
+                    print("[SignIn] \(Date()) resolving identity via Slingshot for \(trimmed)")
+                    let identity = try await resolveIdentityViaSlingshot(identifier: trimmed)
+                    print("[SignIn] \(Date()) resolved DID: \(identity.did), PDS: \(identity.pds)")
+
+                    guard let pdsURL = URL(string: identity.pds) else {
+                        await MainActor.run {
+                            self.clearSession()
+                            self.errorMessage = "Could not determine the account's PDS."
+                        }
+                        return false
+                    }
+
+                    let cfg = ATProtocolConfiguration(pdsURL: pdsURL.absoluteString)
+                    print("[SignIn] \(Date()) authenticating against PDS")
+                    try await cfg.authenticate(with: trimmed, password: password)
+                    print("[SignIn] \(Date()) authenticated successfully")
+
+                    let proto = await ATProtoKit(sessionConfiguration: cfg)
+                    print("[SignIn] \(Date()) ATProtoKit session initialised")
+
+                    await MainActor.run {
+                        self.config = cfg
+                        self.atProto = proto
+                        self.currentHandle = trimmed
+                        self.isAuthenticated = true
+                        self.errorMessage = nil
+                        self.defaults.set(trimmed, forKey: self.storedHandleKey)
+                    }
+                    return true
+                } catch {
+                    let message = error.localizedDescription
+                    await MainActor.run {
+                        self.clearSession()
+                        self.errorMessage = message
+                    }
+                    return false
+                }
+            }
+
+            // Timeout task
+            group.addTask {
+                do {
+                    try await Task.sleep(nanoseconds: timeoutSeconds * 1_000_000_000)
+                } catch {
+                    // Cancelled because the auth task already finished first.
+                    // Don't touch state — it's already been set by that task.
+                    return false
+                }
+
+                await MainActor.run {
+                    self.clearSession()
+                    self.errorMessage = "Login timed out. Please check your internet connection and try again."
+                }
                 return false
             }
-            // 2️⃣ Derive a PDS URL from the handle's domain (simple heuristic).
-            let domain = trimmed.components(separatedBy: "@").last ?? trimmed
-            guard let pdsURL = URL(string: "https://\(domain)") else {
-                errorMessage = "Invalid PDS URL derived from handle."
-                resetState()
-                return false
-            }
-            // 3️⃣ Configure ATProtoKit with the discovered PDS and authenticate.
-            let cfg = ATProtocolConfiguration()
-            cfg.baseURL = pdsURL
-            try await cfg.authenticate(with: trimmed, password: password)
-            // Store configuration and create helper objects.
-            self.config = cfg
-            self.atProto = ATProtoKit(sessionConfiguration: cfg)
-            self.bluesky = ATProtoBluesky(atProtoKitInstance: atProto!)
-            // Update public state.
-            self.currentHandle = trimmed
-            self.isAuthenticated = true
-            self.errorMessage = nil
-            return true
-        } catch {
-            errorMessage = error.localizedDescription
-            resetState()
-            return false
+
+            // Take whichever finishes first, cancel the other
+            let first = await group.next() ?? false
+            group.cancelAll()
+            return first
         }
     }
 
     /// Signs the user out, clearing any stored session.
     func signOut() {
-        resetState()
+        clearSession(clearStoredAccount: true)
+        errorMessage = nil
     }
 
     // MARK: - Helper
-    private func resetState() {
+    private func clearSession(clearStoredAccount: Bool = false) {
         self.isAuthenticated = false
         self.currentHandle = nil
-        self.errorMessage = nil
         self.config = nil
         self.atProto = nil
-        self.bluesky = nil
+
+        if clearStoredAccount {
+            defaults.removeObject(forKey: storedHandleKey)
+        }
     }
 }
