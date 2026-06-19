@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		40FA13452FE4DB4B0016CC0D /* ATProtoKit in Frameworks */ = {isa = PBXBuildFile; productRef = 40FA13442FE4DB4B0016CC0D /* ATProtoKit */; };
+		40FA13482FE4DB810016CC0D /* ATIdentityTools in Frameworks */ = {isa = PBXBuildFile; productRef = 40FA13472FE4DB810016CC0D /* ATIdentityTools */; };
+		40FA134A2FE4DB810016CC0D /* DIDCore in Frameworks */ = {isa = PBXBuildFile; productRef = 40FA13492FE4DB810016CC0D /* DIDCore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		40E065442FE4D6D200D5874B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -72,6 +78,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				40FA134A2FE4DB810016CC0D /* DIDCore in Frameworks */,
+				40FA13452FE4DB4B0016CC0D /* ATProtoKit in Frameworks */,
+				40FA13482FE4DB810016CC0D /* ATIdentityTools in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -133,6 +142,9 @@
 			);
 			name = Inkwell;
 			packageProductDependencies = (
+				40FA13442FE4DB4B0016CC0D /* ATProtoKit */,
+				40FA13472FE4DB810016CC0D /* ATIdentityTools */,
+				40FA13492FE4DB810016CC0D /* DIDCore */,
 			);
 			productName = Inkwell;
 			productReference = 40FF21B62FE4CA3100B4A027 /* Inkwell.app */;
@@ -216,6 +228,10 @@
 			);
 			mainGroup = 40FF21AD2FE4CA3100B4A027;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				40FA13432FE4DB4B0016CC0D /* XCRemoteSwiftPackageReference "ATProtoKit" */,
+				40FA13462FE4DB810016CC0D /* XCRemoteSwiftPackageReference "ATIdentityTools" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 40FF21B72FE4CA3100B4A027 /* Products */;
 			projectDirPath = "";
@@ -600,6 +616,43 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		40FA13432FE4DB4B0016CC0D /* XCRemoteSwiftPackageReference "ATProtoKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/MasterJ93/ATProtoKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.32.5;
+			};
+		};
+		40FA13462FE4DB810016CC0D /* XCRemoteSwiftPackageReference "ATIdentityTools" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ATProtoKit/ATIdentityTools.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		40FA13442FE4DB4B0016CC0D /* ATProtoKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 40FA13432FE4DB4B0016CC0D /* XCRemoteSwiftPackageReference "ATProtoKit" */;
+			productName = ATProtoKit;
+		};
+		40FA13472FE4DB810016CC0D /* ATIdentityTools */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 40FA13462FE4DB810016CC0D /* XCRemoteSwiftPackageReference "ATIdentityTools" */;
+			productName = ATIdentityTools;
+		};
+		40FA13492FE4DB810016CC0D /* DIDCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 40FA13462FE4DB810016CC0D /* XCRemoteSwiftPackageReference "ATIdentityTools" */;
+			productName = DIDCore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 40FF21AE2FE4CA3100B4A027 /* Project object */;
 }
