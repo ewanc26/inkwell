@@ -2,6 +2,10 @@
 
 A SwiftUI iOS blogging app powered by **ATProtoKit** for Bluesky authentication.
 
+## Ambition
+
+Inkwell aims to become a native iOS client for [leaflet.pub](https://leaflet.pub), the ATProto-based long-form publishing platform. The goal is to let people read, write, and publish leaflet.pub documents from an iOS app, built on the same ATProto identity and PDS infrastructure as Bluesky — rather than remain a simple Bluesky-auth demo. The login flow and item-list scaffolding currently in place are early building blocks toward that, not the final feature set.
+
 ## Features
 - **Login flow** using ATProto: resolves handle → DID → PDS and authenticates.
 - State management via `LoginStateManager` (observable, `@StateObject`).
