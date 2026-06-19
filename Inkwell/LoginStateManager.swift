@@ -55,9 +55,29 @@ final class LoginStateManager {
     private(set) var avatarURL: URL?
     private(set) var errorMessage: String?
 
+    /// `true` while the app is attempting to silently resume a previously
+    /// authenticated session on launch. The root view should show a neutral
+    /// loading state for this rather than flashing the login screen.
+    private(set) var isRestoringSession = true
+
     // MARK: - Storage
     @ObservationIgnored private let defaults: UserDefaults
     private let storedHandleKey = "storedAccountHandle"
+    private let storedPDSKey = "storedAccountPDS"
+
+    /// A fixed identifier for the Keychain-backed session storage.
+    ///
+    /// `AppleSecureKeychain` (ATProtoKit's default `SecureKeychainProtocol`)
+    /// namespaces its Keychain entries by `identifier.uuidString`, and that
+    /// identifier defaults to a *freshly generated* `UUID()` on every
+    /// `AppleSecureKeychain()` call. If we let it use the default, every
+    /// app launch (and therefore every rebuild) writes its refresh token and
+    /// password under a brand-new, never-seen-again Keychain key — so even
+    /// though the values are sitting in the Keychain, nothing can find them
+    /// again afterwards. Using one hardcoded identifier instead means we
+    /// always read and write the same Keychain entry, so it survives
+    /// rebuilds/relaunches exactly like any other persisted Keychain item.
+    private static let sharedKeychainIdentifier = UUID(uuidString: "8E3F2D1A-9B47-4E6C-AF2D-5C19D7B4E021")!
 
     // MARK: - Internal Session
     private var config: ATProtocolConfiguration?
@@ -107,7 +127,14 @@ final class LoginStateManager {
                         return false
                     }
 
-                    let cfg = ATProtocolConfiguration(pdsURL: pdsURL.absoluteString)
+                    // Use the fixed Keychain identifier (see
+                    // `sharedKeychainIdentifier`) so the tokens this saves can
+                    // actually be found again by `restoreSessionIfPossible()`
+                    // on the next launch.
+                    let cfg = ATProtocolConfiguration(
+                        pdsURL: pdsURL.absoluteString,
+                        keychainProtocol: AppleSecureKeychain(identifier: LoginStateManager.sharedKeychainIdentifier)
+                    )
                     print("[SignIn] \(Date()) authenticating against PDS")
                     try await cfg.authenticate(with: trimmed, password: password)
                     print("[SignIn] \(Date()) authenticated successfully")
@@ -122,6 +149,10 @@ final class LoginStateManager {
                         self.isAuthenticated = true
                         self.errorMessage = nil
                         self.defaults.set(trimmed, forKey: self.storedHandleKey)
+                        // Persisted alongside the handle so a relaunch can
+                        // rebuild the same ATProtocolConfiguration(pdsURL:)
+                        // without re-resolving it via Slingshot.
+                        self.defaults.set(identity.pds, forKey: self.storedPDSKey)
                     }
 
                     // Best-effort, non-blocking: don't hold up sign-in completion
@@ -178,10 +209,109 @@ final class LoginStateManager {
         }
     }
 
+    /// Attempts to silently resume a previously authenticated session using
+    /// the refresh token already sitting in the Keychain, without requiring
+    /// the handle/password again.
+    ///
+    /// This is what actually fixes "signing in every rebuild": as long as
+    /// the Keychain item written by `signIn(handle:password:)` survives the
+    /// rebuild (which it does for a normal incremental Xcode run — only a
+    /// full app deletion or simulator erase clears it), this exchanges the
+    /// stored refresh token for a fresh access token and restores the
+    /// session, completely offline-of-password.
+    ///
+    /// Call this once on launch (e.g. from a `.task` on the root view).
+    /// Safe to call even if there's nothing to restore — it just falls
+    /// through to the login screen.
+    func restoreSessionIfPossible() async {
+        defer { isRestoringSession = false }
+
+        guard let storedHandle = defaults.string(forKey: storedHandleKey),
+              let storedPDS = defaults.string(forKey: storedPDSKey) else {
+            // Nothing was ever persisted (first launch, or a build from
+            // before this restore logic existed) — nothing to restore.
+            return
+        }
+
+        let cfg = ATProtocolConfiguration(
+            pdsURL: storedPDS,
+            keychainProtocol: AppleSecureKeychain(identifier: LoginStateManager.sharedKeychainIdentifier)
+        )
+
+        do {
+            print("[RestoreSession] \(Date()) attempting to resume session for \(storedHandle)")
+
+            // Reads the refresh token straight out of the Keychain (via the
+            // fixed identifier above) and exchanges it for a new access
+            // token. No password and no Slingshot round-trip required.
+            //
+            // Known limitation: if the refresh token itself is within ~10
+            // seconds of expiring at the exact moment of a cold launch,
+            // ATProtoKit's refreshSession() tries to fall back to a
+            // password re-auth keyed off an in-memory UserSessionRegistry
+            // entry that won't exist yet on a fresh process, and throws
+            // instead. That's a narrow race in ATProtoKit itself; on
+            // failure we simply fall back to the login screen below rather
+            // than crash.
+            try await cfg.refreshSession()
+
+            let proto = await ATProtoKit(sessionConfiguration: cfg)
+
+            guard let session = try await proto.getUserSession() else {
+                print("[RestoreSession] \(Date()) refresh succeeded but no session was registered")
+                clearSession()
+                return
+            }
+
+            self.config = cfg
+            self.atProto = proto
+            self.currentHandle = session.handle
+            self.isAuthenticated = true
+            self.errorMessage = nil
+            print("[RestoreSession] \(Date()) session restored for \(session.handle)")
+
+            Task {
+                do {
+                    let profile = try await proto.getProfile(for: session.sessionDID)
+                    let trimmedName = profile.displayName?.trimmingCharacters(in: .whitespacesAndNewlines)
+                    await MainActor.run {
+                        self.displayName = (trimmedName?.isEmpty == false) ? trimmedName : nil
+                        self.avatarURL = profile.avatarImageURL
+                    }
+                } catch {
+                    // Cosmetic only — same as in signIn(handle:password:).
+                }
+            }
+        } catch {
+            // Refresh token missing, expired beyond recovery, or no network.
+            // Fall back to the login screen rather than getting stuck.
+            // Deliberately doesn't clear the stored handle/PDS here, since a
+            // transient network failure shouldn't force a fresh sign-in —
+            // only an explicit signOut() does that.
+            print("[RestoreSession] \(Date()) failed to restore session: \(error.localizedDescription)")
+            clearSession()
+        }
+    }
+
     /// Signs the user out, clearing any stored session.
     func signOut() {
+        let configToRevoke = config
+        let keychainIdentifier = LoginStateManager.sharedKeychainIdentifier
+
         clearSession(clearStoredAccount: true)
         errorMessage = nil
+
+        Task {
+            // Best-effort cleanup, run after local state is already cleared
+            // above so the UI doesn't wait on it. Without this, the refresh
+            // token/password would still sit in the Keychain under the fixed
+            // identifier and restoreSessionIfPossible() would silently log
+            // the account back in on the next launch — defeating "sign out".
+            try? await configToRevoke?.deleteSession()
+            let keychain = AppleSecureKeychain(identifier: keychainIdentifier)
+            try? await keychain.deleteRefreshToken()
+            try? await keychain.deletePassword()
+        }
     }
 
     // MARK: - Helper
@@ -195,6 +325,7 @@ final class LoginStateManager {
 
         if clearStoredAccount {
             defaults.removeObject(forKey: storedHandleKey)
+            defaults.removeObject(forKey: storedPDSKey)
         }
     }
 }

@@ -15,6 +15,11 @@ struct InkwellApp: App {
         WindowGroup {
             ContentView()
                 .environment(loginStateManager)
+                .task {
+                    // Attempt a silent session resume once per launch, before
+                    // the user sees anything other than the loading state.
+                    await loginStateManager.restoreSessionIfPossible()
+                }
         }
     }
 }

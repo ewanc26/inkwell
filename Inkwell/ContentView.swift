@@ -11,10 +11,24 @@ struct ContentView: View {
     @Environment(LoginStateManager.self) private var loginStateManager
 
     var body: some View {
-        if loginStateManager.isAuthenticated {
+        if loginStateManager.isRestoringSession {
+            restoringView
+        } else if loginStateManager.isAuthenticated {
             authenticatedView
         } else {
             LoginView()
+        }
+    }
+
+    /// Shown briefly on launch while `restoreSessionIfPossible()` checks the
+    /// Keychain for an existing session. Mirrors `LoginView`'s header so
+    /// there's no jarring swap once it resolves to either screen.
+    private var restoringView: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "drop.fill")
+                .font(.system(size: 36, weight: .medium))
+                .foregroundStyle(Color.accentColor)
+            ProgressView()
         }
     }
 
