@@ -131,7 +131,7 @@ final class LoginStateManager {
                     // `sharedKeychainIdentifier`) so the tokens this saves can
                     // actually be found again by `restoreSessionIfPossible()`
                     // on the next launch.
-                    let cfg = ATProtocolConfiguration(
+                    let cfg = await ATProtocolConfiguration(
                         pdsURL: pdsURL.absoluteString,
                         keychainProtocol: AppleSecureKeychain(identifier: LoginStateManager.sharedKeychainIdentifier)
                     )
