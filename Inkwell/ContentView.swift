@@ -19,11 +19,36 @@ struct ContentView: View {
     }
 
     private var authenticatedView: some View {
+        TabView {
+            placeholderTab(
+                title: "Nothing here yet",
+                systemImage: "doc.text",
+                description: "Leaflet.pub document browsing is coming soon."
+            )
+            .tabItem {
+                Label("Read", systemImage: "book")
+            }
+
+            placeholderTab(
+                title: "Nothing to write yet",
+                systemImage: "square.and.pencil",
+                description: "Leaflet.pub publishing is coming soon."
+            )
+            .tabItem {
+                Label("Write", systemImage: "square.and.pencil")
+            }
+        }
+    }
+
+    /// A tab's content while its real feature hasn't been built yet — shares
+    /// the same sign-out button and greeting header across every tab so that
+    /// chrome stays consistent as tabs gain real content over time.
+    private func placeholderTab(title: String, systemImage: String, description: String) -> some View {
         NavigationStack {
             ContentUnavailableView(
-                "Nothing here yet",
-                systemImage: "doc.text",
-                description: Text("Leaflet.pub document browsing and publishing are coming soon.")
+                title,
+                systemImage: systemImage,
+                description: Text(description)
             )
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
