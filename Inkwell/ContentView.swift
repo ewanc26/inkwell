@@ -11,9 +11,17 @@ import SwiftData
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var items: [Item]
-    @EnvironmentObject private var loginStateManager: LoginStateManager
+    @Environment(LoginStateManager.self) private var loginStateManager
 
     var body: some View {
+        if loginStateManager.isAuthenticated {
+            authenticatedView
+        } else {
+            LoginView()
+        }
+    }
+
+    private var authenticatedView: some View {
         NavigationSplitView {
             List {
                 ForEach(items) { item in
@@ -26,6 +34,11 @@ struct ContentView: View {
                 .onDelete(perform: deleteItems)
             }
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(role: .destructive, action: loginStateManager.signOut) {
+                        Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     EditButton()
                 }
@@ -59,4 +72,5 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .modelContainer(for: Item.self, inMemory: true)
+        .environment(LoginStateManager())
 }
