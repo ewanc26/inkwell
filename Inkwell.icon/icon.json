@@ -39,6 +39,12 @@
               "value" : {
                 "solid" : "extended-gray:1.00000,1.00000"
               }
+            },
+            {
+              "appearance" : "tinted",
+              "value" : {
+                "solid" : "display-p3:1.00000,1.00000,1.00000,1.00000"
+              }
             }
           ],
           "image-name" : "letter.svg",
