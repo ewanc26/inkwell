@@ -15,7 +15,13 @@ import SwiftUI
 /// only the ink drop carries a fixed brand colour.
 struct InkwellMark: View {
     private let designSize = CGSize(width: 400, height: 952)
-    private let dotColor = Color(red: 0, green: 152.0 / 255.0, blue: 0)
+    // Matches `Inkwell.icon/icon.json`'s dot fill-specialization exactly
+    // (display-p3:0.07611,0.58470,0.00000), which is constant across light
+    // and dark appearance — the dot doesn't shift with the duotone letter,
+    // it's the one fixed brand colour. Declared in Display P3 rather than
+    // approximated in sRGB so it renders identically to the real app icon
+    // on wide-gamut displays.
+    private let dotColor = Color(.displayP3, red: 0.07611, green: 0.58470, blue: 0.00000)
 
     var body: some View {
         Canvas { context, size in
