@@ -894,20 +894,20 @@ struct PcktProvider: ContentProvider {
 
         case b("image"):
             let attrs = block.attrs
-            let url = attrs?.blob?.reference.link ?? attrs?.url ?? ""
+            let url = attrs?.blob?.reference.link ?? attrs?.src ?? ""
             return .image(alt: attrs?.alt ?? "", url: url)
 
         case b("bulletList"):
-            let items = (block.children ?? []).map { pcktListItemToMarkdown($0) }
+            let items = (block.listContent ?? []).map { pcktListItemToMarkdown($0) }
             return .unorderedList(items: items)
 
         case b("orderedList"):
-            let start = block.attrs?.url.flatMap { Int($0) } ?? 1
-            let items = (block.children ?? []).map { pcktListItemToMarkdown($0) }
+            let start = block.start ?? 1
+            let items = (block.listContent ?? []).map { pcktListItemToMarkdown($0) }
             return .orderedList(start: start, items: items)
 
         case b("taskList"):
-            let items = (block.children ?? []).map { pcktListItemToMarkdown($0) }
+            let items = (block.listContent ?? []).map { pcktListItemToMarkdown($0) }
             return .taskList(items: items)
 
         default:
@@ -918,15 +918,24 @@ struct PcktProvider: ContentProvider {
 
     private func pcktListItemToMarkdown(_ item: PcktListItem) -> MarkdownListItem {
         var text = ""
+        var children: [MarkdownListItem]? = nil
         for block in item.content ?? [] {
-            if block.type == b("text") {
+            switch block.type {
+            case b("text"):
                 text += FacetConverter.facetsToMarkdown(
                     block.plaintext ?? "", facets: block.facets, schema: schema
                 )
+            case b("bulletList"), b("orderedList"):
+                // A nested sub-list lives as another entry in this item's
+                // `content` array, alongside its text block — see
+                // standard.horse's `pckt.ts` `listItemToMdast`.
+                children = (block.listContent ?? []).map { pcktListItemToMarkdown($0) }
+            default:
+                break
             }
         }
 
-        return MarkdownListItem(text: text, checked: nil, children: nil)
+        return MarkdownListItem(text: text, checked: item.checked, children: children)
     }
 
     func fromMarkdown(_ markdown: String) -> UnknownType? {
@@ -983,30 +992,37 @@ struct PcktProvider: ContentProvider {
             // Pckt allows a plain URL src (unlike leaflet)
             return PcktBlock(
                 type: b("image"),
-                attrs: PcktBlockAttrs(url: url, alt: alt)
+                attrs: PcktBlockAttrs(src: url, alt: alt)
             )
 
         case .unorderedList(let items):
-            let listItems = items.map { markdownToPcktListItem($0) }
-            return PcktBlock(type: b("bulletList"), children: listItems)
+            let listItems = items.map { markdownToPcktListItem($0, isTaskItem: false) }
+            return PcktBlock(type: b("bulletList"), listContent: listItems)
 
-        case .orderedList(_, let items):
-            let listItems = items.map { markdownToPcktListItem($0) }
-            return PcktBlock(type: b("orderedList"), children: listItems)
+        case .orderedList(let start, let items):
+            let listItems = items.map { markdownToPcktListItem($0, isTaskItem: false) }
+            return PcktBlock(type: b("orderedList"), listContent: listItems, start: start)
 
         case .taskList(let items):
-            let listItems = items.map { markdownToPcktListItem($0) }
-            return PcktBlock(type: b("taskList"), children: listItems)
+            let listItems = items.map { markdownToPcktListItem($0, isTaskItem: true) }
+            return PcktBlock(type: b("taskList"), listContent: listItems)
         }
     }
 
-    private func markdownToPcktListItem(_ item: MarkdownListItem) -> PcktListItem {
+    private func markdownToPcktListItem(_ item: MarkdownListItem, isTaskItem: Bool) -> PcktListItem {
         let (plaintext, facets) = FacetConverter.markdownToFacets(item.text, schema: schema)
-        let textBlock = PcktBlock(
-            type: b("text"), plaintext: plaintext,
-            facets: facets.isEmpty ? nil : facets
-        )
-        return PcktListItem(type: b("listItem"), content: [textBlock])
+        var content: [PcktBlock] = [
+            PcktBlock(type: b("text"), plaintext: plaintext, facets: facets.isEmpty ? nil : facets)
+        ]
+        if let kids = item.children, !kids.isEmpty {
+            // Nested sub-list: another entry in this item's `content` array,
+            // alongside its text block — see standard.horse's `pckt.ts`
+            // `itemBlock`.
+            let nested = kids.map { markdownToPcktListItem($0, isTaskItem: false) }
+            content.append(PcktBlock(type: b("bulletList"), listContent: nested))
+        }
+        let itemType = isTaskItem ? b("taskItem") : b("listItem")
+        return PcktListItem(type: itemType, content: content, checked: isTaskItem ? (item.checked ?? false) : nil)
     }
 }
 
@@ -1103,15 +1119,18 @@ struct OffprintProvider: ContentProvider {
 
     private func offprintListItemToMarkdown(_ item: OffprintListItem) -> MarkdownListItem {
         var text = ""
-        for block in item.content ?? [] {
-            if block.type == b("text") {
-                text += FacetConverter.facetsToMarkdown(
-                    block.plaintext ?? "", facets: block.facets, schema: schema
-                )
-            }
+        if let content = item.content, content.type == b("text") {
+            text = FacetConverter.facetsToMarkdown(
+                content.plaintext ?? "", facets: content.facets, schema: schema
+            )
         }
 
-        return MarkdownListItem(text: text, checked: item.checked, children: nil)
+        var children: [MarkdownListItem]? = nil
+        if let kids = item.children, !kids.isEmpty {
+            children = kids.map { offprintListItemToMarkdown($0) }
+        }
+
+        return MarkdownListItem(text: text, checked: item.checked, children: children)
     }
 
     func fromMarkdown(_ markdown: String) -> UnknownType? {
@@ -1169,28 +1188,34 @@ struct OffprintProvider: ContentProvider {
             return nil
 
         case .unorderedList(let items):
-            let listItems = items.map { markdownToOffprintListItem($0) }
+            let listItems = items.map { markdownToOffprintListItem($0, ordered: false) }
             return OffprintBlock(type: b("bulletList"), children: listItems)
 
         case .orderedList(let start, let items):
-            let listItems = items.map { markdownToOffprintListItem($0) }
+            let listItems = items.map { markdownToOffprintListItem($0, ordered: true) }
             return OffprintBlock(type: b("orderedList"), children: listItems, start: start)
 
         case .taskList(let items):
-            let listItems = items.map { markdownToOffprintListItem($0) }
+            let listItems = items.map { markdownToOffprintListItem($0, ordered: false) }
             return OffprintBlock(type: b("taskList"), children: listItems)
         }
     }
 
-    private func markdownToOffprintListItem(_ item: MarkdownListItem) -> OffprintListItem {
+    private func markdownToOffprintListItem(_ item: MarkdownListItem, ordered: Bool) -> OffprintListItem {
         let (plaintext, facets) = FacetConverter.markdownToFacets(item.text, schema: schema)
         let textBlock = OffprintBlock(
             type: b("text"), plaintext: plaintext,
             facets: facets.isEmpty ? nil : facets
         )
-        let itemType = item.checked != nil ? "app.offprint.block.taskList#taskItem" : "app.offprint.block.bulletList#listItem"
+        let itemType: String
+        if item.checked != nil {
+            itemType = "app.offprint.block.taskList#taskItem"
+        } else {
+            itemType = ordered ? "app.offprint.block.orderedList#listItem" : "app.offprint.block.bulletList#listItem"
+        }
+        let children = item.children?.map { markdownToOffprintListItem($0, ordered: ordered) }
         return OffprintListItem(
-            type: itemType, content: [textBlock], checked: item.checked
+            type: itemType, content: textBlock, checked: item.checked, children: children
         )
     }
 }

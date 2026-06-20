@@ -136,18 +136,30 @@ public struct OffprintBlock: Codable, Equatable, Hashable, Sendable {
 
 public struct OffprintListItem: Codable, Equatable, Hashable, Sendable {
     public let type: String
-    public let content: [OffprintBlock]?
+    /// A single block (almost always `app.offprint.block.text`) — offprint's
+    /// real schema stores one item body here, not an array. See
+    /// standard.horse's `offprint.ts` `itemBlock`/`itemToMdast`.
+    public let content: OffprintBlock?
     public let checked: Bool?
+    /// Nested sub-list items, for a sub-list directly under this item.
+    public let children: [OffprintListItem]?
 
-    public init(type: String, content: [OffprintBlock]? = nil, checked: Bool? = nil) {
+    public init(
+        type: String,
+        content: OffprintBlock? = nil,
+        checked: Bool? = nil,
+        children: [OffprintListItem]? = nil
+    ) {
         self.type = type
         self.content = content
         self.checked = checked
+        self.children = children
     }
 
     enum CodingKeys: String, CodingKey {
         case type = "$type"
         case content
         case checked
+        case children
     }
 }
