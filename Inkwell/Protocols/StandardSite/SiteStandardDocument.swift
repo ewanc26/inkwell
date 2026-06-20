@@ -67,6 +67,10 @@ extension SiteStandardLexicon {
         /// without needing to understand ``content``'s format.
         public let textContent: String?
 
+        /// Theme for standalone documents. Publication documents inherit the
+        /// publication theme unless they provide this override.
+        public let theme: SiteStandardLexicon.Theme.PublicationTheme?
+
         /// A strong reference to a Bluesky post. Optional.
         ///
         /// Useful for keeping track of comments/discussion happening off-platform, on Bluesky.
@@ -105,6 +109,7 @@ extension SiteStandardLexicon {
             coverImage: ComAtprotoLexicon.Repository.UploadBlobOutput? = nil,
             content: UnknownType? = nil,
             textContent: String? = nil,
+            theme: SiteStandardLexicon.Theme.PublicationTheme? = nil,
             bskyPostRef: ComAtprotoLexicon.Repository.StrongReference? = nil,
             tags: [String]? = nil,
             links: UnknownType? = nil,
@@ -120,6 +125,7 @@ extension SiteStandardLexicon {
             self.coverImage = coverImage
             self.content = content
             self.textContent = textContent
+            self.theme = theme
             self.bskyPostRef = bskyPostRef
             self.tags = tags
             self.links = links
@@ -139,6 +145,7 @@ extension SiteStandardLexicon {
             self.coverImage = try container.decodeIfPresent(ComAtprotoLexicon.Repository.UploadBlobOutput.self, forKey: .coverImage)
             self.content = try container.decodeIfPresent(UnknownType.self, forKey: .content)
             self.textContent = try container.decodeIfPresent(String.self, forKey: .textContent)
+            self.theme = try container.decodeIfPresent(SiteStandardLexicon.Theme.PublicationTheme.self, forKey: .theme)
             self.bskyPostRef = try container.decodeIfPresent(ComAtprotoLexicon.Repository.StrongReference.self, forKey: .bskyPostRef)
             self.tags = try container.decodeIfPresent([String].self, forKey: .tags)
             self.links = try container.decodeIfPresent(UnknownType.self, forKey: .links)
@@ -159,6 +166,7 @@ extension SiteStandardLexicon {
             try container.encodeIfPresent(self.coverImage, forKey: .coverImage)
             try container.encodeIfPresent(self.content, forKey: .content)
             try container.encodeIfPresent(self.textContent, forKey: .textContent)
+            try container.encodeIfPresent(self.theme, forKey: .theme)
             try container.encodeIfPresent(self.bskyPostRef, forKey: .bskyPostRef)
             try container.truncatedEncodeIfPresent(self.tags, forKey: .tags, upToCharacterLength: 128)
             try container.encodeIfPresent(self.links, forKey: .links)
@@ -177,6 +185,7 @@ extension SiteStandardLexicon {
             case coverImage
             case content
             case textContent
+            case theme
             case bskyPostRef
             case tags
             case links

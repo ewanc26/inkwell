@@ -52,6 +52,9 @@ extension SiteStandardLexicon {
         /// content. Optional.
         public let basicTheme: SiteStandardLexicon.Theme.BasicDefinition?
 
+        /// Rich theme used by Leaflet and other compatible publishers.
+        public let theme: SiteStandardLexicon.Theme.PublicationTheme?
+
         /// Self-label values for this publication — effectively content warnings. Optional.
         public let labels: ComAtprotoLexicon.Label.SelfLabelsDefinition?
 
@@ -64,6 +67,7 @@ extension SiteStandardLexicon {
             icon: ComAtprotoLexicon.Repository.UploadBlobOutput? = nil,
             description: String? = nil,
             basicTheme: SiteStandardLexicon.Theme.BasicDefinition? = nil,
+            theme: SiteStandardLexicon.Theme.PublicationTheme? = nil,
             labels: ComAtprotoLexicon.Label.SelfLabelsDefinition? = nil,
             preferences: Preferences? = nil
         ) {
@@ -72,6 +76,7 @@ extension SiteStandardLexicon {
             self.icon = icon
             self.description = description
             self.basicTheme = basicTheme
+            self.theme = theme
             self.labels = labels
             self.preferences = preferences
         }
@@ -84,6 +89,7 @@ extension SiteStandardLexicon {
             self.icon = try container.decodeIfPresent(ComAtprotoLexicon.Repository.UploadBlobOutput.self, forKey: .icon)
             self.description = try container.decodeIfPresent(String.self, forKey: .description)
             self.basicTheme = try container.decodeIfPresent(SiteStandardLexicon.Theme.BasicDefinition.self, forKey: .basicTheme)
+            self.theme = try container.decodeIfPresent(SiteStandardLexicon.Theme.PublicationTheme.self, forKey: .theme)
             self.labels = try container.decodeIfPresent(ComAtprotoLexicon.Label.SelfLabelsDefinition.self, forKey: .labels)
             self.preferences = try container.decodeIfPresent(Preferences.self, forKey: .preferences)
         }
@@ -100,6 +106,7 @@ extension SiteStandardLexicon {
             try container.encodeIfPresent(self.icon, forKey: .icon)
             try container.truncatedEncodeIfPresent(self.description, forKey: .description, upToCharacterLength: 3_000)
             try container.encodeIfPresent(self.basicTheme, forKey: .basicTheme)
+            try container.encodeIfPresent(self.theme, forKey: .theme)
             try container.encodeIfPresent(self.labels, forKey: .labels)
             try container.encodeIfPresent(self.preferences, forKey: .preferences)
         }
@@ -111,6 +118,7 @@ extension SiteStandardLexicon {
             case icon
             case description
             case basicTheme
+            case theme
             case labels
             case preferences
         }

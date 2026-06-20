@@ -10,6 +10,113 @@ import ATProtoKit
 
 extension SiteStandardLexicon.Theme {
 
+    /// Rich publication theme used by Leaflet and compatible publishers.
+    /// It also accepts the older light/dark palette shape still emitted by
+    /// some standard.site applications.
+    nonisolated public struct PublicationTheme: Sendable, Codable, Equatable, Hashable {
+        public let type: String?
+        public let backgroundColor: ColorValue?
+        public let pageBackground: ColorValue?
+        public let primary: ColorValue?
+        public let accentBackground: ColorValue?
+        public let accentText: ColorValue?
+        public let pageWidth: Int?
+        public let showPageBackground: Bool?
+        public let headingFont: String?
+        public let bodyFont: String?
+        public let font: String?
+        public let light: LegacyPalette?
+        public let dark: LegacyPalette?
+
+        public init(
+            type: String? = nil,
+            backgroundColor: ColorValue? = nil,
+            pageBackground: ColorValue? = nil,
+            primary: ColorValue? = nil,
+            accentBackground: ColorValue? = nil,
+            accentText: ColorValue? = nil,
+            pageWidth: Int? = nil,
+            showPageBackground: Bool? = nil,
+            headingFont: String? = nil,
+            bodyFont: String? = nil,
+            font: String? = nil,
+            light: LegacyPalette? = nil,
+            dark: LegacyPalette? = nil
+        ) {
+            self.type = type
+            self.backgroundColor = backgroundColor
+            self.pageBackground = pageBackground
+            self.primary = primary
+            self.accentBackground = accentBackground
+            self.accentText = accentText
+            self.pageWidth = pageWidth
+            self.showPageBackground = showPageBackground
+            self.headingFont = headingFont
+            self.bodyFont = bodyFont
+            self.font = font
+            self.light = light
+            self.dark = dark
+        }
+
+        enum CodingKeys: String, CodingKey {
+            case type = "$type"
+            case backgroundColor
+            case pageBackground
+            case primary
+            case accentBackground
+            case accentText
+            case pageWidth
+            case showPageBackground
+            case headingFont
+            case bodyFont
+            case font
+            case light
+            case dark
+        }
+    }
+
+    nonisolated public struct LegacyPalette: Sendable, Codable, Equatable, Hashable {
+        public let background: String?
+        public let text: String?
+        public let accent: String?
+        public let link: String?
+        public let surfaceHover: String?
+
+        public init(background: String? = nil, text: String? = nil, accent: String? = nil, link: String? = nil, surfaceHover: String? = nil) {
+            self.background = background
+            self.text = text
+            self.accent = accent
+            self.link = link
+            self.surfaceHover = surfaceHover
+        }
+    }
+
+    /// RGB/RGBA union used by Leaflet's rich theme. `$type` is optional to
+    /// remain compatible with legacy records.
+    nonisolated public struct ColorValue: Sendable, Codable, Equatable, Hashable {
+        public let type: String?
+        public let r: Int
+        public let g: Int
+        public let b: Int
+        public let a: Int?
+
+        public init(type: String? = nil, r: Int, g: Int, b: Int, a: Int? = nil) {
+            self.type = type
+            self.r = r
+            self.g = g
+            self.b = b
+            self.a = a
+        }
+
+        enum CodingKeys: String, CodingKey {
+            case type = "$type"
+            case r
+            case g
+            case b
+            case a
+        }
+    }
+
     /// A simplified theme definition for a publication.
     ///
     /// Lets a publication keep a consistent visual identity (background/foreground/accent
@@ -207,6 +314,17 @@ extension SiteStandardLexicon.Theme.RGBAColor {
     /// publication's theme.
     public var color: Color {
         Color(red: Double(r) / 255, green: Double(g) / 255, blue: Double(b) / 255, opacity: Double(a) / 100)
+    }
+}
+
+extension SiteStandardLexicon.Theme.ColorValue {
+    public var color: Color {
+        Color(
+            red: Double(r) / 255,
+            green: Double(g) / 255,
+            blue: Double(b) / 255,
+            opacity: Double(a ?? 100) / 100
+        )
     }
 }
 #endif

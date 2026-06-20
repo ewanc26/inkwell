@@ -93,6 +93,36 @@ final class StandardSiteTests: XCTestCase {
         XCTAssertEqual(decoded, notification)
     }
 
+    func testRecordPageSkipsMalformedRecordsAndAllowsMissingCID() throws {
+        let data = Data(#"""
+        {
+          "cursor": "next",
+          "records": [
+            {
+              "uri": "at://did:plc:alice/site.standard.document/valid",
+              "value": {
+                "$type": "site.standard.document",
+                "site": "https://example.com",
+                "title": "Valid",
+                "publishedAt": "2026-06-20T12:00:00Z"
+              }
+            },
+            {
+              "cid": "bafymalformed",
+              "value": { "$type": "site.standard.document" }
+            }
+          ]
+        }
+        """#.utf8)
+
+        let page = try JSONDecoder().decode(TolerantRecordPage.self, from: data)
+
+        XCTAssertEqual(page.cursor, "next")
+        XCTAssertEqual(page.records.count, 1)
+        XCTAssertNil(page.records.first?.cid)
+        XCTAssertEqual(page.records.first?.uri, "at://did:plc:alice/site.standard.document/valid")
+    }
+
     private func document(
         site: String,
         path: String? = nil
