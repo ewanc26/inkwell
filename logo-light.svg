@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Inkwell wordmark for light backgrounds (README / GitHub light theme).
+  Geometry matches Inkwell.icon/Assets/letter.svg + dot.svg exactly, and
+  UI/InkwellMark.swift's local 1024x1024 design space — see those files
+  before editing coordinates here.
+-->
+<svg width="220" height="211" viewBox="0 0 1024 984" xmlns="http://www.w3.org/2000/svg">
+  <rect x="352" y="112" width="320" height="80" rx="16" fill="#1a1a1a"/>
+  <rect x="437" y="192" width="150" height="640" fill="#1a1a1a"/>
+  <rect x="352" y="832" width="320" height="80" rx="16" fill="#1a1a1a"/>
+  <circle cx="512" cy="952" r="32" fill="#139500"/>
+</svg>
