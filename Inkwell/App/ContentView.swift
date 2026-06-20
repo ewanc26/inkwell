@@ -27,9 +27,10 @@ struct ContentView: View {
     /// there's no jarring swap once it resolves to either screen.
     private var restoringView: some View {
         VStack(spacing: 16) {
-            Image(systemName: "drop.fill")
-                .font(.system(size: 36, weight: .medium))
-                .foregroundStyle(Color.accentColor)
+            Image("Inkwell")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 44, height: 44)
             ProgressView()
         }
     }
@@ -40,17 +41,12 @@ struct ContentView: View {
                 .tabItem {
                     Label("Read", systemImage: "book")
                 }
+                .badge(notificationManager.unreadCount)
 
             DiscoverView()
                 .tabItem {
                     Label("Discover", systemImage: "safari")
                 }
-
-            SubscriptionsView()
-                .tabItem {
-                    Label("Following", systemImage: "bell")
-                }
-                .badge(notificationManager.unreadCount)
 
             WriteView()
                 .tabItem {

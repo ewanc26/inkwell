@@ -10,6 +10,7 @@ import ATProtoKit
 
 struct ReadView: View {
     @Environment(LoginStateManager.self) private var loginStateManager
+    @Environment(\.colorScheme) private var colorScheme
 
     let document: SiteStandardLexicon.DocumentRecord
     let publication: SiteStandardLexicon.PublicationRecord?
@@ -22,27 +23,17 @@ struct ReadView: View {
     @State private var errorMessage: String? = nil
     @State private var isVerified: Bool?
 
-    // Theme styling matching standard.site's basicTheme colors
-    private var backgroundColor: Color {
-        if let rgb = publication?.basicTheme?.background {
-            return rgb.color
-        }
-        return Color(uiColor: .systemBackground)
+    // Resolves Leaflet's rich theme (light/dark palettes, fonts, page
+    // width) first, falling back to standard.site's basicTheme, then
+    // system defaults — see ReaderTheme.swift. A document-level theme
+    // override takes priority over the publication's.
+    private var theme: ReaderTheme {
+        ReaderTheme(document: document, publication: publication, colorScheme: colorScheme)
     }
 
-    private var foregroundColor: Color {
-        if let rgb = publication?.basicTheme?.foreground {
-            return rgb.color
-        }
-        return Color(uiColor: .label)
-    }
-
-    private var accentColor: Color {
-        if let rgb = publication?.basicTheme?.accent {
-            return rgb.color
-        }
-        return .accentColor
-    }
+    private var backgroundColor: Color { theme.background }
+    private var foregroundColor: Color { theme.foreground }
+    private var accentColor: Color { theme.accent }
 
     var body: some View {
         ScrollView {
@@ -51,15 +42,13 @@ struct ReadView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     if let pubName = publication?.name {
                         Text(pubName.uppercased())
-                            .font(.system(.caption, design: .serif))
-                            .fontWeight(.bold)
+                            .font(theme.headingFont(.caption, weight: .bold))
                             .foregroundStyle(accentColor)
                             .tracking(2)
                     }
 
                     Text(document.title)
-                        .font(.system(.largeTitle, design: .serif))
-                        .fontWeight(.bold)
+                        .font(theme.headingFont(.largeTitle, weight: .bold))
                         .foregroundStyle(foregroundColor)
                         .lineSpacing(4)
 
@@ -72,11 +61,11 @@ struct ReadView: View {
                             Spacer()
                             Text(path)
                                 .font(.caption2)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(foregroundColor.opacity(0.5))
                         }
                     }
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(foregroundColor.opacity(0.6))
 
                     HStack(spacing: 12) {
                         if let isVerified {
@@ -100,9 +89,9 @@ struct ReadView: View {
                 // Excerpt/description
                 if let desc = document.description, !desc.isEmpty {
                     Text(desc)
-                        .font(.system(.body, design: .serif))
+                        .font(theme.bodyFont(.body))
                         .italic()
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(foregroundColor.opacity(0.7))
                         .lineSpacing(6)
                         .padding(.vertical, 8)
                         .padding(.horizontal, 12)
@@ -116,16 +105,28 @@ struct ReadView: View {
                 if let cover = document.coverImage, let did = authorDID ?? loginStateManager.currentDID {
                     let urlString = "https://cdn.bsky.app/img/feed_fullsize/plain/\(did)/\(cover.reference.link)"
                     if let url = URL(string: urlString) {
-                        AsyncImage(url: url) { image in
-                            image
-                                .resizable()
-                                .scaledToFit()
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
-                                .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
-                        } placeholder: {
-                            ProgressView()
-                                .frame(maxWidth: .infinity, minHeight: 200)
+                        AsyncImage(url: url) { phase in
+                            switch phase {
+                            case .success(let image):
+                                image.resizable().scaledToFill()
+                            case .failure:
+                                foregroundColor.opacity(0.06)
+                                    .overlay { Image(systemName: "photo").foregroundStyle(foregroundColor.opacity(0.4)) }
+                            default:
+                                foregroundColor.opacity(0.06)
+                                    .overlay { ProgressView() }
+                            }
                         }
+                        // Same fix as ReaderPostCard's cover thumbnail: bound
+                        // the container to a sane aspect ratio with `.fit`
+                        // before cropping the photo to fill it, rather than
+                        // letting a portrait-oriented cover dictate the
+                        // frame's height at its full, unconstrained aspect.
+                        .frame(maxWidth: .infinity)
+                        .aspectRatio(16 / 9, contentMode: .fit)
+                        .clipped()
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
                     }
                 }
 
@@ -142,7 +143,7 @@ struct ReadView: View {
                 } else if let markdown = markdownContent {
                     // Multi-format rendering: content was converted to
                     // markdown by the ContentProvider system.
-                    MarkdownRendererView(markdown: markdown, foregroundColor: foregroundColor, accentColor: accentColor)
+                    MarkdownRendererView(markdown: markdown, theme: theme)
                 } else if !pages.isEmpty {
                     // Leaflet block rendering (original path, with blob page
                     // support that the markdown path doesn't need).
@@ -158,8 +159,20 @@ struct ReadView: View {
                 }
             }
             .padding(.horizontal, 20)
+            .padding(.vertical, theme.showPageBackground ? 24 : 0)
+            .frame(maxWidth: theme.pageWidth)
+            .background(
+                Group {
+                    if theme.showPageBackground {
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .fill(theme.pageBackground)
+                    }
+                }
+            )
+            .frame(maxWidth: .infinity)
         }
         .background(backgroundColor)
+        .tint(accentColor)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(backgroundColor, for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
@@ -180,26 +193,12 @@ struct ReadView: View {
             return
         }
 
-        // First, try the ContentProvider system — this handles all
-        // supported formats (Leaflet, Markpub, Pckt, Offprint) by
-        // detecting the $type and converting to markdown.
-        if let provider = ProviderRegistry.detectProvider(contentUnknown) {
-            let result = provider.toMarkdown(contentUnknown)
-            if !result.markdown.isEmpty {
-                self.markdownContent = result.markdown
-                self.isLoading = false
-                return
-            }
-        }
-
-        // Fallback: try Leaflet-specific decoding with blob page support.
-        // This path handles Leaflet documents that store their blocks in a
-        // blob (downloaded separately), which the ContentProvider system
-        // doesn't handle because it would need async blob fetching.
+        // Leaflet carries layout, alignment, and PDS blob references that
+        // cannot survive a Markdown round-trip. Render it natively first.
         if let leaflet = contentUnknown.getRecord(ofType: LeafletContent.self) {
             if let inlinePages = leaflet.pages, !inlinePages.isEmpty {
-                self.pages = inlinePages
-                self.isLoading = false
+                pages = inlinePages
+                isLoading = false
                 return
             }
 
@@ -207,15 +206,32 @@ struct ReadView: View {
                 do {
                     let data: Data
                     if let authorDID {
-                        data = try await loginStateManager.downloadBlob(cid: blobPages.reference.link, fromDID: authorDID)
+                        data = try await loginStateManager.downloadBlob(
+                            cid: blobPages.reference.link,
+                            fromDID: authorDID
+                        )
                     } else {
                         data = try await loginStateManager.downloadBlob(cid: blobPages.reference.link)
                     }
-                    let decodedPages = try JSONDecoder().decode([LeafletPage].self, from: data)
-                    self.pages = decodedPages
+                    pages = try JSONDecoder().decode([LeafletPage].self, from: data)
+                    isLoading = false
+                    return
                 } catch {
-                    self.errorMessage = "Failed to download pages blob: \(error.localizedDescription)"
+                    errorMessage = "Failed to download this Leaflet: \(error.localizedDescription)"
+                    isLoading = false
+                    return
                 }
+            }
+        }
+
+        // Other supported formats convert cleanly to the shared Markdown
+        // renderer.
+        if let provider = ProviderRegistry.detectProvider(contentUnknown) {
+            let result = provider.toMarkdown(contentUnknown)
+            if !result.markdown.isEmpty {
+                self.markdownContent = result.markdown
+                self.isLoading = false
+                return
             }
         }
 
@@ -277,8 +293,7 @@ struct ReadView: View {
                 }()
 
                 Text(renderText(block.plaintext ?? "", facets: block.facets))
-                    .font(.system(size: fontSize, design: .serif))
-                    .fontWeight(.bold)
+                    .font(.system(size: fontSize, weight: .bold, design: theme.headingFamily.design))
                     .foregroundStyle(foregroundColor)
                     .multilineTextAlignment(textAlignment)
                     .padding(.top, 8)
@@ -286,7 +301,7 @@ struct ReadView: View {
             case "pub.leaflet.blocks.text":
                 if let text = block.plaintext, !text.isEmpty {
                     Text(renderText(text, facets: block.facets))
-                        .font(.system(.body, design: .serif))
+                        .font(theme.bodyFont(.body))
                         .foregroundStyle(foregroundColor)
                         .lineSpacing(6)
                         .multilineTextAlignment(textAlignment)
@@ -302,9 +317,9 @@ struct ReadView: View {
                         .padding(.trailing, 16)
 
                     Text(renderText(block.plaintext ?? "", facets: block.facets))
-                        .font(.system(.body, design: .serif))
+                        .font(theme.bodyFont(.body))
                         .italic()
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(foregroundColor.opacity(0.7))
                         .lineSpacing(6)
                         .multilineTextAlignment(textAlignment)
                 }
@@ -315,24 +330,24 @@ struct ReadView: View {
                     if let lang = block.language, !lang.isEmpty {
                         Text(lang.uppercased())
                             .font(.system(.caption2, design: .monospaced))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(foregroundColor.opacity(0.6))
                             .padding(.horizontal, 8)
                             .padding(.vertical, 2)
-                            .background(Color.primary.opacity(0.05))
+                            .background(foregroundColor.opacity(0.06))
                             .cornerRadius(4)
                     }
 
                     ScrollView(.horizontal, showsIndicators: false) {
                         Text(block.plaintext ?? "")
                             .font(.system(.subheadline, design: .monospaced))
-                            .foregroundStyle(.primary)
+                            .foregroundStyle(foregroundColor)
                             .padding(12)
                     }
-                    .background(Color.primary.opacity(0.03))
+                    .background(foregroundColor.opacity(0.04))
                     .cornerRadius(8)
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+                            .stroke(foregroundColor.opacity(0.12), lineWidth: 1)
                     )
                 }
                 .padding(.vertical, 6)
@@ -340,11 +355,12 @@ struct ReadView: View {
             case "pub.leaflet.blocks.math":
                 HStack {
                     Spacer()
-                    Text("$$ \(block.tex ?? "") $$")
-                        .font(.system(.body, design: .serif))
+                    Text("\u{0024}\u{0024} \(block.tex ?? "") \u{0024}\u{0024}")
+                        .font(theme.bodyFont(.body))
                         .italic()
+                        .foregroundStyle(foregroundColor)
                         .padding(12)
-                        .background(Color.primary.opacity(0.03))
+                        .background(foregroundColor.opacity(0.04))
                         .cornerRadius(8)
                     Spacer()
                 }
@@ -373,7 +389,7 @@ struct ReadView: View {
                                 case .failure:
                                     Image(systemName: "photo")
                                         .font(.largeTitle)
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(foregroundColor.opacity(0.5))
                                         .frame(minHeight: 180)
                                 @unknown default:
                                     EmptyView()
@@ -384,7 +400,7 @@ struct ReadView: View {
                                 Text(alt)
                                     .font(.caption)
                                     .italic()
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(foregroundColor.opacity(0.6))
                                     .multilineTextAlignment(.center)
                             }
                         }
@@ -402,13 +418,13 @@ struct ReadView: View {
                 // Fallback for unsupported blocks
                 HStack {
                     Image(systemName: "questionmark.square.dashed")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(foregroundColor.opacity(0.5))
                     Text("Unsupported standard.site content block type")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(foregroundColor.opacity(0.5))
                 }
                 .padding(8)
-                .background(Color.primary.opacity(0.02))
+                .background(foregroundColor.opacity(0.03))
                 .cornerRadius(6)
             }
         }
@@ -425,7 +441,7 @@ struct ReadView: View {
                             if ordered {
                                 let itemNumber = (startIndex ?? 1) + index
                                 Text("\(itemNumber).")
-                                    .font(.system(.body, design: .serif))
+                                    .font(theme.bodyFont(.body))
                                     .foregroundStyle(accentColor)
                                     .frame(width: 20, alignment: .trailing)
                             } else {
