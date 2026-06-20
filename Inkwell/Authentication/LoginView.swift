@@ -50,10 +50,9 @@ struct LoginView: View {
     private var header: some View {
         VStack(spacing: 12) {
             ZStack {
-                Image("AppLogo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 44, height: 44)
+                InkwellMark()
+                    .frame(height: 48)
+                    .foregroundStyle(.primary)
             }
             .accessibilityHidden(true)
 
