@@ -1,16 +1,17 @@
 # Inkwell
 
-A SwiftUI iOS blogging app powered by **ATProtoKit** for Bluesky authentication.
-
-## Ambition
-
-Inkwell aims to become a native iOS client for [leaflet.pub](https://leaflet.pub), the ATProto-based long-form publishing platform. The goal is to let people read, write, and publish leaflet.pub documents from an iOS app, built on the same ATProto identity and PDS infrastructure as Bluesky — rather than remain a simple Bluesky-auth demo. The login flow and item-list scaffolding currently in place are early building blocks toward that, not the final feature set.
+A native SwiftUI reader and writer for the [Standard.site](https://standard.site) publishing ecosystem on AT Protocol.
 
 ## Features
-- **Login flow** using ATProto: resolves handle → DID → PDS and authenticates.
-- State management via `LoginStateManager` (observable, `@StateObject`).
-- Simple item list UI with add/delete functionality.
-- Integrated ATProtoKit package in the Xcode project.
+
+- Reads `site.standard.publication` and `site.standard.document` records from their owning PDS.
+- Renders Markpub Markdown and the content formats used by Leaflet, pckt, and Offprint, with `textContent` as the format-independent fallback.
+- Publishes Standard.site documents with portable metadata and selectable content formats.
+- Creates and removes `site.standard.graph.subscription` records and creates recommends.
+- Searches the cross-platform public index used by the Standard.site ecosystem, then fetches authoritative records directly from the author.
+- Checks publication `.well-known` verification and document `<link rel="site.standard.document">` verification.
+- Polls subscribed publications and delivers persistent in-app and local notifications, including background app refresh.
+- Uses the `uk.ewancroft.inkwell` namespace for Inkwell-owned protocol identifiers.
 
 ## Getting Started
 1. Clone the repo:
@@ -18,15 +19,15 @@ Inkwell aims to become a native iOS client for [leaflet.pub](https://leaflet.pub
    git clone git@github.com:ewanc26/inkwell.git
    cd Inkwell
    ```
-2. Open `Inkwell.xcodeproj` in Xcode (requires Xcode 15+ for Swift 6 features).
+2. Open `Inkwell.xcodeproj` in Xcode.
 3. Build & run on a device or simulator.
-4. On first launch you’ll see a login screen. Enter your Bluesky handle (e.g. `alice.bsky.social`) and password.
+4. Sign in with an AT Protocol handle and app password.
 
-## Project Structure
-- `LoginStateManager.swift` – Handles ATProto login and exposes `isAuthenticated`.
-- `InkwellApp.swift` – Sets up the `LoginStateManager` as a `@StateObject` and injects it via `environmentObject`.
-- `ContentView.swift` – Shows the login view when not authenticated, otherwise displays the item list.
-- `LoginView.swift` – Simple SwiftUI form for handle/password input (created automatically by the login flow).
+## Interoperability
+
+Standard.site intentionally standardizes publishing metadata rather than one body format. Inkwell always publishes `textContent` and defaults to `at.markpub.markdown`, while retaining readers for `pub.leaflet.content`, `blog.pckt.content`, and `app.offprint.content`.
+
+Inkwell-owned lexicons and XRPC methods must use the `uk.ewancroft.inkwell.*` namespace. Shared records continue to use their canonical `site.standard.*` NSIDs.
 
 ## Dependencies
 - **ATProtoKit** – Added via Xcode Swift Package Manager (url: `https://github.com/MasterJ93/ATProtoKit.git`).
