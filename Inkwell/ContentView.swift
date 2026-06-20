@@ -9,6 +9,8 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(LoginStateManager.self) private var loginStateManager
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var notificationManager = NotificationManager.shared
 
     var body: some View {
         if loginStateManager.isRestoringSession {
@@ -34,22 +36,37 @@ struct ContentView: View {
 
     private var authenticatedView: some View {
         TabView {
-            placeholderTab(
-                title: "Nothing here yet",
-                systemImage: "doc.text",
-                description: "Leaflet.pub document browsing is coming soon."
-            )
-            .tabItem {
-                Label("Read", systemImage: "book")
-            }
+            BrowseDocumentsView()
+                .tabItem {
+                    Label("Read", systemImage: "book")
+                }
 
-            placeholderTab(
-                title: "Nothing to write yet",
-                systemImage: "square.and.pencil",
-                description: "Leaflet.pub publishing is coming soon."
-            )
-            .tabItem {
-                Label("Write", systemImage: "square.and.pencil")
+            DiscoverView()
+                .tabItem {
+                    Label("Discover", systemImage: "safari")
+                }
+
+            SubscriptionsView()
+                .tabItem {
+                    Label("Following", systemImage: "bell")
+                }
+                .badge(notificationManager.unreadCount)
+
+            WriteView()
+                .tabItem {
+                    Label("Write", systemImage: "square.and.pencil")
+                }
+        }
+        .task {
+            // Request notification permission and poll for new documents
+            // from subscribed publications on launch.
+            await NotificationManager.shared.requestPermission()
+            await NotificationManager.shared.pollForNewDocuments(loginStateManager: loginStateManager)
+        }
+        .onChange(of: scenePhase) { _, phase in
+            guard phase == .active else { return }
+            Task {
+                await notificationManager.pollForNewDocuments(loginStateManager: loginStateManager)
             }
         }
     }
