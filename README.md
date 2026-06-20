@@ -1,5 +1,11 @@
 # Inkwell
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="logo-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="logo-light.svg">
+  <img alt="Inkwell" src="logo-light.svg" width="110">
+</picture>
+
 A native SwiftUI reader and writer for the [Standard.site](https://standard.site) publishing ecosystem on AT Protocol.
 
 ## Features
@@ -24,8 +30,6 @@ A native SwiftUI reader and writer for the [Standard.site](https://standard.site
 2. Open `Inkwell.xcodeproj` in Xcode.
 3. Build & run on a device or simulator.
 4. Sign in with an AT Protocol handle and app password.
-
-A `Reference/leaflet` git submodule is also declared (`.gitmodules`) for studying Leaflet's own implementation alongside Inkwell's. It isn't required for building Inkwell itself; run `git submodule update --init` only if you want it checked out.
 
 ## Interoperability
 
