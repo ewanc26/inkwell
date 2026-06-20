@@ -31,6 +31,7 @@ struct WriteView: View {
     @State private var verifiedPublicationURI: String?
     @State private var verificationMessage: String?
     @State private var isVerifyingPublication = false
+    @State private var showCredits = false
 
     var body: some View {
         NavigationStack {
@@ -154,6 +155,14 @@ struct WriteView: View {
                             .font(.headline)
                     }
                 }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button { showCredits = true } label: {
+                        Image(systemName: "info.circle")
+                    }
+                }
+            }
+            .sheet(isPresented: $showCredits) {
+                CreditsView()
             }
             .task {
                 await loadPublications()

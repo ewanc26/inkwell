@@ -17,6 +17,7 @@ struct DiscoverView: View {
     @State private var subscriptions: Set<String> = []
     @State private var isSearching = false
     @State private var errorMessage: String?
+    @State private var showCredits = false
 
     private var publications: [ReaderSearchResult] { results.filter(\.isPublication) }
     private var documents: [ReaderSearchResult] { results.filter { !$0.isPublication } }
@@ -95,6 +96,16 @@ struct DiscoverView: View {
             }
             .listStyle(.insetGrouped)
             .navigationTitle("Discover")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button { showCredits = true } label: {
+                        Image(systemName: "info.circle")
+                    }
+                }
+            }
+            .sheet(isPresented: $showCredits) {
+                CreditsView()
+            }
             .task { await loadSubscriptions() }
         }
     }

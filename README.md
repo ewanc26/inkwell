@@ -49,4 +49,4 @@ The app icon (`Inkwell.icon`, an Icon Composer asset) and the in-app wordmark (`
 - **ATProtoKit** – Added via Xcode Swift Package Manager (url: `https://github.com/MasterJ93/ATProtoKit.git`).
 
 ## License
-MIT – see `LICENSE` file.
+AGPL 3.0 – see `LICENSE` file.
