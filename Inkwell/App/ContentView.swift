@@ -27,10 +27,9 @@ struct ContentView: View {
     /// there's no jarring swap once it resolves to either screen.
     private var restoringView: some View {
         VStack(spacing: 16) {
-            Image("AppLogo")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 44, height: 44)
+            InkwellMark()
+                .frame(height: 48)
+                .foregroundStyle(.primary)
             ProgressView()
         }
     }
