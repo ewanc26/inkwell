@@ -51,6 +51,7 @@ final class LoginStateManager {
     // MARK: - Public State
     private(set) var isAuthenticated = false
     private(set) var currentHandle: String?
+    private(set) var currentDID: String?
     private(set) var displayName: String?
     private(set) var avatarURL: URL?
     private(set) var errorMessage: String?
@@ -82,9 +83,18 @@ final class LoginStateManager {
     // MARK: - Internal Session
     private var config: ATProtocolConfiguration?
     private var atProto: ATProtoKit?
+    private var repositoryClients: [String: ATProtoKit] = [:]
+    private var repositoryPDSURLs: [String: URL] = [:]
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
+        // Record-type registration (site.standard.* plus every content
+        // format) happens once, centrally, in InkwellApp's `.task` — see
+        // `SiteStandardRegistration.swift` and `ContentFormatRegistration.swift`.
+        // It used to be duplicated here against the old, now-removed
+        // StandardPublication/StandardDocument types, which raced the
+        // SiteStandardLexicon registration for the same `$type` keys
+        // depending on which ran first.
     }
 
     // MARK: - Authentication
@@ -146,6 +156,7 @@ final class LoginStateManager {
                         self.config = cfg
                         self.atProto = proto
                         self.currentHandle = trimmed
+                        self.currentDID = identity.did
                         self.isAuthenticated = true
                         self.errorMessage = nil
                         self.defaults.set(trimmed, forKey: self.storedHandleKey)
@@ -266,6 +277,7 @@ final class LoginStateManager {
             self.config = cfg
             self.atProto = proto
             self.currentHandle = session.handle
+            self.currentDID = session.sessionDID
             self.isAuthenticated = true
             self.errorMessage = nil
             print("[RestoreSession] \(Date()) session restored for \(session.handle)")
@@ -314,10 +326,470 @@ final class LoginStateManager {
         }
     }
 
+    // MARK: - standard.site Records API
+
+    /// Fetches all standard.site publication records from the user's repository.
+    func fetchPublications() async throws -> [SiteStandardLexicon.PublicationRecord] {
+        guard let atProto = atProto, let session = try await atProto.getUserSession() else {
+            throw NSError(domain: "LoginStateManager", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])
+        }
+        _ = atProto
+        let records = try await listAllRecords(from: session.sessionDID, collection: SiteStandardLexicon.PublicationRecord.type)
+
+        var publications: [SiteStandardLexicon.PublicationRecord] = []
+        for record in records {
+            if let value = record.value, let pub = value.getRecord(ofType: SiteStandardLexicon.PublicationRecord.self) {
+                publications.append(pub)
+            }
+        }
+        return publications
+    }
+
+    /// Fetches all standard.site document records from the user's repository.
+    func fetchDocuments() async throws -> [SiteStandardLexicon.DocumentRecord] {
+        guard let atProto = atProto, let session = try await atProto.getUserSession() else {
+            throw NSError(domain: "LoginStateManager", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])
+        }
+        _ = atProto
+        let records = try await listAllRecords(from: session.sessionDID, collection: SiteStandardLexicon.DocumentRecord.type)
+
+        var documents: [SiteStandardLexicon.DocumentRecord] = []
+        for record in records {
+            if let value = record.value, let doc = value.getRecord(ofType: SiteStandardLexicon.DocumentRecord.self) {
+                documents.append(doc)
+            }
+        }
+        return documents
+    }
+
+    /// Downloads raw bytes of a blob by its CID.
+    func downloadBlob(cid: String) async throws -> Data {
+        guard let atProto = atProto, let session = try await atProto.getUserSession() else {
+            throw NSError(domain: "LoginStateManager", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])
+        }
+        return try await atProto.getBlob(from: session.sessionDID, cid: cid)
+    }
+
+    /// Downloads a blob from the PDS hosting the specified repository.
+    func downloadBlob(cid: String, fromDID did: String) async throws -> Data {
+        let client = try await repositoryClient(for: did)
+        return try await client.getBlob(from: did, cid: cid)
+    }
+
+    /// Creates and publishes a new standard.site document record.
+    ///
+    /// - Parameters:
+    ///   - title: The document title.
+    ///   - description: Optional description.
+    ///   - path: Optional URL path segment.
+    ///   - site: The publication URL this document belongs to.
+    ///   - markdown: The markdown content to convert and store.
+    ///   - provider: The content provider that converts markdown to the
+    ///     format-specific AT Protocol record.
+    @discardableResult
+    func createDocument(
+        title: String,
+        description: String?,
+        path: String?,
+        site: String,
+        markdown: String,
+        provider: ContentProvider
+    ) async throws -> ComAtprotoLexicon.Repository.StrongReference {
+        guard let atProto = atProto, let session = try await atProto.getUserSession() else {
+            throw NSError(domain: "LoginStateManager", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])
+        }
+
+        // Convert markdown to the format-specific content record.
+        guard let contentRecord = provider.fromMarkdown(markdown) else {
+            throw NSError(domain: "LoginStateManager", code: 422, userInfo: [NSLocalizedDescriptionKey: "Failed to convert markdown to \(provider.label) format"])
+        }
+
+        // Build the standard.site document wrapper. publishedAt is a `Date`
+        // here, not a pre-formatted ISO8601 string — DocumentRecord's own
+        // `encode(to:)` handles AT Protocol datetime formatting.
+        guard (ATURI.parse(site)?.collection == SiteStandardLexicon.PublicationRecord.type) ||
+                (URL(string: site)?.scheme?.lowercased() == "https") else {
+            throw NSError(domain: "LoginStateManager", code: 422, userInfo: [NSLocalizedDescriptionKey: "The document site must be a publication AT-URI or HTTPS URL."])
+        }
+
+        let normalizedPath = path.flatMap { value -> String? in
+            let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !trimmed.isEmpty else { return nil }
+            return trimmed.hasPrefix("/") ? trimmed : "/\(trimmed)"
+        }
+        let plainText = (try? AttributedString(markdown: markdown))
+            .map { String($0.characters) }
+            .flatMap { $0.isEmpty ? nil : $0 }
+
+        var normalizedSite = site
+        while normalizedSite.hasSuffix("/") {
+            normalizedSite.removeLast()
+        }
+        let document = SiteStandardLexicon.DocumentRecord(
+            site: normalizedSite,
+            title: title,
+            publishedAt: Date(),
+            path: normalizedPath,
+            description: description,
+            coverImage: nil,
+            content: contentRecord,
+            textContent: plainText
+        )
+
+        // Wrap in UnknownType and create the record. shouldValidate is false
+        // because site.standard.document is not a Bluesky lexicon — the PDS
+        // would reject it if validation were enabled.
+        let record = UnknownType.record(document)
+        return try await atProto.createRecord(
+            repositoryDID: session.sessionDID,
+            collection: "site.standard.document",
+            shouldValidate: false,
+            record: record
+        )
+    }
+
+    // MARK: - Subscription API
+
+    /// Creates a `site.standard.graph.subscription` record, subscribing the
+    /// user to the publication at the given AT-URI.
+    ///
+    /// - Parameter publicationURI: The AT-URI of the publication record
+    ///   (e.g. `at://did:plc:abc123/site.standard.publication/xyz789`).
+    /// - Returns: The strong reference (URI + CID) of the created subscription.
+    @discardableResult
+    func createSubscription(publicationURI: String) async throws -> ComAtprotoLexicon.Repository.StrongReference {
+        guard let atProto = atProto, let session = try await atProto.getUserSession() else {
+            throw NSError(domain: "LoginStateManager", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])
+        }
+
+        guard ATURI.parse(publicationURI)?.collection == SiteStandardLexicon.PublicationRecord.type else {
+            throw NSError(domain: "LoginStateManager", code: 422, userInfo: [NSLocalizedDescriptionKey: "Subscriptions must reference a Standard.site publication AT-URI."])
+        }
+
+        let subscription = SiteStandardLexicon.Graph.SubscriptionRecord(
+            publication: publicationURI,
+            createdAt: Date()
+        )
+        let record = UnknownType.record(subscription)
+        return try await atProto.createRecord(
+            repositoryDID: session.sessionDID,
+            collection: "site.standard.graph.subscription",
+            shouldValidate: false,
+            record: record
+        )
+    }
+
+    /// Fetches all of the user's subscription records.
+    ///
+    /// Each entry includes the subscription record itself plus the AT-URI and
+    /// record key (needed to unsubscribe).
+    func fetchSubscriptions() async throws -> [SubscriptionEntry] {
+        guard let atProto = atProto, let session = try await atProto.getUserSession() else {
+            throw NSError(domain: "LoginStateManager", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])
+        }
+
+        _ = atProto
+        let records = try await listAllRecords(
+            from: session.sessionDID,
+            collection: SiteStandardLexicon.Graph.SubscriptionRecord.type
+        )
+
+        var entries: [SubscriptionEntry] = []
+        for record in records {
+            if let value = record.value,
+               let sub = value.getRecord(ofType: SiteStandardLexicon.Graph.SubscriptionRecord.self) {
+                let rkey = ATURI.parse(record.uri)?.recordKey ?? ""
+                entries.append(SubscriptionEntry(
+                    uri: record.uri,
+                    recordKey: rkey,
+                    record: sub
+                ))
+            }
+        }
+        return entries
+    }
+
+    /// Deletes a subscription record (unsubscribes from a publication).
+    ///
+    /// - Parameter recordKey: The record key of the subscription to delete.
+    func deleteSubscription(recordKey: String) async throws {
+        guard let atProto = atProto, let session = try await atProto.getUserSession() else {
+            throw NSError(domain: "LoginStateManager", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])
+        }
+
+        try await atProto.deleteRecord(
+            repositoryDID: session.sessionDID,
+            collection: "site.standard.graph.subscription",
+            recordKey: recordKey
+        )
+    }
+
+    // MARK: - Cross-repo Record Fetching
+
+    /// Fetches publication records from any user's repository (not just the
+    /// current user's). Each entry includes the AT-URI and author DID alongside
+    /// the decoded record.
+    ///
+    /// - Parameter did: The DID of the repository to fetch from.
+    func fetchPublications(fromDID did: String) async throws -> [PublicationEntry] {
+        let records = try await listAllRecords(from: did, collection: SiteStandardLexicon.PublicationRecord.type)
+
+        var entries: [PublicationEntry] = []
+        for record in records {
+            if let value = record.value,
+               let pub = value.getRecord(ofType: SiteStandardLexicon.PublicationRecord.self) {
+                entries.append(PublicationEntry(
+                    uri: record.uri,
+                    authorDID: did,
+                    record: pub
+                ))
+            }
+        }
+        return entries
+    }
+
+    /// Fetches document records from any user's repository.
+    ///
+    /// - Parameter did: The DID of the repository to fetch from.
+    func fetchDocuments(fromDID did: String) async throws -> [DocumentEntry] {
+        let records = try await listAllRecords(from: did, collection: SiteStandardLexicon.DocumentRecord.type)
+
+        var entries: [DocumentEntry] = []
+        for record in records {
+            if let value = record.value,
+               let doc = value.getRecord(ofType: SiteStandardLexicon.DocumentRecord.self) {
+                entries.append(DocumentEntry(
+                    uri: record.uri,
+                    authorDID: did,
+                    record: doc
+                ))
+            }
+        }
+        return entries
+    }
+
+    /// Fetches and decodes one Standard.site publication from its AT-URI.
+    func fetchPublication(uri: String) async throws -> PublicationEntry {
+        guard let parsed = ATURI.parse(uri),
+              parsed.collection == SiteStandardLexicon.PublicationRecord.type else {
+            throw NSError(domain: "LoginStateManager", code: 422, userInfo: [NSLocalizedDescriptionKey: "Invalid publication AT-URI."])
+        }
+        let client = try await repositoryClient(for: parsed.did)
+        let output = try await client.getRepositoryRecord(
+            from: parsed.did,
+            collection: parsed.collection,
+            recordKey: parsed.recordKey
+        )
+        guard let value = output.value,
+              let publication = value.getRecord(ofType: SiteStandardLexicon.PublicationRecord.self) else {
+            throw NSError(domain: "LoginStateManager", code: 422, userInfo: [NSLocalizedDescriptionKey: "The record isn't a Standard.site publication."])
+        }
+        return PublicationEntry(uri: output.uri, authorDID: parsed.did, record: publication)
+    }
+
+    /// Fetches and decodes one Standard.site document from its AT-URI.
+    func fetchDocument(uri: String) async throws -> DocumentEntry {
+        guard let parsed = ATURI.parse(uri),
+              parsed.collection == SiteStandardLexicon.DocumentRecord.type else {
+            throw NSError(domain: "LoginStateManager", code: 422, userInfo: [NSLocalizedDescriptionKey: "Invalid document AT-URI."])
+        }
+        let client = try await repositoryClient(for: parsed.did)
+        let output = try await client.getRepositoryRecord(
+            from: parsed.did,
+            collection: parsed.collection,
+            recordKey: parsed.recordKey
+        )
+        guard let value = output.value,
+              let document = value.getRecord(ofType: SiteStandardLexicon.DocumentRecord.self) else {
+            throw NSError(domain: "LoginStateManager", code: 422, userInfo: [NSLocalizedDescriptionKey: "The record isn't a Standard.site document."])
+        }
+        return DocumentEntry(uri: output.uri, authorDID: parsed.did, record: document)
+    }
+
+    private func repositoryClient(for did: String) async throws -> ATProtoKit {
+        if did == currentDID, let atProto {
+            return atProto
+        }
+        if let cached = repositoryClients[did] {
+            return cached
+        }
+
+        let pdsURL = try await repositoryPDSURL(for: did)
+        let remoteConfiguration = ATProtocolConfiguration(pdsURL: pdsURL.absoluteString)
+        let client = await ATProtoKit(sessionConfiguration: remoteConfiguration)
+        repositoryClients[did] = client
+        return client
+    }
+
+    private func repositoryPDSURL(for did: String) async throws -> URL {
+        if let cached = repositoryPDSURLs[did] {
+            return cached
+        }
+        if did == currentDID,
+           let storedPDS = defaults.string(forKey: storedPDSKey),
+           let url = URL(string: storedPDS) {
+            repositoryPDSURLs[did] = url
+            return url
+        }
+
+        let identity = try await resolveIdentityViaSlingshot(identifier: did)
+        guard identity.did == did, let url = URL(string: identity.pds) else {
+            throw NSError(domain: "LoginStateManager", code: 404, userInfo: [NSLocalizedDescriptionKey: "Could not resolve the repository's PDS."])
+        }
+        repositoryPDSURLs[did] = url
+        return url
+    }
+
+    private func listAllRecords(
+        from did: String,
+        collection: String,
+        maximumCount: Int = 1_000
+    ) async throws -> [ComAtprotoLexicon.Repository.GetRecordOutput] {
+        let pdsURL = try await repositoryPDSURL(for: did)
+        var records: [ComAtprotoLexicon.Repository.GetRecordOutput] = []
+        var cursor: String?
+
+        repeat {
+            var components = URLComponents(
+                url: pdsURL.appending(path: "xrpc/com.atproto.repo.listRecords"),
+                resolvingAgainstBaseURL: false
+            )
+            var queryItems = [
+                URLQueryItem(name: "repo", value: did),
+                URLQueryItem(name: "collection", value: collection),
+                URLQueryItem(name: "limit", value: String(min(100, maximumCount - records.count)))
+            ]
+            if let cursor {
+                queryItems.append(URLQueryItem(name: "cursor", value: cursor))
+            }
+            components?.queryItems = queryItems
+            guard let url = components?.url else { throw URLError(.badURL) }
+
+            let (data, response) = try await URLSession.shared.data(from: url)
+            guard let http = response as? HTTPURLResponse,
+                  (200...299).contains(http.statusCode) else {
+                throw URLError(.badServerResponse)
+            }
+            let page = try JSONDecoder().decode(ComAtprotoLexicon.Repository.ListRecordsOutput.self, from: data)
+            records.append(contentsOf: page.records)
+            cursor = page.cursor
+        } while cursor != nil && records.count < maximumCount
+
+        return Array(records.prefix(maximumCount))
+    }
+
+    /// Fetches publications from the current user's repository, enriched with
+    /// their AT-URIs and author DID.
+    func fetchPublicationsWithURIs() async throws -> [PublicationEntry] {
+        guard let session = try await atProto?.getUserSession() else {
+            throw NSError(domain: "LoginStateManager", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])
+        }
+        return try await fetchPublications(fromDID: session.sessionDID)
+    }
+
+    /// Fetches documents from the current user's repository, enriched with
+    /// their AT-URIs and author DID.
+    func fetchDocumentsWithURIs() async throws -> [DocumentEntry] {
+        guard let session = try await atProto?.getUserSession() else {
+            throw NSError(domain: "LoginStateManager", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])
+        }
+        return try await fetchDocuments(fromDID: session.sessionDID)
+    }
+
+    // MARK: - Publication Creation
+
+    /// Creates a `site.standard.publication` record in the user's repository.
+    ///
+    /// - Parameters:
+    ///   - url: The base URL for the publication (e.g. `https://mysite.com`).
+    ///   - name: The display name of the publication.
+    ///   - description: Optional description.
+    /// - Returns: The strong reference (URI + CID) of the created publication.
+    @discardableResult
+    func createPublication(
+        url: String,
+        name: String,
+        description: String?
+    ) async throws -> ComAtprotoLexicon.Repository.StrongReference {
+        guard let atProto = atProto, let session = try await atProto.getUserSession() else {
+            throw NSError(domain: "LoginStateManager", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])
+        }
+
+        let publication = SiteStandardLexicon.PublicationRecord(
+            url: url,
+            name: name,
+            description: description
+        )
+        let record = UnknownType.record(publication)
+        return try await atProto.createRecord(
+            repositoryDID: session.sessionDID,
+            collection: "site.standard.publication",
+            shouldValidate: false,
+            record: record
+        )
+    }
+
+    // MARK: - Recommend API
+
+    /// Creates a `site.standard.graph.recommend` record, endorsing a document.
+    ///
+    /// - Parameter documentURI: The AT-URI of the document record to recommend.
+    /// - Returns: The strong reference of the created recommend.
+    @discardableResult
+    func createRecommend(documentURI: String) async throws -> ComAtprotoLexicon.Repository.StrongReference {
+        guard let atProto = atProto, let session = try await atProto.getUserSession() else {
+            throw NSError(domain: "LoginStateManager", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])
+        }
+
+        guard ATURI.parse(documentURI)?.collection == SiteStandardLexicon.DocumentRecord.type else {
+            throw NSError(domain: "LoginStateManager", code: 422, userInfo: [NSLocalizedDescriptionKey: "Recommends must reference a Standard.site document AT-URI."])
+        }
+
+        let recommend = SiteStandardLexicon.Graph.RecommendRecord(
+            document: documentURI,
+            createdAt: Date()
+        )
+        let record = UnknownType.record(recommend)
+        return try await atProto.createRecord(
+            repositoryDID: session.sessionDID,
+            collection: "site.standard.graph.recommend",
+            shouldValidate: false,
+            record: record
+        )
+    }
+
+    /// Fetches all of the user's recommend records.
+    func fetchRecommends() async throws -> [RecommendEntry] {
+        guard let atProto = atProto, let session = try await atProto.getUserSession() else {
+            throw NSError(domain: "LoginStateManager", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])
+        }
+
+        _ = atProto
+        let records = try await listAllRecords(
+            from: session.sessionDID,
+            collection: SiteStandardLexicon.Graph.RecommendRecord.type
+        )
+
+        var entries: [RecommendEntry] = []
+        for record in records {
+            if let value = record.value,
+               let rec = value.getRecord(ofType: SiteStandardLexicon.Graph.RecommendRecord.self) {
+                let rkey = ATURI.parse(record.uri)?.recordKey ?? ""
+                entries.append(RecommendEntry(
+                    uri: record.uri,
+                    recordKey: rkey,
+                    record: rec
+                ))
+            }
+        }
+        return entries
+    }
+
     // MARK: - Helper
     private func clearSession(clearStoredAccount: Bool = false) {
         self.isAuthenticated = false
         self.currentHandle = nil
+        self.currentDID = nil
         self.displayName = nil
         self.avatarURL = nil
         self.config = nil
