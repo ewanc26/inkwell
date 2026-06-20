@@ -9,6 +9,45 @@ import Foundation
 import Observation
 import ATProtoKit
 
+nonisolated struct RepositoryRecord: Decodable, Sendable {
+    let uri: String
+    let cid: String?
+    let value: UnknownType?
+}
+
+nonisolated struct TolerantRecordPage: Decodable, Sendable {
+    let cursor: String?
+    let records: [RepositoryRecord]
+
+    private enum CodingKeys: String, CodingKey {
+        case cursor
+        case records
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        cursor = try container.decodeIfPresent(String.self, forKey: .cursor)
+        records = try container.decode(LossyRecordArray.self, forKey: .records).elements
+    }
+}
+
+private nonisolated struct LossyRecordArray: Decodable, Sendable {
+    let elements: [RepositoryRecord]
+
+    init(from decoder: Decoder) throws {
+        var container = try decoder.unkeyedContainer()
+        var decoded: [RepositoryRecord] = []
+
+        while !container.isAtEnd {
+            let elementDecoder = try container.superDecoder()
+            if let record = try? RepositoryRecord(from: elementDecoder) {
+                decoded.append(record)
+            }
+        }
+        elements = decoded
+    }
+}
+
 /// Minimal identity record returned by Slingshot's `resolveMiniDoc` endpoint.
 /// Mirrors the shape used by the website's `@ewanc26/atproto` package
 /// (`ResolvedIdentity { did, pds }`), with `handle` included for convenience.
@@ -644,9 +683,9 @@ final class LoginStateManager {
         from did: String,
         collection: String,
         maximumCount: Int = 1_000
-    ) async throws -> [ComAtprotoLexicon.Repository.GetRecordOutput] {
+    ) async throws -> [RepositoryRecord] {
         let pdsURL = try await repositoryPDSURL(for: did)
-        var records: [ComAtprotoLexicon.Repository.GetRecordOutput] = []
+        var records: [RepositoryRecord] = []
         var cursor: String?
 
         repeat {
@@ -670,7 +709,7 @@ final class LoginStateManager {
                   (200...299).contains(http.statusCode) else {
                 throw URLError(.badServerResponse)
             }
-            let page = try JSONDecoder().decode(ComAtprotoLexicon.Repository.ListRecordsOutput.self, from: data)
+            let page = try JSONDecoder().decode(TolerantRecordPage.self, from: data)
             records.append(contentsOf: page.records)
             cursor = page.cursor
         } while cursor != nil && records.count < maximumCount

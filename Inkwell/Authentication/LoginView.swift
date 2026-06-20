@@ -53,9 +53,10 @@ struct LoginView: View {
                 Circle()
                     .fill(Color.accentColor.opacity(0.15))
                     .frame(width: 88, height: 88)
-                Image(systemName: "drop.fill")
-                    .font(.system(size: 36, weight: .medium))
-                    .foregroundStyle(Color.accentColor)
+                Image("Inkwell")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 44, height: 44)
             }
             .accessibilityHidden(true)
 
