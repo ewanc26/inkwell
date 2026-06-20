@@ -21,8 +21,10 @@ import SwiftUI
 
 struct MarkdownRendererView: View {
     let markdown: String
-    let foregroundColor: Color
-    let accentColor: Color
+    let theme: ReaderTheme
+
+    private var foregroundColor: Color { theme.foreground }
+    private var accentColor: Color { theme.accent }
 
     private var blocks: [MarkdownBlock] {
         MarkdownParser.parse(markdown)
@@ -49,14 +51,13 @@ struct MarkdownRendererView: View {
             default: 16
             }
             Text(renderInline(text))
-                .font(.system(size: fontSize, design: .serif))
-                .fontWeight(.bold)
+                .font(.system(size: fontSize, weight: .bold, design: theme.headingFamily.design))
                 .foregroundStyle(foregroundColor)
                 .padding(.top, level == 1 ? 8 : 4)
 
         case .paragraph(let text):
             Text(renderInline(text))
-                .font(.system(.body, design: .serif))
+                .font(theme.bodyFont(.body))
                 .foregroundStyle(foregroundColor)
                 .lineSpacing(6)
 
@@ -65,23 +66,23 @@ struct MarkdownRendererView: View {
                 if let lang = language, !lang.isEmpty {
                     Text(lang.uppercased())
                         .font(.system(.caption2, design: .monospaced))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(foregroundColor.opacity(0.6))
                         .padding(.horizontal, 8)
                         .padding(.vertical, 2)
-                        .background(Color.primary.opacity(0.05))
+                        .background(foregroundColor.opacity(0.06))
                         .cornerRadius(4)
                 }
                 ScrollView(.horizontal, showsIndicators: false) {
                     Text(content)
                         .font(.system(.subheadline, design: .monospaced))
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(foregroundColor)
                         .padding(12)
                 }
-                .background(Color.primary.opacity(0.03))
+                .background(foregroundColor.opacity(0.04))
                 .cornerRadius(8)
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+                        .stroke(foregroundColor.opacity(0.12), lineWidth: 1)
                 )
             }
             .padding(.vertical, 6)
@@ -89,11 +90,12 @@ struct MarkdownRendererView: View {
         case .math(let tex):
             HStack {
                 Spacer()
-                Text("$$ \(tex) $$")
-                    .font(.system(.body, design: .serif))
+                Text("\u{0024}\u{0024} \(tex) \u{0024}\u{0024}")
+                    .font(theme.bodyFont(.body))
                     .italic()
+                    .foregroundStyle(foregroundColor)
                     .padding(12)
-                    .background(Color.primary.opacity(0.03))
+                    .background(foregroundColor.opacity(0.04))
                     .cornerRadius(8)
                 Spacer()
             }
@@ -106,9 +108,9 @@ struct MarkdownRendererView: View {
                     .frame(width: 4)
                     .padding(.trailing, 16)
                 Text(renderInline(text))
-                    .font(.system(.body, design: .serif))
+                    .font(theme.bodyFont(.body))
                     .italic()
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(foregroundColor.opacity(0.7))
                     .lineSpacing(6)
             }
             .padding(.vertical, 8)
@@ -130,7 +132,7 @@ struct MarkdownRendererView: View {
                         case .failure:
                             Image(systemName: "photo")
                                 .font(.largeTitle)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(foregroundColor.opacity(0.5))
                                 .frame(minHeight: 180)
                         @unknown default:
                             EmptyView()
@@ -140,7 +142,7 @@ struct MarkdownRendererView: View {
                         Text(alt)
                             .font(.caption)
                             .italic()
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(foregroundColor.opacity(0.6))
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -170,7 +172,7 @@ struct MarkdownRendererView: View {
                     if ordered {
                         let itemNumber = (startIndex ?? 1) + index
                         Text("\(itemNumber).")
-                            .font(.system(.body, design: .serif))
+                            .font(theme.bodyFont(.body))
                             .foregroundStyle(accentColor)
                             .frame(width: 20, alignment: .trailing)
                     } else {
@@ -182,7 +184,7 @@ struct MarkdownRendererView: View {
 
                     VStack(alignment: .leading, spacing: 8) {
                         Text(renderInline(item.text))
-                            .font(.system(.body, design: .serif))
+                            .font(theme.bodyFont(.body))
                             .foregroundStyle(foregroundColor)
 
                         if let children = item.children, !children.isEmpty {
@@ -202,11 +204,11 @@ struct MarkdownRendererView: View {
                 let item = items[index]
                 HStack(alignment: .top, spacing: 8) {
                     Image(systemName: item.checked == true ? "checkmark.square.fill" : "square")
-                        .foregroundStyle(item.checked == true ? accentColor : .secondary)
+                        .foregroundStyle(item.checked == true ? accentColor : foregroundColor.opacity(0.5))
                         .frame(width: 20, alignment: .center)
 
                     Text(renderInline(item.text))
-                        .font(.system(.body, design: .serif))
+                        .font(theme.bodyFont(.body))
                         .foregroundStyle(foregroundColor)
                         .strikethrough(item.checked == true)
                 }
