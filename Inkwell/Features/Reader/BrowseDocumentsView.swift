@@ -10,6 +10,7 @@ struct BrowseDocumentsView: View {
     @State private var yours: [ReaderFeedItem] = []
     @State private var isLoading = true
     @State private var errorMessage: String?
+    @State private var showCredits = false
 
     private enum ReaderFeed: String, CaseIterable, Identifiable {
         case following = "Following"
@@ -40,11 +41,19 @@ struct BrowseDocumentsView: View {
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
+                    Button { showCredits = true } label: {
+                        Image(systemName: "info.circle")
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
                     Button { Task { await loadData() } } label: {
                         Image(systemName: "arrow.clockwise")
                     }
                     .disabled(isLoading)
                 }
+            }
+            .sheet(isPresented: $showCredits) {
+                CreditsView()
             }
             .task {
                 await loadData()
