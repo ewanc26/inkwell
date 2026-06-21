@@ -1,0 +1,81 @@
+/* ── Shared component styles ── */
+
+.container {
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: var(--spacing-md);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  padding: var(--spacing-xs) var(--spacing-lg);
+  font-weight: 600;
+  border-radius: var(--radius-lg);
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background-color: var(--color-accent);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-accent-light);
+}
+
+.btn-outline {
+  border: 1.5px solid var(--color-accent);
+  color: var(--color-accent);
+}
+
+.btn-outline:hover {
+  background-color: oklch(from var(--color-accent) l c h / 0.1);
+}
+
+/* ── Feature cards ── */
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.feature-card {
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  background-color: light-dark(var(--color-surface), oklch(0.2 0.01 260));
+  border: 1px solid light-dark(oklch(0.9 0.01 260), oklch(0.25 0.01 260));
+}
+
+.feature-card h3 {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  margin-bottom: var(--spacing-2xs);
+}
+
+.feature-card p {
+  color: var(--color-muted);
+  line-height: 1.6;
+}
+
+.feature-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  background-color: oklch(from var(--color-accent) l c h / 0.1);
+  color: var(--color-accent);
+  margin-bottom: var(--spacing-sm);
+}
+
+/* ── App Store badge ── */
+
+.app-store-badge img {
+  height: 3rem;
+  width: auto;
+}

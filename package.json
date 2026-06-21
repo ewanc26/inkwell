@@ -1,0 +1,29 @@
+{
+  "name": "inkwell-website",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "format": "prettier --write --ignore-unknown ."
+  },
+  "devDependencies": {
+    "@lucide/svelte": "latest",
+    "@sveltejs/adapter-vercel": "latest",
+    "@sveltejs/kit": "latest",
+    "@sveltejs/vite-plugin-svelte": "latest",
+    "@tailwindcss/vite": "latest",
+    "@types/node": "latest",
+    "prettier": "latest",
+    "prettier-plugin-svelte": "latest",
+    "prettier-plugin-tailwindcss": "latest",
+    "svelte": "latest",
+    "svelte-check": "latest",
+    "tailwindcss": "latest",
+    "typescript": "latest",
+    "vite": "latest"
+  }
+}
