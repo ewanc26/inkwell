@@ -18,7 +18,7 @@ A native SwiftUI reader and writer for the [Standard.site](https://standard.site
 - Searches the cross-platform public index used by the Standard.site ecosystem, then fetches authoritative records directly from the author.
 - Checks publication `.well-known` verification and document `<link rel="site.standard.document">` verification.
 - Polls subscribed publications and delivers persistent in-app and local notifications, including background app refresh.
-- Signs in with an AT Protocol handle and app password, then resumes the session silently from the Keychain on relaunch — no repeated sign-ins.
+- Signs in with your AT Protocol handle via OAuth (no app password needed), then resumes the session silently from the Keychain on relaunch — no repeated sign-ins.
 - Uses the `uk.ewancroft.inkwell` namespace for Inkwell-owned protocol identifiers.
 
 ## Getting Started
@@ -29,7 +29,7 @@ A native SwiftUI reader and writer for the [Standard.site](https://standard.site
    ```
 2. Open `Inkwell.xcodeproj` in Xcode.
 3. Build & run on a device or simulator.
-4. Sign in with an AT Protocol handle and app password.
+4. Sign in with your AT Protocol handle via OAuth (the system browser will open for authorization).
 
 ## Interoperability
 

@@ -2,7 +2,9 @@
 //  LoginView.swift
 //  Inkwell
 //
-//  Created by Ewan Croft on 19/06/2026.
+//  OAuth-based sign-in. The user enters their AT Protocol handle and taps
+//  "Sign in with your PDS." The app opens the system browser for OAuth
+//  authorization — no app password is ever seen or stored.
 //
 
 import SwiftUI
@@ -11,18 +13,15 @@ struct LoginView: View {
     @Environment(LoginStateManager.self) private var loginStateManager
 
     @State private var handle = ""
-    @State private var password = ""
     @State private var isSigningIn = false
 
     private enum Field: Hashable {
         case handle
-        case password
     }
     @FocusState private var focusedField: Field?
 
     private var canSubmit: Bool {
         !handle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-            && !password.isEmpty
             && !isSigningIn
     }
 
@@ -33,7 +32,7 @@ struct LoginView: View {
                     Spacer(minLength: 24)
                     header
                     formSection
-                    appPasswordNote
+                    oauthNote
                     Spacer(minLength: 24)
                 }
                 .padding(.horizontal, 24)
@@ -68,7 +67,7 @@ struct LoginView: View {
 
     private var formSection: some View {
         VStack(spacing: 16) {
-            credentialFields
+            handleField
 
             if let errorMessage = loginStateManager.errorMessage {
                 errorBanner(errorMessage)
@@ -79,36 +78,21 @@ struct LoginView: View {
         .frame(maxWidth: 400)
     }
 
-    private var credentialFields: some View {
-        VStack(spacing: 12) {
-            VStack(alignment: .leading, spacing: 6) {
-                Text("Handle")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                TextField("yourname.bsky.social", text: $handle)
-                    .textContentType(.username)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .keyboardType(.URL)
-                    .focused($focusedField, equals: .handle)
-                    .submitLabel(.next)
-                    .onSubmit { focusedField = .password }
-                    .padding(12)
-                    .background(fieldBackground)
-            }
-
-            VStack(alignment: .leading, spacing: 6) {
-                Text("App password")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                SecureField("••••••••••••", text: $password)
-                    .textContentType(.password)
-                    .focused($focusedField, equals: .password)
-                    .submitLabel(.go)
-                    .onSubmit(submit)
-                    .padding(12)
-                    .background(fieldBackground)
-            }
+    private var handleField: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Handle")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            TextField("yourname.bsky.social", text: $handle)
+                .textContentType(.username)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .keyboardType(.URL)
+                .focused($focusedField, equals: .handle)
+                .submitLabel(.go)
+                .onSubmit(submit)
+                .padding(12)
+                .background(fieldBackground)
         }
     }
 
@@ -136,7 +120,7 @@ struct LoginView: View {
     private var signInButton: some View {
         Button(action: submit) {
             ZStack {
-                Text("Sign In")
+                Text("Sign in with your PDS")
                     .opacity(isSigningIn ? 0 : 1)
                 if isSigningIn {
                     ProgressView()
@@ -150,12 +134,17 @@ struct LoginView: View {
         .disabled(!canSubmit)
     }
 
-    private var appPasswordNote: some View {
-        Text("Use an app password, not your main account password.")
-            .font(.caption)
-            .foregroundStyle(.secondary)
-            .multilineTextAlignment(.center)
-            .frame(maxWidth: 400)
+    private var oauthNote: some View {
+        VStack(spacing: 8) {
+            Text("Inkwell uses OAuth to sign in to your PDS securely.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Text("Your browser will open so you can approve access — no app password needed.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: 400)
     }
 
     // MARK: - Actions
@@ -165,11 +154,8 @@ struct LoginView: View {
         focusedField = nil
         isSigningIn = true
         Task {
-            _ = await loginStateManager.signIn(handle: handle, password: password)
+            _ = await loginStateManager.signIn(handle: handle)
             isSigningIn = false
-            if loginStateManager.isAuthenticated {
-                password = ""
-            }
         }
     }
 }

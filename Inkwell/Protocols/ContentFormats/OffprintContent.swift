@@ -92,12 +92,7 @@ public struct OffprintBlock: Codable, Equatable, Hashable, Sendable {
         self.facets = try container.decodeIfPresent([LeafletFacet].self, forKey: .facets)
         self.content = try container.decodeIfPresent([OffprintBlock].self, forKey: .content)
         self.alt = try container.decodeIfPresent(String.self, forKey: .alt)
-
-        if let imageContainer = try? container.decodeIfPresent(ComAtprotoLexicon.Repository.BlobContainer.self, forKey: .image) {
-            self.image = imageContainer.blob
-        } else {
-            self.image = try container.decodeIfPresent(ComAtprotoLexicon.Repository.UploadBlobOutput.self, forKey: .image)
-        }
+        self.image = try container.decodeIfPresent(ComAtprotoLexicon.Repository.UploadBlobOutput.self, forKey: .image)
 
         self.children = try container.decodeIfPresent([OffprintListItem].self, forKey: .children)
         self.ordered = try container.decodeIfPresent(Bool.self, forKey: .ordered)

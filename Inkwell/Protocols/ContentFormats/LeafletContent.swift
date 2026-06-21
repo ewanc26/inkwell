@@ -32,11 +32,7 @@ public struct LeafletContent: ATRecordProtocol {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.pages = try container.decodeIfPresent([LeafletPage].self, forKey: .pages)
 
-        if let blobContainer = try? container.decodeIfPresent(ComAtprotoLexicon.Repository.BlobContainer.self, forKey: .blobPages) {
-            self.blobPages = blobContainer.blob
-        } else {
-            self.blobPages = try container.decodeIfPresent(ComAtprotoLexicon.Repository.UploadBlobOutput.self, forKey: .blobPages)
-        }
+        self.blobPages = try container.decodeIfPresent(ComAtprotoLexicon.Repository.UploadBlobOutput.self, forKey: .blobPages)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -127,11 +123,7 @@ public struct LeafletBlock: Codable, Equatable, Hashable, Sendable {
         self.language = try container.decodeIfPresent(String.self, forKey: .language)
         self.tex = try container.decodeIfPresent(String.self, forKey: .tex)
 
-        if let imageContainer = try? container.decodeIfPresent(ComAtprotoLexicon.Repository.BlobContainer.self, forKey: .image) {
-            self.image = imageContainer.blob
-        } else {
-            self.image = try container.decodeIfPresent(ComAtprotoLexicon.Repository.UploadBlobOutput.self, forKey: .image)
-        }
+        self.image = try container.decodeIfPresent(ComAtprotoLexicon.Repository.UploadBlobOutput.self, forKey: .image)
 
         self.alt = try container.decodeIfPresent(String.self, forKey: .alt)
         self.facets = try container.decodeIfPresent([LeafletFacet].self, forKey: .facets)

@@ -1,5 +1,5 @@
 {
-  "originHash" : "ed2233b9eb5ca5d0461511342d4848c41104a429db2fa77caa72e4880f1d004c",
+  "originHash" : "27b8069c3a12894fc5202adb21586b6f9799275a804ec79abeb00692c9c64cef",
   "pins" : [
     {
       "identity" : "atcommontools",
@@ -33,8 +33,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/MasterJ93/ATProtoKit.git",
       "state" : {
-        "revision" : "618aa33b0b57f54f2a145da5d6f77dd6a48de5de",
-        "version" : "0.32.5"
+        "revision" : "48ba6ba9f48f714274e0f8d2f5b11d0083554edb",
+        "version" : "0.32.6"
+      }
+    },
+    {
+      "identity" : "atresolve",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/germ-network/ATResolve.git",
+      "state" : {
+        "revision" : "b446aeed42ac45642bdd88f6a0af7b6c253ac23d",
+        "version" : "1.1.1"
       }
     },
     {
@@ -53,6 +62,15 @@
       "state" : {
         "revision" : "cfb8003e2d6bd8c3520a1b38cdbef8e757876e6d",
         "version" : "0.3.1"
+      }
+    },
+    {
+      "identity" : "oauthenticator",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/germ-network/OAuthenticator.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "f4d416f4d013749ed8b9ab69dae436ebbf42465f"
       }
     },
     {

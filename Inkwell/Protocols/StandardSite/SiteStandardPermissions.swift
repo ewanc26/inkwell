@@ -15,11 +15,11 @@ extension SiteStandardLexicon {
     /// requesting authorization, so the user's PDS knows which `site.standard.*` collections
     /// the app is allowed to create/update/delete records in.
     ///
-    /// Inkwell currently authenticates with an app password via `ATProtocolConfiguration`
-    /// (see `LoginStateManager`) rather than OAuth, so these aren't wired into the sign-in
-    /// flow yet — app-password sessions get whatever access the account itself has, with no
-    /// scoping. They're here for whenever OAuth (and therefore properly scoped, user-consented
-    /// permissions) lands.
+    /// Inkwell authenticates via OAuth (using OAuthenticator — see `LoginStateManager`).
+    /// These scope identifiers are included in the OAuth authorization request so the user's
+    /// PDS knows which `site.standard.*` collections the app is allowed to access.
+    /// Currently Inkwell requests the `atproto` scope which grants full repository access;
+    /// finer-grained site.standard.* scopes may be adopted in the future.
     ///
     /// - SeeAlso: [standard.site/docs/permissions](https://standard.site/docs/permissions/)
     public enum Permissions {

@@ -28,12 +28,12 @@ enum LegalDocumentType {
             Inkwell is a localized client application. The developer (Ewan Croft) does not collect, store, or harvest any personal data, analytics, or usage metrics on proprietary servers. All data you read, write, or publish is communicated directly between your device and your authenticated Personal Data Server (PDS) or the wider AT Protocol network.
             
             **2. Authentication**
-            Your login credentials (such as App Passwords) are stored securely on your device using Apple's native Keychain. We do not have access to your passwords.
-            
+            Inkwell uses OAuth 2.1 to sign in to your AT Protocol account securely via the system browser. Your OAuth tokens are stored securely on your device using Apple's native Keychain. Inkwell never sees or stores your account password or app password.
+
             **3. Third-Party Services**
             To function, Inkwell communicates with external services:
             * **Your PDS & AT Protocol:** Standard network infrastructure to fetch and publish your content.
-            * **Slingshot:** Used for identity resolution across the network.
+            * **AT Protocol identity services:** Standard DNS and PLC directory lookups for identity resolution.
             * **Leaflet Search:** Used as a cross-platform search index for Standard.site records.
             Queries to these public services are subject to their respective privacy and data retention policies.
             

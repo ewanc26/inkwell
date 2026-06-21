@@ -30,12 +30,7 @@ public struct PcktContent: ATRecordProtocol {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.items = try container.decodeIfPresent([PcktBlock].self, forKey: .items)
-
-        if let blobContainer = try? container.decodeIfPresent(ComAtprotoLexicon.Repository.BlobContainer.self, forKey: .blob) {
-            self.blob = blobContainer.blob
-        } else {
-            self.blob = try container.decodeIfPresent(ComAtprotoLexicon.Repository.UploadBlobOutput.self, forKey: .blob)
-        }
+        self.blob = try container.decodeIfPresent(ComAtprotoLexicon.Repository.UploadBlobOutput.self, forKey: .blob)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -170,11 +165,7 @@ public struct PcktBlockAttrs: Codable, Equatable, Hashable, Sendable {
         self.src = try container.decodeIfPresent(String.self, forKey: .src)
         self.alt = try container.decodeIfPresent(String.self, forKey: .alt)
 
-        if let blobContainer = try? container.decodeIfPresent(ComAtprotoLexicon.Repository.BlobContainer.self, forKey: .blob) {
-            self.blob = blobContainer.blob
-        } else {
-            self.blob = try container.decodeIfPresent(ComAtprotoLexicon.Repository.UploadBlobOutput.self, forKey: .blob)
-        }
+        self.blob = try container.decodeIfPresent(ComAtprotoLexicon.Repository.UploadBlobOutput.self, forKey: .blob)
     }
 
     public func encode(to encoder: Encoder) throws {

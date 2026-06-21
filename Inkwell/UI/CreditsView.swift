@@ -54,14 +54,19 @@ struct CreditsView: View {
                         url: "https://github.com/MasterJ93/ATProtoKit"
                     )
                     creditRow(
+                        title: "OAuthenticator",
+                        detail: "OAuth 2.1 authentication (from ChimeHQ / germ-network)",
+                        url: "https://github.com/germ-network/OAuthenticator"
+                    )
+                    creditRow(
+                        title: "ATResolve",
+                        detail: "AT Protocol identity resolution (from ChimeHQ / germ-network)",
+                        url: "https://github.com/germ-network/ATResolve"
+                    )
+                    creditRow(
                         title: "Standard.site",
                         detail: "The publishing protocol Inkwell reads and writes",
                         url: "https://standard.site"
-                    )
-                    creditRow(
-                        title: "Slingshot",
-                        detail: "Identity resolution, by microcosm.blue",
-                        url: "https://microcosm.blue"
                     )
                     creditRow(
                         title: "pub search",

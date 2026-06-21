@@ -56,12 +56,7 @@ nonisolated public struct MarkpubText: Codable, Equatable, Hashable, Sendable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.type = try container.decode(String.self, forKey: .type)
         self.markdown = try container.decodeIfPresent(String.self, forKey: .markdown)
-
-        if let blobContainer = try? container.decodeIfPresent(ComAtprotoLexicon.Repository.BlobContainer.self, forKey: .textBlob) {
-            self.textBlob = blobContainer.blob
-        } else {
-            self.textBlob = try container.decodeIfPresent(ComAtprotoLexicon.Repository.UploadBlobOutput.self, forKey: .textBlob)
-        }
+        self.textBlob = try container.decodeIfPresent(ComAtprotoLexicon.Repository.UploadBlobOutput.self, forKey: .textBlob)
     }
 
     public func encode(to encoder: Encoder) throws {

@@ -11,5 +11,16 @@
 	<array>
 		<string>uk.ewancroft.inkwell.refresh</string>
 	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>uk.ewancroft.Inkwell</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>inkwell</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>
