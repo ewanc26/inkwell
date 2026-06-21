@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <!-- Inkwell icon — ink bottle silhouette -->
+  <rect x="176" y="96" width="160" height="256" rx="32" fill="currentColor" />
+  <rect x="216" y="352" width="80" height="80" rx="16" fill="currentColor" />
+  <rect x="206" y="56" width="100" height="48" rx="16" fill="currentColor" />
+  <circle cx="256" cy="128" r="20" fill="white" />
+  <!-- Quill -->
+  <g transform="translate(310, 176) rotate(35)">
+    <rect x="0" y="-4" width="140" height="8" rx="4" fill="currentColor" />
+    <polygon points="140,-12 180,0 140,12" fill="currentColor" />
+  </g>
+</svg>

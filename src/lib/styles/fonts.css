@@ -1,0 +1,17 @@
+/* Inter Variable — UI and prose */
+@font-face {
+  font-family: "Inter Variable";
+  src: url("/fonts/inter.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* JetBrains Mono Variable — code */
+@font-face {
+  font-family: "JetBrains Mono Variable";
+  src: url("/fonts/jetbrains-mono.woff2") format("woff2");
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+}

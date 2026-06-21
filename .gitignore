@@ -1,0 +1,25 @@
+# SvelteKit
+/.svelte-kit
+/build
+/.env
+/.env.*
+!.env.example
+
+# Vercel
+/.vercel
+.output
+
+# Dependencies
+/node_modules
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude
+.letta
