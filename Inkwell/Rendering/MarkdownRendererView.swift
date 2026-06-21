@@ -42,16 +42,16 @@ struct MarkdownRendererView: View {
     private func renderBlock(_ block: MarkdownBlock) -> some View {
         switch block {
         case .heading(let level, let text):
-            let fontSize: CGFloat = switch level {
-            case 1: 28
-            case 2: 24
-            case 3: 20
-            case 4: 18
-            case 5: 16
-            default: 16
+            let style: Font.TextStyle = switch level {
+            case 1: .largeTitle
+            case 2: .title
+            case 3: .title2
+            case 4: .title3
+            case 5: .headline
+            default: .headline
             }
             Text(renderInline(text))
-                .font(.system(size: fontSize, weight: .bold, design: theme.headingFamily.design))
+                .font(theme.headingFont(style, weight: .bold))
                 .foregroundStyle(foregroundColor)
                 .padding(.top, level == 1 ? 8 : 4)
 
@@ -128,6 +128,7 @@ struct MarkdownRendererView: View {
                             image
                                 .resizable()
                                 .scaledToFit()
+                                .frame(maxHeight: 400)
                                 .clipShape(RoundedRectangle(cornerRadius: 8))
                         case .failure:
                             Image(systemName: "photo")
@@ -174,12 +175,12 @@ struct MarkdownRendererView: View {
                         Text("\(itemNumber).")
                             .font(theme.bodyFont(.body))
                             .foregroundStyle(accentColor)
-                            .frame(width: 20, alignment: .trailing)
+                            .frame(minWidth: 24, alignment: .trailing)
                     } else {
                         Text("\u{2022}")
                             .font(.title3)
                             .foregroundStyle(accentColor)
-                            .frame(width: 20, alignment: .center)
+                            .frame(minWidth: 16, alignment: .center)
                     }
 
                     VStack(alignment: .leading, spacing: 8) {

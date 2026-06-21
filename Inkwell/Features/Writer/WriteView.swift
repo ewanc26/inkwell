@@ -117,11 +117,13 @@ struct WriteView: View {
                     Text(error)
                         .foregroundStyle(.red)
                         .font(.callout)
+                        .lineLimit(4)
                 }
                 if let success = publishSuccess {
                     Text(success)
                         .foregroundStyle(.green)
                         .font(.callout)
+                        .lineLimit(6)
                 }
                 Button {
                     publish()

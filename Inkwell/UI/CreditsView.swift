@@ -126,9 +126,11 @@ struct CreditsView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
                         .foregroundStyle(.primary)
+                        .lineLimit(2)
                     Text(detail)
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                        .lineLimit(3)
                 }
             }
         }

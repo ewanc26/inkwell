@@ -92,6 +92,7 @@ struct DiscoverView: View {
                         Text(errorMessage)
                             .font(.caption)
                             .foregroundStyle(.red)
+                            .lineLimit(3)
                     }
                 }
             }

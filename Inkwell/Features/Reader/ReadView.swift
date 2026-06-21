@@ -148,7 +148,7 @@ struct ReadView: View {
 
                 // Cover Image
                 if let cover = document.coverImage, let did = authorDID ?? loginStateManager.currentDID {
-                    let urlString = "https://cdn.bsky.app/img/feed_fullsize/plain/\(did)/\(cover.reference.link)"
+                    let urlString = "https://cdn.bsky.app/img/feed_thumbnail/plain/\(did)/\(cover.reference.link)"
                     if let url = URL(string: urlString) {
                         AsyncImage(url: url) { phase in
                             switch phase {
@@ -462,17 +462,15 @@ struct ReadView: View {
             switch block.type {
             case "pub.leaflet.blocks.header":
                 let level = block.level ?? 1
-                let fontSize: CGFloat = {
-                    switch level {
-                    case 1: return 28
-                    case 2: return 24
-                    case 3: return 20
-                    default: return 18
-                    }
-                }()
+                let style: Font.TextStyle = switch level {
+                case 1: .largeTitle
+                case 2: .title
+                case 3: .title2
+                default: .title3
+                }
 
                 Text(renderText(block.plaintext ?? "", facets: block.facets))
-                    .font(.system(size: fontSize, weight: .bold, design: theme.headingFamily.design))
+                    .font(theme.headingFont(style, weight: .bold))
                     .foregroundStyle(foregroundColor)
                     .multilineTextAlignment(textAlignment)
                     .padding(.top, 8)
@@ -538,6 +536,7 @@ struct ReadView: View {
                         .font(theme.bodyFont(.body))
                         .italic()
                         .foregroundStyle(foregroundColor)
+                        .lineLimit(10)
                         .padding(12)
                         .background(foregroundColor.opacity(0.04))
                         .cornerRadius(8)
@@ -552,7 +551,7 @@ struct ReadView: View {
 
             case "pub.leaflet.blocks.image":
                 if let img = block.image, let did = authorDID ?? loginStateManager.currentDID {
-                    let urlString = "https://cdn.bsky.app/img/feed_fullsize/plain/\(did)/\(img.reference.link)"
+                    let urlString = "https://cdn.bsky.app/img/feed_thumbnail/plain/\(did)/\(img.reference.link)"
                     if let url = URL(string: urlString) {
                         VStack(alignment: .center, spacing: 8) {
                             AsyncImage(url: url) { phase in
@@ -564,6 +563,7 @@ struct ReadView: View {
                                     image
                                         .resizable()
                                         .scaledToFit()
+                                        .frame(maxHeight: 400)
                                         .clipShape(RoundedRectangle(cornerRadius: 8))
                                 case .failure:
                                     Image(systemName: "photo")
@@ -622,12 +622,12 @@ struct ReadView: View {
                                 Text("\(itemNumber).")
                                     .font(theme.bodyFont(.body))
                                     .foregroundStyle(accentColor)
-                                    .frame(width: 20, alignment: .trailing)
+                                    .frame(minWidth: 24, alignment: .trailing)
                             } else {
                                 Text("•")
                                     .font(.title3)
                                     .foregroundStyle(accentColor)
-                                    .frame(width: 20, alignment: .center)
+                                    .frame(minWidth: 16, alignment: .center)
                             }
 
                             VStack(alignment: .leading, spacing: 8) {
@@ -749,7 +749,7 @@ private struct ReaderActionPill: View {
                 }
                 Text(label)
                     .lineLimit(1)
-                    .fixedSize(horizontal: true, vertical: false)
+                    .truncationMode(.tail)
             }
             .font(.subheadline.weight(.semibold))
             .foregroundStyle(isActive ? activeForeground : tint)
