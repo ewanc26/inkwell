@@ -2,9 +2,13 @@
 
 @layer theme, base, components, utilities;
 
+/* ── Fonts (must load before tokens that reference them) ── */
+@import "../lib/styles/fonts.css";
 /* ── Design tokens ── */
 @import "../lib/styles/tokens.css";
-/* ── Fonts ── */
-@import "../lib/styles/fonts.css";
+/* ── System utilities ── */
+@import "../lib/styles/system.css";
+/* ── Motion ── */
+@import "../lib/styles/motion.css";
 /* ── Components ── */
 @import "../lib/styles/components.css";

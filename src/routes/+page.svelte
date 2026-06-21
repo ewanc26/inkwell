@@ -6,7 +6,6 @@
     PenLine,
     Shield,
     Globe,
-    Sparkles,
     ArrowRight,
     Apple,
   } from "@lucide/svelte";
@@ -18,40 +17,42 @@
 
 <!-- Hero -->
 <section class="container py-16 sm:py-24">
-  <div class="mx-auto max-w-3xl text-center">
-    <img
-      src="/favicon.svg"
-      alt=""
-      class="mx-auto mb-8 h-20 w-20"
-      aria-hidden="true"
-    />
-    <h1 class="mb-6 text-4xl font-extrabold tracking-tight sm:text-5xl">
+  <div class="hero-reveal">
+    <!-- Wordmark — matches InkwellMark.swift -->
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 400 952"
+      fill="none"
+      class="mx-auto mb-8 h-24 w-auto sm:h-28"
+      aria-label="Inkwell"
+      role="img"
+    >
+      <rect x="40" y="40" width="320" height="80" rx="16" fill="currentColor" />
+      <rect x="125" y="120" width="150" height="640" fill="currentColor" />
+      <rect x="40" y="760" width="320" height="80" rx="16" fill="currentColor" />
+      <circle cx="200" cy="880" r="32" fill="var(--color-accent, #139500)" />
+    </svg>
+
+    <h1 class="mb-6 text-4xl font-extrabold tracking-tight sm:text-5xl text-balance">
       Read, discover, and publish
-      <span class="text-(--color-accent)">Standard.site</span>
+      <span class="text-accent">Standard.site</span>
       writing
     </h1>
-    <p class="mb-8 text-lg leading-relaxed text-(--color-muted)">
+
+    <p class="mb-8 text-lg leading-relaxed text-pretty">
       Inkwell is a native iOS reader and writer for the Standard.site
       publishing ecosystem on AT Protocol. Your writing lives on your
       Personal Data Server — no silos, no lock-in.
     </p>
 
-    <div class="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-      <a
-        href="https://apps.apple.com/app/inkwell/id0000000000"
-        class="app-store-badge"
-      >
-        <img
-          src="/app-store-badge.svg"
-          alt="Download on the App Store"
-          class="h-12"
-        />
-      </a>
+    <div class="flex flex-wrap items-center gap-4">
       <a
         href="https://github.com/ewanc26/inkwell"
-        class="btn btn-outline"
+        class="btn btn-outline hover-lift active-press"
       >
-        <Sparkles class="h-4 w-4" />
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12 24 5.37 18.63 0 12 0z"/>
+        </svg>
         View on GitHub
       </a>
     </div>
@@ -59,11 +60,13 @@
 </section>
 
 <!-- Features -->
-<section class="container py-16">
-  <h2 class="mb-12 text-center text-3xl font-bold">What Inkwell does</h2>
+<section class="container py-12">
+  <h2 class="mb-12 text-center text-3xl font-extrabold text-balance">
+    What Inkwell does
+  </h2>
 
   <div class="feature-grid">
-    <div class="feature-card">
+    <div class="feature-card animate-in stagger-1">
       <div class="feature-icon"><BookOpen class="h-5 w-5" /></div>
       <h3>Read</h3>
       <p>
@@ -73,7 +76,7 @@
       </p>
     </div>
 
-    <div class="feature-card">
+    <div class="feature-card animate-in stagger-1">
       <div class="feature-icon"><Compass class="h-5 w-5" /></div>
       <h3>Discover</h3>
       <p>
@@ -83,7 +86,7 @@
       </p>
     </div>
 
-    <div class="feature-card">
+    <div class="feature-card animate-in stagger-1">
       <div class="feature-icon"><PenLine class="h-5 w-5" /></div>
       <h3>Write</h3>
       <p>
@@ -93,7 +96,7 @@
       </p>
     </div>
 
-    <div class="feature-card">
+    <div class="feature-card animate-in stagger-2">
       <div class="feature-icon"><Globe class="h-5 w-5" /></div>
       <h3>AT Protocol Native</h3>
       <p>
@@ -102,7 +105,7 @@
       </p>
     </div>
 
-    <div class="feature-card">
+    <div class="feature-card animate-in stagger-2">
       <div class="feature-icon"><Shield class="h-5 w-5" /></div>
       <h3>Verification Built In</h3>
       <p>
@@ -112,7 +115,7 @@
       </p>
     </div>
 
-    <div class="feature-card">
+    <div class="feature-card animate-in stagger-2">
       <div class="feature-icon"><Apple class="h-5 w-5" /></div>
       <h3>Native iOS</h3>
       <p>
@@ -124,17 +127,17 @@
   </div>
 </section>
 
-<!-- OAuth note -->
-<section class="container pb-16">
-  <div class="mx-auto max-w-2xl rounded-xl border p-8 text-center">
-    <h2 class="mb-4 text-2xl font-bold">Secure by design</h2>
-    <p class="leading-relaxed text-(--color-muted)">
+<!-- Secure by design -->
+<section class="container py-12">
+  <div class="callout animate-in stagger-3">
+    <h2>Secure by design</h2>
+    <p>
       Inkwell uses OAuth 2.1 to sign in to your Personal Data Server.
       Your browser opens once to approve access — no password is ever
       seen or stored by the app. Tokens are DPoP-bound and stored in
-      Apple's Keychain.
+      Apple&rsquo;s Keychain.
     </p>
-    <a href="/privacy" class="mt-4 inline-flex items-center gap-1 text-sm font-medium text-(--color-accent)">
+    <a href="/privacy" class="hover-lift">
       Read the Privacy Policy <ArrowRight class="h-3 w-3" />
     </a>
   </div>

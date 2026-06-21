@@ -1,81 +1,428 @@
-/* ── Shared component styles ── */
+/* ================================================================
+ * components.css — Shared component styles
+ *
+ * Buttons, cards, callouts, navigation, footer, prose.
+ * Every transition references motion tokens from tokens.css;
+ * every colour references palette steps (never raw values).
+ * ================================================================ */
 
-.container {
-  max-width: 72rem;
-  margin-inline: auto;
-  padding-inline: var(--spacing-md);
-}
+@layer components {
+  /* ── Layout shells ─────────────────────────────────────────── */
 
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-2xs);
-  padding: var(--spacing-xs) var(--spacing-lg);
-  font-weight: 600;
-  border-radius: var(--radius-lg);
-  transition: all 0.15s ease;
-  text-decoration: none;
-}
+  .container {
+    max-width: 72rem;
+    margin-inline: auto;
+    padding-inline: var(--spacing-md);
+  }
 
-.btn-primary {
-  background-color: var(--color-accent);
-  color: white;
-}
+  /* ── Buttons — capsule pills matching the app's ReaderActionPill ── */
 
-.btn-primary:hover {
-  background-color: var(--color-accent-light);
-}
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-2xs);
+    padding: var(--spacing-2xs) var(--spacing-md);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    border-radius: var(--radius-full);
+    transition:
+      background-color var(--duration-normal) var(--ease-spring),
+      transform var(--duration-fast) var(--ease-spring);
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+  }
 
-.btn-outline {
-  border: 1.5px solid var(--color-accent);
-  color: var(--color-accent);
-}
+  .btn:active {
+    transform: scale(0.97);
+  }
 
-.btn-outline:hover {
-  background-color: oklch(from var(--color-accent) l c h / 0.1);
-}
+  .btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
 
-/* ── Feature cards ── */
+  .btn-primary {
+    background-color: var(--accent-500);
+    color: light-dark(white, var(--ink-50));
+  }
 
-.feature-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--spacing-md);
-}
+  .btn-primary:hover {
+    background-color: var(--accent-300);
+  }
 
-.feature-card {
-  padding: var(--spacing-lg);
-  border-radius: var(--radius-lg);
-  background-color: light-dark(var(--color-surface), oklch(0.2 0.01 260));
-  border: 1px solid light-dark(oklch(0.9 0.01 260), oklch(0.25 0.01 260));
-}
+  .btn-primary:active {
+    background-color: var(--accent-700);
+  }
 
-.feature-card h3 {
-  font-size: var(--text-lg);
-  font-weight: 700;
-  margin-bottom: var(--spacing-2xs);
-}
+  .btn-outline {
+    border: 1px solid var(--accent-500);
+    color: var(--accent-500);
+    background-color: transparent;
+  }
 
-.feature-card p {
-  color: var(--color-muted);
-  line-height: 1.6;
-}
+  .btn-outline:hover {
+    background-color: var(--accent-50);
+  }
 
-.feature-icon {
-  width: 2.5rem;
-  height: 2.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-md);
-  background-color: oklch(from var(--color-accent) l c h / 0.1);
-  color: var(--color-accent);
-  margin-bottom: var(--spacing-sm);
-}
+  .btn-outline:active {
+    background-color: var(--accent-100);
+  }
 
-/* ── App Store badge ── */
+  /* ── Site navigation ───────────────────────────────────────── */
 
-.app-store-badge img {
-  height: 3rem;
-  width: auto;
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: light-dark(
+      oklch(0.98 0.005 260 / 0.85),
+      oklch(0.12 0.015 270 / 0.85)
+    );
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .site-header .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: var(--spacing-sm);
+    padding-bottom: var(--spacing-sm);
+  }
+
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-size: var(--text-xl);
+    font-weight: 800;
+    text-decoration: none;
+    color: var(--ink-900);
+    transition: opacity var(--duration-fast) var(--ease-out-quart);
+  }
+
+  .nav-brand:hover {
+    opacity: 0.85;
+  }
+
+  .nav-brand img {
+    height: 2rem;
+    width: 2rem;
+  }
+
+  .nav-links {
+    display: none;
+    align-items: center;
+    gap: var(--spacing-md);
+  }
+
+  @media (min-width: 640px) {
+    .nav-links {
+      display: flex;
+    }
+  }
+
+  .nav-link {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-muted);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out-quart);
+  }
+
+  .nav-link:hover {
+    color: var(--ink-900);
+  }
+
+  .nav-link[aria-current="page"] {
+    color: var(--accent-500);
+  }
+
+  .nav-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--ink-700);
+  }
+
+  @media (min-width: 640px) {
+    .nav-toggle {
+      display: none;
+    }
+  }
+
+  /* Mobile nav drawer */
+  .nav-mobile {
+    position: relative;
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3xs);
+    background-color: var(--paper-100);
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--spacing-2xs) var(--spacing-md) var(--spacing-sm);
+  }
+
+  @media (min-width: 640px) {
+    .nav-mobile {
+      display: none;
+    }
+  }
+
+  .nav-mobile a {
+    display: block;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-muted);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition:
+      color var(--duration-fast) var(--ease-out-quart),
+      background-color var(--duration-fast) var(--ease-out-quart);
+  }
+
+  .nav-mobile a:hover {
+    color: var(--ink-900);
+    background-color: var(--surface-color);
+  }
+
+  .nav-mobile a[aria-current="page"] {
+    color: var(--accent-500);
+  }
+
+  /* Mobile backdrop */
+  .nav-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    background: oklch(0 0 0 / 0.2);
+  }
+
+  @media (min-width: 640px) {
+    .nav-backdrop {
+      display: none;
+    }
+  }
+
+  /* ── Site footer ───────────────────────────────────────────── */
+
+  .site-footer {
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--spacing-lg);
+    padding-bottom: var(--spacing-lg);
+  }
+
+  .site-footer .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+    text-align: center;
+  }
+
+  @media (min-width: 640px) {
+    .site-footer .container {
+      flex-direction: row;
+      justify-content: space-between;
+      text-align: left;
+    }
+  }
+
+  .site-footer,
+  .site-footer a {
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+    text-decoration: none;
+  }
+
+  .site-footer a {
+    transition: color var(--duration-fast) var(--ease-out-quart);
+  }
+
+  .site-footer a:hover {
+    color: var(--accent-500);
+  }
+
+  .site-footer .footer-links {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+  }
+
+  /* ── Feature cards & callouts ──────────────────────────────── */
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+  }
+
+  .feature-card,
+  .callout {
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    background-color: var(--surface-color);
+    border: 1px solid var(--color-border);
+  }
+
+  .feature-card {
+    /* Shadow matches the app's cover-image shadow:
+       .shadow(color: .black.opacity(0.08), radius: 8, y: 4) */
+    box-shadow: 0 4px 8px -2px oklch(0 0 0 / 0.06);
+    transition:
+      background-color var(--duration-fast) var(--ease-out-quart),
+      border-color var(--duration-fast) var(--ease-out-quart),
+      transform var(--duration-fast) var(--ease-spring),
+      box-shadow var(--duration-fast) var(--ease-out-quart);
+  }
+
+  .feature-card:hover {
+    background-color: var(--surface-raised);
+    border-color: var(--paper-300);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px -4px oklch(0 0 0 / 0.1);
+  }
+
+  .feature-card h3 {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: var(--spacing-2xs);
+  }
+
+  .feature-card p {
+    line-height: 1.6;
+  }
+
+  .feature-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    /* App accent opacity scale: 0.12 for inactive backgrounds */
+    background-color: var(--accent-50);
+    color: var(--accent-500);
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .callout {
+    text-align: center;
+  }
+
+  .callout h2 {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .callout p {
+    max-width: 56rem;
+    margin-inline: auto;
+    line-height: 1.6;
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .callout a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-4xs);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--accent-500);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out-quart);
+  }
+
+  .callout a:hover {
+    color: var(--accent-300);
+  }
+
+  /* ── App Store badge ───────────────────────────────────────── */
+
+  .app-store-badge img {
+    height: 3rem;
+    width: auto;
+  }
+
+  /* ── Prose (privacy / terms) ───────────────────────────────── */
+
+  .prose {
+    max-width: 65ch;
+    text-wrap: pretty;
+  }
+
+  .prose h1 {
+    font-size: var(--text-4xl);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: var(--spacing-lg);
+    scroll-margin-top: 120px;
+  }
+
+  .prose h2 {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    margin-top: var(--spacing-lg);
+    margin-bottom: var(--spacing-sm);
+    scroll-margin-top: 100px;
+  }
+
+  .prose p {
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.7;
+  }
+
+  .prose ul,
+  .prose ol {
+    margin-bottom: var(--spacing-sm);
+    padding-left: var(--spacing-lg);
+  }
+
+  .prose ul ::marker {
+    color: var(--accent-500);
+  }
+
+  .prose li {
+    margin-bottom: var(--spacing-2xs);
+  }
+
+  .prose a {
+    color: var(--accent-500);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in oklch, var(--accent-500) 35%, transparent);
+    text-underline-offset: 0.2em;
+    transition:
+      color var(--duration-fast) var(--ease-out-quart),
+      text-decoration-color var(--duration-fast) var(--ease-out-quart);
+  }
+
+  .prose a:hover {
+    color: var(--accent-700);
+    text-decoration-color: var(--accent-500);
+  }
+
+  .prose strong {
+    font-weight: 700;
+    color: var(--ink-900);
+  }
+
+  .prose code {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    padding: 0.15em 0.35em;
+    border-radius: var(--radius-xs);
+    background-color: var(--surface-color);
+    border: 1px solid var(--color-border);
+  }
 }
