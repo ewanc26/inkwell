@@ -6,13 +6,13 @@
   <title>Terms of Service — {SITE.title}</title>
 </svelte:head>
 
-<article class="container prose py-16">
+<article class="container prose py-16 animate-in">
   <h1>Terms of Service &amp; EULA</h1>
 
   <p>
     By downloading or using Inkwell, you agree to these terms. Inkwell is
     licensed to you under the terms of the AGPL 3.0 License, alongside
-    Apple's standard App Store End User License Agreement.
+    Apple&rsquo;s standard App Store End User License Agreement.
   </p>
 
   <h2>1. User-Generated Content</h2>
@@ -23,7 +23,7 @@
   <p>In alignment with Apple App Store guidelines:</p>
   <ul>
     <li>You must not publish illegal, highly objectionable, or abusive content.</li>
-    <li>Inkwell provides native tools to mute or block users and report objectionable content to the network's moderation services.</li>
+    <li>Inkwell provides native tools to mute or block users and report objectionable content to the network&rsquo;s moderation services.</li>
     <li>There is zero tolerance for abusive users. We reserve the right to filter or hide content locally within the client that violates App Store guidelines.</li>
   </ul>
 

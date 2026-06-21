@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 952" fill="none">
+  <!-- Inkwell wordmark: serif I letterform + ink drop.
+       Matches InkwellMark.swift coordinates exactly.
+       The letterform follows currentColor (adapts to light/dark);
+       the ink drop uses the CSS color-accent custom property
+       which resolves to the brand green via light-dark(). -->
+
+  <!-- Top bar -->
+  <rect x="40" y="40" width="320" height="80" rx="16" fill="currentColor" />
+
+  <!-- Vertical stroke -->
+  <rect x="125" y="120" width="150" height="640" fill="currentColor" />
+
+  <!-- Bottom bar -->
+  <rect x="40" y="760" width="320" height="80" rx="16" fill="currentColor" />
+
+  <!-- Ink drop: brand green, auto-adapts light/dark via the
+       color-accent CSS custom property defined in tokens.css -->
+  <circle cx="200" cy="880" r="32" fill="var(--color-accent, #139500)" />
+</svg>

@@ -6,10 +6,10 @@
   <title>Privacy Policy — {SITE.title}</title>
 </svelte:head>
 
-<article class="container prose py-16">
+<article class="container prose py-16 animate-in">
   <h1>Privacy Policy</h1>
 
-  <p><strong>Effective Date: 21 June 2026</strong></p>
+  <p><strong>Effective Date: <time datetime="2026-06-21">21 June 2026</time></strong></p>
 
   <p>
     Inkwell is a decentralized client for the Standard.site ecosystem on the
@@ -29,7 +29,7 @@
   <p>
     Inkwell uses OAuth 2.1 to sign in to your AT Protocol account securely via
     the system browser. Your OAuth tokens are stored securely on your device
-    using Apple's native Keychain. Inkwell never sees or stores your account
+    using Apple&rsquo;s native Keychain. Inkwell never sees or stores your account
     password or app password.
   </p>
 

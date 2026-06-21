@@ -1,17 +1,59 @@
+/* ================================================================
+ * tokens.css — Design language tokens
+ *
+ * Single source of truth for every design value.  Every other
+ * stylesheet consumes these variables; none define their own.
+ * If you're hardcoding a number, it should be here.
+ *
+ * Architecture mirrors ewancroft.uk: dual-definition pattern
+ * (Tailwind v4 @theme → CSS custom properties via var())
+ * with light-dark() inversion on every colour step.
+ * ================================================================ */
+
+/* ── Tailwind v4 Theme — maps palette steps to utility classes ── */
 @theme {
-  /* Inkwell brand — ink / paper palette */
-  --color-ink: #1a1a2e;
-  --color-paper: #faf8f5;
-  --color-accent: #4f46e5;
-  --color-accent-light: #818cf8;
-  --color-surface: oklch(0.98 0.01 260);
-  --color-muted: oklch(0.55 0.02 260);
+  /* Ink palette (text hierarchy) */
+  --color-ink-50: var(--ink-50);
+  --color-ink-100: var(--ink-100);
+  --color-ink-200: var(--ink-200);
+  --color-ink-300: var(--ink-300);
+  --color-ink-500: var(--ink-500);
+  --color-ink-600: var(--ink-600);
+  --color-ink-700: var(--ink-700);
+  --color-ink-900: var(--ink-900);
+
+  /* Paper palette (background hierarchy) */
+  --color-paper-50: var(--paper-50);
+  --color-paper-100: var(--paper-100);
+  --color-paper-200: var(--paper-200);
+  --color-paper-300: var(--paper-300);
+  --color-paper-500: var(--paper-500);
+  --color-paper-700: var(--paper-700);
+  --color-paper-900: var(--paper-900);
+
+  /* Accent palette (brand green) */
+  --color-accent-50: var(--accent-50);
+  --color-accent-100: var(--accent-100);
+  --color-accent-200: var(--accent-200);
+  --color-accent-300: var(--accent-300);
+  --color-accent-500: var(--accent-500);
+  --color-accent-700: var(--accent-700);
+  --color-accent-900: var(--accent-900);
+
+  /* Backward-compatible flat aliases — keep existing classes working */
+  --color-ink: var(--ink-700);
+  --color-paper: var(--paper-100);
+  --color-surface: var(--paper-200);
+  --color-muted: var(--ink-600);
+  --color-border: var(--paper-300);
+  --color-accent: var(--accent-500);
+  --color-accent-light: var(--accent-300);
 
   /* Typography */
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
 
-  /* Spacing (4pt scale) */
+  /* Spacing — 4pt scale, Tailwind-compatible naming */
   --spacing-4xs: 0.125rem;
   --spacing-3xs: 0.25rem;
   --spacing-2xs: 0.5rem;
@@ -23,40 +65,121 @@
   --spacing-2xl: 4rem;
   --spacing-3xl: 6rem;
 
-  /* Type scale (1.25 ratio) */
+  /* Type scale — 1.25 modular ratio, fluid at display sizes */
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;
   --text-lg: 1.25rem;
   --text-xl: 1.563rem;
   --text-2xl: 1.953rem;
-  --text-3xl: 2.441rem;
-  --text-4xl: 3.052rem;
+  --text-3xl: clamp(1.75rem, 3vw + 1rem, 2.441rem);
+  --text-4xl: clamp(2rem, 4vw + 1rem, 3.052rem);
+  --text-5xl: clamp(2.25rem, 5vw + 1rem, 3.815rem);
 
   /* Radii */
+  --radius-xs: 0.25rem;
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
   --radius-full: 9999px;
+
+  /* Motion — durations & easing curves.
+     --ease-spring approximates SwiftUI .spring(response: 0.3, dampingFraction: 0.7) */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-instant: 100ms;
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
 }
 
+/* ── CSS Custom Properties (runtime, light-dark() resolution) ── */
 @layer base {
   :root {
     color-scheme: light dark;
+
+    /* ── Ink palette (text/foreground, warm navy) ───────────────── */
+    --ink-50: light-dark(oklch(0.97 0.01 250), oklch(0.14 0.04 255));
+    --ink-100: light-dark(oklch(0.92 0.015 250), oklch(0.18 0.05 255));
+    --ink-200: light-dark(oklch(0.85 0.025 252), oklch(0.24 0.06 258));
+    --ink-300: light-dark(oklch(0.72 0.035 252), oklch(0.32 0.07 260));
+    --ink-500: light-dark(oklch(0.50 0.05 255), oklch(0.46 0.08 262));
+    --ink-600: light-dark(oklch(0.40 0.055 258), oklch(0.58 0.06 258));
+    --ink-700: light-dark(oklch(0.30 0.06 260), oklch(0.68 0.05 255));
+    --ink-900: light-dark(oklch(0.16 0.05 262), oklch(0.90 0.025 250));
+
+    /* ── Paper palette (background/surface, warm off-white) ─────── */
+    --paper-50: light-dark(oklch(0.99 0.006 240), oklch(0.10 0.03 255));
+    --paper-100: light-dark(oklch(0.98 0.01 240), oklch(0.14 0.04 255));
+    --paper-200: light-dark(oklch(0.96 0.02 245), oklch(0.20 0.05 258));
+    --paper-300: light-dark(oklch(0.90 0.03 248), oklch(0.28 0.06 260));
+    --paper-500: light-dark(oklch(0.78 0.04 250), oklch(0.44 0.07 260));
+    --paper-700: light-dark(oklch(0.55 0.05 255), oklch(0.68 0.05 255));
+    --paper-900: light-dark(oklch(0.30 0.05 255), oklch(0.90 0.025 248));
+
+    /* ── Accent palette (vivid brand green, hue ~142) ───────────── */
+    --accent-50: light-dark(oklch(0.96 0.06 142), oklch(0.20 0.06 138));
+    --accent-100: light-dark(oklch(0.91 0.10 142), oklch(0.26 0.09 140));
+    --accent-200: light-dark(oklch(0.82 0.16 142), oklch(0.34 0.14 142));
+    --accent-300: light-dark(oklch(0.52 0.26 142), oklch(0.58 0.16 144));
+    --accent-500: light-dark(oklch(0.48 0.28 142), oklch(0.56 0.22 146));
+    --accent-700: light-dark(oklch(0.35 0.22 142), oklch(0.72 0.20 148));
+    --accent-900: light-dark(oklch(0.24 0.15 140), oklch(0.88 0.12 148));
+
+    /* ── Surface semantic aliases ───────────────────────────────── */
+    --surface-sunken: var(--paper-100);
+    --surface-color: var(--paper-200);
+    --surface-raised: var(--paper-50);
+  }
+
+  /* ── Base element defaults ──────────────────────────────────── */
+
+  html {
+    scroll-behavior: smooth;
+    overflow-x: clip;
+    width: 100%;
   }
 
   body {
-    background-color: light-dark(var(--color-paper), var(--color-ink));
-    color: light-dark(var(--color-ink), var(--color-paper));
+    background-color: var(--paper-100);
+    color: var(--ink-700);
     font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: 1.5;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+    margin: 0;
   }
 
+  /* ── Selection ───────────────────────────────────────────────── */
+
   ::selection {
-    background-color: light-dark(
-      oklch(from var(--color-accent) l c h / 0.2),
-      oklch(from var(--color-accent-light) l c h / 0.3)
-    );
+    background-color: var(--accent-200);
+  }
+
+  /* ── Focus ring ──────────────────────────────────────────────── */
+
+  :focus-visible {
+    outline: 2px solid var(--accent-500);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
+
+  /* ── Reduced motion ──────────────────────────────────────────── */
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
