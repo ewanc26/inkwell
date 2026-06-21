@@ -43,6 +43,7 @@ struct DiscoverView: View {
                             ProgressView()
                             Text("Searching the Standard.site network...")
                                 .foregroundStyle(.secondary)
+                                .lineLimit(2)
                         }
                     }
                 } else if results.isEmpty && errorMessage == nil {
@@ -196,26 +197,81 @@ struct RemoteDocumentView: View {
     }
 }
 
+/// A small bounded thumbnail shared by both search row types — fixed-size
+/// regardless of the AsyncImage's loading phase, so a slow or missing image
+/// never grows the row or distorts the list. Falls back to an SF Symbol on
+/// a faint tinted square when there's nothing to show.
+private struct SearchResultThumbnail: View {
+    let urlString: String?
+    let placeholderSystemImage: String
+    var size: CGFloat = 52
+    var cornerRadius: CGFloat = 10
+
+    var body: some View {
+        Group {
+            if let urlString, let url = URL(string: urlString) {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image.resizable().scaledToFill()
+                    case .failure:
+                        placeholder
+                    default:
+                        Color.primary.opacity(0.05)
+                            .overlay { ProgressView().scaleEffect(0.6) }
+                    }
+                }
+            } else {
+                placeholder
+            }
+        }
+        .frame(width: size, height: size)
+        .background(Color.primary.opacity(0.05))
+        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+    }
+
+    private var placeholder: some View {
+        Image(systemName: placeholderSystemImage)
+            .foregroundStyle(.secondary)
+    }
+}
+
 private struct DocumentSearchRow: View {
     let result: ReaderSearchResult
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 5) {
-            Text(result.title)
-                .font(.system(.body, design: .serif, weight: .semibold))
-                .lineLimit(2)
-            if let snippet = result.snippet, !snippet.isEmpty {
-                Text(snippet)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+        HStack(alignment: .top, spacing: 12) {
+            SearchResultThumbnail(
+                urlString: result.coverImage,
+                placeholderSystemImage: "doc.text.image"
+            )
+
+            VStack(alignment: .leading, spacing: 5) {
+                Text(result.title)
+                    .font(.system(.body, design: .serif, weight: .semibold))
                     .lineLimit(2)
+                if let snippet = result.snippet, !snippet.isEmpty {
+                    Text(snippet)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(2)
+                }
+                HStack(spacing: 4) {
+                    Text(result.platform ?? "standard.site")
+                        .lineLimit(1)
+                    if let handle = result.handle {
+                        Text("·")
+                        Text(handle)
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                    }
+                }
+                .font(.caption2)
+                .foregroundStyle(.secondary)
             }
-            HStack {
-                Text(result.platform ?? "standard.site")
-                if let handle = result.handle { Text(handle) }
-            }
-            .font(.caption2)
-            .foregroundStyle(.secondary)
+            // Lets the text column truncate instead of pushing the row wider
+            // than the list, however long the title/handle turn out to be.
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.vertical, 4)
     }
@@ -229,28 +285,44 @@ private struct PublicationSearchRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: "building.2.crop.left.right.fill")
-                .foregroundStyle(.secondary)
-                .frame(width: 40, height: 40)
-                .background(Color.primary.opacity(0.05))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+            SearchResultThumbnail(
+                urlString: publication.coverImage,
+                placeholderSystemImage: "building.2.crop.left.right.fill",
+                size: 44
+            )
+
             VStack(alignment: .leading, spacing: 4) {
                 Text(publication.title)
                     .font(.headline)
+                    .lineLimit(2)
                 if let basePath = publication.basePath {
                     Text(basePath)
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
                 }
             }
-            Spacer()
-            Button(action: onSubscribe) {
-                Image(systemName: isSubscribed ? "bell.fill" : "bell")
-                    .foregroundStyle(isSubscribed ? Color.accentColor : Color.secondary)
-            }
-            .buttonStyle(.borderless)
-            .disabled(!canSubscribe)
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            subscribeButton
         }
         .padding(.vertical, 4)
+    }
+
+    private var subscribeButton: some View {
+        Button(action: onSubscribe) {
+            Image(systemName: isSubscribed ? "bell.fill" : "bell")
+                .font(.subheadline)
+                .symbolEffect(.bounce, value: isSubscribed)
+                .foregroundStyle(isSubscribed ? Color.white : Color.accentColor)
+                .frame(width: 32, height: 32)
+                .background(
+                    Circle().fill(isSubscribed ? Color.accentColor : Color.accentColor.opacity(0.12))
+                )
+        }
+        .buttonStyle(.borderless)
+        .disabled(!canSubscribe)
+        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSubscribed)
     }
 }

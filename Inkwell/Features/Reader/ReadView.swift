@@ -23,6 +23,17 @@ struct ReadView: View {
     @State private var errorMessage: String? = nil
     @State private var isVerified: Bool?
 
+    // Subscribe (to the publication) / Recommend (this document) state.
+    // Loaded once on appearance and mutated optimistically on tap — see
+    // `loadActionState()`, `toggleSubscription()`, and `toggleRecommend()`.
+    @State private var isSubscribed = false
+    @State private var subscriptionRecordKey: String?
+    @State private var isTogglingSubscription = false
+    @State private var isRecommended = false
+    @State private var recommendRecordKey: String?
+    @State private var isSubmittingRecommend = false
+    @State private var actionMessage: String?
+
     // Resolves Leaflet's rich theme (light/dark palettes, fonts, page
     // width) first, falling back to standard.site's basicTheme, then
     // system defaults — see ReaderTheme.swift. A document-level theme
@@ -35,6 +46,17 @@ struct ReadView: View {
     private var foregroundColor: Color { theme.foreground }
     private var accentColor: Color { theme.accent }
 
+    /// The publication's AT-URI, when `document.site` actually points at one
+    /// (rather than a bare HTTPS URL) — the same shape `createSubscription`
+    /// requires. Standalone documents published straight to a URL have
+    /// nothing to subscribe to, so the action simply doesn't appear for them.
+    private var publicationURI: String? {
+        guard ATURI.parse(document.site)?.collection == SiteStandardLexicon.PublicationRecord.type else {
+            return nil
+        }
+        return document.site
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
@@ -45,6 +67,7 @@ struct ReadView: View {
                             .font(theme.headingFont(.caption, weight: .bold))
                             .foregroundStyle(accentColor)
                             .tracking(2)
+                            .lineLimit(1)
                     }
 
                     Text(document.title)
@@ -58,10 +81,12 @@ struct ReadView: View {
                             .fontWeight(.medium)
 
                         if let path = document.path {
-                            Spacer()
+                            Spacer(minLength: 8)
                             Text(path)
                                 .font(.caption2)
                                 .foregroundStyle(foregroundColor.opacity(0.5))
+                                .lineLimit(1)
+                                .truncationMode(.middle)
                         }
                     }
                     .font(.caption)
@@ -74,9 +99,11 @@ struct ReadView: View {
                                 systemImage: isVerified ? "checkmark.seal.fill" : "exclamationmark.triangle"
                             )
                             .foregroundStyle(isVerified ? Color.green : Color.orange)
+                            .lineLimit(1)
                         }
                         if let url = document.canonicalURL(publication: publication) {
                             Link("Open original", destination: url)
+                                .lineLimit(1)
                         }
                     }
                     .font(.caption)
@@ -85,6 +112,24 @@ struct ReadView: View {
                         .background(accentColor.opacity(0.3))
                 }
                 .padding(.top, 16)
+
+                // Subscribe / Recommend actions. Wrapped in ViewThatFits so
+                // that on narrow screens or larger Dynamic Type sizes the
+                // pills stack vertically instead of clipping or squeezing
+                // off the trailing edge.
+                if publicationURI != nil || documentURI != nil {
+                    VStack(alignment: .leading, spacing: 6) {
+                        ViewThatFits(in: .horizontal) {
+                            HStack(spacing: 10) { actionPills }
+                            VStack(alignment: .leading, spacing: 8) { actionPills }
+                        }
+                        if let actionMessage {
+                            Text(actionMessage)
+                                .font(.caption)
+                                .foregroundStyle(.red)
+                        }
+                    }
+                }
 
                 // Excerpt/description
                 if let desc = document.description, !desc.isEmpty {
@@ -128,6 +173,27 @@ struct ReadView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                         .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
                     }
+                } else {
+                    // No cover image: a small Inkwell-branded gradient banner
+                    // instead of leaving a gap, so plain-text documents still
+                    // have some visual presence on the way in. Purely
+                    // decorative chrome, tinted from the resolved theme's own
+                    // accent so it never fights whatever the publication has
+                    // actually set — it just keeps the page from feeling bare
+                    // before the content underneath kicks in.
+                    LinearGradient(
+                        colors: [accentColor.opacity(0.16), accentColor.opacity(0.04)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    .frame(maxWidth: .infinity)
+                    .aspectRatio(16 / 9, contentMode: .fit)
+                    .overlay {
+                        InkwellMark()
+                            .frame(width: 30, height: 30 * 952 / 400)
+                            .foregroundStyle(accentColor.opacity(0.45))
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
 
                 // Content Section
@@ -181,6 +247,119 @@ struct ReadView: View {
         }
         .task(id: documentURI) {
             await verifySource()
+        }
+        .task(id: documentURI) {
+            await loadActionState()
+        }
+    }
+
+    // MARK: - Action Pills
+
+    @ViewBuilder
+    private var actionPills: some View {
+        if let publicationURI {
+            ReaderActionPill(
+                icon: isSubscribed ? "bell.fill" : "bell",
+                label: isSubscribed ? "Subscribed" : "Subscribe",
+                isActive: isSubscribed,
+                isLoading: isTogglingSubscription,
+                tint: accentColor,
+                activeForeground: theme.accentForeground
+            ) {
+                Task { await toggleSubscription(publicationURI: publicationURI) }
+            }
+            .disabled(isTogglingSubscription)
+        }
+
+        if let documentURI {
+            ReaderActionPill(
+                icon: isRecommended ? "star.fill" : "star",
+                label: isRecommended ? "Recommended" : "Recommend",
+                isActive: isRecommended,
+                isLoading: isSubmittingRecommend,
+                tint: accentColor,
+                activeForeground: theme.accentForeground
+            ) {
+                Task { await toggleRecommend(documentURI: documentURI) }
+            }
+            .disabled(isSubmittingRecommend)
+        }
+    }
+
+    // MARK: - Action State
+
+    private func loadActionState() async {
+        if let publicationURI {
+            if let subs = try? await loginStateManager.fetchSubscriptions(),
+               let match = subs.first(where: { $0.record.publication == publicationURI }) {
+                isSubscribed = true
+                subscriptionRecordKey = match.recordKey
+            } else {
+                isSubscribed = false
+                subscriptionRecordKey = nil
+            }
+        }
+
+        if let documentURI {
+            if let recs = try? await loginStateManager.fetchRecommends(),
+               let match = recs.first(where: { $0.record.document == documentURI }) {
+                isRecommended = true
+                recommendRecordKey = match.recordKey
+            } else {
+                isRecommended = false
+                recommendRecordKey = nil
+            }
+        }
+    }
+
+    private func toggleSubscription(publicationURI: String) async {
+        guard !isTogglingSubscription else { return }
+        isTogglingSubscription = true
+        actionMessage = nil
+        defer { isTogglingSubscription = false }
+
+        do {
+            if isSubscribed, let key = subscriptionRecordKey {
+                try await loginStateManager.deleteSubscription(recordKey: key)
+                isSubscribed = false
+                subscriptionRecordKey = nil
+            } else {
+                if let publication {
+                    // Best-effort: subscribing shouldn't be blocked on the
+                    // verification round-trip, only informed by it.
+                    _ = try? await SiteStandardLexicon.Verification.verify(
+                        publicationURI: publicationURI,
+                        publication: publication
+                    )
+                }
+                let reference = try await loginStateManager.createSubscription(publicationURI: publicationURI)
+                isSubscribed = true
+                subscriptionRecordKey = ATURI.parse(reference.recordURI)?.recordKey
+                await NotificationManager.shared.requestPermission()
+            }
+        } catch {
+            actionMessage = "Couldn't update subscription: \(error.localizedDescription)"
+        }
+    }
+
+    private func toggleRecommend(documentURI: String) async {
+        guard !isSubmittingRecommend else { return }
+        isSubmittingRecommend = true
+        actionMessage = nil
+        defer { isSubmittingRecommend = false }
+
+        do {
+            if isRecommended, let key = recommendRecordKey {
+                try await loginStateManager.deleteRecommend(recordKey: key)
+                isRecommended = false
+                recommendRecordKey = nil
+            } else {
+                let reference = try await loginStateManager.createRecommend(documentURI: documentURI)
+                isRecommended = true
+                recommendRecordKey = ATURI.parse(reference.recordURI)?.recordKey
+            }
+        } catch {
+            actionMessage = "Couldn't update recommendation: \(error.localizedDescription)"
         }
     }
 
@@ -538,5 +717,54 @@ extension Alignment {
         case .center: return .center
         default: return .leading
         }
+    }
+}
+
+// MARK: - Action Pill
+
+/// A small capsule button used for the Subscribe / Recommend actions.
+/// Tinted from the resolved `ReaderTheme` so it stays in step with whatever
+/// the publication actually set, while the capsule shape, fill transition,
+/// and bounce give Inkwell's own chrome a bit more personality than a bare
+/// toolbar icon would.
+private struct ReaderActionPill: View {
+    let icon: String
+    let label: String
+    let isActive: Bool
+    let isLoading: Bool
+    let tint: Color
+    let activeForeground: Color
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 6) {
+                if isLoading {
+                    ProgressView()
+                        .scaleEffect(0.7)
+                        .tint(isActive ? activeForeground : tint)
+                } else {
+                    Image(systemName: icon)
+                        .symbolEffect(.bounce, value: isActive)
+                }
+                Text(label)
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
+            }
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(isActive ? activeForeground : tint)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 8)
+            .background(
+                Capsule()
+                    .fill(isActive ? tint : tint.opacity(0.12))
+            )
+            .overlay(
+                Capsule()
+                    .strokeBorder(tint.opacity(isActive ? 0 : 0.35), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isActive)
     }
 }

@@ -1,0 +1,22 @@
+{
+  "lastAgent": null,
+  "conversationGoalToolsByServer": {
+    "api.letta.com": {
+      "conv-2e781da9-14b9-43e2-b9ce-bc88fdf07c2e": true
+    }
+  },
+  "conversationGoalsByServer": {
+    "api.letta.com": {
+      "conv-2e781da9-14b9-43e2-b9ce-bc88fdf07c2e": {
+        "objective": "looks good, feels a little empty imo. needs more images or something. needs recommend and subscribe buttons. Also make sure nothing overflows and is all properly sized to fit the screen. use git to track the changes.",
+        "status": "active",
+        "createdAt": "2026-06-21T04:19:12.817Z",
+        "updatedAt": "2026-06-21T04:24:04.935Z",
+        "activeStartedAt": "2026-06-21T04:19:12.817Z",
+        "activeTimeSeconds": 0,
+        "tokensUsed": 132680,
+        "tokenBudget": null
+      }
+    }
+  }
+}

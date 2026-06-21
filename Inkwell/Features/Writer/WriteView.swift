@@ -153,6 +153,8 @@ struct WriteView: View {
                         avatarView
                         Text(timeZoneAwareGreeting)
                             .font(.headline)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {

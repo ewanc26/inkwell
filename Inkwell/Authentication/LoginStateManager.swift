@@ -824,6 +824,21 @@ final class LoginStateManager {
         return entries
     }
 
+    /// Deletes a recommend record, withdrawing an endorsement of a document.
+    ///
+    /// - Parameter recordKey: The record key of the recommend to delete.
+    func deleteRecommend(recordKey: String) async throws {
+        guard let atProto = atProto, let session = try await atProto.getUserSession() else {
+            throw NSError(domain: "LoginStateManager", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])
+        }
+
+        try await atProto.deleteRecord(
+            repositoryDID: session.sessionDID,
+            collection: "site.standard.graph.recommend",
+            recordKey: recordKey
+        )
+    }
+
     // MARK: - Helper
     private func clearSession(clearStoredAccount: Bool = false) {
         self.isAuthenticated = false
