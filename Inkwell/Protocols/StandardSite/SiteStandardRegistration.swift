@@ -24,7 +24,8 @@ extension SiteStandardLexicon {
             SiteStandardLexicon.PublicationRecord.self,
             SiteStandardLexicon.DocumentRecord.self,
             SiteStandardLexicon.Graph.SubscriptionRecord.self,
-            SiteStandardLexicon.Graph.RecommendRecord.self
+            SiteStandardLexicon.Graph.RecommendRecord.self,
+            PubLeafletComment.self,
         ])
     }
 }

@@ -913,6 +913,58 @@ final class LoginStateManager {
         )
     }
 
+    // MARK: - Comments
+
+    /// Fetches all `pub.leaflet.comment` records that reference the given
+    /// document as their `subject`, newest first.
+    func fetchComments(documentURI: String) async throws -> [CommentEntry] {
+        guard let did = currentDID else { throw LoginError.notAuthenticated }
+        let records = try await listAllRecords(
+            from: did, collection: PubLeafletComment.type
+        )
+        return records.compactMap { record in
+            record.value
+                .flatMap { $0.getRecord(ofType: PubLeafletComment.self) }
+                .filter { $0.subject == documentURI }
+                .map {
+                    CommentEntry(
+                        uri: record.uri,
+                        recordKey: ATURI.parse(record.uri)?.recordKey ?? "",
+                        record: $0
+                    )
+                }
+        }
+        .sorted { $0.record.createdAt > $1.record.createdAt }
+    }
+
+    /// Creates a `pub.leaflet.comment` record.
+    @discardableResult
+    func createComment(
+        subject: String,
+        plaintext: String,
+        replyTo: String? = nil,
+        onPage: String? = nil
+    ) async throws -> ComAtprotoLexicon.Repository.StrongReference {
+        let comment = PubLeafletComment(
+            subject: subject,
+            plaintext: plaintext,
+            reply: replyTo.map { PubLeafletComment.ReplyRef(parent: $0) },
+            onPage: onPage
+        )
+        return try await createRecord(
+            collection: PubLeafletComment.type,
+            record: UnknownType.record(comment)
+        )
+    }
+
+    /// Deletes a comment record by its record key.
+    func deleteComment(recordKey: String) async throws {
+        try await deleteRecord(
+            collection: PubLeafletComment.type,
+            recordKey: recordKey
+        )
+    }
+
     // MARK: - PDS Resolution
 
     /// Resolves the PDS URL for a given DID, caching the result.
