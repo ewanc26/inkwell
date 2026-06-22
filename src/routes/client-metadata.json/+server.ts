@@ -13,7 +13,7 @@ export function GET() {
     client_name: "Inkwell",
     client_uri: "https://inkwell.app",
     application_type: "native",
-    redirect_uris: ["inkwell://callback"],
+    redirect_uris: ["uk.ewancroft.inkwell://callback"],
     scope: "atproto",
     grant_types: ["authorization_code", "refresh_token"],
     dpop_bound_access_tokens: true,
