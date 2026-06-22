@@ -142,15 +142,24 @@ struct BrowseDocumentsView: View {
             }
 
             var followedItems: [ReaderFeedItem] = []
-            for subscription in followedPublications {
-                guard let publicationURI = subscription.publicationURI else { continue }
-                let publication = try? await loginStateManager.fetchPublication(uri: subscription.record.publication)
-                guard let remoteDocuments = try? await loginStateManager.fetchDocuments(fromDID: publicationURI.did) else {
-                    continue
+            await withTaskGroup(of: [ReaderFeedItem].self) { group in
+                for subscription in followedPublications {
+                    group.addTask {
+                        guard let publicationURI = subscription.publicationURI else { return [] }
+                        let publication = try? await loginStateManager.fetchPublication(uri: subscription.record.publication)
+                        guard let remoteDocuments = try? await loginStateManager.fetchDocuments(fromDID: publicationURI.did) else {
+                            return []
+                        }
+                        return remoteDocuments.compactMap { document in
+                            guard (publication?.contains(document.record) ?? false) || document.record.site == subscription.record.publication else {
+                                return nil
+                            }
+                            return ReaderFeedItem(document: document, publication: publication)
+                        }
+                    }
                 }
-
-                for document in remoteDocuments where (publication?.contains(document.record) ?? false) || document.record.site == subscription.record.publication {
-                    followedItems.append(ReaderFeedItem(document: document, publication: publication))
+                for await items in group {
+                    followedItems.append(contentsOf: items)
                 }
             }
 

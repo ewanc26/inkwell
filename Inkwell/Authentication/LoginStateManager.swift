@@ -444,6 +444,7 @@ final class LoginStateManager {
 
         var request = URLRequest(url: url)
         request.httpMethod = method
+        request.timeoutInterval = 8
         if let body {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.httpBody = body
