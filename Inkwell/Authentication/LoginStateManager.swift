@@ -122,11 +122,23 @@ final class LoginStateManager {
     /// The `clientId` URL must serve the `client-metadata.json` file
     /// found in the repo's `oauth/` directory. In production this is
     /// `https://inkwell.ewancroft.uk/client-metadata.json`.
+    ///
+    /// Scopes follow the AT Protocol granular permission model
+    /// (`atproto.com/specs/permission`). Inkwell requests access to:
+    /// - Four `site.standard.*` collections (publications, documents,
+    ///   subscriptions, recommends) for full CRUD.
+    /// - `blob:*/*` for downloading media blobs via `sync.getBlob`.
     private var appCredentials: AppCredentials {
         AppCredentials(
             clientId: "https://inkwell.ewancroft.uk/client-metadata.json",
             clientPassword: "",
-            scopes: ["atproto"],
+            scopes: [
+                "repo:site.standard.publication",
+                "repo:site.standard.document",
+                "repo:site.standard.graph.subscription",
+                "repo:site.standard.graph.recommend",
+                "blob:*/*"
+            ],
             callbackURL: URL(string: "uk.ewancroft.inkwell:/callback")!
         )
     }

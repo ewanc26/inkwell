@@ -16,11 +16,22 @@ extension SiteStandardLexicon {
     /// the app is allowed to create/update/delete records in.
     ///
     /// Inkwell authenticates via OAuth (using OAuthenticator — see `LoginStateManager`).
-    /// These scope identifiers are included in the OAuth authorization request so the user's
-    /// PDS knows which `site.standard.*` collections the app is allowed to access.
-    /// Currently Inkwell requests the `atproto` scope which grants full repository access;
-    /// finer-grained site.standard.* scopes may be adopted in the future.
+    /// As of June 2026, Inkwell uses AT Protocol granular scopes
+    /// (`atproto.com/specs/permission`) instead of the legacy `atproto` catch-all:
     ///
+    /// ```
+    /// repo:site.standard.publication
+    /// repo:site.standard.document
+    /// repo:site.standard.graph.subscription
+    /// repo:site.standard.graph.recommend
+    /// blob:*/*
+    /// ```
+    ///
+    /// Once `site.standard` permission-set lexicons are published and widely
+    /// supported by PDS instances, these can be replaced with the cleaner
+    /// `include:site.standard.authFull` invocation.
+    ///
+    /// - SeeAlso: [AT Protocol Permissions Spec](https://atproto.com/specs/permission)
     /// - SeeAlso: [standard.site/docs/permissions](https://standard.site/docs/permissions/)
     public enum Permissions {
 
