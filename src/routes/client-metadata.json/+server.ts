@@ -14,7 +14,7 @@ export function GET() {
     client_uri: "https://inkwell.ewancroft.uk",
     application_type: "native",
     redirect_uris: ["uk.ewancroft.inkwell:/callback"],
-    scope: "repo:site.standard.publication repo:site.standard.document repo:site.standard.graph.subscription repo:site.standard.graph.recommend blob:*/*",
+    scope: "atproto repo:site.standard.publication repo:site.standard.document repo:site.standard.graph.subscription repo:site.standard.graph.recommend blob:*/*",
     grant_types: ["authorization_code", "refresh_token"],
     dpop_bound_access_tokens: true,
     token_endpoint_auth_method: "none",
