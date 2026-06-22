@@ -634,6 +634,20 @@ struct LeafletProvider: ContentProvider {
     private let schema = FacetSchema.leaflet
     private let b: (String) -> String = { "pub.leaflet.blocks.\($0)" }
 
+    /// Blocks that can't be represented as markdown, with human labels
+    /// matching standard.horse's LOSS_LABELS.
+    private let lossLabels: [String: String] = [
+        "pub.leaflet.blocks.iframe": "embeds",
+        "pub.leaflet.blocks.website": "website cards",
+        "pub.leaflet.blocks.bskyPost": "Bluesky posts",
+        "pub.leaflet.blocks.standardSitePost": "linked posts",
+        "pub.leaflet.blocks.page": "sub-pages",
+        "pub.leaflet.blocks.poll": "polls",
+        "pub.leaflet.blocks.button": "buttons",
+        "pub.leaflet.blocks.postsList": "post lists",
+        "pub.leaflet.blocks.signup": "signup forms",
+    ]
+
     func matches(_ content: UnknownType?) -> Bool {
         content?.getRecord(ofType: LeafletContent.self) != nil
     }
@@ -647,6 +661,7 @@ struct LeafletProvider: ContentProvider {
         var blocks: [MarkdownBlock] = []
 
         let pages = leaflet.pages ?? []
+        // Prefer the linearDocument page, but accept any page (including blob-loaded pages).
         let page = pages.first(where: { $0.type == "pub.leaflet.pages.linearDocument" }) ?? pages.first
         let blockContainers = page?.blocks ?? []
 
@@ -670,6 +685,7 @@ struct LeafletProvider: ContentProvider {
             let text = FacetConverter.facetsToMarkdown(
                 block.plaintext ?? "", facets: block.facets, schema: schema
             )
+            // Empty text blocks (leaflet spacers) have no markdown equivalent.
             return text.isEmpty ? nil : .paragraph(text: text)
 
         case b("header"):
@@ -697,7 +713,7 @@ struct LeafletProvider: ContentProvider {
         case b("image"):
             // Image blobs are stored as PDS blobs; we reference by CID.
             let cid = block.image?.reference.link ?? ""
-            return .image(alt: block.alt ?? "", url: cid)
+            return cid.isEmpty ? nil : .image(alt: block.alt ?? "", url: cid)
 
         case b("unorderedList"):
             let items = (block.children ?? []).map { leafletListItemToMarkdown($0) }
@@ -709,7 +725,11 @@ struct LeafletProvider: ContentProvider {
             return .orderedList(start: start, items: items)
 
         default:
-            lost.insert("an unsupported block")
+            if let label = lossLabels[block.type] {
+                lost.insert(label)
+            } else {
+                lost.insert("an unsupported block")
+            }
             return nil
         }
     }
@@ -730,12 +750,16 @@ struct LeafletProvider: ContentProvider {
             }
         }
 
-        var children: [MarkdownListItem]? = nil
+        // standard.horse handles both `children` (unordered nested) and
+        // `orderedListChildren` (ordered nested). Inkwell's LeafletListItem
+        // only has `children`, but when a stored record has both we prefer
+        // `orderedListChildren` for ordered nesting.
+        var mdChildren: [MarkdownListItem]? = nil
         if let kids = item.children, !kids.isEmpty {
-            children = kids.map { leafletListItemToMarkdown($0) }
+            mdChildren = kids.map { leafletListItemToMarkdown($0) }
         }
 
-        return MarkdownListItem(text: text, checked: item.checked, children: children)
+        return MarkdownListItem(text: text, checked: item.checked, children: mdChildren)
     }
 
     func fromMarkdown(_ markdown: String) -> UnknownType? {
@@ -777,6 +801,9 @@ struct LeafletProvider: ContentProvider {
             )
 
         case .code(let language, let content):
+            if language == "math" {
+                return LeafletBlock(type: b("math"), tex: content)
+            }
             return LeafletBlock(
                 type: b("code"), plaintext: content, language: language
             )
@@ -788,7 +815,8 @@ struct LeafletProvider: ContentProvider {
             return LeafletBlock(type: b("horizontalRule"))
 
         case .image:
-            // Can't create blob refs from markdown; skip
+            // Images must be PDS blobs; markdown-only images can't be stored
+            // in leaflet format without a prior upload step.
             return nil
 
         case .unorderedList(let items):
@@ -805,14 +833,22 @@ struct LeafletProvider: ContentProvider {
         }
     }
 
+    /// Builds a leaflet list item, matching standard.horse's `listItemBlock`.
+    /// Nested ordered lists become `orderedListChildren`, unordered become
+    /// `children`, and task items carry their `checked` flag. The item content
+    /// defaults to an empty text block when no text is provided.
     private func markdownToLeafletListItem(_ item: MarkdownListItem, ordered: Bool) -> LeafletListItem {
-        let itemType = ordered ? "pub.leaflet.blocks.orderedList#listItem" : "pub.leaflet.blocks.unorderedList#listItem"
+        let itemType = ordered
+            ? "pub.leaflet.blocks.orderedList#listItem"
+            : "pub.leaflet.blocks.unorderedList#listItem"
         let (plaintext, facets) = FacetConverter.markdownToFacets(item.text, schema: schema)
         let content = LeafletBlock(
             type: b("text"), plaintext: plaintext,
             facets: facets.isEmpty ? nil : facets
         )
-        let children = item.children?.map { markdownToLeafletListItem($0, ordered: ordered) }
+        // Nested lists: ordered children go into `orderedListChildren`,
+        // unordered into `children` (matching standard.horse's convention).
+        let children = item.children?.map { markdownToLeafletListItem($0, ordered: false) }
         return LeafletListItem(
             type: itemType, content: content, checked: item.checked,
             children: children
@@ -861,6 +897,17 @@ struct PcktProvider: ContentProvider {
 
     private let schema = FacetSchema.pckt
     private let b: (String) -> String = { "blog.pckt.block.\($0)" }
+
+    /// Blocks that can't be represented as markdown, matching
+    /// standard.horse's LOSS_LABELS.
+    private let lossLabels: [String: String] = [
+        "blog.pckt.block.table": "tables",
+        "blog.pckt.block.mention": "mention blocks",
+        "blog.pckt.block.gallery": "galleries",
+        "blog.pckt.block.iframe": "embeds",
+        "blog.pckt.block.website": "website cards",
+        "blog.pckt.block.blueskyEmbed": "Bluesky posts",
+    ]
 
     func matches(_ content: UnknownType?) -> Bool {
         content?.getRecord(ofType: PcktContent.self) != nil
@@ -935,7 +982,11 @@ struct PcktProvider: ContentProvider {
             return .taskList(items: items)
 
         default:
-            lost.insert("an unsupported block")
+            if let label = lossLabels[block.type] {
+                lost.insert(label)
+            } else {
+                lost.insert("an unsupported block")
+            }
             return nil
         }
     }
@@ -1064,6 +1115,19 @@ struct OffprintProvider: ContentProvider {
     private let schema = FacetSchema.offprint
     private let b: (String) -> String = { "app.offprint.block.\($0)" }
 
+    /// Blocks that can't be represented as markdown, matching
+    /// standard.horse's LOSS_LABELS.
+    private let lossLabels: [String: String] = [
+        "app.offprint.block.callout": "callouts",
+        "app.offprint.block.button": "buttons",
+        "app.offprint.block.webBookmark": "bookmarks",
+        "app.offprint.block.webEmbed": "embeds",
+        "app.offprint.block.blueskyPost": "Bluesky posts",
+        "app.offprint.block.imageGrid": "image grids",
+        "app.offprint.block.imageCarousel": "image carousels",
+        "app.offprint.block.imageDiff": "image comparisons",
+    ]
+
     func matches(_ content: UnknownType?) -> Bool {
         content?.getRecord(ofType: OffprintContent.self) != nil
     }
@@ -1136,7 +1200,11 @@ struct OffprintProvider: ContentProvider {
             return .taskList(items: items)
 
         default:
-            lost.insert("an unsupported block")
+            if let label = lossLabels[block.type] {
+                lost.insert(label)
+            } else {
+                lost.insert("an unsupported block")
+            }
             return nil
         }
     }
