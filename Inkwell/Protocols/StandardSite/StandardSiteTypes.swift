@@ -138,6 +138,15 @@ struct SubscriptionEntry: Identifiable, Equatable, Hashable {
     var publicationURI: ATURI? { ATURI.parse(record.publication) }
 }
 
+/// A comment record enriched with its AT-URI and record key.
+struct CommentEntry: Identifiable, Equatable, Hashable {
+    let uri: String
+    let recordKey: String
+    let record: PubLeafletComment
+
+    var id: String { uri }
+}
+
 /// A recommend record enriched with its AT-URI and record key.
 struct RecommendEntry: Identifiable, Equatable, Hashable {
     /// The AT-URI of the recommend record itself.
