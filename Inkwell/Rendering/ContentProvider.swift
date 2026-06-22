@@ -452,9 +452,19 @@ enum MarkdownParser {
                 continue
             }
 
-            // Ordered list: "1. Item" or "1) Item"
-            if let match = trimmed.firstMatch(of: /^(\d+)[.)]\s/),
-               let number = Int(match.output.1) {
+            // Ordered list: "1. Item" or "1) Item" — match leading digits
+            // followed by a period or parenthesis
+            var numberStart = trimmed.startIndex
+            var numberStr = ""
+            while numberStart < trimmed.endIndex, trimmed[numberStart].isNumber {
+                numberStr.append(trimmed[numberStart])
+                numberStart = trimmed.index(after: numberStart)
+            }
+            if !numberStr.isEmpty, numberStart < trimmed.endIndex,
+               (trimmed[numberStart] == "." || trimmed[numberStart] == ")"),
+               trimmed.index(after: numberStart) < trimmed.endIndex,
+               trimmed[trimmed.index(after: numberStart)].isWhitespace,
+               let number = Int(numberStr) {
                 let (items, nextI) = parseList(lines, from: i, ordered: true)
                 blocks.append(.orderedList(start: number, items: items))
                 i = nextI
@@ -503,7 +513,7 @@ enum MarkdownParser {
 
             // Check for list markers
             let isUnordered = trimmed.hasPrefix("- ") || trimmed.hasPrefix("* ")
-            let isOrdered = ordered && trimmed.firstMatch(of: /^\d+[.)]\s/) != nil
+            let isOrdered = ordered && trimmed.range(of: #"^\d+[.)]\s"#, options: .regularExpression) != nil
 
             if !isUnordered && !isOrdered {
                 break
