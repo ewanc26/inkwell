@@ -133,11 +133,7 @@ final class LoginStateManager {
             clientId: "https://inkwell.ewancroft.uk/client-metadata.json",
             clientPassword: "",
             scopes: [
-                "repo:site.standard.publication",
-                "repo:site.standard.document",
-                "repo:site.standard.graph.subscription",
-                "repo:site.standard.graph.recommend",
-                "blob:*/*"
+                "atproto"
             ],
             callbackURL: URL(string: "uk.ewancroft.inkwell:/callback")!
         )
