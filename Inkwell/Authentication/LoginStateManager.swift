@@ -664,6 +664,9 @@ final class LoginStateManager {
             }
 
             let page = try JSONDecoder().decode(TolerantRecordPage.self, from: data)
+            print("[listAllRecords] \(collection): raw JSON returned \(page.records.count) records (cursor: \(page.cursor ?? "nil"))")
+            let withValues = page.records.filter { $0.value != nil }
+            print("[listAllRecords] \(collection): \(withValues.count)/\(page.records.count) records have non-nil value")
             allRecords.append(contentsOf: page.records)
             cursor = page.cursor
         } while cursor != nil && allRecords.count < maximumCount
@@ -677,17 +680,21 @@ final class LoginStateManager {
     func fetchPublications() async throws -> [SiteStandardLexicon.PublicationRecord] {
         guard let did = currentDID else { throw LoginError.notAuthenticated }
         let records = try await listAllRecords(from: did, collection: SiteStandardLexicon.PublicationRecord.type)
-        return records.compactMap { $0.value?.getRecord(ofType: SiteStandardLexicon.PublicationRecord.self) }
+        let decoded = records.compactMap { $0.value?.getRecord(ofType: SiteStandardLexicon.PublicationRecord.self) }
+        print("[fetchPublications] \(records.count) raw → \(decoded.count) decoded")
+        return decoded
     }
 
     /// Fetches publications from any user's repository.
     func fetchPublications(fromDID did: String) async throws -> [PublicationEntry] {
         let records = try await listAllRecords(from: did, collection: SiteStandardLexicon.PublicationRecord.type)
-        return records.compactMap { record in
+        let decoded = records.compactMap { record in
             record.value
                 .flatMap { $0.getRecord(ofType: SiteStandardLexicon.PublicationRecord.self) }
                 .map { PublicationEntry(uri: record.uri, authorDID: did, record: $0) }
         }
+        print("[fetchPublicationsEntry] \(records.count) raw → \(decoded.count) decoded PublicationEntry")
+        return decoded
     }
 
     /// Fetches publications from the current user's repository with URIs.
@@ -733,17 +740,21 @@ final class LoginStateManager {
     func fetchDocuments() async throws -> [SiteStandardLexicon.DocumentRecord] {
         guard let did = currentDID else { throw LoginError.notAuthenticated }
         let records = try await listAllRecords(from: did, collection: SiteStandardLexicon.DocumentRecord.type)
-        return records.compactMap { $0.value?.getRecord(ofType: SiteStandardLexicon.DocumentRecord.self) }
+        let decoded = records.compactMap { $0.value?.getRecord(ofType: SiteStandardLexicon.DocumentRecord.self) }
+        print("[fetchDocuments] \(records.count) raw → \(decoded.count) decoded")
+        return decoded
     }
 
     /// Fetches documents from any user's repository.
     func fetchDocuments(fromDID did: String) async throws -> [DocumentEntry] {
         let records = try await listAllRecords(from: did, collection: SiteStandardLexicon.DocumentRecord.type)
-        return records.compactMap { record in
+        let decoded = records.compactMap { record in
             record.value
                 .flatMap { $0.getRecord(ofType: SiteStandardLexicon.DocumentRecord.self) }
                 .map { DocumentEntry(uri: record.uri, authorDID: did, record: $0) }
         }
+        print("[fetchDocumentsEntry] \(records.count) raw → \(decoded.count) decoded DocumentEntry")
+        return decoded
     }
 
     /// Fetches documents from the current user's repository with URIs.
@@ -842,7 +853,7 @@ final class LoginStateManager {
         let records = try await listAllRecords(
             from: did, collection: SiteStandardLexicon.Graph.SubscriptionRecord.type
         )
-        return records.compactMap { record in
+        let decoded = records.compactMap { record in
             record.value
                 .flatMap { $0.getRecord(ofType: SiteStandardLexicon.Graph.SubscriptionRecord.self) }
                 .map {
@@ -850,6 +861,8 @@ final class LoginStateManager {
                     return SubscriptionEntry(uri: record.uri, recordKey: rkey, record: $0)
                 }
         }
+        print("[fetchSubscriptions] \(records.count) raw → \(decoded.count) decoded")
+        return decoded
     }
 
     /// Deletes a subscription record.
