@@ -144,16 +144,15 @@ struct BrowseDocumentsView: View {
             var followedItems: [ReaderFeedItem] = []
             await withTaskGroup(of: [ReaderFeedItem].self) { group in
                 for subscription in followedPublications {
-                    group.addTask {
-                        guard let publicationURI = subscription.publicationURI else { return [] }
-                        let publication = try? await loginStateManager.fetchPublication(uri: subscription.record.publication)
-                        guard let remoteDocuments = try? await loginStateManager.fetchDocuments(fromDID: publicationURI.did) else {
+                    let pubURI = subscription.record.publication
+                    guard let pubDID = ATURI.parse(pubURI)?.did else { continue }
+                    group.addTask { [pubURI, pubDID] in
+                        let publication = try? await loginStateManager.fetchPublication(uri: pubURI)
+                        guard let remoteDocuments = try? await loginStateManager.fetchDocuments(fromDID: pubDID) else {
                             return []
                         }
                         return remoteDocuments.compactMap { document in
-                            guard (publication?.contains(document.record) ?? false) || document.record.site == subscription.record.publication else {
-                                return nil
-                            }
+                            guard document.record.site == pubURI else { return nil }
                             return ReaderFeedItem(document: document, publication: publication)
                         }
                     }
