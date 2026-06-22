@@ -649,19 +649,16 @@ final class LoginStateManager {
                 queryItems.append(URLQueryItem(name: "cursor", value: cursor))
             }
 
+            // listRecords doesn't require authentication for public collections.
+            // Standard.site records are always public, so we use unauthenticated
+            // requests for all repositories, avoiding DPoP nonce issues with
+            // XRPC endpoints that don't return DPoP-Nonce headers.
             let data: Data
-            if isOwn {
-                data = try await authenticatedData(
-                    path: "/xrpc/com.atproto.repo.listRecords",
-                    queryItems: queryItems
-                )
-            } else {
-                data = try await unauthenticatedData(
-                    pdsURL: pdsURL,
-                    path: "/xrpc/com.atproto.repo.listRecords",
-                    queryItems: queryItems
-                )
-            }
+            data = try await unauthenticatedData(
+                pdsURL: pdsURL,
+                path: "/xrpc/com.atproto.repo.listRecords",
+                queryItems: queryItems
+            )
 
             let page = try JSONDecoder().decode(TolerantRecordPage.self, from: data)
             print("[listAllRecords] \(collection): raw JSON returned \(page.records.count) records (cursor: \(page.cursor ?? "nil"))")
