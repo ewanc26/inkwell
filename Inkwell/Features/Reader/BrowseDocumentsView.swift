@@ -214,26 +214,15 @@ private struct ReaderPostCard: View {
                     switch phase {
                     case .success(let image):
                         image.resizable().scaledToFill()
-                    case .failure:
-                        foreground.opacity(0.06)
-                            .overlay { Image(systemName: "photo").foregroundStyle(foreground.opacity(0.4)) }
-                    default:
-                        foreground.opacity(0.06)
-                            .overlay { ProgressView() }
+                            .frame(maxWidth: .infinity)
+                            .aspectRatio(16 / 9, contentMode: .fit)
+                            .clipped()
+                    case .failure, .empty:
+                        EmptyView()
+                    @unknown default:
+                        EmptyView()
                     }
                 }
-                // `.fit`, not `.fill`, here — this sizes the *container*
-                // (the AsyncImage's own frame), not the photo inside it.
-                // Inside a ScrollView/LazyVStack the proposed height is
-                // effectively infinite, and `.fill` grows to cover that
-                // proposed size in both dimensions, which is what was
-                // blowing the card up to near full-screen height. `.fit`
-                // correctly resolves to width × (width * 9/16) instead.
-                // The photo itself still crops-to-cover via
-                // `.scaledToFill()` above, once it has a sane box to fill.
-                .frame(maxWidth: .infinity)
-                .aspectRatio(16 / 9, contentMode: .fit)
-                .clipped()
             }
 
             VStack(alignment: .leading, spacing: 9) {
