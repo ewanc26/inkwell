@@ -60,7 +60,7 @@
 </section>
 
 <!-- Features -->
-<section class="container py-12">
+<section class="container pb-12">
   <h2 class="mb-12 text-center text-3xl font-extrabold text-balance">
     What Inkwell does
   </h2>

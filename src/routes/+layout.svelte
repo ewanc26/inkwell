@@ -3,7 +3,7 @@
   import { SITE, NAV_LINKS } from "$lib/config";
   import { page } from "$app/state";
   import { Menu, X } from "@lucide/svelte";
-  import { slide } from "svelte/transition";
+  import { fade, slide } from "svelte/transition";
 
   let { children } = $props();
   let mobileOpen = $state(false);
@@ -77,7 +77,7 @@
       class="nav-backdrop"
       aria-label="Close menu"
       onclick={closeMobile}
-      transition:slide={{ duration: 150 }}
+      transition:fade={{ duration: 150 }}
     ></button>
   {/if}
 

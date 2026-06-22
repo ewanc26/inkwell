@@ -317,6 +317,8 @@
   }
 
   .callout {
+    max-width: 42rem;
+    margin-inline: auto;
     text-align: center;
   }
 
@@ -327,8 +329,6 @@
   }
 
   .callout p {
-    max-width: 56rem;
-    margin-inline: auto;
     line-height: 1.6;
     margin-bottom: var(--spacing-sm);
   }
