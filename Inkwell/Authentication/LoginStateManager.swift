@@ -634,7 +634,6 @@ final class LoginStateManager {
         maximumCount: Int = 1_000
     ) async throws -> [RepositoryRecord] {
         let pdsURL = try await repositoryPDSURL(for: did)
-        let isOwn = did == currentDID
 
         var allRecords: [RepositoryRecord] = []
         var cursor: String?
