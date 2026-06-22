@@ -8,8 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		40FA13452FE4DB4B0016CC0D /* ATProtoKit in Frameworks */ = {isa = PBXBuildFile; productRef = 40FA13442FE4DB4B0016CC0D /* ATProtoKit */; };
-		40FA13482FE4DB810016CC0D /* ATIdentityTools in Frameworks */ = {isa = PBXBuildFile; productRef = 40FA13472FE4DB810016CC0D /* ATIdentityTools */; };
-		40FA134A2FE4DB810016CC0D /* DIDCore in Frameworks */ = {isa = PBXBuildFile; productRef = 40FA13492FE4DB810016CC0D /* DIDCore */; };
 		40FA134D2FE500000016CC0D /* OAuthenticator in Frameworks */ = {isa = PBXBuildFile; productRef = 40FA134C2FE500000016CC0D /* OAuthenticator */; };
 		40FA13502FE500000016CC0D /* ATResolve in Frameworks */ = {isa = PBXBuildFile; productRef = 40FA134F2FE500000016CC0D /* ATResolve */; };
 /* End PBXBuildFile section */
@@ -73,9 +71,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				40FA134A2FE4DB810016CC0D /* DIDCore in Frameworks */,
 				40FA13452FE4DB4B0016CC0D /* ATProtoKit in Frameworks */,
-				40FA13482FE4DB810016CC0D /* ATIdentityTools in Frameworks */,
 				40FA134D2FE500000016CC0D /* OAuthenticator in Frameworks */,
 				40FA13502FE500000016CC0D /* ATResolve in Frameworks */,
 			);
@@ -139,8 +135,6 @@
 			name = Inkwell;
 			packageProductDependencies = (
 				40FA13442FE4DB4B0016CC0D /* ATProtoKit */,
-				40FA13472FE4DB810016CC0D /* ATIdentityTools */,
-				40FA13492FE4DB810016CC0D /* DIDCore */,
 				40FA134C2FE500000016CC0D /* OAuthenticator */,
 				40FA134F2FE500000016CC0D /* ATResolve */,
 			);
@@ -228,7 +222,6 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				40FA13432FE4DB4B0016CC0D /* XCRemoteSwiftPackageReference "ATProtoKit" */,
-				40FA13462FE4DB810016CC0D /* XCRemoteSwiftPackageReference "ATIdentityTools" */,
 				40FA134B2FE500000016CC0D /* XCRemoteSwiftPackageReference "OAuthenticator" */,
 				40FA134E2FE500000016CC0D /* XCRemoteSwiftPackageReference "ATResolve" */,
 			);
@@ -633,14 +626,6 @@
 				minimumVersion = 0.32.5;
 			};
 		};
-		40FA13462FE4DB810016CC0D /* XCRemoteSwiftPackageReference "ATIdentityTools" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ATProtoKit/ATIdentityTools.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.1.4;
-			};
-		};
 		40FA134B2FE500000016CC0D /* XCRemoteSwiftPackageReference "OAuthenticator" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/germ-network/OAuthenticator.git";
@@ -664,16 +649,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 40FA13432FE4DB4B0016CC0D /* XCRemoteSwiftPackageReference "ATProtoKit" */;
 			productName = ATProtoKit;
-		};
-		40FA13472FE4DB810016CC0D /* ATIdentityTools */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 40FA13462FE4DB810016CC0D /* XCRemoteSwiftPackageReference "ATIdentityTools" */;
-			productName = ATIdentityTools;
-		};
-		40FA13492FE4DB810016CC0D /* DIDCore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 40FA13462FE4DB810016CC0D /* XCRemoteSwiftPackageReference "ATIdentityTools" */;
-			productName = DIDCore;
 		};
 		40FA134C2FE500000016CC0D /* OAuthenticator */ = {
 			isa = XCSwiftPackageProductDependency;

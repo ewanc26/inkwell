@@ -1,33 +1,6 @@
 {
-  "originHash" : "27b8069c3a12894fc5202adb21586b6f9799275a804ec79abeb00692c9c64cef",
+  "originHash" : "123b9a7d214607a77b64dd62527be2ef59fcdec78a07f275d9bc1435fe30fd76",
   "pins" : [
-    {
-      "identity" : "atcommontools",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ATProtoKit/ATCommonTools.git",
-      "state" : {
-        "revision" : "f37c1b617a6377bf2d17c225cf05880e7d30db9d",
-        "version" : "0.0.15"
-      }
-    },
-    {
-      "identity" : "atcryptography",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ATProtoKit/ATCryptography.git",
-      "state" : {
-        "revision" : "855a3e8efebdea57e0c596f861c078461ed3f820",
-        "version" : "0.2.1"
-      }
-    },
-    {
-      "identity" : "atidentitytools",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ATProtoKit/ATIdentityTools.git",
-      "state" : {
-        "revision" : "066d097a13b0a8c9e197ad4dcdcae626b6b98dc8",
-        "version" : "0.1.4"
-      }
-    },
     {
       "identity" : "atprotokit",
       "kind" : "remoteSourceControl",
@@ -47,39 +20,12 @@
       }
     },
     {
-      "identity" : "bigint",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/attaswift/BigInt.git",
-      "state" : {
-        "revision" : "e07e00fa1fd435143a2dcf8b7eec9a7710b2fdfe",
-        "version" : "5.7.0"
-      }
-    },
-    {
-      "identity" : "multiformatskit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ATProtoKit/MultiformatsKit.git",
-      "state" : {
-        "revision" : "cfb8003e2d6bd8c3520a1b38cdbef8e757876e6d",
-        "version" : "0.3.1"
-      }
-    },
-    {
       "identity" : "oauthenticator",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/germ-network/OAuthenticator.git",
       "state" : {
         "branch" : "main",
         "revision" : "f4d416f4d013749ed8b9ab69dae436ebbf42465f"
-      }
-    },
-    {
-      "identity" : "swift-asn1",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-asn1.git",
-      "state" : {
-        "revision" : "a9a5efd40eaf558a2bcd48d64b1d1646be686008",
-        "version" : "1.7.1"
       }
     },
     {
@@ -92,39 +38,12 @@
       }
     },
     {
-      "identity" : "swift-cbor",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/MasterJ93/swift-cbor.git",
-      "state" : {
-        "revision" : "7452e1d1dbfb99fa0baca7732cf199be1bfc7e7c",
-        "version" : "0.0.8"
-      }
-    },
-    {
-      "identity" : "swift-crypto",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-crypto.git",
-      "state" : {
-        "revision" : "95ba0316a9b733e92bb6b071255ff46263bbe7dc",
-        "version" : "3.15.1"
-      }
-    },
-    {
       "identity" : "swift-log",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-log.git",
       "state" : {
         "revision" : "92448c359f00ebe36ae97d3bd9086f13c7692b5a",
         "version" : "1.13.2"
-      }
-    },
-    {
-      "identity" : "swift-secp256k1",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/21-DOT-DEV/swift-secp256k1.git",
-      "state" : {
-        "revision" : "57ce9af6db14e0114af631ace25231a9d0ccccbd",
-        "version" : "0.18.0"
       }
     }
   ],
