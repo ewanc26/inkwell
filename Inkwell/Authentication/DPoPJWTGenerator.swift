@@ -14,7 +14,7 @@ import OAuthenticator
 
 private extension Data {
     /// Base64url-encoded string (RFC 7515 / RFC 9449).
-    var base64urlString: String {
+    nonisolated var base64urlString: String {
         base64EncodedString()
             .replacingOccurrences(of: "+", with: "-")
             .replacingOccurrences(of: "/", with: "_")
@@ -32,13 +32,14 @@ enum DPoPJWTGenerator {
     /// Build a JWT generator that signs DPoP proofs with the given P-256 private key.
     static func generator(key: P256.Signing.PrivateKey) -> DPoPSigner.JWTGenerator {
         let publicKey = key.publicKey
+        let jwk = publicKeyJWK(from: publicKey)
 
         return { params in
             // --- JWT Header ---
             let header: [String: Any] = [
                 "typ": params.keyType,
                 "alg": "ES256",
-                "jwk": publicKeyJWK(from: publicKey),
+                "jwk": jwk,
             ]
 
             // --- JWT Payload ---
@@ -76,7 +77,7 @@ enum DPoPJWTGenerator {
     // MARK: - JWK Helpers
 
     /// Build a JWK representation of a P-256 public key.
-    private static func publicKeyJWK(from key: P256.Signing.PublicKey) -> [String: String] {
+    nonisolated private static func publicKeyJWK(from key: P256.Signing.PublicKey) -> [String: String] {
         let raw = key.rawRepresentation // 64 bytes: x || y
         let x = raw.prefix(32)
         let y = raw.suffix(32)

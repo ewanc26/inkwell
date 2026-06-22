@@ -127,7 +127,7 @@ final class LoginStateManager {
             clientId: "https://inkwell.ewancroft.uk/client-metadata.json",
             clientPassword: "",
             scopes: ["atproto"],
-            callbackURL: URL(string: "uk.ewancroft.inkwell://callback")!
+            callbackURL: URL(string: "uk.ewancroft.inkwell:/callback")!
         )
     }
 
