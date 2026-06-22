@@ -127,7 +127,7 @@ final class LoginStateManager {
             clientId: "https://inkwell.ewancroft.uk/client-metadata.json",
             clientPassword: "",
             scopes: ["atproto"],
-            callbackURL: URL(string: "inkwell://callback")!
+            callbackURL: URL(string: "uk.ewancroft.inkwell://callback")!
         )
     }
 
@@ -243,8 +243,27 @@ final class LoginStateManager {
             }
 
             return true
+        } catch let error as DecodingError {
+            // Decoding errors are ambiguous — surface the full context.
+            let detail: String
+            switch error {
+            case .keyNotFound(let key, let context):
+                detail = "missing key '\(key.stringValue)' (path: \(context.codingPath.map(\.stringValue)))"
+            case .valueNotFound(let type, let context):
+                detail = "null value for \(type) (path: \(context.codingPath.map(\.stringValue)))"
+            case .typeMismatch(let type, let context):
+                detail = "type mismatch, expected \(type) (path: \(context.codingPath.map(\.stringValue)))"
+            case .dataCorrupted(let context):
+                detail = "corrupted data: \(context.debugDescription)"
+            @unknown default:
+                detail = "unknown decoding error"
+            }
+            print("[SignIn] DecodingError: \(detail)")
+            errorMessage = "Unexpected response from server. Please try again."
+            clearSession()
+            return false
         } catch {
-            print("[SignIn] error: \(error.localizedDescription)")
+            print("[SignIn] error: \(type(of: error)) — \(error.localizedDescription)")
             errorMessage = error.localizedDescription
             clearSession()
             return false
@@ -905,9 +924,9 @@ final class LoginStateManager {
         // can use it from any isolation domain without hopping to @MainActor.
         let store = loginStore
         return LoginStorage(
-            retrieveLogin: { try store.read() },
-            storeLogin: { try store.write($0) },
-            clearLogin: { try store.delete() }
+            retrieveLogin: { try await store.read() },
+            storeLogin: { try await store.write($0) },
+            clearLogin: { try await store.delete() }
         )
     }
 
