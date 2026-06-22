@@ -915,6 +915,27 @@ final class LoginStateManager {
 
     // MARK: - Comments
 
+    /// Resolves blob-backed Leaflet pages when a document's content uses
+    /// `blobPages` (large posts offloaded to a PDS blob). Returns a new
+    /// UnknownType with the resolved pages inlined, or the original content
+    /// when no blobPages are present.
+    func resolveBlobPages(in content: UnknownType?) async -> UnknownType? {
+        guard let content,
+              let leaflet = content.getRecord(ofType: LeafletContent.self),
+              let blobRef = leaflet.blobPages else {
+            return content
+        }
+        do {
+            let blobData = try await downloadBlob(cid: blobRef.reference.link)
+            let pages = try JSONDecoder().decode([LeafletPage].self, from: blobData)
+            let resolved = LeafletContent(pages: pages, blobPages: nil)
+            return UnknownType.record(resolved)
+        } catch {
+            print("[resolveBlobPages] failed to fetch blob pages: \(error)")
+            return content  // fall back to whatever inline pages exist
+        }
+    }
+
     /// Fetches all `pub.leaflet.comment` records that reference the given
     /// document as their `subject`, newest first.
     func fetchComments(documentURI: String) async throws -> [CommentEntry] {

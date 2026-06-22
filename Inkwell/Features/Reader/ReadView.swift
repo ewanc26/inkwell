@@ -34,6 +34,13 @@ struct ReadView: View {
     @State private var isSubmittingRecommend = false
     @State private var actionMessage: String?
 
+    // Comment state
+    @State private var comments: [CommentEntry] = []
+    @State private var newCommentText = ""
+    @State private var isSubmittingComment = false
+    @State private var isLoadingComments = false
+    @State private var replyToComment: CommentEntry? = nil
+
     // Resolves Leaflet's rich theme (light/dark palettes, fonts, page
     // width) first, falling back to standard.site's basicTheme, then
     // system defaults — see ReaderTheme.swift. A document-level theme
@@ -236,6 +243,64 @@ struct ReadView: View {
                 }
             )
             .frame(maxWidth: .infinity)
+
+            // MARK: - Comments
+            if documentURI != nil || authorDID != nil {
+                VStack(alignment: .leading, spacing: 12) {
+                    Divider()
+                        .padding(.vertical, 8)
+
+                    Text("Comments")
+                        .font(theme.headingFont(.headline, weight: .bold))
+                        .foregroundStyle(foregroundColor)
+
+                    if isLoadingComments {
+                        HStack { Spacer(); ProgressView(); Spacer() }
+                    } else if comments.isEmpty {
+                        Text("No comments yet.")
+                            .font(theme.bodyFont(.subheadline))
+                            .foregroundStyle(foregroundColor.opacity(0.5))
+                    } else {
+                        ForEach(comments) { comment in
+                            CommentRow(
+                                comment: comment,
+                                foregroundColor: foregroundColor,
+                                accentColor: accentColor,
+                                onReply: { replyToComment = comment }
+                            )
+                        }
+                    }
+
+                    // New comment composer
+                    HStack(spacing: 8) {
+                        TextField("Add a comment...", text: $newCommentText, axis: .vertical)
+                            .textFieldStyle(.plain)
+                            .font(theme.bodyFont(.subheadline))
+                            .padding(10)
+                            .background(foregroundColor.opacity(0.08))
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+
+                        Button {
+                            Task { await submitComment() }
+                        } label: {
+                            if isSubmittingComment {
+                                ProgressView().scaleEffect(0.8)
+                            } else {
+                                Image(systemName: "arrow.up.circle.fill")
+                                    .font(.title2)
+                                    .foregroundStyle(accentColor)
+                            }
+                        }
+                        .disabled(newCommentText.trimmingCharacters(in: .whitespaces).isEmpty || isSubmittingComment)
+                    }
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 16)
+                .frame(maxWidth: theme.pageWidth)
+                .task(id: documentURI) {
+                    await loadComments()
+                }
+            }
         }
         .background(backgroundColor)
         .tint(accentColor)
@@ -251,6 +316,51 @@ struct ReadView: View {
         .task(id: documentURI) {
             await loadActionState()
         }
+    }
+
+    // MARK: - Comments
+
+    private func loadComments() async {
+        guard let uri = documentURI ?? resolvedDocumentURI else { return }
+        isLoadingComments = true
+        defer { isLoadingComments = false }
+        do {
+            comments = try await loginStateManager.fetchComments(documentURI: uri)
+        } catch {
+            // Comments are best-effort — don't show errors inline
+            print("[ReadView] loadComments failed: \(error)")
+        }
+    }
+
+    private func submitComment() async {
+        guard let uri = documentURI ?? resolvedDocumentURI else { return }
+        let text = newCommentText.trimmingCharacters(in: .whitespaces)
+        guard !text.isEmpty else { return }
+
+        isSubmittingComment = true
+        defer { isSubmittingComment = false }
+
+        do {
+            try await loginStateManager.createComment(
+                subject: uri,
+                plaintext: text,
+                replyTo: replyToComment?.uri,
+                onPage: nil
+            )
+            newCommentText = ""
+            replyToComment = nil
+            await loadComments()  // refresh
+        } catch {
+            print("[ReadView] submitComment failed: \(error)")
+        }
+    }
+
+    /// The resolved AT-URI of the current document, derived from the author
+    /// DID + document path when an explicit documentURI isn't provided.
+    private var resolvedDocumentURI: String? {
+        guard let did = authorDID ?? loginStateManager.currentDID else { return nil }
+        // Reconstruct from the document record's identity
+        return "at://\(did)/site.standard.document/\(document.path ?? "")"
     }
 
     // MARK: - Action Pills
@@ -707,6 +817,38 @@ struct ReadView: View {
         outputFormatter.dateStyle = .medium
         outputFormatter.timeStyle = .none
         return outputFormatter.string(from: date)
+    }
+}
+
+// MARK: - Comment Row
+
+struct CommentRow: View {
+    let comment: CommentEntry
+    let foregroundColor: Color
+    let accentColor: Color
+    var onReply: (() -> Void)? = nil
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(comment.record.plaintext)
+                .font(.body)
+                .foregroundStyle(foregroundColor)
+
+            HStack(spacing: 8) {
+                Text(comment.record.createdAt.formatted(date: .abbreviated, time: .shortened))
+                    .font(.caption)
+                    .foregroundStyle(foregroundColor.opacity(0.5))
+
+                if onReply != nil {
+                    Button("Reply") {
+                        onReply?()
+                    }
+                    .font(.caption)
+                    .foregroundStyle(accentColor)
+                }
+            }
+        }
+        .padding(.vertical, 4)
     }
 }
 
