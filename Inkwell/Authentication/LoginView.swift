@@ -120,7 +120,7 @@ struct LoginView: View {
     private var signInButton: some View {
         Button(action: submit) {
             ZStack {
-                Text("Sign in with your PDS")
+                Text("Continue")
                     .opacity(isSigningIn ? 0 : 1)
                 if isSigningIn {
                     ProgressView()
