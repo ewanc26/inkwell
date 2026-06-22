@@ -9,11 +9,11 @@ import { json } from "@sveltejs/kit";
  */
 export function GET() {
   return json({
-    client_id: "https://inkwell.app/client-metadata.json",
+    client_id: "https://inkwell.ewancroft.uk/client-metadata.json",
     client_name: "Inkwell",
-    client_uri: "https://inkwell.app",
+    client_uri: "https://inkwell.ewancroft.uk",
     application_type: "native",
-    redirect_uris: ["uk.ewancroft.inkwell://callback"],
+    redirect_uris: ["uk.ewancroft.inkwell:/callback"],
     scope: "atproto",
     grant_types: ["authorization_code", "refresh_token"],
     dpop_bound_access_tokens: true,
