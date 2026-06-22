@@ -154,8 +154,9 @@ enum FacetConverter {
 
     /// Convert facets to markdown inline text by inserting delimiters at
     /// facet boundaries. Consecutive segments with the same marks are merged
-    /// to avoid unnecessary delimiter pairs.
-    static func facetsToMarkdown(_ plaintext: String, facets: [LeafletFacet]?, schema: FacetSchema) -> String {
+    /// to avoid unnecessary delimiter pairs. Unknown features are recorded in
+    /// `lost` using their schema's `lossy` labels.
+    static func facetsToMarkdown(_ plaintext: String, facets: [LeafletFacet]?, schema: FacetSchema, lost: inout Set<String>? = nil) -> String {
         guard let facets = facets, !facets.isEmpty else {
             return plaintext
         }
@@ -206,7 +207,10 @@ enum FacetConverter {
                         case schema.code: code = true
                         case schema.strike: strike = true
                         case schema.link: link = feature.uri
-                        default: break
+                        default:
+                            if let label = schema.lossy[feature.type] {
+                                lost?.insert(label)
+                            }
                         }
                     }
                 }
