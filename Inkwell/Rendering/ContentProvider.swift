@@ -65,7 +65,7 @@ private func harvestImageBlobs(from value: Any, into out: inout [String: ComAtpr
     // Walk the struct/class properties looking for blobs.
     for child in mirror.children {
         if let blob = child.value as? ComAtprotoLexicon.Repository.UploadBlobOutput,
-           blob.mimeType?.hasPrefix("image/") ?? true {
+           blob.mimeType.hasPrefix("image/") {
             let cid = blob.reference.link
             if !cid.isEmpty { out[cid] = blob }
         } else if let dict = child.value as? [String: Any] {
@@ -152,11 +152,10 @@ struct FacetSchema {
 /// markdown inline syntax (**bold**, *italic*, `code`, ~~strike~~, [text](url)).
 enum FacetConverter {
 
-    /// Convert facets to markdown inline text by inserting delimiters at
-    /// facet boundaries. Consecutive segments with the same marks are merged
-    /// to avoid unnecessary delimiter pairs. Unknown features are recorded in
-    /// `lost` using their schema's `lossy` labels.
-    static func facetsToMarkdown(_ plaintext: String, facets: [LeafletFacet]?, schema: FacetSchema, lost: inout Set<String>? = nil) -> String {
+    /// Convert facets to markdown inline text. Unknown features are tracked
+    /// in `lost` using schema.lossy labels.
+    static func facetsToMarkdown(_ plaintext: String, facets: [LeafletFacet]?, schema: FacetSchema, lost: inout Set<String>) -> String {
+
         guard let facets = facets, !facets.isEmpty else {
             return plaintext
         }
@@ -209,7 +208,7 @@ enum FacetConverter {
                         case schema.link: link = feature.uri
                         default:
                             if let label = schema.lossy[feature.type] {
-                                lost?.insert(label)
+                                lost.insert(label)
                             }
                         }
                     }
@@ -249,6 +248,13 @@ enum FacetConverter {
             result += wrapped
         }
         return result
+    }
+
+    /// Convenience overload — converts facets to markdown without tracking
+    /// lossy inline features (e.g. list item text, image alts).
+    static func facetsToMarkdown(_ plaintext: String, facets: [LeafletFacet]?, schema: FacetSchema) -> String {
+        var dummy = Set<String>()
+        return facetsToMarkdown(plaintext, facets: facets, schema: schema, lost: &dummy)
     }
 
     /// Parse markdown inline syntax into plaintext + facets.

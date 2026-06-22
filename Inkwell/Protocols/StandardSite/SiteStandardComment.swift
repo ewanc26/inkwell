@@ -92,7 +92,7 @@ extension PubLeafletComment {
 
     /// References a parent comment for threaded replies.
     /// Matching `pub.leaflet.comment#replyRef`.
-    public struct ReplyRef: Sendable, Codable, Equatable, Hashable {
+    nonisolated public struct ReplyRef: Sendable, Codable, Equatable, Hashable {
         /// AT-URI of the parent comment.
         public let parent: String
 

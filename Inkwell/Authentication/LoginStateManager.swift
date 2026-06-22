@@ -922,19 +922,18 @@ final class LoginStateManager {
         let records = try await listAllRecords(
             from: did, collection: PubLeafletComment.type
         )
-        return records.compactMap { record in
-            record.value
-                .flatMap { $0.getRecord(ofType: PubLeafletComment.self) }
-                .filter { $0.subject == documentURI }
-                .map {
-                    CommentEntry(
-                        uri: record.uri,
-                        recordKey: ATURI.parse(record.uri)?.recordKey ?? "",
-                        record: $0
-                    )
-                }
+        var comments: [CommentEntry] = []
+        for record in records {
+            guard let value = record.value,
+                  let comment = value.getRecord(ofType: PubLeafletComment.self),
+                  comment.subject == documentURI else { continue }
+            comments.append(CommentEntry(
+                uri: record.uri,
+                recordKey: ATURI.parse(record.uri)?.recordKey ?? "",
+                record: comment
+            ))
         }
-        .sorted { $0.record.createdAt > $1.record.createdAt }
+        return comments.sorted { $0.record.createdAt > $1.record.createdAt }
     }
 
     /// Creates a `pub.leaflet.comment` record.
