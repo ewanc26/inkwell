@@ -699,6 +699,13 @@ struct LeafletProvider: ContentProvider {
         content?.getRecord(ofType: LeafletContent.self) != nil
     }
 
+    /// When `blobPages` are present (large leaflet documents), the caller
+    /// should fetch and decode the blob before building the LeafletContent.
+    /// This helper unpacks pages from either source.
+    private static func unpackPages(_ content: LeafletContent) -> [LeafletPage] {
+        content.pages ?? []
+    }
+
     func toMarkdown(_ content: UnknownType?) -> ConvertResult {
         guard let leaflet = content?.getRecord(ofType: LeafletContent.self) else {
             return ConvertResult(markdown: "", lost: [])
@@ -707,8 +714,12 @@ struct LeafletProvider: ContentProvider {
         var lost = Set<String>()
         var blocks: [MarkdownBlock] = []
 
-        let pages = leaflet.pages ?? []
-        // Prefer the linearDocument page, but accept any page (including blob-loaded pages).
+        // When blobPages are present, the inline pages array may be empty —
+        // the caller is expected to have already fetched the blob and
+        // reconstructed LeafletContent with the decoded pages. We just
+        // read whatever pages are available.
+        let pages = LeafletProvider.unpackPages(leaflet)
+        // Prefer the linearDocument page, but accept any page.
         let page = pages.first(where: { $0.type == "pub.leaflet.pages.linearDocument" }) ?? pages.first
         let blockContainers = page?.blocks ?? []
 
