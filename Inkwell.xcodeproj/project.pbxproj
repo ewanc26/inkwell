@@ -630,8 +630,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/germ-network/OAuthenticator.git";
 			requirement = {
-				kind = branch;
 				branch = main;
+				kind = branch;
 			};
 		};
 		40FA134E2FE500000016CC0D /* XCRemoteSwiftPackageReference "ATResolve" */ = {
