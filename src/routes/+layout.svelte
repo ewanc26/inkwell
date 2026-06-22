@@ -37,7 +37,20 @@
   <header class="site-header">
     <div class="container">
       <a href="/" class="nav-brand">
-        <img src="/favicon.svg" alt="" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 512 512"
+          fill="none"
+          class="nav-icon"
+          aria-hidden="true"
+        >
+          <!-- Inline SVG: currentColor & var(--color-accent) resolve
+               because it lives in the page DOM, unlike an <img> src. -->
+          <rect x="108" y="64" width="296" height="44" rx="16" fill="currentColor" />
+          <rect x="189" y="108" width="134" height="290" fill="currentColor" />
+          <rect x="108" y="398" width="296" height="44" rx="16" fill="currentColor" />
+          <circle cx="256" cy="468" r="20" fill="var(--color-accent, #139500)" />
+        </svg>
         {SITE.title}
       </a>
 

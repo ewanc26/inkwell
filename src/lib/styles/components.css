@@ -108,7 +108,7 @@
     opacity: 0.85;
   }
 
-  .nav-brand img {
+  .nav-brand :where(img, .nav-icon) {
     height: 2rem;
     width: 2rem;
   }
