@@ -901,10 +901,13 @@ final class LoginStateManager {
     // MARK: - Helpers
 
     private func makeLoginStorage() -> LoginStorage {
-        LoginStorage(
-            retrieveLogin: { [weak self] in try self?.loginStore.read() },
-            storeLogin: { [weak self] login in try self?.loginStore.write(login) },
-            clearLogin: { [weak self] in try self?.loginStore.delete() }
+        // KeychainStore is a value type — capture a copy so the closures
+        // can use it from any isolation domain without hopping to @MainActor.
+        let store = loginStore
+        return LoginStorage(
+            retrieveLogin: { try store.read() },
+            storeLogin: { try store.write($0) },
+            clearLogin: { try store.delete() }
         )
     }
 
