@@ -54,6 +54,9 @@ struct FacetSchema {
     let code: String
     let strike: String
     let link: String
+    /// Feature `$type` → human label, for features markdown can't represent.
+    /// Matching standard.horse's `lossy` pattern.
+    let lossy: [String: String]
 
     static let leaflet = FacetSchema(
         facet: "pub.leaflet.richtext.facet",
@@ -62,7 +65,14 @@ struct FacetSchema {
         italic: "pub.leaflet.richtext.facet#italic",
         code: "pub.leaflet.richtext.facet#code",
         strike: "pub.leaflet.richtext.facet#strikethrough",
-        link: "pub.leaflet.richtext.facet#link"
+        link: "pub.leaflet.richtext.facet#link",
+        lossy: [
+            "pub.leaflet.richtext.facet#highlight": "highlight",
+            "pub.leaflet.richtext.facet#underline": "underline",
+            "pub.leaflet.richtext.facet#atMention": "mentions",
+            "pub.leaflet.richtext.facet#didMention": "mentions",
+            "pub.leaflet.richtext.facet#footnote": "footnotes",
+        ]
     )
 
     static let pckt = FacetSchema(
@@ -72,7 +82,14 @@ struct FacetSchema {
         italic: "blog.pckt.richtext.facet#italic",
         code: "blog.pckt.richtext.facet#code",
         strike: "blog.pckt.richtext.facet#strikethrough",
-        link: "blog.pckt.richtext.facet#link"
+        link: "blog.pckt.richtext.facet#link",
+        lossy: [
+            "blog.pckt.richtext.facet#highlight": "highlight",
+            "blog.pckt.richtext.facet#underline": "underline",
+            "blog.pckt.richtext.facet#atMention": "mentions",
+            "blog.pckt.richtext.facet#didMention": "mentions",
+            "blog.pckt.richtext.facet#id": "anchors",
+        ]
     )
 
     static let offprint = FacetSchema(
@@ -82,7 +99,13 @@ struct FacetSchema {
         italic: "app.offprint.richtext.facet#italic",
         code: "app.offprint.richtext.facet#code",
         strike: "app.offprint.richtext.facet#strikethrough",
-        link: "app.offprint.richtext.facet#link"
+        link: "app.offprint.richtext.facet#link",
+        lossy: [
+            "app.offprint.richtext.facet#highlight": "highlight",
+            "app.offprint.richtext.facet#underline": "underline",
+            "app.offprint.richtext.facet#mention": "mentions",
+            "app.offprint.richtext.facet#webMention": "mentions",
+        ]
     )
 }
 
@@ -429,10 +452,9 @@ enum MarkdownParser {
                 continue
             }
 
-            // Ordered list
-            if let firstSpace = trimmed.firstIndex(of: " "),
-               let number = Int(trimmed[..<firstSpace]),
-               trimmed[trimmed.index(after: firstSpace)...].hasPrefix(".") || trimmed[trimmed.index(after: firstSpace)...].hasPrefix(" ") {
+            // Ordered list: "1. Item" or "1) Item"
+            if let match = trimmed.firstMatch(of: /^(\d+)[.)]\s/),
+               let number = Int(match.output.1) {
                 let (items, nextI) = parseList(lines, from: i, ordered: true)
                 blocks.append(.orderedList(start: number, items: items))
                 i = nextI
@@ -481,28 +503,20 @@ enum MarkdownParser {
 
             // Check for list markers
             let isUnordered = trimmed.hasPrefix("- ") || trimmed.hasPrefix("* ")
-            let isOrdered = ordered && {
-                if let firstSpace = trimmed.firstIndex(of: " "),
-                   let _ = Int(trimmed[..<firstSpace]) {
-                    return true
-                }
-                return false
-            }()
+            let isOrdered = ordered && trimmed.firstMatch(of: /^\d+[.)]\s/) != nil
 
             if !isUnordered && !isOrdered {
                 break
             }
 
-            // Extract item text
+            // Extract item text (strip the marker)
             var itemText: String
             if isUnordered {
                 itemText = String(trimmed.dropFirst(2))
             } else {
-                if let firstSpace = trimmed.firstIndex(of: " ") {
-                    itemText = String(trimmed[trimmed.index(after: firstSpace)...])
-                    if itemText.hasPrefix(".") {
-                        itemText = String(itemText.dropFirst()).trimmingCharacters(in: .whitespaces)
-                    }
+                // Find the first space after the ordered list marker (e.g. "1. ")
+                if let markerEnd = trimmed.firstIndex(of: " ") {
+                    itemText = String(trimmed[trimmed.index(after: markerEnd)...])
                 } else {
                     itemText = ""
                 }
