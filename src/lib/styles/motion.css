@@ -9,7 +9,7 @@
 /* ── Entrance animation ──────────────────────────────────────── */
 
 .animate-in {
-  animation: fade-slide-up var(--duration-slow) var(--ease-out-expo) both;
+  animation: fade-slide-up var(--duration-slow) var(--ease-out-expo) backwards;
 }
 
 /* ── Staggered delays ────────────────────────────────────────── */
@@ -23,7 +23,7 @@
 /* ── Hero reveal ─────────────────────────────────────────────── */
 
 .hero-reveal {
-  animation: hero-reveal var(--duration-slow) var(--ease-out-expo) both;
+  animation: hero-reveal var(--duration-slow) var(--ease-out-expo) backwards;
 }
 
 /* ── Interaction feedback ────────────────────────────────────── */
