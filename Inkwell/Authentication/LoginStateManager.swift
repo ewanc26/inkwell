@@ -783,11 +783,13 @@ final class LoginStateManager {
         path: String?,
         site: String,
         markdown: String,
-        provider: ContentProvider
+        provider: ContentProvider,
+        previousContent: UnknownType? = nil
     ) async throws -> ComAtprotoLexicon.Repository.StrongReference {
         guard currentDID != nil else { throw LoginError.notAuthenticated }
 
-        guard let contentRecord = provider.fromMarkdown(markdown) else {
+        let ctx = WriteContext(previousContent: previousContent)
+        guard let contentRecord = provider.fromMarkdown(markdown, ctx: ctx) else {
             throw LoginError.contentConversionFailed
         }
 
