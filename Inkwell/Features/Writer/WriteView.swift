@@ -47,6 +47,12 @@ struct WriteView: View {
                         Text("No publications found.")
                             .font(.callout)
                             .foregroundStyle(.secondary)
+                        if let error = publishError {
+                            Text(error)
+                                .font(.caption)
+                                .foregroundStyle(.red)
+                                .lineLimit(4)
+                        }
                         Button {
                             showCreatePublication = true
                         } label: {

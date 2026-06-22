@@ -48,6 +48,9 @@ extension SiteStandardLexicon {
         /// - Important: Current maximum length is 3,000 graphemes (30,000 bytes).
         public let description: String?
 
+        /// The timestamp when the publication record was created. Optional.
+        public let createdAt: Date?
+
         /// A simplified theme for tools and apps to use when displaying this publication's
         /// content. Optional.
         public let basicTheme: SiteStandardLexicon.Theme.BasicDefinition?
@@ -69,7 +72,8 @@ extension SiteStandardLexicon {
             basicTheme: SiteStandardLexicon.Theme.BasicDefinition? = nil,
             theme: SiteStandardLexicon.Theme.PublicationTheme? = nil,
             labels: ComAtprotoLexicon.Label.SelfLabelsDefinition? = nil,
-            preferences: Preferences? = nil
+            preferences: Preferences? = nil,
+            createdAt: Date? = nil
         ) {
             self.url = url
             self.name = name
@@ -79,6 +83,7 @@ extension SiteStandardLexicon {
             self.theme = theme
             self.labels = labels
             self.preferences = preferences
+            self.createdAt = createdAt
         }
 
         public init(from decoder: any Decoder) throws {
@@ -92,6 +97,7 @@ extension SiteStandardLexicon {
             self.theme = try container.decodeIfPresent(SiteStandardLexicon.Theme.PublicationTheme.self, forKey: .theme)
             self.labels = try container.decodeIfPresent(ComAtprotoLexicon.Label.SelfLabelsDefinition.self, forKey: .labels)
             self.preferences = try container.decodeIfPresent(Preferences.self, forKey: .preferences)
+            self.createdAt = try container.decodeDateIfPresent(forKey: .createdAt)
         }
 
         public func encode(to encoder: any Encoder) throws {
@@ -109,6 +115,7 @@ extension SiteStandardLexicon {
             try container.encodeIfPresent(self.theme, forKey: .theme)
             try container.encodeIfPresent(self.labels, forKey: .labels)
             try container.encodeIfPresent(self.preferences, forKey: .preferences)
+            try container.encodeDateIfPresent(self.createdAt, forKey: .createdAt)
         }
 
         enum CodingKeys: String, CodingKey {
@@ -121,6 +128,7 @@ extension SiteStandardLexicon {
             case theme
             case labels
             case preferences
+            case createdAt
         }
     }
 }
