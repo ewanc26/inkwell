@@ -15,6 +15,13 @@ import ATProtoKit
 
 // MARK: - ContentProvider Protocol
 
+/// Context passed to `fromMarkdown` so providers can round-trip image blobs.
+/// Matching standard.horse's `WriteCtx`.
+struct WriteContext {
+    /// The content object being replaced, so existing image blobs round-trip.
+    let previousContent: UnknownType?
+}
+
 /// A content-format provider that reads and writes one standard.site `content`
 /// member ($type), converting it to/from the markdown the editor speaks.
 protocol ContentProvider {
@@ -30,8 +37,9 @@ protocol ContentProvider {
     func matches(_ content: UnknownType?) -> Bool
     /// Read stored content into editable markdown.
     func toMarkdown(_ content: UnknownType?) -> ConvertResult
-    /// Build a fresh content object from edited markdown.
-    func fromMarkdown(_ markdown: String) -> UnknownType?
+    /// Build a fresh content object from edited markdown, using the write
+    /// context to round-trip existing image blobs from the previous content.
+    func fromMarkdown(_ markdown: String, ctx: WriteContext) -> UnknownType?
 }
 
 /// Result of converting stored content to markdown.
@@ -39,6 +47,35 @@ struct ConvertResult {
     let markdown: String
     /// Human labels for blocks/features dropped converting to markdown.
     let lost: [String]
+}
+
+// MARK: - Image Blob Harvesting
+
+/// Walks a content tree (recursively) collecting every image blob referenced by
+/// CID, keyed by CID string. Matching standard.horse's `harvestImages`.
+func harvestImageBlobs(from content: UnknownType?) -> [String: ComAtprotoLexicon.Repository.UploadBlobOutput] {
+    guard let content else { return [:] }
+    var out: [String: ComAtprotoLexicon.Repository.UploadBlobOutput] = [:]
+    harvestImageBlobs(from: content, into: &out)
+    return out
+}
+
+private func harvestImageBlobs(from value: Any, into out: inout [String: ComAtprotoLexicon.Repository.UploadBlobOutput]) {
+    let mirror = Mirror(reflecting: value)
+    // Walk the struct/class properties looking for blobs.
+    for child in mirror.children {
+        if let blob = child.value as? ComAtprotoLexicon.Repository.UploadBlobOutput,
+           blob.mimeType?.hasPrefix("image/") ?? true {
+            let cid = blob.reference.link
+            if !cid.isEmpty { out[cid] = blob }
+        } else if let dict = child.value as? [String: Any] {
+            for (_, v) in dict { harvestImageBlobs(from: v, into: &out) }
+        } else if let array = child.value as? [Any] {
+            for v in array { harvestImageBlobs(from: v, into: &out) }
+        } else if child.value is CustomReflectable || Mirror(reflecting: child.value).children.count > 0 {
+            harvestImageBlobs(from: child.value, into: &out)
+        }
+    }
 }
 
 // MARK: - Facet Schema
@@ -762,12 +799,17 @@ struct LeafletProvider: ContentProvider {
         return MarkdownListItem(text: text, checked: item.checked, children: mdChildren)
     }
 
-    func fromMarkdown(_ markdown: String) -> UnknownType? {
+    func fromMarkdown(_ markdown: String, ctx: WriteContext) -> UnknownType? {
+        // Harvest existing image blobs from the previous content so CIDs in
+        // markdown (e.g. ![](bafy...)) can be matched and reattached verbatim
+        // without re-uploading — matching standard.horse's round-trip pattern.
+        let previousBlobs = harvestImageBlobs(from: ctx.previousContent)
+
         let blocks = MarkdownParser.parse(markdown)
         var leafletBlocks: [LeafletBlockContainer] = []
 
         for block in blocks {
-            if let lb = markdownToLeafletBlock(block) {
+            if let lb = markdownToLeafletBlock(block, previousBlobs: previousBlobs) {
                 leafletBlocks.append(LeafletBlockContainer(block: lb))
             }
         }
@@ -777,7 +819,7 @@ struct LeafletProvider: ContentProvider {
         return UnknownType.record(content)
     }
 
-    private func markdownToLeafletBlock(_ block: MarkdownBlock) -> LeafletBlock? {
+    private func markdownToLeafletBlock(_ block: MarkdownBlock, previousBlobs: [String: ComAtprotoLexicon.Repository.UploadBlobOutput]) -> LeafletBlock? {
         switch block {
         case .heading(let level, let text):
             let (plaintext, facets) = FacetConverter.markdownToFacets(text, schema: schema)
@@ -814,21 +856,28 @@ struct LeafletProvider: ContentProvider {
         case .horizontalRule:
             return LeafletBlock(type: b("horizontalRule"))
 
-        case .image:
-            // Images must be PDS blobs; markdown-only images can't be stored
-            // in leaflet format without a prior upload step.
+        case .image(let alt, let url):
+            // Match CID against previous content's blobs (standard.horse pattern).
+            // A blob CID is a base32 CIDv1 (`bafy…`) or base58 CIDv0 (`Qm…`).
+            let isCID = url.hasPrefix("baf") || url.hasPrefix("Qm")
+            if isCID, let existingBlob = previousBlobs[url] {
+                return LeafletBlock(
+                    type: b("image"), image: existingBlob, alt: alt.isEmpty ? nil : alt
+                )
+            }
+            // External URLs can't be stored in leaflet format.
             return nil
 
         case .unorderedList(let items):
-            let listItems = items.map { markdownToLeafletListItem($0, ordered: false) }
+            let listItems = items.map { markdownToLeafletListItem($0, ordered: false, previousBlobs: previousBlobs) }
             return LeafletBlock(type: b("unorderedList"), children: listItems)
 
         case .orderedList(let start, let items):
-            let listItems = items.map { markdownToLeafletListItem($0, ordered: true) }
+            let listItems = items.map { markdownToLeafletListItem($0, ordered: true, previousBlobs: previousBlobs) }
             return LeafletBlock(type: b("orderedList"), children: listItems, startIndex: start)
 
         case .taskList(let items):
-            let listItems = items.map { markdownToLeafletListItem($0, ordered: false) }
+            let listItems = items.map { markdownToLeafletListItem($0, ordered: false, previousBlobs: previousBlobs) }
             return LeafletBlock(type: b("unorderedList"), children: listItems)
         }
     }
@@ -837,7 +886,7 @@ struct LeafletProvider: ContentProvider {
     /// Nested ordered lists become `orderedListChildren`, unordered become
     /// `children`, and task items carry their `checked` flag. The item content
     /// defaults to an empty text block when no text is provided.
-    private func markdownToLeafletListItem(_ item: MarkdownListItem, ordered: Bool) -> LeafletListItem {
+    private func markdownToLeafletListItem(_ item: MarkdownListItem, ordered: Bool, previousBlobs: [String: ComAtprotoLexicon.Repository.UploadBlobOutput]) -> LeafletListItem {
         let itemType = ordered
             ? "pub.leaflet.blocks.orderedList#listItem"
             : "pub.leaflet.blocks.unorderedList#listItem"
@@ -846,9 +895,7 @@ struct LeafletProvider: ContentProvider {
             type: b("text"), plaintext: plaintext,
             facets: facets.isEmpty ? nil : facets
         )
-        // Nested lists: ordered children go into `orderedListChildren`,
-        // unordered into `children` (matching standard.horse's convention).
-        let children = item.children?.map { markdownToLeafletListItem($0, ordered: false) }
+        let children = item.children?.map { markdownToLeafletListItem($0, ordered: false, previousBlobs: previousBlobs) }
         return LeafletListItem(
             type: itemType, content: content, checked: item.checked,
             children: children
@@ -878,7 +925,7 @@ struct MarkpubProvider: ContentProvider {
         return ConvertResult(markdown: markpub.text.markdown ?? "", lost: [])
     }
 
-    func fromMarkdown(_ markdown: String) -> UnknownType? {
+    func fromMarkdown(_ markdown: String, ctx: WriteContext) -> UnknownType? {
         let text = MarkpubText(type: "at.markpub.text", markdown: markdown)
         let content = MarkpubContent(text: text)
         return UnknownType.record(content)
@@ -1013,7 +1060,7 @@ struct PcktProvider: ContentProvider {
         return MarkdownListItem(text: text, checked: item.checked, children: children)
     }
 
-    func fromMarkdown(_ markdown: String) -> UnknownType? {
+    func fromMarkdown(_ markdown: String, ctx: WriteContext) -> UnknownType? {
         let blocks = MarkdownParser.parse(markdown)
         var items: [PcktBlock] = []
 
@@ -1225,7 +1272,7 @@ struct OffprintProvider: ContentProvider {
         return MarkdownListItem(text: text, checked: item.checked, children: children)
     }
 
-    func fromMarkdown(_ markdown: String) -> UnknownType? {
+    func fromMarkdown(_ markdown: String, ctx: WriteContext) -> UnknownType? {
         let blocks = MarkdownParser.parse(markdown)
         var items: [OffprintBlock] = []
 

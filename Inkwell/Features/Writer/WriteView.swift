@@ -244,7 +244,8 @@ struct WriteView: View {
                     path: path.isEmpty ? nil : path,
                     site: pub.uri,
                     markdown: markdown,
-                    provider: provider
+                    provider: provider,
+                    previousContent: nil  // new posts have no previous content
                 )
                 let linkTag = SiteStandardLexicon.Verification.discoveryLinkTag(
                     forRecordURI: reference.recordURI,
