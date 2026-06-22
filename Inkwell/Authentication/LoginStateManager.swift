@@ -121,10 +121,10 @@ final class LoginStateManager {
     ///
     /// The `clientId` URL must serve the `client-metadata.json` file
     /// found in the repo's `oauth/` directory. In production this is
-    /// `https://inkwell.app/client-metadata.json`.
+    /// `https://inkwell.ewancroft.uk/client-metadata.json`.
     private var appCredentials: AppCredentials {
         AppCredentials(
-            clientId: "https://inkwell.app/client-metadata.json",
+            clientId: "https://inkwell.ewancroft.uk/client-metadata.json",
             clientPassword: "",
             scopes: ["atproto"],
             callbackURL: URL(string: "inkwell://callback")!
