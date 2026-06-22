@@ -20,7 +20,7 @@ enum LegalDocumentType {
         switch self {
         case .privacyPolicy:
             return """
-            **Effective Date: \(Date.now.formatted(date: .long, time: .omitted))**
+            **Effective Date: 21 June 2026**
             
             Inkwell is a decentralized client for the Standard.site ecosystem on the AT Protocol. We believe your data belongs to you.
             
