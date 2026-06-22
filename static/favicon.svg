@@ -1,17 +1,26 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
-  <!-- Inkwell favicon: serif I letterform + ink drop, adapted from wordmark.svg.
-       Uses currentColor for the letterform (adapts to light/dark theme)
-       and var(--color-accent) for the ink drop (brand green). -->
+  <!-- Inkwell favicon: serif I letterform + ink drop.
+       Colours are hardcoded — as a favicon / <img> src, CSS custom
+       properties (var()) and currentColor from the page don't resolve.
+       The inline SVG in +layout.svelte handles theme adaptation. -->
 
   <!-- Top bar -->
-  <rect x="108" y="64" width="296" height="44" rx="16" fill="currentColor" />
+  <rect x="108" y="64" width="296" height="44" rx="16" fill="#1a1a2e" />
 
   <!-- Vertical stroke -->
-  <rect x="189" y="108" width="134" height="290" fill="currentColor" />
+  <rect x="189" y="108" width="134" height="290" fill="#1a1a2e" />
 
   <!-- Bottom bar -->
-  <rect x="108" y="398" width="296" height="44" rx="16" fill="currentColor" />
+  <rect x="108" y="398" width="296" height="44" rx="16" fill="#1a1a2e" />
 
-  <!-- Ink drop: brand green, auto-adapts light/dark via CSS custom property -->
-  <circle cx="256" cy="468" r="20" fill="var(--color-accent, #139500)" />
+  <!-- Ink drop: brand green -->
+  <circle cx="256" cy="468" r="20" fill="#139500" />
+
+  <!-- Dark mode override: lighten the letterform, brighten the ink drop -->
+  <style>
+    @media (prefers-color-scheme: dark) {
+      rect { fill: #e8e6f0; }
+      circle { fill: #2db84d; }
+    }
+  </style>
 </svg>
