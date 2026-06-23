@@ -35,8 +35,6 @@ struct ReadView: View {
     @State private var recommendRecordKey: String?
     @State private var isSubmittingRecommend = false
     @State private var actionMessage: String?
-    @State private var hasInitiallyLoadedActions = false
-
     // Comment state
     @State private var comments: [CommentEntry] = []
     @State private var newCommentText = ""
@@ -376,11 +374,9 @@ struct ReadView: View {
                 isLoading: isTogglingSubscription,
                 tint: accentColor,
                 activeForeground: theme.accentForeground,
-                animate: hasInitiallyLoadedActions,
                 action: { Task { await toggleSubscription(publicationURI: publicationURI) } }
             )
             .disabled(isTogglingSubscription)
-            .modifier(ConditionalHaptic(active: hasInitiallyLoadedActions, trigger: isSubscribed))
         }
 
         if let documentURI {
@@ -391,11 +387,9 @@ struct ReadView: View {
                 isLoading: isSubmittingRecommend,
                 tint: accentColor,
                 activeForeground: theme.accentForeground,
-                animate: hasInitiallyLoadedActions,
                 action: { Task { await toggleRecommend(documentURI: documentURI) } }
             )
             .disabled(isSubmittingRecommend)
-            .modifier(ConditionalHaptic(active: hasInitiallyLoadedActions, trigger: isRecommended))
         }
     }
 
@@ -423,8 +417,6 @@ struct ReadView: View {
                 recommendRecordKey = nil
             }
         }
-
-        hasInitiallyLoadedActions = true
     }
 
     private func toggleSubscription(publicationURI: String) async {
@@ -1174,7 +1166,6 @@ private struct ReaderActionPill: View {
     let isLoading: Bool
     let tint: Color
     let activeForeground: Color
-    var animate: Bool = false
     let action: () -> Void
 
     var body: some View {
@@ -1185,14 +1176,8 @@ private struct ReaderActionPill: View {
                         .scaleEffect(0.7)
                         .tint(isActive ? activeForeground : tint)
                 } else {
-                    Group {
-                        if animate {
-                            Image(systemName: icon)
-                                .symbolEffect(.bounce, value: isActive)
-                        } else {
-                            Image(systemName: icon)
-                        }
-                    }
+                    Image(systemName: icon)
+                        .symbolEffect(.bounce, value: isActive)
                 }
                 Text(label)
                     .lineLimit(1)
@@ -1212,6 +1197,6 @@ private struct ReaderActionPill: View {
             )
         }
         .buttonStyle(.plain)
-        .animation(animate ? .spring(response: 0.3, dampingFraction: 0.7) : nil, value: isActive)
+        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isActive)
     }
 }
