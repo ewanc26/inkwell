@@ -709,10 +709,10 @@ struct ReadView: View {
                 renderList(block.children, ordered: true, startIndex: block.startIndex ?? 1)
 
             case "pub.leaflet.blocks.bskyPost":
-                renderBSkyPost(block)
+                renderGenericEmbed(icon: "bubble.left.fill", label: "Bluesky Post")
 
             case "pub.leaflet.blocks.standardSitePost":
-                renderStandardSitePost(block)
+                renderGenericEmbed(icon: "doc.text.fill", label: "Standard.site Post")
 
             case "pub.leaflet.blocks.website":
                 renderWebsiteCard(block)
@@ -727,7 +727,7 @@ struct ReadView: View {
                 renderSignupPrompt(block)
 
             case "pub.leaflet.blocks.poll":
-                renderPollPlaceholder(block)
+                renderGenericEmbed(icon: "chart.bar.fill", label: "Poll")
 
             case "pub.leaflet.blocks.page":
                 renderPageReference(block)
@@ -795,35 +795,21 @@ struct ReadView: View {
         return AnyView(EmptyView())
     }
 
-    // MARK: - New Block Renderers (bskyPost, standardSitePost, website, button, postsList, signup, poll, page, iframe)
+    // MARK: - Block Renderers (embeds, website, button, postsList, signup, page, iframe)
 
     @ViewBuilder
-    private func renderBSkyPost(_ block: LeafletBlock) -> some View {
-        if let uri = block.subject?.recordURI {
-            BSkyPostEmbedView(
-                postURI: uri,
-                foregroundColor: foregroundColor,
-                accentColor: accentColor
-            )
-        } else {
-            // Fallback if no URI — shouldn't happen for valid blocks
-            BSkyPostEmbedView(
-                postURI: "at://",
-                foregroundColor: foregroundColor,
-                accentColor: accentColor
-            )
+    private func renderGenericEmbed(icon: String, label: String) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .foregroundStyle(accentColor)
+            Text(label)
+                .font(theme.bodyFont(.subheadline))
+                .foregroundStyle(foregroundColor.opacity(0.6))
+            Spacer()
         }
-    }
-
-    @ViewBuilder
-    private func renderStandardSitePost(_ block: LeafletBlock) -> some View {
-        if let uri = block.standardSitePostSubject {
-            StandardSitePostEmbedView(
-                subjectURI: uri,
-                size: block.size,
-                showPublicationTheme: block.showPublicationTheme ?? false
-            )
-        }
+        .padding(12)
+        .background(foregroundColor.opacity(0.04))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 
     @ViewBuilder
