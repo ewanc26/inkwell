@@ -12,9 +12,11 @@ struct InkwellApp: App {
     @UIApplicationDelegateAdaptor(InkwellAppDelegate.self) private var appDelegate
     @State private var loginStateManager = LoginStateManager()
 
-    /// Fades out when the app is ready. The splash matches the static
-    /// `UILaunchScreen` (LaunchBackground color + centered mark) so the
-    /// transition from OS launch screen → SwiftUI is invisible.
+    /// Controls whether the splash screen is in the view hierarchy.
+    /// Uses a boolean (not opacity comparison) to ensure the overlay
+    /// is fully REMOVED after fading out — an invisible Color with
+    /// ignoresSafeArea still intercepts all touches at screen top.
+    @State private var showSplash = true
     @State private var splashOpacity: Double = 1.0
 
     var body: some Scene {
@@ -22,10 +24,10 @@ struct InkwellApp: App {
             ZStack {
                 ContentView()
                     .environment(loginStateManager)
-                    .opacity(1.0 - splashOpacity)
 
-                // Splash overlay — matches UILaunchScreen exactly
-                if splashOpacity > 0 {
+                // Splash overlay — matches UILaunchScreen exactly.
+                // Removed from hierarchy after fade, not just hidden.
+                if showSplash {
                     Color("LaunchBackground")
                         .ignoresSafeArea()
                         .overlay {
@@ -37,12 +39,16 @@ struct InkwellApp: App {
                 }
             }
             .task {
-                // Hold the splash long enough for the system animation to
-                // finish, then fade into the real UI with a soft spring.
+                // Hold briefly so the system launch screen → SwiftUI
+                // transition isn't a flash, then fade out.
                 try? await Task.sleep(for: .milliseconds(300))
                 withAnimation(.spring(response: 0.6, dampingFraction: 0.85)) {
                     splashOpacity = 0.0
                 }
+                // Wait for animation to finish, then remove from hierarchy
+                // so it doesn't block touches on nav bar / toolbar buttons.
+                try? await Task.sleep(for: .milliseconds(700))
+                showSplash = false
             }
             .task {
                     // Cheap, synchronous-in-effect, so do it before resuming the session.
