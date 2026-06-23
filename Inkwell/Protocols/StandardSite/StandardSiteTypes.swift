@@ -63,7 +63,7 @@ struct PublicationEntry: Identifiable, Equatable, Hashable {
 extension PublicationEntry {
     /// Matches both the preferred publication AT-URI and the URL form used by
     /// older and standalone Standard.site producers.
-    func contains(_ document: SiteStandardLexicon.DocumentRecord) -> Bool {
+    nonisolated func contains(_ document: SiteStandardLexicon.DocumentRecord) -> Bool {
         document.site == uri || normalizedSite(document.site) == normalizedSite(record.url)
     }
 }
@@ -111,7 +111,7 @@ extension SiteStandardLexicon.DocumentRecord {
     }
 }
 
-private func normalizedSite(_ value: String) -> String {
+private nonisolated func normalizedSite(_ value: String) -> String {
     guard var components = URLComponents(string: value), components.host != nil else {
         return value.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
     }
