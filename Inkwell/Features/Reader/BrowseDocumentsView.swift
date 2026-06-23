@@ -110,7 +110,6 @@ struct BrowseDocumentsView: View {
                         } label: {
                             ReaderPostCard(item: item)
                         }
-                        .buttonStyle(.plain)
                     }
                 }
                 .padding(.horizontal, 14)
