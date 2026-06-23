@@ -708,6 +708,33 @@ struct ReadView: View {
             case "pub.leaflet.blocks.orderedList":
                 renderList(block.children, ordered: true, startIndex: block.startIndex ?? 1)
 
+            case "pub.leaflet.blocks.bskyPost":
+                renderBSkyPost(block)
+
+            case "pub.leaflet.blocks.standardSitePost":
+                renderStandardSitePost(block)
+
+            case "pub.leaflet.blocks.website":
+                renderWebsiteCard(block)
+
+            case "pub.leaflet.blocks.button":
+                renderButton(block)
+
+            case "pub.leaflet.blocks.postsList":
+                renderPostsListPlaceholder(block)
+
+            case "pub.leaflet.blocks.signup":
+                renderSignupPrompt(block)
+
+            case "pub.leaflet.blocks.poll":
+                renderPollPlaceholder(block)
+
+            case "pub.leaflet.blocks.page":
+                renderPageReference(block)
+
+            case "pub.leaflet.blocks.iframe":
+                renderIframePlaceholder(block)
+
             default:
                 // Fallback for unsupported blocks
                 HStack {
@@ -766,6 +793,251 @@ struct ReadView: View {
             )
         }
         return AnyView(EmptyView())
+    }
+
+    // MARK: - New Block Renderers (bskyPost, standardSitePost, website, button, postsList, signup, poll, page, iframe)
+
+    @ViewBuilder
+    private func renderBSkyPost(_ block: LeafletBlock) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                Image(systemName: "bubble.left.fill")
+                    .foregroundStyle(accentColor)
+                Text("Embedded Bluesky Post")
+                    .font(theme.bodyFont(.subheadline).weight(.semibold))
+                Spacer()
+            }
+            .foregroundStyle(foregroundColor)
+            if let uri = block.subject?.recordURI {
+                Text(uri)
+                    .font(.caption2)
+                    .foregroundStyle(foregroundColor.opacity(0.4))
+                    .lineLimit(1)
+            }
+        }
+        .padding(12)
+        .background(foregroundColor.opacity(0.04))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(foregroundColor.opacity(0.12), lineWidth: 1)
+        )
+    }
+
+    @ViewBuilder
+    private func renderStandardSitePost(_ block: LeafletBlock) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                Image(systemName: "doc.text.fill")
+                    .foregroundStyle(accentColor)
+                Text("Standard.site Post")
+                    .font(theme.bodyFont(.subheadline).weight(.semibold))
+                Spacer()
+                if let uri = block.standardSitePostSubject {
+                    Link(destination: URL(string: "https://standard.site/\(uri)")!) {
+                        Image(systemName: "arrow.up.right")
+                            .font(.caption)
+                    }
+                }
+            }
+            .foregroundStyle(foregroundColor)
+            if let cid = block.standardSitePostCID {
+                Text("CID: \(String(cid.prefix(16)))…")
+                    .font(.caption2)
+                    .foregroundStyle(foregroundColor.opacity(0.4))
+                    .lineLimit(1)
+            }
+        }
+        .padding(12)
+        .background(foregroundColor.opacity(0.04))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(foregroundColor.opacity(0.12), lineWidth: 1)
+        )
+    }
+
+    @ViewBuilder
+    private func renderWebsiteCard(_ block: LeafletBlock) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            if let img = block.image, let did = authorDID ?? loginStateManager.currentDID {
+                let imgURL = URL(string: "https://cdn.bsky.app/img/feed_thumbnail/plain/\(did)/\(img.reference.link)")
+                AsyncImage(url: imgURL) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image.resizable().scaledToFill()
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 180)
+                            .clipped()
+                    default:
+                        EmptyView()
+                    }
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                if let title = block.websiteTitle {
+                    Text(title)
+                        .font(theme.bodyFont(.subheadline).weight(.semibold))
+                        .foregroundStyle(foregroundColor)
+                        .lineLimit(2)
+                }
+                if let desc = block.websiteDescription {
+                    Text(desc)
+                        .font(.caption)
+                        .foregroundStyle(foregroundColor.opacity(0.6))
+                        .lineLimit(3)
+                }
+                if let url = block.url {
+                    Text(url)
+                        .font(.caption2)
+                        .foregroundStyle(accentColor)
+                        .lineLimit(1)
+                }
+            }
+            .padding(12)
+        }
+        .background(foregroundColor.opacity(0.04))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(foregroundColor.opacity(0.12), lineWidth: 1)
+        )
+        .onTapGesture {
+            if let urlString = block.url, let url = URL(string: urlString) {
+                // handled by Link if wrapped — here as fallback
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func renderButton(_ block: LeafletBlock) -> some View {
+        if let urlString = block.url, let url = URL(string: urlString) {
+            Link(destination: url) {
+                HStack {
+                    Spacer()
+                    Text(block.text ?? "Open")
+                        .font(theme.bodyFont(.subheadline).weight(.semibold))
+                    Image(systemName: "arrow.up.right")
+                        .font(.caption)
+                    Spacer()
+                }
+                .foregroundStyle(theme.accentForeground)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .background(accentColor)
+                .clipShape(Capsule())
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func renderPostsListPlaceholder(_ block: LeafletBlock) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: "list.bullet.rectangle")
+                .foregroundStyle(accentColor)
+            Text("Posts from this publication")
+                .font(theme.bodyFont(.subheadline))
+                .foregroundStyle(foregroundColor.opacity(0.6))
+            Spacer()
+        }
+        .padding(12)
+        .background(foregroundColor.opacity(0.04))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+
+    @ViewBuilder
+    private func renderSignupPrompt(_ block: LeafletBlock) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: "envelope.fill")
+                .font(.title3)
+                .foregroundStyle(accentColor)
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Subscribe to this publication")
+                    .font(theme.bodyFont(.subheadline).weight(.semibold))
+                    .foregroundStyle(foregroundColor)
+                Text("Visit the publication's site to sign up for email updates.")
+                    .font(.caption)
+                    .foregroundStyle(foregroundColor.opacity(0.5))
+            }
+            Spacer()
+        }
+        .padding(12)
+        .background(accentColor.opacity(0.06))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+    }
+
+    @ViewBuilder
+    private func renderPollPlaceholder(_ block: LeafletBlock) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: "chart.bar.fill")
+                .foregroundStyle(accentColor)
+            Text("Poll")
+                .font(theme.bodyFont(.subheadline))
+                .foregroundStyle(foregroundColor.opacity(0.6))
+            Spacer()
+        }
+        .padding(12)
+        .background(foregroundColor.opacity(0.04))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+
+    @ViewBuilder
+    private func renderPageReference(_ block: LeafletBlock) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: "doc.text")
+                .foregroundStyle(accentColor)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Page \(block.pageIndex.map { String($0 + 1) } ?? "?"))")
+                    .font(theme.bodyFont(.subheadline).weight(.semibold))
+                    .foregroundStyle(foregroundColor)
+                if let doc = block.pageDocument {
+                    Text(doc)
+                        .font(.caption2)
+                        .foregroundStyle(foregroundColor.opacity(0.4))
+                        .lineLimit(1)
+                }
+            }
+            Spacer()
+            Image(systemName: "arrow.turn.down.right")
+                .font(.caption)
+                .foregroundStyle(foregroundColor.opacity(0.4))
+        }
+        .padding(12)
+        .background(foregroundColor.opacity(0.04))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+
+    @ViewBuilder
+    private func renderIframePlaceholder(_ block: LeafletBlock) -> some View {
+        VStack(spacing: 8) {
+            HStack(spacing: 8) {
+                Image(systemName: "rectangle.on.rectangle")
+                    .foregroundStyle(accentColor)
+                Text("Embedded content")
+                    .font(theme.bodyFont(.subheadline).weight(.semibold))
+                    .foregroundStyle(foregroundColor)
+                Spacer()
+                if let url = block.url {
+                    Link(destination: URL(string: url)!) {
+                        Image(systemName: "arrow.up.right")
+                            .font(.caption)
+                    }
+                }
+            }
+
+            if let url = block.url {
+                Text(url)
+                    .font(.caption2)
+                    .foregroundStyle(foregroundColor.opacity(0.4))
+                    .lineLimit(1)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .padding(12)
+        .background(foregroundColor.opacity(0.04))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(foregroundColor.opacity(0.12), lineWidth: 1)
+        )
     }
 
     // MARK: - AttributedString Rich Text Parser
