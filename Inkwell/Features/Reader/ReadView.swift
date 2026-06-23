@@ -78,16 +78,12 @@ struct ReadView: View {
                             .foregroundStyle(accentColor)
                             .tracking(2)
                             .lineLimit(1)
-                            .opacity(isLoading ? 0 : 1)
-                            .offset(y: isLoading ? 8 : 0)
                     }
 
                     Text(document.title)
                         .font(theme.headingFont(.largeTitle, weight: .bold))
                         .foregroundStyle(foregroundColor)
                         .lineSpacing(4)
-                        .opacity(isLoading ? 0 : 1)
-                        .offset(y: isLoading ? 8 : 0)
 
                     HStack(spacing: 8) {
                         Text("Published")
@@ -212,11 +208,12 @@ struct ReadView: View {
 
                 // Content Section
                 if isLoading {
-                    VStack(spacing: 20) {
-                        InkwellLoader(message: "Loading content…")
+                    HStack {
+                        Spacer()
+                        ProgressView()
+                        Spacer()
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 60)
+                    .padding(.vertical, 40)
                 } else if let errorMessage = errorMessage {
                     ContentUnavailableView("Failed to load content", systemImage: "exclamationmark.triangle", description: Text(errorMessage))
                 } else if let markdown = markdownContent {
@@ -240,7 +237,6 @@ struct ReadView: View {
             .padding(.horizontal, 20)
             .padding(.vertical, theme.showPageBackground ? 24 : 0)
             .frame(maxWidth: theme.pageWidth)
-            .animation(InkwellMotion.standard, value: isLoading)
             .background(
                 Group {
                     if theme.showPageBackground {
