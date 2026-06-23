@@ -160,16 +160,20 @@ struct BrowseDocumentsView: View {
                             guard doc.record.site == pubURI else { return nil }
                             return ReaderFeedItem(document: doc, publication: publication)
                         }
-
-                        // 2. Supplement with search index (finds documents on other DIDs)
                         var seenURIs = Set(items.map { $0.document.uri })
-                        if let searchResults = try? await searchAPI.fetchDocuments(forPublication: pubURI, limit: 50) {
-                            for result in searchResults.results where !seenURIs.contains(result.uri) {
-                                // Fetch the full document record from the author's PDS
-                                if let doc = try? await loginStateManager.fetchDocument(uri: result.uri) {
-                                    seenURIs.insert(doc.uri)
-                                    items.append(ReaderFeedItem(document: doc, publication: publication))
-                                }
+
+                        // 2. Supplement via search index — query by publication name
+                        //    to find documents from other authors' PDSs, then fetch
+                        //    full records and filter by the site field.
+                        let searchQuery = publication?.record.name ?? ""
+                        if !searchQuery.isEmpty,
+                           let searchResults = try? await searchAPI.search(for: searchQuery, limit: 30) {
+                            for result in searchResults.results
+                                where result.isStandardSiteDocument && !seenURIs.contains(result.uri) {
+                                guard let doc = try? await loginStateManager.fetchDocument(uri: result.uri),
+                                      doc.record.site == pubURI else { continue }
+                                seenURIs.insert(doc.uri)
+                                items.append(ReaderFeedItem(document: doc, publication: publication))
                             }
                         }
 
