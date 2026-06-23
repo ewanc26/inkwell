@@ -225,8 +225,8 @@ struct ReadView: View {
                     // support that the markdown path doesn't need).
                     ForEach(pages, id: \.self) { page in
                         if let blocks = page.blocks {
-                            ForEach(blocks.indices, id: \.self) { idx in
-                                renderBlock(blocks[idx].block, alignment: blocks[idx].alignment)
+                            ForEach(Array(blocks.enumerated()), id: \.offset) { idx, container in
+                                renderBlock(container.block, alignment: container.alignment)
                             }
                         }
                     }
@@ -729,8 +729,7 @@ struct ReadView: View {
         if let items = items {
             return AnyView(
                 VStack(alignment: .leading, spacing: 8) {
-                    ForEach(items.indices, id: \.self) { index in
-                        let item = items[index]
+                    ForEach(Array(items.enumerated()), id: \.offset) { index, item in
                         HStack(alignment: .top, spacing: 8) {
                             if ordered {
                                 let itemNumber = (startIndex ?? 1) + index
