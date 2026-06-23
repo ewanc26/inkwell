@@ -76,13 +76,16 @@ final class StandardReaderAPI {
         ])
     }
 
-    /// Fetch documents belonging to a specific publication from the search index.
-    /// Uses the publication's AT-URI as a filter so we get documents from ALL
-    /// authors, not just the publication owner's PDS.
-    func fetchDocuments(forPublication uri: String, limit: Int = 100) async throws -> ReaderSearchResponse {
-        try await request("search", queryItems: [
-            URLQueryItem(name: "q", value: ""),
-            URLQueryItem(name: "site", value: uri),
+    /// Search for documents by a term (publication name, URL, or topic).
+    /// The search index aggregates across the AT Protocol firehose — this
+    /// finds documents from ALL authors, not just one PDS.
+    func search(for term: String, limit: Int = 50) async throws -> ReaderSearchResponse {
+        let query = term.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else {
+            return ReaderSearchResponse(results: [], total: 0, hasMore: false)
+        }
+        return try await request("search", queryItems: [
+            URLQueryItem(name: "q", value: query),
             URLQueryItem(name: "mode", value: "keyword"),
             URLQueryItem(name: "limit", value: String(max(1, min(limit, 100)))),
             URLQueryItem(name: "format", value: "v2")
