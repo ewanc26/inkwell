@@ -24,12 +24,14 @@
 //
 
 import Foundation
+import OSLog
 import UserNotifications
 import Observation
 
 @MainActor
 @Observable
 final class NotificationManager {
+    private let logger = Logger(subsystem: "uk.ewancroft.Inkwell", category: "Notifications")
     static let shared = NotificationManager()
 
     // MARK: - State
@@ -164,7 +166,7 @@ final class NotificationManager {
 
         } catch {
             // Silent failure — polling is best-effort.
-            print("[NotificationManager] poll failed: \(error.localizedDescription)")
+            logger.error("[NotificationManager] poll failed: \(error.localizedDescription)")
         }
     }
 

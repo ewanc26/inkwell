@@ -1,7 +1,9 @@
 import SwiftUI
 import ATProtoKit
+import OSLog
 
 struct BrowseDocumentsView: View {
+    private let logger = Logger(subsystem: "uk.ewancroft.Inkwell", category: "Reader")
     @Environment(LoginStateManager.self) private var loginStateManager
     @State private var notificationManager = NotificationManager.shared
 
@@ -146,13 +148,27 @@ struct BrowseDocumentsView: View {
                 for subscription in followedPublications {
                     let pubURI = subscription.record.publication
                     guard let pubDID = ATURI.parse(pubURI)?.did else { continue }
-                    group.addTask { [pubURI, pubDID] in
+                    group.addTask { [pubURI, pubDID, logger] in
                         let publication = try? await loginStateManager.fetchPublication(uri: pubURI)
-                        guard let remoteDocuments = try? await loginStateManager.fetchDocuments(fromDID: pubDID) else {
+                        let remoteDocuments: [DocumentEntry]
+                        do {
+                            remoteDocuments = try await loginStateManager.fetchDocuments(fromDID: pubDID)
+                        } catch {
+                            logger.error("[loadData] fetchDocuments failed for \(pubDID): \(error.localizedDescription)")
                             return []
                         }
                         return remoteDocuments.compactMap { document in
-                            guard document.record.site == pubURI else { return nil }
+                            // Use the richer publication.contains() match when available —
+                            // it handles both the AT-URI form and the HTTPS URL form of
+                            // document.site (via normalizedSite). Falling back to a raw
+                            // string compare only when the publication failed to load.
+                            let belongs: Bool
+                            if let publication {
+                                belongs = publication.contains(document.record)
+                            } else {
+                                belongs = document.record.site == pubURI
+                            }
+                            guard belongs else { return nil }
                             return ReaderFeedItem(document: document, publication: publication)
                         }
                     }

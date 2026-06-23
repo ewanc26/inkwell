@@ -17,6 +17,7 @@
 
 import Foundation
 import Observation
+import OSLog
 import ATProtoKit
 import OAuthenticator
 import ATResolve
@@ -79,6 +80,7 @@ private struct LossyRecordArray: Decodable, Sendable {
 @MainActor
 @Observable
 final class LoginStateManager {
+    private let logger = Logger(subsystem: "uk.ewancroft.Inkwell", category: "Auth")
     // MARK: - Public State
     private(set) var isAuthenticated = false
     private(set) var currentHandle: String?
@@ -173,7 +175,7 @@ final class LoginStateManager {
                 return false
             }
 
-            print("[SignIn] resolved \(identity.handle) → DID \(identity.did), PDS \(pdsURL.absoluteString)")
+            logger.info("[SignIn] resolved \(identity.handle) → DID \(identity.did), PDS \(pdsURL.absoluteString)")
 
             // 2. Load OAuth server metadata from the PDS
             let serverMetadata = try await ServerMetadata.load(for: pdsHost, provider: URLSession.defaultProvider)
@@ -217,9 +219,9 @@ final class LoginStateManager {
             )
             let auth = Authenticator(config: config)
 
-            print("[SignIn] starting ASWebAuthenticationSession…")
+            logger.info("[SignIn] starting ASWebAuthenticationSession…")
             try await auth.authenticate()
-            print("[SignIn] OAuth flow completed")
+            logger.info("[SignIn] OAuth flow completed")
 
             // 6. Rebuild Authenticator in automatic mode for subsequent requests
             let autoConfig = Authenticator.Configuration(
@@ -241,12 +243,15 @@ final class LoginStateManager {
             // 7. Best-effort profile fetch (cosmetic — don't block sign-in)
             Task { [weak self] in
                 guard let self else { return }
-                if let profile = try? await self.fetchProfile(did: identity.did) {
+                do {
+                    let profile = try await self.fetchProfile(did: identity.did)
                     await MainActor.run {
                         let trimmedName = profile.displayName?.trimmingCharacters(in: .whitespacesAndNewlines)
                         self.displayName = (trimmedName?.isEmpty == false) ? trimmedName : nil
                         self.avatarURL = profile.avatarURL
                     }
+                } catch {
+                    logger.error("[SignIn] profile fetch failed: \(error.localizedDescription)")
                 }
             }
 
@@ -266,12 +271,12 @@ final class LoginStateManager {
             @unknown default:
                 detail = "unknown decoding error"
             }
-            print("[SignIn] DecodingError: \(detail)")
+            logger.error("[SignIn] DecodingError: \(detail)")
             errorMessage = "Unexpected response from server. Please try again."
             clearSession()
             return false
         } catch {
-            print("[SignIn] error: \(type(of: error)) — \(error.localizedDescription)")
+            logger.error("[SignIn] error: \(type(of: error)) — \(error.localizedDescription)")
             errorMessage = error.localizedDescription
             clearSession()
             return false
@@ -295,7 +300,7 @@ final class LoginStateManager {
         guard let dpopKeyData = try? dpopKeyStore.read(),
               let key = try? P256.Signing.PrivateKey(rawRepresentation: dpopKeyData),
               let storedLogin = try? loginStore.read() else {
-            print("[RestoreSession] no stored session found")
+            logger.info("[RestoreSession] no stored session found")
             clearSession()
             return
         }
@@ -303,7 +308,7 @@ final class LoginStateManager {
         // Quick expiry check — don't bother building the authenticator
         // if the access token is already expired and there's no refresh token.
         if !storedLogin.accessToken.valid && storedLogin.refreshToken == nil {
-            print("[RestoreSession] access token expired, no refresh token")
+            logger.info("[RestoreSession] access token expired, no refresh token")
             clearSession()
             return
         }
@@ -311,7 +316,7 @@ final class LoginStateManager {
         do {
             // Resolve identity for fresh DID
             guard let identity = try? await resolver.resolveHandle(storedHandle) else {
-                print("[RestoreSession] identity resolution failed")
+                logger.error("[RestoreSession] identity resolution failed")
                 clearSession()
                 return
             }
@@ -346,20 +351,37 @@ final class LoginStateManager {
             self.isAuthenticated = true
             self.errorMessage = nil
 
-            print("[RestoreSession] session restored for \(identity.handle)")
+            logger.info("[RestoreSession] session restored for \(identity.handle)")
+
+            // Verify the restored tokens are still accepted by the PDS
+            // before declaring the session live. This catches server-side
+            // revocation before the user tries to write anything — reads
+            // use unauthenticated requests so they would succeed either
+            // way, masking a broken token until the first mutation.
+            do {
+                _ = try await authenticatedData(path: "/xrpc/com.atproto.server.getSession")
+                logger.info("[RestoreSession] token verification succeeded")
+            } catch {
+                logger.warning("[RestoreSession] token verification failed (\(error.localizedDescription)) — clearing session")
+                clearSession()
+                return
+            }
 
             Task { [weak self] in
                 guard let self else { return }
-                if let profile = try? await self.fetchProfile(did: identity.did) {
+                do {
+                    let profile = try await self.fetchProfile(did: identity.did)
                     await MainActor.run {
                         let trimmedName = profile.displayName?.trimmingCharacters(in: .whitespacesAndNewlines)
                         self.displayName = (trimmedName?.isEmpty == false) ? trimmedName : nil
                         self.avatarURL = profile.avatarURL
                     }
+                } catch {
+                    logger.error("[RestoreSession] profile fetch failed: \(error.localizedDescription)")
                 }
             }
         } catch {
-            print("[RestoreSession] failed: \(error.localizedDescription)")
+            logger.error("[RestoreSession] failed: \(error.localizedDescription)")
             clearSession()
         }
     }
@@ -417,7 +439,9 @@ final class LoginStateManager {
 
         guard let http = response as? HTTPURLResponse,
               (200...299).contains(http.statusCode) else {
-            throw LoginError.httpError(status: (response as? HTTPURLResponse)?.statusCode ?? 0)
+            let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+            logger.error("[authenticatedData] HTTP \(status) for \(url.absoluteString)")
+            throw LoginError.httpError(status: status)
         }
 
         return data
@@ -455,7 +479,9 @@ final class LoginStateManager {
 
         guard let http = response as? HTTPURLResponse,
               (200...299).contains(http.statusCode) else {
-            throw LoginError.httpError(status: (response as? HTTPURLResponse)?.statusCode ?? 0)
+            let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+            logger.error("[unauthenticatedData] HTTP \(status) for \(url.absoluteString)")
+            throw LoginError.httpError(status: status)
         }
 
         return data
@@ -661,9 +687,9 @@ final class LoginStateManager {
             )
 
             let page = try JSONDecoder().decode(TolerantRecordPage.self, from: data)
-            print("[listAllRecords] \(collection): raw JSON returned \(page.records.count) records (cursor: \(page.cursor ?? "nil"))")
+            logger.info("[listAllRecords] \(collection): raw JSON returned \(page.records.count) records (cursor: \(page.cursor ?? "nil"))")
             let withValues = page.records.filter { $0.value != nil }
-            print("[listAllRecords] \(collection): \(withValues.count)/\(page.records.count) records have non-nil value")
+            logger.info("[listAllRecords] \(collection): \(withValues.count)/\(page.records.count) records have non-nil value")
             allRecords.append(contentsOf: page.records)
             cursor = page.cursor
         } while cursor != nil && allRecords.count < maximumCount
@@ -678,7 +704,10 @@ final class LoginStateManager {
         guard let did = currentDID else { throw LoginError.notAuthenticated }
         let records = try await listAllRecords(from: did, collection: SiteStandardLexicon.PublicationRecord.type)
         let decoded = records.compactMap { $0.value?.getRecord(ofType: SiteStandardLexicon.PublicationRecord.self) }
-        print("[fetchPublications] \(records.count) raw → \(decoded.count) decoded")
+        logger.info("[fetchPublications] \(records.count) raw → \(decoded.count) decoded")
+        if decoded.isEmpty && !records.isEmpty {
+            logger.warning("[fetchPublications] 0/\(records.count) records decoded — type registration issue?")
+        }
         return decoded
     }
 
@@ -690,7 +719,10 @@ final class LoginStateManager {
                 .flatMap { $0.getRecord(ofType: SiteStandardLexicon.PublicationRecord.self) }
                 .map { PublicationEntry(uri: record.uri, authorDID: did, record: $0) }
         }
-        print("[fetchPublicationsEntry] \(records.count) raw → \(decoded.count) decoded PublicationEntry")
+        logger.info("[fetchPublicationsEntry] \(records.count) raw → \(decoded.count) decoded PublicationEntry")
+        if decoded.isEmpty && !records.isEmpty {
+            logger.warning("[fetchPublicationsEntry] 0/\(records.count) records decoded for \(did)")
+        }
         return decoded
     }
 
@@ -738,7 +770,10 @@ final class LoginStateManager {
         guard let did = currentDID else { throw LoginError.notAuthenticated }
         let records = try await listAllRecords(from: did, collection: SiteStandardLexicon.DocumentRecord.type)
         let decoded = records.compactMap { $0.value?.getRecord(ofType: SiteStandardLexicon.DocumentRecord.self) }
-        print("[fetchDocuments] \(records.count) raw → \(decoded.count) decoded")
+        logger.info("[fetchDocuments] \(records.count) raw → \(decoded.count) decoded")
+        if decoded.isEmpty && !records.isEmpty {
+            logger.warning("[fetchDocuments] 0/\(records.count) records decoded — type registration issue?")
+        }
         return decoded
     }
 
@@ -750,7 +785,10 @@ final class LoginStateManager {
                 .flatMap { $0.getRecord(ofType: SiteStandardLexicon.DocumentRecord.self) }
                 .map { DocumentEntry(uri: record.uri, authorDID: did, record: $0) }
         }
-        print("[fetchDocumentsEntry] \(records.count) raw → \(decoded.count) decoded DocumentEntry")
+        logger.info("[fetchDocumentsEntry] \(records.count) raw → \(decoded.count) decoded DocumentEntry")
+        if decoded.isEmpty && !records.isEmpty {
+            logger.warning("[fetchDocumentsEntry] 0/\(records.count) records decoded for \(did)")
+        }
         return decoded
     }
 
@@ -860,7 +898,10 @@ final class LoginStateManager {
                     return SubscriptionEntry(uri: record.uri, recordKey: rkey, record: $0)
                 }
         }
-        print("[fetchSubscriptions] \(records.count) raw → \(decoded.count) decoded")
+        logger.info("[fetchSubscriptions] \(records.count) raw → \(decoded.count) decoded")
+        if decoded.isEmpty && !records.isEmpty {
+            logger.warning("[fetchSubscriptions] 0/\(records.count) records decoded — type registration issue?")
+        }
         return decoded
     }
 
@@ -931,7 +972,7 @@ final class LoginStateManager {
             let resolved = LeafletContent(pages: pages, blobPages: nil)
             return UnknownType.record(resolved)
         } catch {
-            print("[resolveBlobPages] failed to fetch blob pages: \(error)")
+            logger.error("[resolveBlobPages] failed to fetch blob pages: \(error)")
             return content  // fall back to whatever inline pages exist
         }
     }

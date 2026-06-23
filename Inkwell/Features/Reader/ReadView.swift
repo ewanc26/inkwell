@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import OSLog
 import ATProtoKit
 
 struct ReadView: View {
+    private let logger = Logger(subsystem: "uk.ewancroft.Inkwell", category: "Reader")
     @Environment(LoginStateManager.self) private var loginStateManager
     @Environment(\.colorScheme) private var colorScheme
 
@@ -33,6 +35,7 @@ struct ReadView: View {
     @State private var recommendRecordKey: String?
     @State private var isSubmittingRecommend = false
     @State private var actionMessage: String?
+    @State private var hasInitiallyLoadedActions = false
 
     // Comment state
     @State private var comments: [CommentEntry] = []
@@ -328,7 +331,7 @@ struct ReadView: View {
             comments = try await loginStateManager.fetchComments(documentURI: uri)
         } catch {
             // Comments are best-effort — don't show errors inline
-            print("[ReadView] loadComments failed: \(error)")
+            logger.error("[ReadView] loadComments failed: \(error)")
         }
     }
 
@@ -351,7 +354,7 @@ struct ReadView: View {
             replyToComment = nil
             await loadComments()  // refresh
         } catch {
-            print("[ReadView] submitComment failed: \(error)")
+            logger.error("[ReadView] submitComment failed: \(error)")
         }
     }
 
@@ -374,10 +377,10 @@ struct ReadView: View {
                 isActive: isSubscribed,
                 isLoading: isTogglingSubscription,
                 tint: accentColor,
-                activeForeground: theme.accentForeground
-            ) {
-                Task { await toggleSubscription(publicationURI: publicationURI) }
-            }
+                activeForeground: theme.accentForeground,
+                animate: hasInitiallyLoadedActions,
+                action: { Task { await toggleSubscription(publicationURI: publicationURI) } }
+            )
             .disabled(isTogglingSubscription)
         }
 
@@ -388,10 +391,10 @@ struct ReadView: View {
                 isActive: isRecommended,
                 isLoading: isSubmittingRecommend,
                 tint: accentColor,
-                activeForeground: theme.accentForeground
-            ) {
-                Task { await toggleRecommend(documentURI: documentURI) }
-            }
+                activeForeground: theme.accentForeground,
+                animate: hasInitiallyLoadedActions,
+                action: { Task { await toggleRecommend(documentURI: documentURI) } }
+            )
             .disabled(isSubmittingRecommend)
         }
     }
@@ -420,6 +423,8 @@ struct ReadView: View {
                 recommendRecordKey = nil
             }
         }
+
+        hasInitiallyLoadedActions = true
     }
 
     private func toggleSubscription(publicationURI: String) async {
@@ -876,6 +881,7 @@ private struct ReaderActionPill: View {
     let isLoading: Bool
     let tint: Color
     let activeForeground: Color
+    var animate: Bool = false
     let action: () -> Void
 
     var body: some View {
@@ -886,8 +892,14 @@ private struct ReaderActionPill: View {
                         .scaleEffect(0.7)
                         .tint(isActive ? activeForeground : tint)
                 } else {
-                    Image(systemName: icon)
-                        .symbolEffect(.bounce, value: isActive)
+                    Group {
+                        if animate {
+                            Image(systemName: icon)
+                                .symbolEffect(.bounce, value: isActive)
+                        } else {
+                            Image(systemName: icon)
+                        }
+                    }
                 }
                 Text(label)
                     .lineLimit(1)
@@ -907,6 +919,6 @@ private struct ReaderActionPill: View {
             )
         }
         .buttonStyle(.plain)
-        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isActive)
+        .animation(animate ? .spring(response: 0.3, dampingFraction: 0.7) : nil, value: isActive)
     }
 }
