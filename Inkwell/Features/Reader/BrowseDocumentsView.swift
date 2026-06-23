@@ -158,17 +158,7 @@ struct BrowseDocumentsView: View {
                             return []
                         }
                         return remoteDocuments.compactMap { document in
-                            // Use the richer publication.contains() match when available —
-                            // it handles both the AT-URI form and the HTTPS URL form of
-                            // document.site (via normalizedSite). Falling back to a raw
-                            // string compare only when the publication failed to load.
-                            let belongs: Bool
-                            if let publication {
-                                belongs = publication.contains(document.record)
-                            } else {
-                                belongs = document.record.site == pubURI
-                            }
-                            guard belongs else { return nil }
+                            guard document.record.site == pubURI else { return nil }
                             return ReaderFeedItem(document: document, publication: publication)
                         }
                     }
