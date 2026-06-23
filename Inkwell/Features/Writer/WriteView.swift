@@ -16,6 +16,7 @@ import ATProtoKit
 struct WriteView: View {
     @Environment(LoginStateManager.self) private var loginStateManager
 
+    @State private var showSignIn = false
     @State private var publications: [PublicationEntry] = []
     @State private var selectedPublication: PublicationEntry?
     @State private var selectedProviderId: String = ProviderRegistry.defaultProvider.id
@@ -35,7 +36,20 @@ struct WriteView: View {
 
     var body: some View {
         NavigationStack {
-            Form {
+            if !loginStateManager.isAuthenticated {
+                ContentUnavailableView {
+                    Label("Sign in to write", systemImage: "square.and.pencil")
+                } description: {
+                    Text("You need an AT Protocol account to publish documents.")
+                } actions: {
+                    Button("Sign In") { showSignIn = true }
+                        .buttonStyle(.borderedProminent)
+                }
+                .sheet(isPresented: $showSignIn) {
+                    LoginView()
+                }
+            } else {
+                Form {
                 // MARK: - Publication
                 if isLoadingPublications {
                     HStack {
@@ -197,6 +211,7 @@ struct WriteView: View {
                     }
                 }
             }
+            }  // else
         }
     }
 
