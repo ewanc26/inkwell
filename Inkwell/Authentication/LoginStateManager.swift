@@ -272,7 +272,8 @@ final class LoginStateManager {
                 detail = "unknown decoding error"
             }
             logger.error("[SignIn] DecodingError: \(detail)")
-            errorMessage = "Unexpected response from server. Please try again."
+            logger.error("[SignIn] The token endpoint returned a response that doesn't match the expected format. This usually means the PDS rejected the token request. Check that https://inkwell.ewancroft.uk/client-metadata.json is publicly accessible and returns valid JSON with the correct client_id, redirect_uris, and grant_types.")
+            errorMessage = "Your PDS rejected the token exchange. Make sure it supports AT Protocol OAuth and that https://inkwell.ewancroft.uk/client-metadata.json is publicly accessible."
             clearSession()
             return false
         } catch {
