@@ -151,7 +151,7 @@ struct BrowseDocumentsView: View {
                     let pubURI = subscription.record.publication
                     guard let pubDID = ATURI.parse(pubURI)?.did else { continue }
 
-                    group.addTask { [pubURI, pubDID, logger] in
+                    group.addTask { [pubURI, pubDID] in
                         let publication = try? await loginStateManager.fetchPublication(uri: pubURI)
 
                         // 1. Fetch documents from the publication author's PDS (fast path)
@@ -162,12 +162,9 @@ struct BrowseDocumentsView: View {
                         }
 
                         // 2. Supplement with search index (finds documents on other DIDs)
-                        var seenURIs = Set(items.map(\.id))
+                        var seenURIs = Set(items.map { $0.document.uri })
                         if let searchResults = try? await searchAPI.fetchDocuments(forPublication: pubURI, limit: 50) {
                             for result in searchResults.results where !seenURIs.contains(result.uri) {
-                                guard let docDID = ATURI.parse(result.uri)?.did,
-                                      let docRKey = ATURI.parse(result.uri)?.recordKey else { continue }
-
                                 // Fetch the full document record from the author's PDS
                                 if let doc = try? await loginStateManager.fetchDocument(uri: result.uri) {
                                     seenURIs.insert(doc.uri)
