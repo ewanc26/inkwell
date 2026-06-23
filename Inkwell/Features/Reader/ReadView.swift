@@ -78,12 +78,16 @@ struct ReadView: View {
                             .foregroundStyle(accentColor)
                             .tracking(2)
                             .lineLimit(1)
+                            .opacity(isLoading ? 0 : 1)
+                            .offset(y: isLoading ? 8 : 0)
                     }
 
                     Text(document.title)
                         .font(theme.headingFont(.largeTitle, weight: .bold))
                         .foregroundStyle(foregroundColor)
                         .lineSpacing(4)
+                        .opacity(isLoading ? 0 : 1)
+                        .offset(y: isLoading ? 8 : 0)
 
                     HStack(spacing: 8) {
                         Text("Published")
@@ -208,12 +212,11 @@ struct ReadView: View {
 
                 // Content Section
                 if isLoading {
-                    HStack {
-                        Spacer()
-                        ProgressView("Loading publication content...")
-                        Spacer()
+                    VStack(spacing: 20) {
+                        InkwellLoader(message: "Loading content…")
                     }
-                    .padding(.vertical, 40)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 60)
                 } else if let errorMessage = errorMessage {
                     ContentUnavailableView("Failed to load content", systemImage: "exclamationmark.triangle", description: Text(errorMessage))
                 } else if let markdown = markdownContent {
@@ -237,6 +240,7 @@ struct ReadView: View {
             .padding(.horizontal, 20)
             .padding(.vertical, theme.showPageBackground ? 24 : 0)
             .frame(maxWidth: theme.pageWidth)
+            .animation(InkwellMotion.standard, value: isLoading)
             .background(
                 Group {
                     if theme.showPageBackground {
@@ -382,6 +386,7 @@ struct ReadView: View {
                 action: { Task { await toggleSubscription(publicationURI: publicationURI) } }
             )
             .disabled(isTogglingSubscription)
+            .modifier(ConditionalHaptic(active: hasInitiallyLoadedActions, trigger: isSubscribed))
         }
 
         if let documentURI {
@@ -396,6 +401,7 @@ struct ReadView: View {
                 action: { Task { await toggleRecommend(documentURI: documentURI) } }
             )
             .disabled(isSubmittingRecommend)
+            .modifier(ConditionalHaptic(active: hasInitiallyLoadedActions, trigger: isRecommended))
         }
     }
 

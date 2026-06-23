@@ -155,8 +155,7 @@ struct StandardSitePostEmbedView: View {
 
     private var loadingCard: some View {
         HStack(spacing: 10) {
-            ProgressView()
-                .scaleEffect(0.8)
+            InkwellInlineLoader()
             Text("Loading…")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)

@@ -408,9 +408,8 @@ struct BSkyPostEmbedView: View {
 
     private var loadingCard: some View {
         HStack(spacing: 10) {
-            ProgressView()
-                .scaleEffect(0.8)
-            Text("Loading Bluesky post…")
+            InkwellInlineLoader()
+            Text("Loading post…")
                 .font(.subheadline)
                 .foregroundStyle(foregroundColor.opacity(0.5))
             Spacer()
