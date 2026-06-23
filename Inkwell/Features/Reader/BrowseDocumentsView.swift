@@ -180,7 +180,9 @@ struct BrowseDocumentsView: View {
 
             following = deduplicated(followedItems)
             yours.sort(by: ReaderFeedItem.newestFirst)
+            logger.info("[loadData] yours: \(self.yours.count), following: \(self.following.count), subscriptions: \(followedPublications.count)")
         } catch {
+            logger.error("[loadData] failed: \(error.localizedDescription)")
             errorMessage = error.localizedDescription
         }
     }
