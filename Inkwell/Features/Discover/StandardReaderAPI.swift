@@ -68,16 +68,33 @@ final class StandardReaderAPI {
     }
 
     func search(query: String, limit: Int = 40) async throws -> ReaderSearchResponse {
-        var components = URLComponents(
-            url: baseURL.appending(path: "search"),
-            resolvingAgainstBaseURL: false
-        )!
-        components.queryItems = [
+        try await request("search", queryItems: [
             URLQueryItem(name: "q", value: query),
             URLQueryItem(name: "mode", value: "keyword"),
             URLQueryItem(name: "limit", value: String(max(1, min(limit, 100)))),
             URLQueryItem(name: "format", value: "v2")
-        ]
+        ])
+    }
+
+    /// Fetch documents belonging to a specific publication from the search index.
+    /// Uses the publication's AT-URI as a filter so we get documents from ALL
+    /// authors, not just the publication owner's PDS.
+    func fetchDocuments(forPublication uri: String, limit: Int = 100) async throws -> ReaderSearchResponse {
+        try await request("search", queryItems: [
+            URLQueryItem(name: "q", value: ""),
+            URLQueryItem(name: "site", value: uri),
+            URLQueryItem(name: "mode", value: "keyword"),
+            URLQueryItem(name: "limit", value: String(max(1, min(limit, 100)))),
+            URLQueryItem(name: "format", value: "v2")
+        ])
+    }
+
+    private func request(_ path: String, queryItems: [URLQueryItem]) async throws -> ReaderSearchResponse {
+        var components = URLComponents(
+            url: baseURL.appending(path: path),
+            resolvingAgainstBaseURL: false
+        )!
+        components.queryItems = queryItems
 
         let (data, response) = try await session.data(from: components.url!)
         guard let http = response as? HTTPURLResponse,

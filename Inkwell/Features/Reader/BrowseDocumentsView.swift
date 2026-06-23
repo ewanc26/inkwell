@@ -144,23 +144,39 @@ struct BrowseDocumentsView: View {
             }
 
             var followedItems: [ReaderFeedItem] = []
+            let searchAPI = StandardReaderAPI.shared
+
             await withTaskGroup(of: [ReaderFeedItem].self) { group in
                 for subscription in followedPublications {
                     let pubURI = subscription.record.publication
                     guard let pubDID = ATURI.parse(pubURI)?.did else { continue }
+
                     group.addTask { [pubURI, pubDID, logger] in
                         let publication = try? await loginStateManager.fetchPublication(uri: pubURI)
-                        let remoteDocuments: [DocumentEntry]
-                        do {
-                            remoteDocuments = try await loginStateManager.fetchDocuments(fromDID: pubDID)
-                        } catch {
-                            logger.error("[loadData] fetchDocuments failed for \(pubDID): \(error.localizedDescription)")
-                            return []
+
+                        // 1. Fetch documents from the publication author's PDS (fast path)
+                        let pdsDocuments = (try? await loginStateManager.fetchDocuments(fromDID: pubDID)) ?? []
+                        var items = pdsDocuments.compactMap { doc -> ReaderFeedItem? in
+                            guard doc.record.site == pubURI else { return nil }
+                            return ReaderFeedItem(document: doc, publication: publication)
                         }
-                        return remoteDocuments.compactMap { document in
-                            guard document.record.site == pubURI else { return nil }
-                            return ReaderFeedItem(document: document, publication: publication)
+
+                        // 2. Supplement with search index (finds documents on other DIDs)
+                        var seenURIs = Set(items.map(\.id))
+                        if let searchResults = try? await searchAPI.fetchDocuments(forPublication: pubURI, limit: 50) {
+                            for result in searchResults.results where !seenURIs.contains(result.uri) {
+                                guard let docDID = ATURI.parse(result.uri)?.did,
+                                      let docRKey = ATURI.parse(result.uri)?.recordKey else { continue }
+
+                                // Fetch the full document record from the author's PDS
+                                if let doc = try? await loginStateManager.fetchDocument(uri: result.uri) {
+                                    seenURIs.insert(doc.uri)
+                                    items.append(ReaderFeedItem(document: doc, publication: publication))
+                                }
+                            }
                         }
+
+                        return items
                     }
                 }
                 for await items in group {
