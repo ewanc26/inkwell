@@ -13,6 +13,7 @@ struct BrowseDocumentsView: View {
     @State private var isLoading = true
     @State private var errorMessage: String?
     @State private var showCredits = false
+    @State private var showSignIn = false
 
     private enum ReaderFeed: String, CaseIterable, Identifiable {
         case following = "Following"
@@ -38,8 +39,10 @@ struct BrowseDocumentsView: View {
             .navigationTitle("Reader")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button(role: .destructive, action: loginStateManager.signOut) {
-                        Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
+                    if loginStateManager.isAuthenticated {
+                        Button(role: .destructive, action: loginStateManager.signOut) {
+                            Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
+                        }
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
@@ -56,6 +59,9 @@ struct BrowseDocumentsView: View {
             }
             .sheet(isPresented: $showCredits) {
                 CreditsView()
+            }
+            .sheet(isPresented: $showSignIn) {
+                LoginView()
             }
             .task {
                 await loadData()
@@ -75,6 +81,15 @@ struct BrowseDocumentsView: View {
                 systemImage: "exclamationmark.triangle",
                 description: Text(errorMessage)
             )
+        } else if activeItems.isEmpty && !loginStateManager.isAuthenticated {
+            ContentUnavailableView {
+                Label("Sign in to your AT Protocol account", systemImage: "person.crop.circle")
+            } description: {
+                Text("Your subscriptions and published posts will appear here.")
+            } actions: {
+                Button("Sign In") { showSignIn = true }
+                .buttonStyle(.borderedProminent)
+            }
         } else if activeItems.isEmpty {
             ContentUnavailableView {
                 Label(emptyTitle, systemImage: selectedFeed == .following ? "books.vertical" : "doc.text")

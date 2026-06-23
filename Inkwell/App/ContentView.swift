@@ -12,26 +12,29 @@ struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var notificationManager = NotificationManager.shared
 
+    @State private var selectedTab = "Read"
+    @State private var showSignIn = false
+
     var body: some View {
-        if loginStateManager.isRestoringSession {
-            restoringView
-        } else if loginStateManager.isAuthenticated {
-            authenticatedView
-        } else {
+        Group {
+            if loginStateManager.isRestoringSession {
+                restoringView
+            } else {
+                mainTabView
+            }
+        }
+        .sheet(isPresented: $showSignIn) {
             LoginView()
         }
     }
 
     /// Shown briefly on launch while `restoreSessionIfPossible()` checks the
-    /// Keychain for an existing session. Shows the animated ink drop loader
-    /// so there's personality during the brief session-restore window.
+    /// Keychain for an existing session.
     private var restoringView: some View {
         InkwellLoader(message: "Restoring your session…")
     }
 
-    @State private var selectedTab = "Read"
-
-    private var authenticatedView: some View {
+    private var mainTabView: some View {
         TabView(selection: $selectedTab) {
             BrowseDocumentsView()
                 .tabItem {
@@ -54,13 +57,13 @@ struct ContentView: View {
         }
         .sensoryFeedback(.selection, trigger: selectedTab)
         .task {
-            // Request notification permission and poll for new documents
-            // from subscribed publications on launch.
-            await NotificationManager.shared.requestPermission()
-            await NotificationManager.shared.pollForNewDocuments(loginStateManager: loginStateManager)
+            if loginStateManager.isAuthenticated {
+                await NotificationManager.shared.requestPermission()
+                await NotificationManager.shared.pollForNewDocuments(loginStateManager: loginStateManager)
+            }
         }
         .onChange(of: scenePhase) { _, phase in
-            guard phase == .active else { return }
+            guard phase == .active, loginStateManager.isAuthenticated else { return }
             Task {
                 await notificationManager.pollForNewDocuments(loginStateManager: loginStateManager)
             }
