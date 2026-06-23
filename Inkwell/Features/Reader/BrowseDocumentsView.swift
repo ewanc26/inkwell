@@ -184,7 +184,8 @@ struct BrowseDocumentsView: View {
                         if !searchQuery.isEmpty,
                            let searchResults = try? await searchAPI.search(for: searchQuery, limit: 30) {
                             for result in searchResults.results
-                                where result.isStandardSiteDocument && !seenURIs.contains(result.uri) {
+                                where result.uri.contains("/site.standard.document/")
+                                      && !seenURIs.contains(result.uri) {
                                 guard let doc = try? await loginStateManager.fetchDocument(uri: result.uri),
                                       doc.record.site == pubURI else { continue }
                                 seenURIs.insert(doc.uri)
