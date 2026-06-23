@@ -67,7 +67,7 @@ struct BrowseDocumentsView: View {
     @ViewBuilder
     private var content: some View {
         if isLoading && activeItems.isEmpty {
-            ProgressView("Loading your reader...")
+            InkwellLoader(message: "Loading your reader…")
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if let errorMessage, activeItems.isEmpty {
             ContentUnavailableView(

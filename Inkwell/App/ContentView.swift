@@ -23,35 +23,36 @@ struct ContentView: View {
     }
 
     /// Shown briefly on launch while `restoreSessionIfPossible()` checks the
-    /// Keychain for an existing session. Mirrors `LoginView`'s header so
-    /// there's no jarring swap once it resolves to either screen.
+    /// Keychain for an existing session. Shows the animated ink drop loader
+    /// so there's personality during the brief session-restore window.
     private var restoringView: some View {
-        VStack(spacing: 16) {
-            InkwellMark()
-                .frame(height: 48)
-                .foregroundStyle(.primary)
-            ProgressView()
-        }
+        InkwellLoader(message: "Restoring your session…")
     }
 
+    @State private var selectedTab = "Read"
+
     private var authenticatedView: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             BrowseDocumentsView()
                 .tabItem {
                     Label("Read", systemImage: "book")
                 }
                 .badge(notificationManager.unreadCount)
+                .tag("Read")
 
             DiscoverView()
                 .tabItem {
                     Label("Discover", systemImage: "safari")
                 }
+                .tag("Discover")
 
             WriteView()
                 .tabItem {
                     Label("Write", systemImage: "square.and.pencil")
                 }
+                .tag("Write")
         }
+        .sensoryFeedback(.selection, trigger: selectedTab)
         .task {
             // Request notification permission and poll for new documents
             // from subscribed publications on launch.
