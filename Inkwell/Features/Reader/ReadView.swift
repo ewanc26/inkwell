@@ -799,64 +799,50 @@ struct ReadView: View {
 
     @ViewBuilder
     private func renderBSkyPost(_ block: LeafletBlock) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 8) {
-                Image(systemName: "bubble.left.fill")
-                    .foregroundStyle(accentColor)
-                Text("Embedded Bluesky Post")
-                    .font(theme.bodyFont(.subheadline).weight(.semibold))
-                Spacer()
-            }
-            .foregroundStyle(foregroundColor)
-            if let uri = block.subject?.recordURI {
-                Text(uri)
-                    .font(.caption2)
-                    .foregroundStyle(foregroundColor.opacity(0.4))
-                    .lineLimit(1)
-            }
+        if let uri = block.subject?.recordURI {
+            BSkyPostEmbedView(
+                postURI: uri,
+                foregroundColor: foregroundColor,
+                accentColor: accentColor
+            )
+        } else {
+            // Fallback if no URI — shouldn't happen for valid blocks
+            BSkyPostEmbedView(
+                postURI: "at://",
+                foregroundColor: foregroundColor,
+                accentColor: accentColor
+            )
         }
-        .padding(12)
-        .background(foregroundColor.opacity(0.04))
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(foregroundColor.opacity(0.12), lineWidth: 1)
-        )
     }
 
     @ViewBuilder
     private func renderStandardSitePost(_ block: LeafletBlock) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 8) {
-                Image(systemName: "doc.text.fill")
-                    .foregroundStyle(accentColor)
-                Text("Standard.site Post")
-                    .font(theme.bodyFont(.subheadline).weight(.semibold))
-                Spacer()
-                if let uri = block.standardSitePostSubject {
-                    Link(destination: URL(string: "https://standard.site/\(uri)")!) {
-                        Image(systemName: "arrow.up.right")
-                            .font(.caption)
-                    }
-                }
-            }
-            .foregroundStyle(foregroundColor)
-            if let cid = block.standardSitePostCID {
-                Text("CID: \(String(cid.prefix(16)))…")
-                    .font(.caption2)
-                    .foregroundStyle(foregroundColor.opacity(0.4))
-                    .lineLimit(1)
-            }
+        if let uri = block.standardSitePostSubject {
+            StandardSitePostEmbedView(
+                subjectURI: uri,
+                size: block.size,
+                showPublicationTheme: block.showPublicationTheme ?? false
+            )
         }
-        .padding(12)
-        .background(foregroundColor.opacity(0.04))
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(foregroundColor.opacity(0.12), lineWidth: 1)
-        )
     }
 
     @ViewBuilder
     private func renderWebsiteCard(_ block: LeafletBlock) -> some View {
+        let imageHeight: CGFloat = block.aspectRatio
+            .flatMap { parseAspectRatio($0) }
+            .map { $0 * 280 } ?? 160   // default ~16:9 at card width
+
+        Group {
+            if let urlString = block.url, let url = URL(string: urlString) {
+                Link(destination: url) { cardContent(block, imageHeight: imageHeight) }
+            } else {
+                cardContent(block, imageHeight: imageHeight)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func cardContent(_ block: LeafletBlock, imageHeight: CGFloat) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             if let img = block.image, let did = authorDID ?? loginStateManager.currentDID {
                 let imgURL = URL(string: "https://cdn.bsky.app/img/feed_thumbnail/plain/\(did)/\(img.reference.link)")
@@ -865,7 +851,7 @@ struct ReadView: View {
                     case .success(let image):
                         image.resizable().scaledToFill()
                             .frame(maxWidth: .infinity)
-                            .frame(height: 180)
+                            .frame(height: min(imageHeight, 220))
                             .clipped()
                     default:
                         EmptyView()
@@ -887,10 +873,14 @@ struct ReadView: View {
                         .lineLimit(3)
                 }
                 if let url = block.url {
-                    Text(url)
-                        .font(.caption2)
-                        .foregroundStyle(accentColor)
-                        .lineLimit(1)
+                    HStack(spacing: 4) {
+                        Image(systemName: "link")
+                            .font(.caption2)
+                        Text(host(from: url))
+                            .font(.caption2)
+                            .lineLimit(1)
+                    }
+                    .foregroundStyle(accentColor)
                 }
             }
             .padding(12)
@@ -901,11 +891,16 @@ struct ReadView: View {
             RoundedRectangle(cornerRadius: 10)
                 .stroke(foregroundColor.opacity(0.12), lineWidth: 1)
         )
-        .onTapGesture {
-            if let urlString = block.url, let url = URL(string: urlString) {
-                // handled by Link if wrapped — here as fallback
-            }
-        }
+    }
+
+    private func host(from url: String) -> String {
+        URL(string: url)?.host ?? url
+    }
+
+    private func parseAspectRatio(_ ratio: String) -> CGFloat? {
+        let parts = ratio.split(separator: "/").compactMap { Double($0) }
+        guard parts.count == 2, parts[1] != 0 else { return nil }
+        return CGFloat(parts[1] / parts[0])  // height/width
     }
 
     @ViewBuilder
@@ -931,17 +926,52 @@ struct ReadView: View {
 
     @ViewBuilder
     private func renderPostsListPlaceholder(_ block: LeafletBlock) -> some View {
-        HStack(spacing: 8) {
-            Image(systemName: "list.bullet.rectangle")
-                .foregroundStyle(accentColor)
-            Text("Posts from this publication")
-                .font(theme.bodyFont(.subheadline))
-                .foregroundStyle(foregroundColor.opacity(0.6))
-            Spacer()
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                Image(systemName: "list.bullet.rectangle.fill")
+                    .foregroundStyle(accentColor)
+                Text("Posts from this publication")
+                    .font(theme.bodyFont(.subheadline).weight(.semibold))
+                    .foregroundStyle(foregroundColor)
+                Spacer()
+            }
+
+            if let viewMode = block.listView {
+                Label(
+                    viewMode == "small" ? "Compact list" : "Full posts",
+                    systemImage: viewMode == "small" ? "rectangle.compress.vertical" : "rectangle.expand.vertical"
+                )
+                .font(.caption2)
+                .foregroundStyle(foregroundColor.opacity(0.5))
+            }
+
+            if let tags = block.filterByTags, !tags.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 6) {
+                        ForEach(tags, id: \.self) { tag in
+                            Text("#\(tag)")
+                                .font(.caption2)
+                                .foregroundStyle(accentColor)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 3)
+                                .background(accentColor.opacity(0.1))
+                                .clipShape(Capsule())
+                        }
+                    }
+                }
+            }
+
+            Text("Visit the publication's site to browse all posts.")
+                .font(.caption)
+                .foregroundStyle(foregroundColor.opacity(0.4))
         }
         .padding(12)
         .background(foregroundColor.opacity(0.04))
-        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(foregroundColor.opacity(0.12), lineWidth: 1)
+        )
     }
 
     @ViewBuilder
@@ -967,17 +997,13 @@ struct ReadView: View {
 
     @ViewBuilder
     private func renderPollPlaceholder(_ block: LeafletBlock) -> some View {
-        HStack(spacing: 8) {
-            Image(systemName: "chart.bar.fill")
-                .foregroundStyle(accentColor)
-            Text("Poll")
-                .font(theme.bodyFont(.subheadline))
-                .foregroundStyle(foregroundColor.opacity(0.6))
-            Spacer()
+        if let subject = block.subject {
+            PollEmbedView(
+                pollRef: subject,
+                foregroundColor: foregroundColor,
+                accentColor: accentColor
+            )
         }
-        .padding(12)
-        .background(foregroundColor.opacity(0.04))
-        .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 
     @ViewBuilder
@@ -1008,6 +1034,17 @@ struct ReadView: View {
 
     @ViewBuilder
     private func renderIframePlaceholder(_ block: LeafletBlock) -> some View {
+        Group {
+            if let urlString = block.url, let url = URL(string: urlString) {
+                Link(destination: url) { iframeContent(block) }
+            } else {
+                iframeContent(block)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func iframeContent(_ block: LeafletBlock) -> some View {
         VStack(spacing: 8) {
             HStack(spacing: 8) {
                 Image(systemName: "rectangle.on.rectangle")
@@ -1016,16 +1053,15 @@ struct ReadView: View {
                     .font(theme.bodyFont(.subheadline).weight(.semibold))
                     .foregroundStyle(foregroundColor)
                 Spacer()
-                if let url = block.url {
-                    Link(destination: URL(string: url)!) {
-                        Image(systemName: "arrow.up.right")
-                            .font(.caption)
-                    }
+                if let _ = block.url {
+                    Image(systemName: "arrow.up.right")
+                        .font(.caption)
+                        .foregroundStyle(accentColor)
                 }
             }
 
             if let url = block.url {
-                Text(url)
+                Text(host(from: url))
                     .font(.caption2)
                     .foregroundStyle(foregroundColor.opacity(0.4))
                     .lineLimit(1)

@@ -655,7 +655,7 @@ final class LoginStateManager {
 
     /// Lists all records of a given collection from a repository,
     /// following pagination cursors up to `maximumCount`.
-    private func listAllRecords(
+    func listAllRecords(
         from did: String,
         collection: String,
         maximumCount: Int = 1_000
