@@ -11,6 +11,7 @@ import SwiftUI
 struct InkwellApp: App {
     @UIApplicationDelegateAdaptor(InkwellAppDelegate.self) private var appDelegate
     @State private var loginStateManager = LoginStateManager()
+    @State private var storeManager = StoreManager()
 
     /// Controls whether the splash screen is in the view hierarchy.
     /// Uses a boolean (not opacity comparison) to ensure the overlay
@@ -24,6 +25,7 @@ struct InkwellApp: App {
             ZStack {
                 ContentView()
                     .environment(loginStateManager)
+                    .environment(storeManager)
 
                 // Splash overlay — matches UILaunchScreen exactly.
                 // Removed from hierarchy after fade, not just hidden.

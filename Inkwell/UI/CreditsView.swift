@@ -80,6 +80,13 @@ struct CreditsView: View {
                 }
 
                 Section {
+                    NavigationLink {
+                        SupportView()
+                    } label: {
+                        Label("Tip Jar & Support", systemImage: "heart.fill")
+                            .foregroundStyle(.pink)
+                    }
+
                     creditRow(
                         title: "Source on GitHub",
                         detail: "ewanc26/inkwell",
