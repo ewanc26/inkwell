@@ -12,13 +12,28 @@ struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var notificationManager = NotificationManager.shared
 
+    @State private var selectedTab = 0
+
     var body: some View {
-        if loginStateManager.isRestoringSession {
-            restoringView
-        } else if loginStateManager.isAuthenticated {
-            authenticatedView
-        } else {
-            LoginView()
+        Group {
+            if loginStateManager.isRestoringSession {
+                restoringView
+            } else if loginStateManager.isAuthenticated {
+                authenticatedView
+            } else {
+                LoginView()
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .inkwellOpenTab)) { notification in
+            guard let raw = notification.userInfo?[InkwellTabKey.tab] as? String,
+                  let tab = InkwellTab(rawValue: raw) else { return }
+            withAnimation {
+                switch tab {
+                case .reader: selectedTab = 0
+                case .discover: selectedTab = 1
+                case .writer: selectedTab = 2
+                }
+            }
         }
     }
 
@@ -35,22 +50,25 @@ struct ContentView: View {
     }
 
     private var authenticatedView: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             BrowseDocumentsView()
                 .tabItem {
                     Label("Read", systemImage: "book")
                 }
+                .tag(0)
                 .badge(notificationManager.unreadCount)
 
             DiscoverView()
                 .tabItem {
                     Label("Discover", systemImage: "safari")
                 }
+                .tag(1)
 
             WriteView()
                 .tabItem {
                     Label("Write", systemImage: "square.and.pencil")
                 }
+                .tag(2)
         }
         .task {
             // Request notification permission and poll for new documents

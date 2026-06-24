@@ -530,7 +530,9 @@ final class LoginStateManager {
         }
         request.setValue("application/json", forHTTPHeaderField: "Accept")
 
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await withRetry {
+            try await URLSession.shared.data(for: request)
+        }
 
         guard let http = response as? HTTPURLResponse,
               (200...299).contains(http.statusCode) else {
@@ -540,6 +542,41 @@ final class LoginStateManager {
         }
 
         return data
+    }
+
+    // MARK: - Retry
+
+    /// Retries an async operation with exponential backoff.
+    ///
+    /// Uses jittered exponential backoff (100ms → 200ms → 400ms → 800ms)
+    /// for transient network errors. Non-retryable errors (e.g. 401, 403,
+    /// invalid URIs) are rethrown immediately.
+    private func withRetry<T>(
+        maxAttempts: Int = 4,
+        operation: () async throws -> T
+    ) async throws -> T {
+        var attempt = 0
+        var lastError: Error?
+
+        while attempt < maxAttempts {
+            do {
+                return try await operation()
+            } catch let error as URLError where error.isTransient {
+                attempt += 1
+                lastError = error
+                guard attempt < maxAttempts else { throw error }
+                let delay = Double(1 << min(attempt, 4)) * 0.1  // 0.1, 0.2, 0.4, 0.8s
+                try? await Task.sleep(for: .seconds(delay))
+            } catch LoginError.httpError(let status) where (500...599).contains(status) {
+                attempt += 1
+                lastError = LoginError.httpError(status: status)
+                guard attempt < maxAttempts else { throw lastError! }
+                let delay = Double(1 << min(attempt, 4)) * 0.1
+                try? await Task.sleep(for: .seconds(delay))
+            }
+        }
+
+        throw lastError ?? LoginError.httpError(status: 0)
     }
 
     // MARK: - Profile
@@ -1367,6 +1404,23 @@ enum LoginError: LocalizedError {
             return "Could not resolve the repository's PDS."
         case .httpError(let status):
             return "HTTP error (status \(status))."
+        }
+    }
+}
+
+extension URLError {
+    /// True for transient network errors worth retrying (timeouts, DNS,
+    /// connection lost, cannot connect). False for permanent errors like
+    /// bad URLs, cancelled requests, or authentication failures.
+    var isTransient: Bool {
+        switch code {
+        case .timedOut, .cannotFindHost, .cannotConnectToHost,
+                .networkConnectionLost, .dnsLookupFailed,
+                .notConnectedToInternet, .resourceUnavailable,
+                .secureConnectionFailed:
+            return true
+        default:
+            return false
         }
     }
 }
