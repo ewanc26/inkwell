@@ -135,6 +135,10 @@ struct BrowseDocumentsView: View {
     }
 
     private func loadData() async {
+        guard loginStateManager.isAuthenticated else {
+            isLoading = false
+            return
+        }
         isLoading = true
         errorMessage = nil
         defer { isLoading = false }
