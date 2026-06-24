@@ -4,6 +4,13 @@
     {
       "displayName" : "Small Tip",
       "description" : "A small tip to support Inkwell's development.",
+      "localizations" : [
+        {
+          "displayName" : "Small Tip",
+          "description" : "A small tip to support Inkwell's development.",
+          "locale" : "en"
+        }
+      ],
       "productID" : "uk.ewancroft.inkwell.tip.small",
       "referenceName" : "Tip - Small",
       "price" : 0.99
@@ -11,6 +18,13 @@
     {
       "displayName" : "Medium Tip",
       "description" : "A medium tip to support Inkwell's development.",
+      "localizations" : [
+        {
+          "displayName" : "Medium Tip",
+          "description" : "A medium tip to support Inkwell's development.",
+          "locale" : "en"
+        }
+      ],
       "productID" : "uk.ewancroft.inkwell.tip.medium",
       "referenceName" : "Tip - Medium",
       "price" : 2.99
@@ -18,6 +32,13 @@
     {
       "displayName" : "Large Tip",
       "description" : "A large tip to support Inkwell's development.",
+      "localizations" : [
+        {
+          "displayName" : "Large Tip",
+          "description" : "A large tip to support Inkwell's development.",
+          "locale" : "en"
+        }
+      ],
       "productID" : "uk.ewancroft.inkwell.tip.large",
       "referenceName" : "Tip - Large",
       "price" : 4.99
@@ -25,6 +46,13 @@
     {
       "displayName" : "Generous Tip",
       "description" : "A generous tip to support Inkwell's development.",
+      "localizations" : [
+        {
+          "displayName" : "Generous Tip",
+          "description" : "A generous tip to support Inkwell's development.",
+          "locale" : "en"
+        }
+      ],
       "productID" : "uk.ewancroft.inkwell.tip.generous",
       "referenceName" : "Tip - Generous",
       "price" : 9.99
