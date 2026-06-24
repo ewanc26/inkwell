@@ -12,58 +12,54 @@ struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var notificationManager = NotificationManager.shared
 
-    @State private var selectedTab = "Read"
-    @State private var showSignIn = false
-
     var body: some View {
-        Group {
-            if loginStateManager.isRestoringSession {
-                restoringView
-            } else {
-                mainTabView
-            }
-        }
-        .sheet(isPresented: $showSignIn) {
+        if loginStateManager.isRestoringSession {
+            restoringView
+        } else if loginStateManager.isAuthenticated {
+            authenticatedView
+        } else {
             LoginView()
         }
     }
 
     /// Shown briefly on launch while `restoreSessionIfPossible()` checks the
-    /// Keychain for an existing session.
+    /// Keychain for an existing session. Mirrors `LoginView`'s header so
+    /// there's no jarring swap once it resolves to either screen.
     private var restoringView: some View {
-        InkwellLoader(message: "Restoring your session…")
+        VStack(spacing: 16) {
+            InkwellMark()
+                .frame(height: 48)
+                .foregroundStyle(.primary)
+            ProgressView()
+        }
     }
 
-    private var mainTabView: some View {
-        TabView(selection: $selectedTab) {
+    private var authenticatedView: some View {
+        TabView {
             BrowseDocumentsView()
                 .tabItem {
                     Label("Read", systemImage: "book")
                 }
                 .badge(notificationManager.unreadCount)
-                .tag("Read")
 
             DiscoverView()
                 .tabItem {
                     Label("Discover", systemImage: "safari")
                 }
-                .tag("Discover")
 
             WriteView()
                 .tabItem {
                     Label("Write", systemImage: "square.and.pencil")
                 }
-                .tag("Write")
         }
-        .sensoryFeedback(.selection, trigger: selectedTab)
         .task {
-            if loginStateManager.isAuthenticated {
-                await NotificationManager.shared.requestPermission()
-                await NotificationManager.shared.pollForNewDocuments(loginStateManager: loginStateManager)
-            }
+            // Request notification permission and poll for new documents
+            // from subscribed publications on launch.
+            await NotificationManager.shared.requestPermission()
+            await NotificationManager.shared.pollForNewDocuments(loginStateManager: loginStateManager)
         }
         .onChange(of: scenePhase) { _, phase in
-            guard phase == .active, loginStateManager.isAuthenticated else { return }
+            guard phase == .active else { return }
             Task {
                 await notificationManager.pollForNewDocuments(loginStateManager: loginStateManager)
             }

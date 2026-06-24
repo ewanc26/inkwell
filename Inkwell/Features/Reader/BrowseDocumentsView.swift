@@ -1,9 +1,7 @@
 import SwiftUI
 import ATProtoKit
-import OSLog
 
 struct BrowseDocumentsView: View {
-    private let logger = Logger(subsystem: "uk.ewancroft.Inkwell", category: "Reader")
     @Environment(LoginStateManager.self) private var loginStateManager
     @State private var notificationManager = NotificationManager.shared
 
@@ -13,7 +11,6 @@ struct BrowseDocumentsView: View {
     @State private var isLoading = true
     @State private var errorMessage: String?
     @State private var showCredits = false
-    @State private var showSignIn = false
 
     private enum ReaderFeed: String, CaseIterable, Identifiable {
         case following = "Following"
@@ -37,13 +34,10 @@ struct BrowseDocumentsView: View {
                 content
             }
             .navigationTitle("Reader")
-            .toolbarBackgroundVisibility(.visible, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    if loginStateManager.isAuthenticated {
-                        Button(role: .destructive, action: loginStateManager.signOut) {
-                            Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
-                        }
+                    Button(role: .destructive, action: loginStateManager.signOut) {
+                        Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
@@ -61,12 +55,6 @@ struct BrowseDocumentsView: View {
             .sheet(isPresented: $showCredits) {
                 CreditsView()
             }
-            .sheet(isPresented: $showSignIn) {
-                LoginView()
-            }
-            .onChange(of: loginStateManager.isAuthenticated) { _, authenticated in
-                if authenticated { showSignIn = false }
-            }
             .task {
                 await loadData()
                 notificationManager.markAllAsRead()
@@ -77,7 +65,7 @@ struct BrowseDocumentsView: View {
     @ViewBuilder
     private var content: some View {
         if isLoading && activeItems.isEmpty {
-            InkwellLoader(message: "Loading your reader…")
+            ProgressView("Loading your reader...")
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if let errorMessage, activeItems.isEmpty {
             ContentUnavailableView(
@@ -85,15 +73,6 @@ struct BrowseDocumentsView: View {
                 systemImage: "exclamationmark.triangle",
                 description: Text(errorMessage)
             )
-        } else if activeItems.isEmpty && !loginStateManager.isAuthenticated {
-            ContentUnavailableView {
-                Label("Sign in to your AT Protocol account", systemImage: "person.crop.circle")
-            } description: {
-                Text("Your subscriptions and published posts will appear here.")
-            } actions: {
-                Button("Sign In") { showSignIn = true }
-                .buttonStyle(.borderedProminent)
-            }
         } else if activeItems.isEmpty {
             ContentUnavailableView {
                 Label(emptyTitle, systemImage: selectedFeed == .following ? "books.vertical" : "doc.text")
@@ -114,6 +93,7 @@ struct BrowseDocumentsView: View {
                         } label: {
                             ReaderPostCard(item: item)
                         }
+                        .buttonStyle(.plain)
                     }
                 }
                 .padding(.horizontal, 14)
@@ -139,10 +119,6 @@ struct BrowseDocumentsView: View {
     }
 
     private func loadData() async {
-        guard loginStateManager.isAuthenticated else {
-            isLoading = false
-            return
-        }
         isLoading = true
         errorMessage = nil
         defer { isLoading = false }
@@ -166,41 +142,19 @@ struct BrowseDocumentsView: View {
             }
 
             var followedItems: [ReaderFeedItem] = []
-            let searchAPI = StandardReaderAPI.shared
-
             await withTaskGroup(of: [ReaderFeedItem].self) { group in
                 for subscription in followedPublications {
                     let pubURI = subscription.record.publication
                     guard let pubDID = ATURI.parse(pubURI)?.did else { continue }
-
                     group.addTask { [pubURI, pubDID] in
                         let publication = try? await loginStateManager.fetchPublication(uri: pubURI)
-
-                        // 1. Fetch documents from the publication author's PDS (fast path)
-                        let pdsDocuments = (try? await loginStateManager.fetchDocuments(fromDID: pubDID)) ?? []
-                        var items = pdsDocuments.compactMap { doc -> ReaderFeedItem? in
-                            guard doc.record.site == pubURI else { return nil }
-                            return ReaderFeedItem(document: doc, publication: publication)
+                        guard let remoteDocuments = try? await loginStateManager.fetchDocuments(fromDID: pubDID) else {
+                            return []
                         }
-                        var seenURIs = Set(items.map { $0.document.uri })
-
-                        // 2. Supplement via search index — query by publication name
-                        //    to find documents from other authors' PDSs, then fetch
-                        //    full records and filter by the site field.
-                        let searchQuery = publication?.record.name ?? ""
-                        if !searchQuery.isEmpty,
-                           let searchResults = try? await searchAPI.search(for: searchQuery, limit: 30) {
-                            for result in searchResults.results
-                                where result.uri.contains("/site.standard.document/")
-                                      && !seenURIs.contains(result.uri) {
-                                guard let doc = try? await loginStateManager.fetchDocument(uri: result.uri),
-                                      doc.record.site == pubURI else { continue }
-                                seenURIs.insert(doc.uri)
-                                items.append(ReaderFeedItem(document: doc, publication: publication))
-                            }
+                        return remoteDocuments.compactMap { document in
+                            guard document.record.site == pubURI else { return nil }
+                            return ReaderFeedItem(document: document, publication: publication)
                         }
-
-                        return items
                     }
                 }
                 for await items in group {
@@ -210,9 +164,7 @@ struct BrowseDocumentsView: View {
 
             following = deduplicated(followedItems)
             yours.sort(by: ReaderFeedItem.newestFirst)
-            logger.info("[loadData] yours: \(self.yours.count), following: \(self.following.count), subscriptions: \(followedPublications.count)")
         } catch {
-            logger.error("[loadData] failed: \(error.localizedDescription)")
             errorMessage = error.localizedDescription
         }
     }
