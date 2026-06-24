@@ -13,9 +13,7 @@
 //
 
 import SwiftUI
-#if os(iOS)
 import UIKit
-#endif
 
 // MARK: - Motion Personality
 
@@ -62,39 +60,35 @@ enum InkwellHaptics {
     /// Light tap — button presses, cell selection, toggle switches.
     /// The most common haptic. Subtle, like a pen touching paper.
     @MainActor static func light() {
-        #if os(iOS)
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
-        #endif
     }
 
+    /// Medium press — publish button, confirmations, destructive warnings.
+    /// Noticeable but not alarming.
     @MainActor static func medium() {
-        #if os(iOS)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-        #endif
     }
 
+    /// Success — subscription confirmed, post published, comment posted.
+    /// A warm pulse that says "well done."
     @MainActor static func success() {
-        #if os(iOS)
         UINotificationFeedbackGenerator().notificationOccurred(.success)
-        #endif
     }
 
+    /// Warning — verification failed, something needs attention.
     @MainActor static func warning() {
-        #if os(iOS)
         UINotificationFeedbackGenerator().notificationOccurred(.warning)
-        #endif
     }
 
+    /// Error — publish failed, network error, authentication failure.
     @MainActor static func error() {
-        #if os(iOS)
         UINotificationFeedbackGenerator().notificationOccurred(.error)
-        #endif
     }
 
+    /// Selection change — tab switches, picker value changes.
+    /// A subtle tick, like a fountain pen's click.
     @MainActor static func selection() {
-        #if os(iOS)
         UISelectionFeedbackGenerator().selectionChanged()
-        #endif
     }
 }
 
