@@ -3,9 +3,7 @@
 //  Inkwell
 //
 
-#if os(iOS)
 import BackgroundTasks
-#endif
 import UIKit
 
 enum InkwellIdentifiers {
@@ -26,7 +24,6 @@ final class BackgroundRefreshManager {
         self.refreshAction = refreshAction
     }
 
-    #if os(iOS)
     func register() {
         BGTaskScheduler.shared.register(
             forTaskWithIdentifier: Self.taskIdentifier,
@@ -64,10 +61,6 @@ final class BackgroundRefreshManager {
             operation.cancel()
         }
     }
-    #else
-    func register() {}
-    func schedule() {}
-    #endif
 }
 
 @MainActor
