@@ -10,7 +10,7 @@ AT Protocol natives, writers and bloggers who care about data ownership, and iOS
 
 ## Product Purpose
 
-Inkwell is a native iOS reader and writer for the Standard.site publishing ecosystem on AT Protocol. It exists because decentralized publishing deserves a first-class native client — not a web view, not a Bluesky tab. The website's job is to convert curiosity into downloads by showing what the app does, how it respects user data, and why AT Protocol matters. Success is a visitor who reads the hero, scans the features, and hits the App Store button.
+Inkwell is a native reader and writer for the Standard.site publishing ecosystem on AT Protocol — primarily iOS (SwiftUI), with an experimental Android port (Jetpack Compose). It exists because decentralized publishing deserves a first-class native client — not a web view, not a Bluesky tab. The website's job is to convert curiosity into downloads by showing what the app does, how it respects user data, and why AT Protocol matters. Success is a visitor who reads the hero, scans the features, and hits the App Store or GitHub button.
 
 ## Brand Personality
 
