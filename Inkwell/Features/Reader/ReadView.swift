@@ -12,6 +12,7 @@ import ATProtoKit
 struct ReadView: View {
     private let logger = Logger(subsystem: "uk.ewancroft.Inkwell", category: "Reader")
     @Environment(LoginStateManager.self) private var loginStateManager
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
 
     let document: SiteStandardLexicon.DocumentRecord
@@ -304,10 +305,23 @@ struct ReadView: View {
             }
         }
         .background(backgroundColor)
-        .tint(accentColor)
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                            .font(.body.weight(.semibold))
+                        Text("Reader")
+                    }
+                    .foregroundStyle(.primary)
+                }
+            }
+        }
         .toolbarBackground(.visible, for: .navigationBar)
-        .toolbarBackgroundVisibility(.visible, for: .navigationBar)
         .toolbarBackgroundVisibility(.visible, for: .navigationBar)
         .task {
             await loadContent()
