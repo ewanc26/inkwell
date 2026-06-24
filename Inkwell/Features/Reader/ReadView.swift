@@ -93,12 +93,14 @@ struct ReadView: View {
                             .foregroundStyle(accentColor)
                             .tracking(2)
                             .lineLimit(1)
+                            .accessibilityLabel("Publication: \(pubName)")
                     }
 
                     Text(document.title)
                         .font(theme.headingFont(.largeTitle, weight: .bold))
                         .foregroundStyle(foregroundColor)
                         .lineSpacing(4)
+                        .accessibilityAddTraits(.isHeader)
 
                     HStack(spacing: 8) {
                         Text("Published")
@@ -347,6 +349,8 @@ struct ReadView: View {
                             .padding(10)
                             .background(foregroundColor.opacity(0.08))
                             .clipShape(RoundedRectangle(cornerRadius: 10))
+                            .accessibilityLabel("New comment")
+                            .accessibilityHint("Type your comment and tap the send button to publish")
 
                         Button {
                             Task { await submitComment() }
@@ -360,6 +364,8 @@ struct ReadView: View {
                             }
                         }
                         .disabled(newCommentText.trimmingCharacters(in: .whitespaces).isEmpty || isSubmittingComment)
+                        .accessibilityLabel("Send comment")
+                        .accessibilityHint("Publishes your comment to the AT Protocol")
                     }
                 }
                 .padding(.horizontal, 20)
@@ -1053,6 +1059,9 @@ private struct ReaderActionPill: View {
         }
         .buttonStyle(.plain)
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isActive)
+        .accessibilityLabel(label)
+        .accessibilityHint(isActive ? "Tap to remove" : "Tap to add")
+        .accessibilityAddTraits(isActive ? [.isButton, .isSelected] : .isButton)
     }
 }
 

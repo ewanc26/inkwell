@@ -1401,9 +1401,32 @@ enum LoginError: LocalizedError {
         case .contentConversionFailed:
             return "Failed to convert content to the output format."
         case .pdsResolutionFailed:
-            return "Could not resolve the repository's PDS."
+            return "Could not resolve the repository's PDS. Check that the DID or handle is correct."
         case .httpError(let status):
-            return "HTTP error (status \(status))."
+            return httpErrorMessage(status: status)
+        }
+    }
+
+    /// Maps AT Protocol HTTP status codes to user-friendly messages.
+    /// See https://atproto.com/specs/xrpc#error-responses
+    private func httpErrorMessage(status: Int) -> String {
+        switch status {
+        case 400:
+            return "Bad request. The server could not understand the request."
+        case 401:
+            return "Authentication required. Your session may have expired — sign in again."
+        case 403:
+            return "Access denied. You don't have permission to view this content."
+        case 404:
+            return "Not found. The record, repository, or endpoint does not exist."
+        case 408:
+            return "Request timed out. The PDS took too long to respond."
+        case 429:
+            return "Rate limited. The PDS is throttling requests — try again shortly."
+        case 500, 502, 503, 504:
+            return "The PDS server encountered an error (HTTP \(status)). It may be temporarily unavailable."
+        default:
+            return "Unexpected server response (HTTP \(status))."
         }
     }
 }
