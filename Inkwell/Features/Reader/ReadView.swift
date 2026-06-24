@@ -69,8 +69,15 @@ struct ReadView: View {
             VStack(spacing: 0) {
                 // Give Liquid Glass a system-colored surface to sample
                 // instead of the publication's dark theme background.
-                Color(.systemBackground)
-                    .frame(height: 60)
+                // Gradient from system background to theme colour so the
+                // Liquid Glass nav bar samples light pixels for its tint,
+                // keeping the back button visible on dark publications.
+                LinearGradient(
+                    colors: [Color(.systemBackground), backgroundColor],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .frame(height: 60)
                 // Wrapper to scope the theme background to content only
                 VStack(alignment: .leading, spacing: 24) {
                 // Header section
