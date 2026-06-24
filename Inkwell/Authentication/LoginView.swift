@@ -31,6 +31,7 @@ struct LoginView: View {
                 VStack(spacing: 32) {
                     Spacer(minLength: 24)
                     header
+                    onboardingSection
                     formSection
                     oauthNote
                     Spacer(minLength: 24)
@@ -63,6 +64,46 @@ struct LoginView: View {
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
         }
+    }
+
+    private var onboardingSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label {
+                Text("Read long-form posts from any standard.site blog — directly from the AT Protocol network, no middleman.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            } icon: {
+                Image(systemName: "book")
+                    .foregroundStyle(.blue)
+                    .frame(width: 20)
+            }
+
+            Label {
+                Text("Subscribe to publications, leave comments, and recommend posts. Your data stays in your PDS.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            } icon: {
+                Image(systemName: "bell")
+                    .foregroundStyle(.orange)
+                    .frame(width: 20)
+            }
+
+            Label {
+                Text("Write and publish your own posts using the standard.site lexicon.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            } icon: {
+                Image(systemName: "square.and.pencil")
+                    .foregroundStyle(.green)
+                    .frame(width: 20)
+            }
+        }
+        .padding(16)
+        .background(.quaternary.opacity(0.3))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
     private var formSection: some View {
