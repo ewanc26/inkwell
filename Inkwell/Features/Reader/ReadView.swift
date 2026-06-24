@@ -303,7 +303,6 @@ struct ReadView: View {
             }
         }
         .background(backgroundColor)
-        .tint(accentColor)
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await loadContent()
