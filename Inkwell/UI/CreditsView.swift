@@ -83,7 +83,7 @@ struct CreditsView: View {
                     NavigationLink {
                         SupportView()
                     } label: {
-                        Label("Tip Jar & Support", systemImage: "heart.fill")
+                        Label("Support Inkwell", systemImage: "heart.fill")
                             .foregroundStyle(.pink)
                     }
 
