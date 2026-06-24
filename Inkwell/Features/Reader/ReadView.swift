@@ -7,6 +7,7 @@
 
 import SwiftUI
 import ATProtoKit
+import WebKit
 
 struct ReadView: View {
     @Environment(LoginStateManager.self) private var loginStateManager
@@ -16,6 +17,10 @@ struct ReadView: View {
     let publication: SiteStandardLexicon.PublicationRecord?
     var documentURI: String? = nil
     var authorDID: String? = nil
+
+    // Prev/Next navigation (from the feed that pushed this view).
+    var previousItem: ReaderFeedItem? = nil
+    var nextItem: ReaderFeedItem? = nil
 
     @State private var pages: [LeafletPage] = []
     @State private var markdownContent: String? = nil
@@ -118,11 +123,12 @@ struct ReadView: View {
                                 isVerified ? "Verified source" : "Unverified source",
                                 systemImage: isVerified ? "checkmark.seal.fill" : "exclamationmark.triangle"
                             )
-                            .foregroundStyle(isVerified ? Color.green : Color.orange)
+                            .foregroundStyle(isVerified ? accentColor : foregroundColor.opacity(0.5))
                             .lineLimit(1)
                         }
                         if let url = document.canonicalURL(publication: publication) {
                             Link("Open original", destination: url)
+                                .foregroundStyle(accentColor)
                                 .lineLimit(1)
                         }
                     }
@@ -221,11 +227,14 @@ struct ReadView: View {
                     HStack {
                         Spacer()
                         ProgressView("Loading publication content...")
+                            .tint(accentColor)
+                            .foregroundStyle(foregroundColor.opacity(0.5))
                         Spacer()
                     }
                     .padding(.vertical, 40)
                 } else if let errorMessage = errorMessage {
                     ContentUnavailableView("Failed to load content", systemImage: "exclamationmark.triangle", description: Text(errorMessage))
+                        .foregroundStyle(foregroundColor)
                 } else if let markdown = markdownContent {
                     // Multi-format rendering: content was converted to
                     // markdown by the ContentProvider system.
@@ -257,6 +266,50 @@ struct ReadView: View {
             )
             .frame(maxWidth: .infinity)
 
+            // MARK: - Prev / Next Navigation
+            if previousItem != nil || nextItem != nil {
+                Divider()
+                    .padding(.vertical, 4)
+
+                HStack(spacing: 12) {
+                    if let prev = previousItem {
+                        NavigationLink {
+                            ReadView(
+                                document: prev.document.record,
+                                publication: prev.publication?.record,
+                                documentURI: prev.document.uri,
+                                authorDID: prev.document.authorDID
+                            )
+                        } label: {
+                            PostNavButton(
+                                direction: .previous,
+                                title: prev.document.record.title,
+                                theme: theme
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    if let next = nextItem {
+                        NavigationLink {
+                            ReadView(
+                                document: next.document.record,
+                                publication: next.publication?.record,
+                                documentURI: next.document.uri,
+                                authorDID: next.document.authorDID
+                            )
+                        } label: {
+                            PostNavButton(
+                                direction: .next,
+                                title: next.document.record.title,
+                                theme: theme
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .frame(maxWidth: theme.pageWidth)
+            }
+
             // MARK: - Comments
             if documentURI != nil || authorDID != nil {
                 VStack(alignment: .leading, spacing: 12) {
@@ -268,7 +321,7 @@ struct ReadView: View {
                         .foregroundStyle(foregroundColor)
 
                     if isLoadingComments {
-                        HStack { Spacer(); ProgressView(); Spacer() }
+                        HStack { Spacer(); ProgressView().tint(accentColor); Spacer() }
                     } else if comments.isEmpty {
                         Text("No comments yet.")
                             .font(theme.bodyFont(.subheadline))
@@ -289,6 +342,8 @@ struct ReadView: View {
                         TextField("Add a comment...", text: $newCommentText, axis: .vertical)
                             .textFieldStyle(.plain)
                             .font(theme.bodyFont(.subheadline))
+                            .foregroundStyle(foregroundColor)
+                            .tint(accentColor)
                             .padding(10)
                             .background(foregroundColor.opacity(0.08))
                             .clipShape(RoundedRectangle(cornerRadius: 10))
@@ -297,7 +352,7 @@ struct ReadView: View {
                             Task { await submitComment() }
                         } label: {
                             if isSubmittingComment {
-                                ProgressView().scaleEffect(0.8)
+                                ProgressView().scaleEffect(0.8).tint(accentColor)
                             } else {
                                 Image(systemName: "arrow.up.circle.fill")
                                     .font(.title2)
@@ -680,6 +735,7 @@ struct ReadView: View {
                                 switch phase {
                                 case .empty:
                                     ProgressView()
+                                        .tint(accentColor)
                                         .frame(minHeight: 180)
                                 case .success(let image):
                                     image
@@ -715,12 +771,89 @@ struct ReadView: View {
             case "pub.leaflet.blocks.orderedList":
                 renderList(block.children, ordered: true, startIndex: block.startIndex ?? 1)
 
+            // MARK: Embeds
+
+            case "pub.leaflet.blocks.bskyPost":
+                if let uri = block.subject?.recordURI {
+                    BSkyPostEmbedView(
+                        postURI: uri,
+                        foregroundColor: foregroundColor,
+                        accentColor: accentColor
+                    )
+                }
+
+            case "pub.leaflet.blocks.standardSitePost":
+                if let uri = block.standardSitePostSubject {
+                    StandardSitePostEmbedView(
+                        subjectURI: uri,
+                        size: block.size,
+                        showPublicationTheme: block.showPublicationTheme ?? true,
+                        foregroundColor: foregroundColor,
+                        accentColor: accentColor
+                    )
+                }
+
+            case "pub.leaflet.blocks.poll":
+                if let ref = block.subject {
+                    PollEmbedView(
+                        pollRef: ref,
+                        foregroundColor: foregroundColor,
+                        accentColor: accentColor
+                    )
+                }
+
+            case "pub.leaflet.blocks.website":
+                WebsitePreviewBlock(
+                    url: block.url ?? "",
+                    title: block.websiteTitle,
+                    description: block.websiteDescription,
+                    foregroundColor: foregroundColor,
+                    accentColor: accentColor
+                )
+
+            case "pub.leaflet.blocks.iframe":
+                if let urlString = block.url, let url = URL(string: urlString) {
+                    IframeBlockView(
+                        url: url,
+                        height: block.height,
+                        aspectRatio: block.aspectRatio,
+                        foregroundColor: foregroundColor
+                    )
+                    .frame(height: block.height ?? 300)
+                }
+
+            case "pub.leaflet.blocks.button":
+                if let urlString = block.url, let text = block.text, let url = URL(string: urlString) {
+                    Link(destination: url) {
+                        Text(text)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(theme.accentForeground)
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 10)
+                            .background(accentColor)
+                            .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                }
+
+            case "pub.leaflet.blocks.page":
+                VStack(spacing: 4) {
+                    Divider().background(accentColor.opacity(0.2))
+                    if let idx = block.pageIndex {
+                        Text("Page \(idx + 1)")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(accentColor)
+                    }
+                    Divider().background(accentColor.opacity(0.2))
+                }
+                .padding(.vertical, 8)
+
             default:
-                // Fallback for unsupported blocks
+                // Fallback for truly unknown blocks
                 HStack {
                     Image(systemName: "questionmark.square.dashed")
                         .foregroundStyle(foregroundColor.opacity(0.5))
-                    Text("Unsupported standard.site content block type")
+                    Text("Unsupported content block: \(block.type)")
                         .font(.caption)
                         .foregroundStyle(foregroundColor.opacity(0.5))
                 }
@@ -920,5 +1053,142 @@ private struct ReaderActionPill: View {
         }
         .buttonStyle(.plain)
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isActive)
+    }
+}
+
+// MARK: - Website Preview Block
+
+/// A link-preview card for `pub.leaflet.blocks.website` embeds.
+/// Matches leaflet.pub's `PostContent.tsx` website block rendering:
+/// title, description, and host shown as a tappable card.
+private struct WebsitePreviewBlock: View {
+    let url: String
+    let title: String?
+    let description: String?
+    let foregroundColor: Color
+    let accentColor: Color
+
+    var body: some View {
+        Link(destination: URL(string: url) ?? URL(string: "about:blank")!) {
+            VStack(alignment: .leading, spacing: 4) {
+                if let title {
+                    Text(title)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(foregroundColor)
+                        .lineLimit(1)
+                }
+                if let description {
+                    Text(description)
+                        .font(.caption)
+                        .foregroundStyle(foregroundColor.opacity(0.6))
+                        .lineLimit(2)
+                }
+                Text(URL(string: url)?.host ?? url)
+                    .font(.caption2)
+                    .foregroundStyle(foregroundColor.opacity(0.4))
+                    .lineLimit(1)
+            }
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(foregroundColor.opacity(0.04))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(foregroundColor.opacity(0.1), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+// MARK: - Iframe Block View
+
+/// Wraps a `WKWebView` for `pub.leaflet.blocks.iframe` embeds.
+/// Blocks link-activated navigation so the iframe acts as a pure embed.
+private struct IframeBlockView: UIViewRepresentable {
+    let url: URL
+    let height: Double?
+    let aspectRatio: String?
+    let foregroundColor: Color
+
+    func makeUIView(context: Context) -> WKWebView {
+        let config = WKWebViewConfiguration()
+        let webView = WKWebView(frame: .zero, configuration: config)
+        webView.scrollView.isScrollEnabled = false
+        webView.isOpaque = false
+        webView.backgroundColor = .clear
+        webView.navigationDelegate = context.coordinator
+        webView.load(URLRequest(url: url))
+        return webView
+    }
+
+    func updateUIView(_ webView: WKWebView, context: Context) {}
+
+    func makeCoordinator() -> Coordinator { Coordinator() }
+
+    class Coordinator: NSObject, WKNavigationDelegate {
+        func webView(
+            _ webView: WKWebView,
+            decidePolicyFor navigationAction: WKNavigationAction,
+            decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
+        ) {
+            if navigationAction.navigationType == .linkActivated {
+                decisionHandler(.cancel)
+            } else {
+                decisionHandler(.allow)
+            }
+        }
+    }
+}
+
+// MARK: - Post Navigation Button
+
+/// A styled prev/next navigation button for moving between posts in a feed.
+/// Matches leaflet.pub's `PostPrevNextButtons.tsx` pattern.
+private struct PostNavButton: View {
+    enum Direction { case previous, next }
+
+    let direction: Direction
+    let title: String
+    let theme: ReaderTheme
+
+    var body: some View {
+        HStack(spacing: 8) {
+            if direction == .previous {
+                Image(systemName: "chevron.left")
+                    .font(.caption.weight(.semibold))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Previous")
+                        .font(.caption2)
+                        .foregroundStyle(theme.foreground.opacity(0.5))
+                    Text(title)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(theme.foreground)
+                        .lineLimit(1)
+                }
+            }
+            Spacer(minLength: 0)
+            if direction == .next {
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("Next")
+                        .font(.caption2)
+                        .foregroundStyle(theme.foreground.opacity(0.5))
+                    Text(title)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(theme.foreground)
+                        .lineLimit(1)
+                }
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: direction == .previous ? .leading : .trailing)
+        .background(theme.foreground.opacity(0.04))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(theme.accent.opacity(0.15), lineWidth: 1)
+        )
     }
 }

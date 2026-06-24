@@ -19,6 +19,8 @@ struct StandardSitePostEmbedView: View {
     let subjectURI: String
     let size: String?         // "small" or "medium"
     let showPublicationTheme: Bool
+    var foregroundColor: Color = .primary
+    var accentColor: Color = .blue
 
     @Environment(LoginStateManager.self) private var loginStateManager
     @State private var document: DocumentEntry?
@@ -68,7 +70,7 @@ struct StandardSitePostEmbedView: View {
                     Text(pubName.uppercased())
                         .font(isSmall ? .caption2 : .caption)
                         .fontWeight(.bold)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(foregroundColor.opacity(0.5))
                         .tracking(1)
                         .lineLimit(1)
                 }
@@ -77,29 +79,29 @@ struct StandardSitePostEmbedView: View {
                 Text(doc.record.title)
                     .font(isSmall ? .subheadline : .headline)
                     .fontWeight(.semibold)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(foregroundColor)
                     .lineLimit(isSmall ? 2 : 3)
 
                 // Description
                 if !isSmall, let desc = doc.record.description, !desc.isEmpty {
                     Text(desc)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(foregroundColor.opacity(0.5))
                         .lineLimit(2)
                 }
 
                 // Published date
                 Text(doc.record.publishedAt.formatted(date: .abbreviated, time: .omitted))
                     .font(.caption2)
-                    .foregroundStyle(.secondary.opacity(0.7))
+                    .foregroundStyle(foregroundColor.opacity(0.6))
             }
             .padding(isSmall ? 10 : 14)
         }
-        .background(.quaternary.opacity(0.5))
+        .background(foregroundColor.opacity(0.04))
         .clipShape(RoundedRectangle(cornerRadius: isSmall ? 8 : 12))
         .overlay(
             RoundedRectangle(cornerRadius: isSmall ? 8 : 12)
-                .stroke(.quaternary, lineWidth: 1)
+                .stroke(foregroundColor.opacity(0.1), lineWidth: 1)
         )
     }
 
@@ -142,14 +144,14 @@ struct StandardSitePostEmbedView: View {
     private var fallbackCard: some View {
         HStack(spacing: 8) {
             Image(systemName: "doc.text.fill")
-                .foregroundStyle(.secondary)
+                .foregroundStyle(foregroundColor.opacity(0.4))
             Text("Standard.site post unavailable")
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(foregroundColor.opacity(0.5))
             Spacer()
         }
         .padding(12)
-        .background(.quaternary.opacity(0.5))
+        .background(foregroundColor.opacity(0.04))
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
@@ -158,11 +160,11 @@ struct StandardSitePostEmbedView: View {
             InkwellInlineLoader()
             Text("Loading…")
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(foregroundColor.opacity(0.5))
             Spacer()
         }
         .padding(14)
-        .background(.quaternary.opacity(0.5))
+        .background(foregroundColor.opacity(0.04))
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }

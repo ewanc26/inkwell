@@ -116,6 +116,7 @@ final class LoginStateManager {
 
     // MARK: - Cross-repo Cache
     @ObservationIgnored private var repositoryPDSURLs: [String: URL] = [:]
+    @ObservationIgnored private var _cachedSubscriptions: [SubscriptionEntry]?
 
     // MARK: - Client Metadata
 
@@ -543,23 +544,12 @@ final class LoginStateManager {
 
     // MARK: - Profile
 
-    /// Fetches a Bluesky profile for the given DID.
+    /// Fetches a Bluesky profile for the given DID via the public API.
+    ///
+    /// Delegates to ``BSkyProfileFetcher`` so the full profile model is
+    /// available to the app and cached globally.
     func fetchProfile(did: String) async throws -> ProfileSnapshot {
-        // Use public API for profile (no auth needed)
-        guard let url = URL(string: "https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=\(did)") else {
-            throw URLError(.badURL)
-        }
-        let (data, response) = try await URLSession.shared.data(from: url)
-        guard let http = response as? HTTPURLResponse,
-              (200...299).contains(http.statusCode) else {
-            throw LoginError.httpError(status: (response as? HTTPURLResponse)?.statusCode ?? 0)
-        }
-
-        struct ProfileResponse: Decodable {
-            let displayName: String?
-            let avatar: String?
-        }
-        let profile = try JSONDecoder().decode(ProfileResponse.self, from: data)
+        let profile = try await BSkyProfileFetcher.fetchProfile(did: did)
         return ProfileSnapshot(
             displayName: profile.displayName,
             avatarURL: profile.avatar.flatMap { URL(string: $0) }
@@ -729,16 +719,32 @@ final class LoginStateManager {
                 queryItems.append(URLQueryItem(name: "cursor", value: cursor))
             }
 
-            // listRecords doesn't require authentication for public collections.
-            // Standard.site records are always public, so we use unauthenticated
-            // requests for all repositories, avoiding DPoP nonce issues with
-            // XRPC endpoints that don't return DPoP-Nonce headers.
+            // Try unauthenticated first — most PDS servers allow public
+            // listRecords for standard.site collections. If the PDS
+            // requires authentication (401/403), retry with auth.
+            // This avoids DPoP nonce exhaustion when multiple
+            // collections are listed in sequence for the same DID.
             let data: Data
-            data = try await unauthenticatedData(
-                pdsURL: pdsURL,
-                path: "/xrpc/com.atproto.repo.listRecords",
-                queryItems: queryItems
-            )
+            if did == currentDID {
+                do {
+                    data = try await unauthenticatedData(
+                        pdsURL: pdsURL,
+                        path: "/xrpc/com.atproto.repo.listRecords",
+                        queryItems: queryItems
+                    )
+                } catch LoginError.httpError(let status) where status == 401 || status == 403 {
+                    data = try await authenticatedData(
+                        path: "/xrpc/com.atproto.repo.listRecords",
+                        queryItems: queryItems
+                    )
+                }
+            } else {
+                data = try await unauthenticatedData(
+                    pdsURL: pdsURL,
+                    path: "/xrpc/com.atproto.repo.listRecords",
+                    queryItems: queryItems
+                )
+            }
 
             let page = try JSONDecoder().decode(TolerantRecordPage.self, from: data)
             logger.info("[listAllRecords] \(collection): raw JSON returned \(page.records.count) records (cursor: \(page.cursor ?? "nil"))")
@@ -749,6 +755,62 @@ final class LoginStateManager {
         } while cursor != nil && allRecords.count < maximumCount
 
         return Array(allRecords.prefix(maximumCount))
+    }
+
+    /// Fetches a single page of records from a repository.
+    ///
+    /// Unlike ``listAllRecords(from:collection:maximumCount:)``, this makes
+    /// exactly one HTTP request — no pagination loop. The caller is responsible
+    /// for advancing the cursor to fetch subsequent pages.
+    ///
+    /// - Parameters:
+    ///   - did: The DID whose repository to query.
+    ///   - collection: The NSID of the collection to list.
+    ///   - limit: The number of records per page (1–100, default 25).
+    ///   - cursor: An opaque cursor from a previous page, or `nil` for the first page.
+    /// - Returns: A tuple of the decoded records and an optional cursor for the next page.
+    func listRecordsPage(
+        from did: String,
+        collection: String,
+        limit: Int = 25,
+        cursor: String? = nil
+    ) async throws -> (records: [RepositoryRecord], cursor: String?) {
+        let pdsURL = try await repositoryPDSURL(for: did)
+
+        var queryItems = [
+            URLQueryItem(name: "repo", value: did),
+            URLQueryItem(name: "collection", value: collection),
+            URLQueryItem(name: "limit", value: String(min(limit, 100))),
+        ]
+        if let cursor {
+            queryItems.append(URLQueryItem(name: "cursor", value: cursor))
+        }
+
+        let data: Data
+        if did == currentDID {
+            do {
+                data = try await unauthenticatedData(
+                    pdsURL: pdsURL,
+                    path: "/xrpc/com.atproto.repo.listRecords",
+                    queryItems: queryItems
+                )
+            } catch LoginError.httpError(let status) where status == 401 || status == 403 {
+                data = try await authenticatedData(
+                    path: "/xrpc/com.atproto.repo.listRecords",
+                    queryItems: queryItems
+                )
+            }
+        } else {
+            data = try await unauthenticatedData(
+                pdsURL: pdsURL,
+                path: "/xrpc/com.atproto.repo.listRecords",
+                queryItems: queryItems
+            )
+        }
+
+        let page = try JSONDecoder().decode(TolerantRecordPage.self, from: data)
+        logger.info("[listRecordsPage] \(collection): \(page.records.count) records (cursor: \(page.cursor ?? "nil"))")
+        return (page.records, page.cursor)
     }
 
     // MARK: - Publications
@@ -938,9 +1000,16 @@ final class LoginStateManager {
         )
     }
 
-    /// Fetches the user's subscriptions.
+    /// Fetches the user's subscriptions. Results are cached in-memory for the
+    /// lifetime of the session so concurrent callers (e.g. BrowseDocumentsView
+    /// and NotificationManager) don't race DPoP nonces against each other.
     func fetchSubscriptions() async throws -> [SubscriptionEntry] {
         guard let did = currentDID else { throw LoginError.notAuthenticated }
+
+        // Return a cached snapshot when available — avoids redundant
+        // authenticated listRecords calls that would collide on DPoP nonces.
+        if let cached = _cachedSubscriptions { return cached }
+
         let records = try await listAllRecords(
             from: did, collection: SiteStandardLexicon.Graph.SubscriptionRecord.type
         )
@@ -952,6 +1021,7 @@ final class LoginStateManager {
                     return SubscriptionEntry(uri: record.uri, recordKey: rkey, record: $0)
                 }
         }
+        _cachedSubscriptions = decoded
         logger.info("[fetchSubscriptions] \(records.count) raw → \(decoded.count) decoded")
         if decoded.isEmpty && !records.isEmpty {
             logger.warning("[fetchSubscriptions] 0/\(records.count) records decoded — type registration issue?")
@@ -984,7 +1054,11 @@ final class LoginStateManager {
         )
     }
 
-    /// Fetches the user's recommends.
+    /// Fetches the **current user's** recommends (local repo only).
+    ///
+    /// Used to determine whether the signed-in user has already recommended
+    /// a given document. For a global recommend count or list across all
+    /// repos, use ``fetchAllRecommends(for:)`` instead.
     func fetchRecommends() async throws -> [RecommendEntry] {
         guard let did = currentDID else { throw LoginError.notAuthenticated }
         let records = try await listAllRecords(
@@ -998,6 +1072,81 @@ final class LoginStateManager {
                     return RecommendEntry(uri: record.uri, recordKey: rkey, record: $0)
                 }
         }
+    }
+
+    /// Fetches **all** recommend records referencing a document, across the
+    /// entire AT Protocol network, using the Constellation backlink index.
+    ///
+    /// Each discovered backlink is hydrated from the recommender's PDS.
+    /// Results are deduplicated by URI.
+    func fetchAllRecommends(for documentURI: String) async -> [RecommendEntry] {
+        let backlinks = await ConstellationClient.getRecommendBacklinks(
+            documentURI: documentURI
+        )
+
+        var seen = Set<String>()
+        var recommends: [RecommendEntry] = []
+
+        await withTaskGroup(of: RecommendEntry?.self) { group in
+            for backlink in backlinks {
+                let uri = backlink.recordURI
+                guard seen.insert(uri).inserted else { continue }
+
+                group.addTask { [backlink] in
+                    guard let (recordURI, _, value) = try? await self.getRepositoryRecord(
+                        from: backlink.did,
+                        collection: backlink.collection,
+                        recordKey: backlink.rkey
+                    ),
+                    let record = value?.getRecord(ofType: SiteStandardLexicon.Graph.RecommendRecord.self),
+                    record.document == documentURI else {
+                        return nil
+                    }
+                    return RecommendEntry(uri: recordURI, recordKey: backlink.rkey, record: record)
+                }
+            }
+            for await result in group {
+                if let entry = result {
+                    recommends.append(entry)
+                }
+            }
+        }
+
+        return recommends
+    }
+
+    /// Returns the total count of recommends for a document (across all
+    /// repos), using Constellation discovery without hydrating records.
+    func fetchRecommendCount(for documentURI: String) async -> Int {
+        // A single page is sufficient for counting; the first response
+        // includes a `total` field. We ask for 1 record to minimise bytes.
+        let result = try? await ConstellationClient.getBacklinks(
+            subject: documentURI,
+            source: "site.standard.graph.recommend:document",
+            limit: 1
+        )
+        // The total count is available from the Constellation API but we
+        // didn't model it. Fall back: paginate and count.
+        guard let result else { return 0 }
+        if result.cursor == nil {
+            return result.backlinks.count
+        }
+        // Multi-page case — paginate fully.
+        let all = await ConstellationClient.getRecommendBacklinks(
+            documentURI: documentURI
+        )
+        return all.count
+    }
+
+    /// Returns the AT-URIs of Bluesky posts that link to the given document
+    /// URL via facets or external embeds, using Constellation.
+    ///
+    /// This mirrors leaflet.pub's `getConstellationBacklinks()`.
+    func fetchDocumentMentionURIs(for documentURL: String) async -> [String] {
+        let backlinks = await ConstellationClient.getDocumentMentionBacklinks(
+            url: documentURL
+        )
+        return backlinks.map(\.recordURI)
     }
 
     /// Deletes a recommend record.
@@ -1031,24 +1180,82 @@ final class LoginStateManager {
         }
     }
 
-    /// Fetches all `pub.leaflet.comment` records that reference the given
-    /// document as their `subject`, newest first.
+    /// Fetches `pub.leaflet.comment` records referencing the given document
+    /// as their `subject`, newest first.
+    ///
+    /// Uses two sources, merged:
+    ///
+    /// 1. **Constellation** (microcosm.blue) — a global AT Protocol backlink
+    ///    index that discovers comment records across *all* repositories.
+    ///    This catches comments from any user, not just the current one.
+    ///    Each discovered backlink is hydrated from the commenter's PDS via
+    ///    `com.atproto.repo.getRecord`.
+    ///
+    /// 2. **Local PDS** — the current user's own repo, as a fast path for
+    ///    the user's own comments (avoids the Constellation round-trip and
+    ///    PDS hydration for those records).
+    ///
+    /// Constellation results are deduplicated against local results by URI.
     func fetchComments(documentURI: String) async throws -> [CommentEntry] {
         guard let did = currentDID else { throw LoginError.notAuthenticated }
-        let records = try await listAllRecords(
+
+        // 1. Local: fetch the current user's own comments from their repo.
+        let localRecords = (try? await listAllRecords(
             from: did, collection: PubLeafletComment.type
-        )
+        )) ?? []
+
+        var seen = Set<String>()
         var comments: [CommentEntry] = []
-        for record in records {
+
+        for record in localRecords {
             guard let value = record.value,
                   let comment = value.getRecord(ofType: PubLeafletComment.self),
-                  comment.subject == documentURI else { continue }
+                  comment.subject == documentURI,
+                  !seen.contains(record.uri) else { continue }
+            seen.insert(record.uri)
             comments.append(CommentEntry(
                 uri: record.uri,
                 recordKey: ATURI.parse(record.uri)?.recordKey ?? "",
                 record: comment
             ))
         }
+
+        // 2. Constellation: discover comments from ALL repos.
+        let backlinks = await ConstellationClient.getCommentBacklinks(
+            documentURI: documentURI
+        )
+
+        // Hydrate each backlink from the commenter's PDS.
+        await withTaskGroup(of: CommentEntry?.self) { group in
+            for backlink in backlinks {
+                let uri = backlink.recordURI
+                guard !seen.contains(uri) else { continue }
+                seen.insert(uri)
+
+                group.addTask { [backlink, documentURI] in
+                    guard let (recordURI, _, value) = try? await self.getRepositoryRecord(
+                        from: backlink.did,
+                        collection: backlink.collection,
+                        recordKey: backlink.rkey
+                    ),
+                    let comment = value?.getRecord(ofType: PubLeafletComment.self),
+                    comment.subject == documentURI else {
+                        return nil
+                    }
+                    return CommentEntry(
+                        uri: recordURI,
+                        recordKey: backlink.rkey,
+                        record: comment
+                    )
+                }
+            }
+            for await result in group {
+                if let entry = result {
+                    comments.append(entry)
+                }
+            }
+        }
+
         return comments.sorted { $0.record.createdAt > $1.record.createdAt }
     }
 
@@ -1127,6 +1334,7 @@ final class LoginStateManager {
         dpopKey = nil
         resolvedPDSURL = nil
         repositoryPDSURLs.removeAll()
+        _cachedSubscriptions = nil
 
         if clearStoredAccount {
             defaults.removeObject(forKey: storedHandleKey)
