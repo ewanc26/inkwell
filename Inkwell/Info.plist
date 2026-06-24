@@ -21,6 +21,8 @@
 	<array>
 		<string>fetch</string>
 	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>
@@ -28,5 +30,7 @@
 		<key>UIImageRespectsSafeAreaInsets</key>
 		<false/>
 	</dict>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.news</string>
 </dict>
 </plist>
