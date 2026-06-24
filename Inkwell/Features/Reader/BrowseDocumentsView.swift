@@ -34,6 +34,7 @@ struct BrowseDocumentsView: View {
                 content
             }
             .navigationTitle("Reader")
+            .toolbarBackgroundVisibility(.visible, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button(role: .destructive, action: loginStateManager.signOut) {
