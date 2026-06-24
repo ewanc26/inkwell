@@ -302,7 +302,7 @@ struct ReadView: View {
                 }
             }
         }
-        .background(backgroundColor)
+        .scrollContentBackground(.hidden)
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await loadContent()
