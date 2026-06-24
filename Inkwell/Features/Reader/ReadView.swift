@@ -66,7 +66,9 @@ struct ReadView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
+            VStack(spacing: 0) {
+                // Wrapper to scope the theme background to content only
+                VStack(alignment: .leading, spacing: 24) {
                 // Header section
                 VStack(alignment: .leading, spacing: 12) {
                     if let pubName = publication?.name {
@@ -301,6 +303,8 @@ struct ReadView: View {
                     await loadComments()
                 }
             }
+            }
+            .background(backgroundColor)
         }
         .scrollContentBackground(.hidden)
         .navigationBarTitleDisplayMode(.inline)
