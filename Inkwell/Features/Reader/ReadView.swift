@@ -304,7 +304,11 @@ struct ReadView: View {
             }
         }
         .background(backgroundColor)
+        .tint(accentColor)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarBackgroundVisibility(.visible, for: .navigationBar)
+        .toolbarBackgroundVisibility(.visible, for: .navigationBar)
         .task {
             await loadContent()
         }
