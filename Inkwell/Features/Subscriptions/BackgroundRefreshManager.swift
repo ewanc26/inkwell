@@ -70,6 +70,17 @@ final class InkwellAppDelegate: NSObject, UIApplicationDelegate {
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
         BackgroundRefreshManager.shared.register()
+        configureNavigationBar()
         return true
+    }
+
+    /// Match IceCubesApp's navigation bar setup: translucent bar,
+    /// no custom backgrounds. Let Liquid Glass handle the rest.
+    private func configureNavigationBar() {
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithDefaultBackground()
+        UINavigationBar.appearance().standardAppearance = appearance
+        UINavigationBar.appearance().scrollEdgeAppearance = appearance
+        UINavigationBar.appearance().isTranslucent = true
     }
 }
