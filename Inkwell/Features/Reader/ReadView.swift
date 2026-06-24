@@ -6,13 +6,10 @@
 //
 
 import SwiftUI
-import OSLog
 import ATProtoKit
 
 struct ReadView: View {
-    private let logger = Logger(subsystem: "uk.ewancroft.Inkwell", category: "Reader")
     @Environment(LoginStateManager.self) private var loginStateManager
-    @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
 
     let document: SiteStandardLexicon.DocumentRecord
@@ -36,6 +33,7 @@ struct ReadView: View {
     @State private var recommendRecordKey: String?
     @State private var isSubmittingRecommend = false
     @State private var actionMessage: String?
+
     // Comment state
     @State private var comments: [CommentEntry] = []
     @State private var newCommentText = ""
@@ -209,7 +207,7 @@ struct ReadView: View {
                 if isLoading {
                     HStack {
                         Spacer()
-                        ProgressView()
+                        ProgressView("Loading publication content...")
                         Spacer()
                     }
                     .padding(.vertical, 40)
@@ -224,8 +222,8 @@ struct ReadView: View {
                     // support that the markdown path doesn't need).
                     ForEach(pages, id: \.self) { page in
                         if let blocks = page.blocks {
-                            ForEach(Array(blocks.enumerated()), id: \.offset) { idx, container in
-                                renderBlock(container.block, alignment: container.alignment)
+                            ForEach(blocks.indices, id: \.self) { idx in
+                                renderBlock(blocks[idx].block, alignment: blocks[idx].alignment)
                             }
                         }
                     }
@@ -305,24 +303,8 @@ struct ReadView: View {
             }
         }
         .background(backgroundColor)
+        .tint(accentColor)
         .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button {
-                    dismiss()
-                } label: {
-                    HStack(spacing: 4) {
-                        Image(systemName: "chevron.left")
-                            .font(.body.weight(.semibold))
-                        Text("Reader")
-                    }
-                    .foregroundStyle(.primary)
-                }
-            }
-        }
-        .toolbarBackground(.visible, for: .navigationBar)
-        .toolbarBackgroundVisibility(.visible, for: .navigationBar)
         .task {
             await loadContent()
         }
@@ -344,7 +326,7 @@ struct ReadView: View {
             comments = try await loginStateManager.fetchComments(documentURI: uri)
         } catch {
             // Comments are best-effort — don't show errors inline
-            logger.error("[ReadView] loadComments failed: \(error)")
+            print("[ReadView] loadComments failed: \(error)")
         }
     }
 
@@ -367,7 +349,7 @@ struct ReadView: View {
             replyToComment = nil
             await loadComments()  // refresh
         } catch {
-            logger.error("[ReadView] submitComment failed: \(error)")
+            print("[ReadView] submitComment failed: \(error)")
         }
     }
 
@@ -390,9 +372,10 @@ struct ReadView: View {
                 isActive: isSubscribed,
                 isLoading: isTogglingSubscription,
                 tint: accentColor,
-                activeForeground: theme.accentForeground,
-                action: { Task { await toggleSubscription(publicationURI: publicationURI) } }
-            )
+                activeForeground: theme.accentForeground
+            ) {
+                Task { await toggleSubscription(publicationURI: publicationURI) }
+            }
             .disabled(isTogglingSubscription)
         }
 
@@ -403,9 +386,10 @@ struct ReadView: View {
                 isActive: isRecommended,
                 isLoading: isSubmittingRecommend,
                 tint: accentColor,
-                activeForeground: theme.accentForeground,
-                action: { Task { await toggleRecommend(documentURI: documentURI) } }
-            )
+                activeForeground: theme.accentForeground
+            ) {
+                Task { await toggleRecommend(documentURI: documentURI) }
+            }
             .disabled(isSubmittingRecommend)
         }
     }
@@ -717,33 +701,6 @@ struct ReadView: View {
             case "pub.leaflet.blocks.orderedList":
                 renderList(block.children, ordered: true, startIndex: block.startIndex ?? 1)
 
-            case "pub.leaflet.blocks.bskyPost":
-                renderGenericEmbed(icon: "bubble.left.fill", label: "Bluesky Post")
-
-            case "pub.leaflet.blocks.standardSitePost":
-                renderGenericEmbed(icon: "doc.text.fill", label: "Standard.site Post")
-
-            case "pub.leaflet.blocks.website":
-                renderWebsiteCard(block)
-
-            case "pub.leaflet.blocks.button":
-                renderButton(block)
-
-            case "pub.leaflet.blocks.postsList":
-                renderPostsListPlaceholder(block)
-
-            case "pub.leaflet.blocks.signup":
-                renderSignupPrompt(block)
-
-            case "pub.leaflet.blocks.poll":
-                renderGenericEmbed(icon: "chart.bar.fill", label: "Poll")
-
-            case "pub.leaflet.blocks.page":
-                renderPageReference(block)
-
-            case "pub.leaflet.blocks.iframe":
-                renderIframePlaceholder(block)
-
             default:
                 // Fallback for unsupported blocks
                 HStack {
@@ -765,7 +722,8 @@ struct ReadView: View {
         if let items = items {
             return AnyView(
                 VStack(alignment: .leading, spacing: 8) {
-                    ForEach(Array(items.enumerated()), id: \.offset) { index, item in
+                    ForEach(items.indices, id: \.self) { index in
+                        let item = items[index]
                         HStack(alignment: .top, spacing: 8) {
                             if ordered {
                                 let itemNumber = (startIndex ?? 1) + index
@@ -802,273 +760,6 @@ struct ReadView: View {
             )
         }
         return AnyView(EmptyView())
-    }
-
-    // MARK: - Block Renderers (embeds, website, button, postsList, signup, page, iframe)
-
-    @ViewBuilder
-    private func renderGenericEmbed(icon: String, label: String) -> some View {
-        HStack(spacing: 8) {
-            Image(systemName: icon)
-                .foregroundStyle(accentColor)
-            Text(label)
-                .font(theme.bodyFont(.subheadline))
-                .foregroundStyle(foregroundColor.opacity(0.6))
-            Spacer()
-        }
-        .padding(12)
-        .background(foregroundColor.opacity(0.04))
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-    }
-
-    @ViewBuilder
-    private func renderWebsiteCard(_ block: LeafletBlock) -> some View {
-        let imageHeight: CGFloat = block.aspectRatio
-            .flatMap { parseAspectRatio($0) }
-            .map { $0 * 280 } ?? 160   // default ~16:9 at card width
-
-        Group {
-            if let urlString = block.url, let url = URL(string: urlString) {
-                Link(destination: url) { cardContent(block, imageHeight: imageHeight) }
-            } else {
-                cardContent(block, imageHeight: imageHeight)
-            }
-        }
-    }
-
-    @ViewBuilder
-    private func cardContent(_ block: LeafletBlock, imageHeight: CGFloat) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            if let img = block.image, let did = authorDID ?? loginStateManager.currentDID {
-                let imgURL = URL(string: "https://cdn.bsky.app/img/feed_thumbnail/plain/\(did)/\(img.reference.link)")
-                AsyncImage(url: imgURL) { phase in
-                    switch phase {
-                    case .success(let image):
-                        image.resizable().scaledToFill()
-                            .frame(maxWidth: .infinity)
-                            .frame(height: min(imageHeight, 220))
-                            .clipped()
-                    default:
-                        EmptyView()
-                    }
-                }
-            }
-
-            VStack(alignment: .leading, spacing: 6) {
-                if let title = block.websiteTitle {
-                    Text(title)
-                        .font(theme.bodyFont(.subheadline).weight(.semibold))
-                        .foregroundStyle(foregroundColor)
-                        .lineLimit(2)
-                }
-                if let desc = block.websiteDescription {
-                    Text(desc)
-                        .font(.caption)
-                        .foregroundStyle(foregroundColor.opacity(0.6))
-                        .lineLimit(3)
-                }
-                if let url = block.url {
-                    HStack(spacing: 4) {
-                        Image(systemName: "link")
-                            .font(.caption2)
-                        Text(host(from: url))
-                            .font(.caption2)
-                            .lineLimit(1)
-                    }
-                    .foregroundStyle(accentColor)
-                }
-            }
-            .padding(12)
-        }
-        .background(foregroundColor.opacity(0.04))
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(foregroundColor.opacity(0.12), lineWidth: 1)
-        )
-    }
-
-    private func host(from url: String) -> String {
-        URL(string: url)?.host ?? url
-    }
-
-    private func parseAspectRatio(_ ratio: String) -> CGFloat? {
-        let parts = ratio.split(separator: "/").compactMap { Double($0) }
-        guard parts.count == 2, parts[1] != 0 else { return nil }
-        return CGFloat(parts[1] / parts[0])  // height/width
-    }
-
-    @ViewBuilder
-    private func renderButton(_ block: LeafletBlock) -> some View {
-        if let urlString = block.url, let url = URL(string: urlString) {
-            Link(destination: url) {
-                HStack {
-                    Spacer()
-                    Text(block.text ?? "Open")
-                        .font(theme.bodyFont(.subheadline).weight(.semibold))
-                    Image(systemName: "arrow.up.right")
-                        .font(.caption)
-                    Spacer()
-                }
-                .foregroundStyle(theme.accentForeground)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 12)
-                .background(accentColor)
-                .clipShape(Capsule())
-            }
-        }
-    }
-
-    @ViewBuilder
-    private func renderPostsListPlaceholder(_ block: LeafletBlock) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 8) {
-                Image(systemName: "list.bullet.rectangle.fill")
-                    .foregroundStyle(accentColor)
-                Text("Posts from this publication")
-                    .font(theme.bodyFont(.subheadline).weight(.semibold))
-                    .foregroundStyle(foregroundColor)
-                Spacer()
-            }
-
-            if let viewMode = block.listView {
-                Label(
-                    viewMode == "small" ? "Compact list" : "Full posts",
-                    systemImage: viewMode == "small" ? "rectangle.compress.vertical" : "rectangle.expand.vertical"
-                )
-                .font(.caption2)
-                .foregroundStyle(foregroundColor.opacity(0.5))
-            }
-
-            if let tags = block.filterByTags, !tags.isEmpty {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 6) {
-                        ForEach(tags, id: \.self) { tag in
-                            Text("#\(tag)")
-                                .font(.caption2)
-                                .foregroundStyle(accentColor)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 3)
-                                .background(accentColor.opacity(0.1))
-                                .clipShape(Capsule())
-                        }
-                    }
-                }
-            }
-
-            Text("Visit the publication's site to browse all posts.")
-                .font(.caption)
-                .foregroundStyle(foregroundColor.opacity(0.4))
-        }
-        .padding(12)
-        .background(foregroundColor.opacity(0.04))
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(foregroundColor.opacity(0.12), lineWidth: 1)
-        )
-    }
-
-    @ViewBuilder
-    private func renderSignupPrompt(_ block: LeafletBlock) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: "envelope.fill")
-                .font(.title3)
-                .foregroundStyle(accentColor)
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Subscribe to this publication")
-                    .font(theme.bodyFont(.subheadline).weight(.semibold))
-                    .foregroundStyle(foregroundColor)
-                Text("Visit the publication's site to sign up for email updates.")
-                    .font(.caption)
-                    .foregroundStyle(foregroundColor.opacity(0.5))
-            }
-            Spacer()
-        }
-        .padding(12)
-        .background(accentColor.opacity(0.06))
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-    }
-
-    @ViewBuilder
-    private func renderPollPlaceholder(_ block: LeafletBlock) -> some View {
-        if let subject = block.subject {
-            PollEmbedView(
-                pollRef: subject,
-                foregroundColor: foregroundColor,
-                accentColor: accentColor
-            )
-        }
-    }
-
-    @ViewBuilder
-    private func renderPageReference(_ block: LeafletBlock) -> some View {
-        HStack(spacing: 10) {
-            Image(systemName: "doc.text")
-                .foregroundStyle(accentColor)
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Page \(block.pageIndex.map { String($0 + 1) } ?? "?"))")
-                    .font(theme.bodyFont(.subheadline).weight(.semibold))
-                    .foregroundStyle(foregroundColor)
-                if let doc = block.pageDocument {
-                    Text(doc)
-                        .font(.caption2)
-                        .foregroundStyle(foregroundColor.opacity(0.4))
-                        .lineLimit(1)
-                }
-            }
-            Spacer()
-            Image(systemName: "arrow.turn.down.right")
-                .font(.caption)
-                .foregroundStyle(foregroundColor.opacity(0.4))
-        }
-        .padding(12)
-        .background(foregroundColor.opacity(0.04))
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-    }
-
-    @ViewBuilder
-    private func renderIframePlaceholder(_ block: LeafletBlock) -> some View {
-        Group {
-            if let urlString = block.url, let url = URL(string: urlString) {
-                Link(destination: url) { iframeContent(block) }
-            } else {
-                iframeContent(block)
-            }
-        }
-    }
-
-    @ViewBuilder
-    private func iframeContent(_ block: LeafletBlock) -> some View {
-        VStack(spacing: 8) {
-            HStack(spacing: 8) {
-                Image(systemName: "rectangle.on.rectangle")
-                    .foregroundStyle(accentColor)
-                Text("Embedded content")
-                    .font(theme.bodyFont(.subheadline).weight(.semibold))
-                    .foregroundStyle(foregroundColor)
-                Spacer()
-                if let _ = block.url {
-                    Image(systemName: "arrow.up.right")
-                        .font(.caption)
-                        .foregroundStyle(accentColor)
-                }
-            }
-
-            if let url = block.url {
-                Text(host(from: url))
-                    .font(.caption2)
-                    .foregroundStyle(foregroundColor.opacity(0.4))
-                    .lineLimit(1)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-        }
-        .padding(12)
-        .background(foregroundColor.opacity(0.04))
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(foregroundColor.opacity(0.12), lineWidth: 1)
-        )
     }
 
     // MARK: - AttributedString Rich Text Parser
