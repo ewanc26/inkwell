@@ -8,6 +8,8 @@
 
 A native SwiftUI reader and writer for the [Standard.site](https://standard.site) publishing ecosystem on AT Protocol.
 
+An [experimental Android version](https://github.com/ewanc26/inkwell-android) built with Jetpack Compose and Material 3 is also available.
+
 ## Features
 
 - Reads `site.standard.publication` and `site.standard.document` records from their owning PDS, in a three-tab structure (Read / Discover / Write).
