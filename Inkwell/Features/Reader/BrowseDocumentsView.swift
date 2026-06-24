@@ -1,15 +1,33 @@
 import SwiftUI
 import ATProtoKit
 
+// MARK: - Pagination State
+
+/// Tracks cursor-based pagination across multiple subscribed publications.
+/// Each DID gets its own cursor; items are merged into a single feed sorted by
+/// `publishedAt` descending.
+@MainActor
+struct FollowingFeedState {
+    var items: [ReaderFeedItem] = []
+    var isLoading = true        // true during initial load
+    var isLoadingNextPage = false
+    var error: String?
+    /// Per-DID cursors for the next page of `site.standard.document`.
+    var cursors: [String: String] = [:]
+    var hasMorePages = true
+    /// Whether the initial fetch has completed (even if empty).
+    var hasLoaded = false
+}
+
 struct BrowseDocumentsView: View {
     @Environment(LoginStateManager.self) private var loginStateManager
     @State private var notificationManager = NotificationManager.shared
 
     @State private var selectedFeed = ReaderFeed.following
-    @State private var following: [ReaderFeedItem] = []
+    @State private var followingState = FollowingFeedState()
     @State private var yours: [ReaderFeedItem] = []
-    @State private var isLoading = true
-    @State private var errorMessage: String?
+    @State private var isLoadingYours = true
+    @State private var yoursError: String?
     @State private var showCredits = false
 
     private enum ReaderFeed: String, CaseIterable, Identifiable {
@@ -49,7 +67,7 @@ struct BrowseDocumentsView: View {
                     Button { Task { await loadData() } } label: {
                         Image(systemName: "arrow.clockwise")
                     }
-                    .disabled(isLoading)
+                    .disabled(followingState.isLoading || isLoadingYours)
                 }
             }
             .sheet(isPresented: $showCredits) {
@@ -64,31 +82,134 @@ struct BrowseDocumentsView: View {
 
     @ViewBuilder
     private var content: some View {
-        if isLoading && activeItems.isEmpty {
+        if selectedFeed == .following {
+            followingContent
+        } else {
+            yoursContent
+        }
+    }
+
+    // MARK: - Following feed
+
+    @ViewBuilder
+    private var followingContent: some View {
+        if followingState.isLoading && followingState.items.isEmpty {
             ProgressView("Loading your reader...")
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-        } else if let errorMessage, activeItems.isEmpty {
+        } else if let error = followingState.error, followingState.items.isEmpty {
             ContentUnavailableView(
                 "Reader Unavailable",
                 systemImage: "exclamationmark.triangle",
-                description: Text(errorMessage)
+                description: Text(error)
             )
-        } else if activeItems.isEmpty {
+        } else if followingState.items.isEmpty && followingState.hasLoaded {
             ContentUnavailableView {
-                Label(emptyTitle, systemImage: selectedFeed == .following ? "books.vertical" : "doc.text")
+                Label("Nothing to read yet", systemImage: "books.vertical")
             } description: {
-                Text(emptyDescription)
+                Text("Subscribe to publications in Discover and their latest posts will appear here.")
             }
         } else {
             ScrollView {
                 LazyVStack(spacing: 18) {
-                    ForEach(activeItems) { item in
+                    ForEach(Array(followingState.items.enumerated()), id: \.element.id) { index, item in
                         NavigationLink {
                             ReadView(
                                 document: item.document.record,
                                 publication: item.publication?.record,
                                 documentURI: item.document.uri,
-                                authorDID: item.document.authorDID
+                                authorDID: item.document.authorDID,
+                                previousItem: index > 0 ? followingState.items[index - 1] : nil,
+                                nextItem: index < followingState.items.count - 1 ? followingState.items[index + 1] : nil
+                            )
+                        } label: {
+                            ReaderPostCard(item: item)
+                        }
+                        .buttonStyle(.plain)
+                    }
+
+                    // Infinite-scroll sentinel
+                    sentinel
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 12)
+            }
+            .refreshable { await loadData() }
+        }
+    }
+
+    @ViewBuilder
+    private var sentinel: some View {
+        if followingState.isLoadingNextPage {
+            HStack(spacing: 10) {
+                ProgressView()
+                Text("Loading more...")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+        } else if let error = followingState.error {
+            HStack(spacing: 8) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.orange)
+                    .font(.caption)
+                Text(error)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+                Button("Retry") {
+                    Task { await loadNextFollowingPage() }
+                }
+                .font(.caption.weight(.semibold))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 8)
+        } else if followingState.hasMorePages && followingState.hasLoaded {
+            Color.clear
+                .frame(height: 1)
+                .onAppear {
+                    Task { await loadNextFollowingPage() }
+                }
+        } else if followingState.hasLoaded && !followingState.items.isEmpty {
+            Text("You're all caught up")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+        }
+    }
+
+    // MARK: - Yours feed
+
+    @ViewBuilder
+    private var yoursContent: some View {
+        if isLoadingYours && yours.isEmpty {
+            ProgressView("Loading your posts...")
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if let error = yoursError, yours.isEmpty {
+            ContentUnavailableView(
+                "Reader Unavailable",
+                systemImage: "exclamationmark.triangle",
+                description: Text(error)
+            )
+        } else if yours.isEmpty {
+            ContentUnavailableView {
+                Label("No published posts", systemImage: "doc.text")
+            } description: {
+                Text("Posts you publish from Inkwell or another standard.site app will appear here.")
+            }
+        } else {
+            ScrollView {
+                LazyVStack(spacing: 18) {
+                    ForEach(Array(yours.enumerated()), id: \.element.id) { index, item in
+                        NavigationLink {
+                            ReadView(
+                                document: item.document.record,
+                                publication: item.publication?.record,
+                                documentURI: item.document.uri,
+                                authorDID: item.document.authorDID,
+                                previousItem: index > 0 ? yours[index - 1] : nil,
+                                nextItem: index < yours.count - 1 ? yours[index + 1] : nil
                             )
                         } label: {
                             ReaderPostCard(item: item)
@@ -103,36 +224,142 @@ struct BrowseDocumentsView: View {
         }
     }
 
-    private var activeItems: [ReaderFeedItem] {
-        selectedFeed == .following ? following : yours
-    }
-
-    private var emptyTitle: String {
-        selectedFeed == .following ? "Nothing to read yet" : "No published posts"
-    }
-
-    private var emptyDescription: String {
-        if selectedFeed == .following {
-            return "Subscribe to publications in Discover and their latest posts will appear here."
-        }
-        return "Posts you publish from Inkwell or another standard.site app will appear here."
-    }
+    // MARK: - Data Loading
 
     private func loadData() async {
-        isLoading = true
-        errorMessage = nil
-        defer { isLoading = false }
+        // Always refresh both feeds.
+        async let _following: () = loadFollowingFeed()
+        async let _yours: () = loadYoursFeed()
+        _ = await (_following, _yours)
+    }
+
+    // MARK: Following — paginated
+
+    /// Fetches subscriptions and the first page of documents from each followed
+    /// publication. Subsequent pages are loaded on-demand via the sentinel.
+    private func loadFollowingFeed() async {
+        followingState.isLoading = true
+        followingState.error = nil
+        defer {
+            followingState.isLoading = false
+            followingState.hasLoaded = true
+        }
+
+        do {
+            let subscriptions = try await loginStateManager.fetchSubscriptions()
+
+            // Reset state
+            followingState.items = []
+            followingState.cursors = [:]
+            followingState.hasMorePages = !subscriptions.isEmpty
+
+            guard !subscriptions.isEmpty else { return }
+
+            // Fetch first page from each subscribed publication concurrently.
+            await withTaskGroup(of: (did: String, items: [ReaderFeedItem], cursor: String?).self) { group in
+                for subscription in subscriptions {
+                    let pubURI = subscription.record.publication
+                    guard let pubDID = ATURI.parse(pubURI)?.did else { continue }
+                    group.addTask { [pubURI, pubDID] in
+                        let pubEntry = try? await loginStateManager.fetchPublication(uri: pubURI)
+                        let (records, cursor) = (try? await loginStateManager.listRecordsPage(
+                            from: pubDID,
+                            collection: SiteStandardLexicon.DocumentRecord.type,
+                            limit: 25
+                        )) ?? ([], nil)
+
+                        let items: [ReaderFeedItem] = records.compactMap { record in
+                            guard let value = record.value,
+                                  let doc = value.getRecord(ofType: SiteStandardLexicon.DocumentRecord.self),
+                                  doc.site == pubURI else { return nil }
+                            return ReaderFeedItem(
+                                document: DocumentEntry(uri: record.uri, authorDID: pubDID, record: doc),
+                                publication: pubEntry
+                            )
+                        }
+                        return (pubDID, items, cursor)
+                    }
+                }
+                for await result in group {
+                    followingState.items.append(contentsOf: result.items)
+                    if let cursor = result.cursor {
+                        followingState.cursors[result.did] = cursor
+                    }
+                }
+            }
+
+            followingState.items = deduplicated(followingState.items)
+
+            // Check if any DID still has more pages.
+            followingState.hasMorePages = !followingState.cursors.isEmpty
+        } catch {
+            followingState.error = error.localizedDescription
+        }
+    }
+
+    /// Loads the next page for each subscribed publication that still has a
+    /// cursor, merging the results into the feed.
+    private func loadNextFollowingPage() async {
+        guard !followingState.isLoadingNextPage, followingState.hasMorePages else { return }
+        followingState.isLoadingNextPage = true
+        followingState.error = nil
+        defer { followingState.isLoadingNextPage = false }
+
+        let cursors = followingState.cursors
+        guard !cursors.isEmpty else {
+            followingState.hasMorePages = false
+            return
+        }
+
+        followingState.cursors = [:]
+
+        await withTaskGroup(of: (did: String, items: [ReaderFeedItem], cursor: String?).self) { group in
+            for (did, cursor) in cursors {
+                group.addTask { [did, cursor] in
+                    let (records, nextCursor) = (try? await loginStateManager.listRecordsPage(
+                        from: did,
+                        collection: SiteStandardLexicon.DocumentRecord.type,
+                        limit: 25,
+                        cursor: cursor
+                    )) ?? ([], nil)
+
+                    let items: [ReaderFeedItem] = records.compactMap { record in
+                        guard let value = record.value,
+                              let doc = value.getRecord(ofType: SiteStandardLexicon.DocumentRecord.self) else {
+                            return nil
+                        }
+                        return ReaderFeedItem(
+                            document: DocumentEntry(uri: record.uri, authorDID: did, record: doc),
+                            publication: nil  // pub resolved on first page; not re-fetched here
+                        )
+                    }
+                    return (did, items, nextCursor)
+                }
+            }
+            for await result in group {
+                followingState.items.append(contentsOf: result.items)
+                if let cursor = result.cursor {
+                    followingState.cursors[result.did] = cursor
+                }
+            }
+        }
+
+        followingState.items = deduplicated(followingState.items)
+        followingState.hasMorePages = !followingState.cursors.isEmpty
+    }
+
+    // MARK: Yours — eager (own documents are typically few)
+
+    private func loadYoursFeed() async {
+        isLoadingYours = true
+        yoursError = nil
+        defer { isLoadingYours = false }
 
         do {
             async let ownPublications = loginStateManager.fetchPublicationsWithURIs()
             async let ownDocuments = loginStateManager.fetchDocumentsWithURIs()
-            async let subscriptions = loginStateManager.fetchSubscriptions()
 
-            let (publications, documents, followedPublications) = try await (
-                ownPublications,
-                ownDocuments,
-                subscriptions
-            )
+            let (publications, documents) = try await (ownPublications, ownDocuments)
 
             yours = documents.map { document in
                 ReaderFeedItem(
@@ -140,33 +367,16 @@ struct BrowseDocumentsView: View {
                     publication: publications.first(where: { $0.contains(document.record) })
                 )
             }
-
-            var followedItems: [ReaderFeedItem] = []
-            await withTaskGroup(of: [ReaderFeedItem].self) { group in
-                for subscription in followedPublications {
-                    let pubURI = subscription.record.publication
-                    guard let pubDID = ATURI.parse(pubURI)?.did else { continue }
-                    group.addTask { [pubURI, pubDID] in
-                        let publication = try? await loginStateManager.fetchPublication(uri: pubURI)
-                        guard let remoteDocuments = try? await loginStateManager.fetchDocuments(fromDID: pubDID) else {
-                            return []
-                        }
-                        return remoteDocuments.compactMap { document in
-                            guard document.record.site == pubURI else { return nil }
-                            return ReaderFeedItem(document: document, publication: publication)
-                        }
-                    }
-                }
-                for await items in group {
-                    followedItems.append(contentsOf: items)
-                }
-            }
-
-            following = deduplicated(followedItems)
             yours.sort(by: ReaderFeedItem.newestFirst)
         } catch {
-            errorMessage = error.localizedDescription
+            yoursError = error.localizedDescription
         }
+    }
+
+    // MARK: - Helpers
+
+    private var activeItems: [ReaderFeedItem] {
+        selectedFeed == .following ? followingState.items : yours
     }
 
     private func deduplicated(_ items: [ReaderFeedItem]) -> [ReaderFeedItem] {

@@ -82,7 +82,11 @@ final class NotificationManager {
         guard loginStateManager.isAuthenticated else { return }
 
         do {
-            let subs = try await loginStateManager.fetchSubscriptions()
+            // Use try? so a DPoP nonce collision (e.g. BrowseDocumentsView
+            // racing the same fetchSubscriptions call) degrades gracefully
+            // instead of logging an error. The cache in LoginStateManager
+            // ensures subsequent polls hit memory, not the network.
+            let subs = (try? await loginStateManager.fetchSubscriptions()) ?? []
             var newDocs: [(doc: DocumentEntry, pub: PublicationEntry?)] = []
             var allSeenURIs = Set<String>(lastSeenURIs)
 
