@@ -7,47 +7,13 @@
 //
 
 import SwiftUI
-import StoreKit
 import UIKit
 
 struct SupportView: View {
-    @Environment(StoreManager.self) private var store
-
     var body: some View {
         NavigationStack {
             List {
-                // MARK: - Tip Jar
-                Section {
-                    if store.tipProducts.isEmpty {
-                        HStack {
-                            Spacer()
-                            ProgressView("Loading tips…")
-                            Spacer()
-                        }
-                    } else {
-                        ForEach(store.tipProducts) { product in
-                            ProductView(id: product.id)
-                                .productViewStyle(.compact)
-                        }
-                    }
-
-                    if store.hasTipped {
-                        HStack {
-                            Spacer()
-                            Label("Thank you for your support!", systemImage: "heart.fill")
-                                .foregroundStyle(.pink)
-                                .font(.subheadline.weight(.medium))
-                            Spacer()
-                        }
-                        .listRowBackground(Color.pink.opacity(0.08))
-                    }
-                } header: {
-                    Text("Tip Jar")
-                } footer: {
-                    Text("One-time tips to support Inkwell's development. Not a subscription — pay once, and thank you forever.")
-                }
-
-                // MARK: - Alternate Methods
+                // MARK: - Support Methods
                 Section {
                     Link(destination: URL(string: "https://ko-fi.com/ewancroft")!) {
                         supportRow(
@@ -65,7 +31,7 @@ struct SupportView: View {
                         )
                     }
                 } header: {
-                    Text("Other Ways to Support")
+                    Text("Support Inkwell")
                 }
 
                 // MARK: - Crypto
@@ -181,5 +147,4 @@ struct SupportView: View {
 
 #Preview {
     SupportView()
-        .environment(StoreManager())
 }
