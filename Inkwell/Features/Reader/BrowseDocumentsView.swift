@@ -63,6 +63,9 @@ struct BrowseDocumentsView: View {
             .sheet(isPresented: $showSignIn) {
                 LoginView()
             }
+            .onChange(of: loginStateManager.isAuthenticated) { _, authenticated in
+                if authenticated { showSignIn = false }
+            }
             .task {
                 await loadData()
                 notificationManager.markAllAsRead()

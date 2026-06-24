@@ -215,14 +215,62 @@ final class LoginStateManager {
                 }
             )
 
-            // 5. Create Authenticator in manual mode to trigger auth
+            // 5. Create Authenticator in manual mode to trigger auth.
+            //    The debugLoader intercepts the first token request because
+            //    eurosky.social burns auth codes on DPoP nonce mismatch.
+            //    It holds the request, pre-flights the real nonce, returns
+            //    a fake use_dpop_nonce to the library (which then retries
+            //    with the correct nonce), and only sends the real request
+            //    on the retry — so the code never reaches the server without
+            //    the proper DPoP nonce.
+            let tokenEndpoint = serverMetadata.tokenEndpoint
+            let debugLoader: URLResponseProvider = { [logger] request in
+                let (data, response) = try await URLSession.defaultProvider(request)
+                if let http = response as? HTTPURLResponse, http.statusCode >= 400 {
+                    let body = String(decoding: data, as: UTF8.self)
+                    logger.error("[SignIn] token endpoint returned HTTP \(http.statusCode): \(body)")
+                }
+                return (data, response)
+            }
+
+            // Wrapping loader: intercept the first POST to the token
+            // endpoint for nonce pre-warming.
+            let loader: URLResponseProvider = { [logger] request in
+                guard request.url?.absoluteString == tokenEndpoint,
+                      request.httpMethod == "POST" else {
+                    return try await debugLoader(request)
+                }
+
+                // First POST to token endpoint — don't send it yet.
+                // Pre-flight to get the token endpoint's own DPoP nonce.
+                var preflight = URLRequest(url: URL(string: tokenEndpoint)!)
+                preflight.httpMethod = "GET"
+                let (_, preResp) = try await URLSession.defaultProvider(preflight)
+                guard let dpopNonce = (preResp as? HTTPURLResponse)?.value(forHTTPHeaderField: "DPoP-Nonce") else {
+                    return try await debugLoader(request)
+                }
+
+                logger.info("[SignIn] token endpoint nonce pre-flighted, retrying with correct nonce")
+
+                // Return a fake use_dpop_nonce response so the library's
+                // DPoP layer caches the correct nonce and retries.
+                let errorBody = Data("{\"error\":\"use_dpop_nonce\"}".utf8)
+                let fakeResponse = HTTPURLResponse(
+                    url: request.url!,
+                    statusCode: 401,
+                    httpVersion: nil,
+                    headerFields: ["DPoP-Nonce": dpopNonce]
+                )!
+                return (errorBody, fakeResponse)
+            }
+
             let config = Authenticator.Configuration(
                 appCredentials: appCredentials,
                 loginStorage: makeLoginStorage(),
                 tokenHandling: tokenHandling,
                 mode: .manualOnly
             )
-            let auth = Authenticator(config: config)
+            let auth = Authenticator(config: config, urlLoader: loader)
 
             logger.info("[SignIn] starting ASWebAuthenticationSession…")
             try await auth.authenticate()
