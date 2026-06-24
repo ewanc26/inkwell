@@ -67,6 +67,10 @@ struct ReadView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
+                // Give Liquid Glass a system-colored surface to sample
+                // instead of the publication's dark theme background.
+                Color(.systemBackground)
+                    .frame(height: 60)
                 // Wrapper to scope the theme background to content only
                 VStack(alignment: .leading, spacing: 24) {
                 // Header section
