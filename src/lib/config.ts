@@ -1,4 +1,8 @@
-// Site-wide configuration — mirrors the pattern from ewancroft.uk
+// ── Site-wide configuration ──────────────────────────────────────
+// Mirrors the pattern from ewancroft.uk — all route-level metadata
+// and navigation structure lives in one place rather than scattered
+// across components.
+
 export const SITE = {
   title: "Inkwell",
   description:

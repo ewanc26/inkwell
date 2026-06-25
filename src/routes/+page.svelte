@@ -1,3 +1,10 @@
+<!--
+  Landing page — the product pitch, one page, one purpose.
+  Hero wordmark -> feature grid -> security callout.
+  No secondary navigation; every link either installs the app or
+  leads to the privacy/terms that build trust.
+-->
+
 <script lang="ts">
   import { SITE } from "$lib/config";
   import {
@@ -19,7 +26,12 @@
 <!-- Hero -->
 <section class="container py-16 sm:py-24">
   <div class="hero-reveal">
-    <!-- Wordmark — matches InkwellMark.swift -->
+    <!--
+      Wordmark SVG — mirrors InkwellMark.swift in the iOS app.
+      The capsule shapes and ink-drop circle are the app icon's
+      defining forms, rendered here as an inline <svg> so
+      currentColor and var(--color-accent) resolve in the page DOM.
+    -->
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 400 952"

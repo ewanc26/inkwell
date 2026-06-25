@@ -1,3 +1,10 @@
+<!--
+  Privacy Policy page.
+  Legal text rendered as prose; the content is substantive enough
+  to warrant its own route rather than a modal.  Readable at
+  any device width.
+-->
+
 <script lang="ts">
   import { SITE } from "$lib/config";
 </script>

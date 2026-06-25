@@ -1,4 +1,7 @@
 <!doctype html>
+<!-- SvelteKit app shell for Inkwell.
+     The %sveltekit.*% placeholders are replaced at build time with
+     the rendered head and body from the active route. -->
 <html lang="en-gb" style="color-scheme: light dark">
   <head>
     <meta charset="utf-8" />
@@ -7,6 +10,8 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     %sveltekit.head%
   </head>
+  <!-- Hover-based preloading: prefetches data when the cursor rests on a
+       link, and prefetches code chunks as soon as a route enters the viewport. -->
   <body data-sveltekit-preload-data="hover" data-sveltekit-preload-code="viewport">
     <div style="display: contents">%sveltekit.body%</div>
   </body>

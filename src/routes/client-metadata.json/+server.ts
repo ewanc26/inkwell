@@ -1,3 +1,8 @@
+// ── AT Protocol OAuth client metadata endpoint ───────────────────
+// Serves the client_metadata JSON that every PDS fetches during
+// OAuth 2.1 login.  The URL of this endpoint *is* the client_id
+// that the app passes to the PDS — changing its path breaks auth.
+
 import { json } from "@sveltejs/kit";
 
 /**

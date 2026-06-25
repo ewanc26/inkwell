@@ -1,3 +1,9 @@
+<!--
+  Root layout — the app shell that wraps every page.
+  Renders the sticky header with desktop + mobile nav, the main content
+  slot, and the footer.  Responsive breakpoint is at 640px.
+-->
+
 <script lang="ts">
   import "../routes/layout.css";
   import { SITE, NAV_LINKS } from "$lib/config";
@@ -12,6 +18,7 @@
     mobileOpen = false;
   }
 
+  // Dismiss mobile nav on Escape, matching native sheet behaviour
   function onKeydown(e: KeyboardEvent) {
     if (e.key === "Escape") closeMobile();
   }
@@ -67,7 +74,7 @@
         {/each}
       </nav>
 
-      <!-- Mobile toggle -->
+      <!-- Mobile toggle — 44x44 tap target meets Apple HIG minimum -->
       <button
         class="nav-toggle"
         aria-label="Toggle menu"
