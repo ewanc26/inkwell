@@ -1,3 +1,10 @@
+<!--
+  Terms of Service / EULA page.
+  AGPL-3.0 + Apple App Store EULA legalese, with user-conduct
+  guidelines for the AT Protocol network.  Prose layout
+  identical to /privacy.
+-->
+
 <script lang="ts">
   import { SITE } from "$lib/config";
 </script>
