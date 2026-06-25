@@ -7,7 +7,7 @@ export const SITE = {
   title: "Inkwell",
   description:
     "A native reader and writer for the Standard.site publishing ecosystem on AT Protocol. Read, discover, and publish portable writing from your own PDS.",
-  url: "https://inkwell.app",
+  url: "https://inkwell.ewancroft.uk",
 };
 
 export const NAV_LINKS = [
