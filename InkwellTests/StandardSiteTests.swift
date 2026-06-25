@@ -1,6 +1,19 @@
+//
+//  StandardSiteTests.swift
+//  Inkwell
+//
+//  Unit tests for the AT-URI parser, publication/document association,
+//  canonical URL construction, verification endpoints, wire-format
+//  encoding, search response decoding, notification persistence, and
+//  tolerant record-page decoding that drops malformed records instead
+//  of failing the entire batch.
+//
+
 import Foundation
 import XCTest
 @testable import Inkwell
+
+// MARK: - Standard.site Tests
 
 @MainActor
 final class StandardSiteTests: XCTestCase {

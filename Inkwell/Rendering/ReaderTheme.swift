@@ -1,3 +1,14 @@
+//
+//  ReaderTheme.swift
+//  Inkwell
+//
+//  Resolves a publication's visual identity — colours, fonts, and page
+//  dimensions — from the richest available source down to system defaults.
+//  The resolution chain runs: Leaflet's rich theme → standard.site's
+//  BasicDefinition → system appearance, so a publication that sets nothing
+//  still renders legibly without ever looking broken.
+//
+
 import SwiftUI
 
 struct ReaderTheme {

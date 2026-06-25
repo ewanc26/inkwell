@@ -2,9 +2,16 @@
 //  StandardReaderAPI.swift
 //  Inkwell
 //
-//  Search client for pub search, the maintained cross-platform index listed
-//  by Standard.site. The index covers Standard.site plus legacy Leaflet and
-//  WhiteWind records; record values are still fetched from their owning PDS.
+//  Search client for pub search (leaflet-search-backend.fly.dev), the
+//  maintained cross-platform index recommended by Standard.site. The index
+//  aggregates records across the AT Protocol firehose and returns discovery
+//  metadata; Inkwell always fetches the authoritative record from the
+//  author's own PDS before rendering or subscribing to anything.
+//
+//  Two search entry points exist: `search(query:)` for the Discover tab's
+//  keyword search, and `search(for:)` which accepts a broader term and
+//  shares the same backend — internally both hit the same `/search`
+//  endpoint with the same `keyword` mode.
 //
 
 import Foundation

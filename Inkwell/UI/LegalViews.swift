@@ -2,6 +2,11 @@
 //  LegalViews.swift
 //  Inkwell
 //
+//  Privacy Policy and Terms of Service screens. The documents themselves
+//  live as LocalizedStringKey constants rather than a bundled file, so
+//  they render with SwiftUI's inline Markdown formatting (bold, links) and
+//  stay localised without needing a web view or a static resource bundle.
+//
 
 import SwiftUI
 
