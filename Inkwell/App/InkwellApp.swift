@@ -50,6 +50,7 @@ struct InkwellApp: App {
                 try? await Task.sleep(for: .milliseconds(700))
                 showSplash = false
             }
+            // MARK: - Launch Task
             .task {
                     // Cheap, synchronous-in-effect, so do it before resuming the session.
                     // Order doesn't matter between these two — they register disjoint

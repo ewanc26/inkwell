@@ -1,3 +1,14 @@
+//
+//  BrowseDocumentsView.swift
+//  Inkwell
+//
+//  The main reader feed: a "Following" tab that merges documents from every
+//  subscribed publication into one chronologically-sorted stream, and a
+//  "Yours" tab showing the signed-in user's own published documents.
+//  Pagination is cursor-based per-DID so each publication's feed page
+//  advances independently.
+//
+
 import SwiftUI
 import ATProtoKit
 

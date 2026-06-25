@@ -24,6 +24,9 @@ struct ContentView: View {
                 LoginView()
             }
         }
+        // Routes App Intent tab-switch notifications to the matching
+        // TabView index. Posted by OpenReaderIntent, OpenWriterIntent,
+        // and OpenDiscoverIntent when run via Siri or Shortcuts.
         .onReceive(NotificationCenter.default.publisher(for: .inkwellOpenTab)) { notification in
             guard let raw = notification.userInfo?[InkwellTabKey.tab] as? String,
                   let tab = InkwellTab(rawValue: raw) else { return }
