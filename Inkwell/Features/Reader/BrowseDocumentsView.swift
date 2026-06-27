@@ -266,6 +266,12 @@ struct BrowseDocumentsView: View {
 
             guard !subscriptions.isEmpty else { return }
 
+            // Collect unique DIDs for profile resolution.
+            let uniqueDIDs = Set(subscriptions.compactMap { sub in
+                ATURI.parse(sub.record.publication)?.did
+            })
+            let profiles = await resolveProfiles(dids: uniqueDIDs)
+
             // Fetch first page from each subscribed publication concurrently.
             await withTaskGroup(of: (did: String, items: [ReaderFeedItem], cursor: String?).self) { group in
                 for subscription in subscriptions {
@@ -279,13 +285,15 @@ struct BrowseDocumentsView: View {
                             limit: 25
                         )) ?? ([], nil)
 
+                        let profile = profiles[pubDID] ?? profiles[pubDID.lowercased()]
                         let items: [ReaderFeedItem] = records.compactMap { record in
                             guard let value = record.value,
                                   let doc = value.getRecord(ofType: SiteStandardLexicon.DocumentRecord.self),
                                   doc.site == pubURI else { return nil }
                             return ReaderFeedItem(
                                 document: DocumentEntry(uri: record.uri, authorDID: pubDID, record: doc),
-                                publication: pubEntry
+                                publication: pubEntry,
+                                authorProfile: profile
                             )
                         }
                         return (pubDID, items, cursor)
@@ -308,6 +316,26 @@ struct BrowseDocumentsView: View {
         }
     }
 
+    /// Resolves Bluesky profiles for a set of DIDs concurrently.
+    private func resolveProfiles(dids: Set<String>) async -> [String: BSkyActorProfile] {
+        await withTaskGroup(of: (String, BSkyActorProfile?).self) { group in
+            for did in dids {
+                group.addTask {
+                    let profile = try? await BSkyProfileFetcher.fetchProfile(did: did)
+                    return (did, profile)
+                }
+            }
+            var result: [String: BSkyActorProfile] = [:]
+            for await (did, profile) in group {
+                if let profile = profile {
+                    result[did] = profile
+                    result[profile.handle.lowercased()] = profile
+                }
+            }
+            return result
+        }
+    }
+
     /// Loads the next page for each subscribed publication that still has a
     /// cursor, merging the results into the feed.
     private func loadNextFollowingPage() async {
@@ -324,6 +352,17 @@ struct BrowseDocumentsView: View {
 
         followingState.cursors = [:]
 
+        // Look up cached profiles for existing DIDs.
+        let existingProfiles: [String: BSkyActorProfile] = {
+            var map: [String: BSkyActorProfile] = [:]
+            for item in followingState.items {
+                if let profile = item.authorProfile {
+                    map[item.document.authorDID] = profile
+                }
+            }
+            return map
+        }()
+
         await withTaskGroup(of: (did: String, items: [ReaderFeedItem], cursor: String?).self) { group in
             for (did, cursor) in cursors {
                 group.addTask { [did, cursor] in
@@ -334,6 +373,12 @@ struct BrowseDocumentsView: View {
                         cursor: cursor
                     )) ?? ([], nil)
 
+                    let profile: BSkyActorProfile?
+                    if let existing = existingProfiles[did] {
+                        profile = existing
+                    } else {
+                        profile = try? await BSkyProfileFetcher.fetchProfile(did: did)
+                    }
                     let items: [ReaderFeedItem] = records.compactMap { record in
                         guard let value = record.value,
                               let doc = value.getRecord(ofType: SiteStandardLexicon.DocumentRecord.self) else {
@@ -341,7 +386,8 @@ struct BrowseDocumentsView: View {
                         }
                         return ReaderFeedItem(
                             document: DocumentEntry(uri: record.uri, authorDID: did, record: doc),
-                            publication: nil  // pub resolved on first page; not re-fetched here
+                            publication: nil,
+                            authorProfile: profile
                         )
                     }
                     return (did, items, nextCursor)
@@ -372,10 +418,19 @@ struct BrowseDocumentsView: View {
 
             let (publications, documents) = try await (ownPublications, ownDocuments)
 
+            // Resolve the user's own profile.
+            let ownProfile: BSkyActorProfile?
+            if let did = documents.first?.authorDID {
+                ownProfile = try? await BSkyProfileFetcher.fetchProfile(did: did)
+            } else {
+                ownProfile = nil
+            }
+
             yours = documents.map { document in
                 ReaderFeedItem(
                     document: document,
-                    publication: publications.first(where: { $0.contains(document.record) })
+                    publication: publications.first(where: { $0.contains(document.record) }),
+                    authorProfile: ownProfile
                 )
             }
             yours.sort(by: ReaderFeedItem.newestFirst)
@@ -401,6 +456,7 @@ struct BrowseDocumentsView: View {
 struct ReaderFeedItem: Identifiable {
     let document: DocumentEntry
     let publication: PublicationEntry?
+    let authorProfile: BSkyActorProfile?
 
     var id: String { document.uri }
 
@@ -455,6 +511,28 @@ private struct ReaderPostCard: View {
             }
 
             VStack(alignment: .leading, spacing: 9) {
+                HStack(spacing: 10) {
+                    if let avatarURL = item.authorProfile?.avatar.flatMap({ URL(string: $0) }) {
+                        AsyncImage(url: avatarURL) { phase in
+                            switch phase {
+                            case .success(let image):
+                                image.resizable().scaledToFill()
+                                    .frame(width: 28, height: 28)
+                                    .clipShape(.circle)
+                            case .failure, .empty:
+                                EmptyView()
+                            @unknown default:
+                                EmptyView()
+                            }
+                        }
+                    }
+                    if let displayName = item.authorProfile?.displayName {
+                        Text(displayName)
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(foreground.opacity(0.7))
+                    }
+                }
+
                 Text(document.title)
                     .font(theme.headingFont(.title3, weight: .bold))
                     .foregroundStyle(foreground)
