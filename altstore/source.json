@@ -1,0 +1,39 @@
+{
+  "name": "Inkwell",
+  "subtitle": "AT Protocol reader and writer for Standard.site",
+  "description": "A native SwiftUI reader and writer for the Standard.site publishing ecosystem on AT Protocol. Reads site.standard.publication and site.standard.document records, renders Leaflet and Markdown content, discovers publications via Constellation, and publishes documents with portable metadata.",
+  "website": "https://inkwell.ewancroft.uk",
+  "iconURL": "https://inkwell.ewancroft.uk/altstore/icon.png",
+  "tintColor": "#a6e3a1",
+  "featuredApps": [
+    "uk.ewancroft.Inkwell"
+  ],
+  "apps": [
+    {
+      "name": "Inkwell",
+      "bundleIdentifier": "uk.ewancroft.Inkwell",
+      "developerName": "Ewan Croft",
+      "subtitle": "Read and write on Standard.site via AT Protocol",
+      "localizedDescription": "A native SwiftUI reader and writer for the Standard.site publishing ecosystem on AT Protocol.\n\nRead — Reads site.standard.publication and site.standard.document records from their owning PDS, rendered in a three-tab layout (Read / Discover / Write). Renders Leaflet block content and Markpub/Offprint/pckt markdown formats. Resolves display themes from Leaflet's rich palette through basicTheme to system defaults.\n\nDiscover — Searches the cross-platform public index used by the Standard.site ecosystem, then fetches authoritative records directly from the author. Cross-repo comment discovery via Constellation (microcosm.blue).\n\nWrite — Publishes Standard.site documents with portable metadata and selectable content formats.\n\nAuthentication is OAuth-based with your AT Protocol handle — no app password needed. Silent session restoration from the Keychain on relaunch.",
+      "iconURL": "https://inkwell.ewancroft.uk/altstore/icon.png",
+      "tintColor": "#a6e3a1",
+      "category": "social",
+      "screenshots": [],
+      "versions": [
+        {
+          "version": "1.0",
+          "buildVersion": "49",
+          "date": "2026-06-27",
+          "localizedDescription": "First AltStore release. Read, Discover, and Write tabs. OAuth sign-in with AT Protocol handle. Leaflet and Markdown rendering. Publication search via Standard.site public index. Background notification polling.",
+          "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-1.0.ipa",
+          "size": 0
+        }
+      ],
+      "appPermissions": {
+        "entitlements": [],
+        "privacy": {}
+      }
+    }
+  ],
+  "news": []
+}
