@@ -1028,6 +1028,7 @@ final class LoginStateManager {
         guard ATURI.parse(publicationURI)?.collection == SiteStandardLexicon.PublicationRecord.type else {
             throw LoginError.invalidURI
         }
+        _cachedSubscriptions = nil  // invalidate cache
         let subscription = SiteStandardLexicon.Graph.SubscriptionRecord(
             publication: publicationURI, createdAt: Date()
         )
@@ -1068,6 +1069,7 @@ final class LoginStateManager {
 
     /// Deletes a subscription record.
     func deleteSubscription(recordKey: String) async throws {
+        _cachedSubscriptions = nil  // invalidate cache
         try await deleteRecord(
             collection: SiteStandardLexicon.Graph.SubscriptionRecord.type,
             recordKey: recordKey
@@ -1338,7 +1340,26 @@ final class LoginStateManager {
             return url
         }
 
-        // Resolve via ATResolve.
+        if did.hasPrefix("did:") {
+            // DID — fetch the DID document from the PLC directory.
+            guard let plcURL = URL(string: "https://plc.directory/\(did)") else {
+                throw LoginError.pdsResolutionFailed
+            }
+            let (data, _) = try await URLSession.shared.data(from: plcURL)
+            let doc = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+            let services = doc?["service"] as? [[String: Any]]
+            let atprotoService = services?.first(where: { svc in
+                (svc["type"] as? String) == "AtprotoPersonalDataServer"
+            })
+            guard let pdsString = atprotoService?["serviceEndpoint"] as? String,
+                  let url = URL(string: pdsString) else {
+                throw LoginError.pdsResolutionFailed
+            }
+            repositoryPDSURLs[did] = url
+            return url
+        }
+
+        // Handle — resolve via ATResolve.
         let identity = try await resolver.resolveHandle(did)
         guard let pdsString = identity?.serviceEndpoint,
               let url = URL(string: pdsString) else {
