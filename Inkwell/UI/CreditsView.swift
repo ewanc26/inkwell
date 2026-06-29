@@ -120,6 +120,12 @@ struct CreditsView: View {
                         Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
                     }
                 }
+
+                Section {
+                    Text("Inkwell for Android is also available on GitHub.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
             .navigationTitle("About")
             .navigationBarTitleDisplayMode(.inline)
