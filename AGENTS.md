@@ -1,21 +1,36 @@
 # AGENTS.md
 
-Guidance for agents working on Inkwell for Android, the Kotlin/Jetpack Compose counterpart to the iOS Inkwell app.
+Guidance for agents working on the experimental Android Inkwell client. It is a Kotlin/Compose counterpart to iOS Inkwell, but the checked-in implementation is an incomplete prototype and source behavior—not README parity claims—is authoritative.
 
-## Boundaries
+## Read First and Architecture
 
-- `app/src/main/` contains Compose UI, navigation, view models, data/network layers, resources, and manifest configuration.
-- `app/src/test/` and `app/src/androidTest/` cover JVM and device behavior.
-- `docs/` records architecture and interoperability decisions. Keep behavior aligned with iOS where the README identifies shared product contracts, not by copying platform-specific implementation.
+- Read `README.md`, Gradle/version catalog files, `AndroidManifest.xml`, `docs/oauth/client-metadata.json`, and all touched Kotlin. Compare shared wire behavior with the owned iOS `../inkwell` checkout, without copying Swift lifecycle or security assumptions.
+- `data/auth` stores the OAuth session, `data/repository/PdsRepository.kt` performs public/authenticated XRPC, `data/model` defines partial Standard.site/Leaflet shapes, and `ConstellationClient` queries backlinks.
+- Hilt modules construct OAuth/network services. ViewModels own `StateFlow`; Compose screens and `NavGraph` own UI/navigation. There is no Worker, notification manager, verification implementation, or test source tree despite README claims.
+- Target facts: compile/target SDK 36, minimum SDK 26, Java/Kotlin JVM 17, release minification enabled, app ID `uk.ewancroft.inkwell`, and debug ID suffix `.debug`.
 
-## Invariants
+## Current Capability Gaps
 
-- Use coroutines and structured concurrency; never block the main dispatcher with PDS or file work.
-- Keep UI state lifecycle-aware and avoid duplicate writes during recomposition.
-- Store OAuth tokens in Android secure storage and keep secrets/log headers out of source and diagnostics.
-- Preserve AT Protocol/open-union content, facets, blobs, and record revisions.
-- Support accessibility, dark theme, font scaling, back navigation, and process recreation.
+- Writer format selection is presentation-only: `selectedFormat` is ignored and every publish writes only a `site.standard.document` with optional `textContent`. No path, content union, facets, blobs, update/edit, or revision handling is implemented.
+- Reader feeds collect document summaries. The detail screen explicitly says full content, comments, and interactions are future work; Leaflet rendering helpers/models do not prove they are wired into a complete read path.
+- Subscription/recommend models and Constellation convenience functions exist, but user-facing create/delete flows are absent. WorkManager is neither a dependency nor implemented; `POST_NOTIFICATIONS` alone does not provide background polling.
+- Publication/document verification is not implemented. Do not advertise these features or “feature parity” until exercised end to end.
+- There are no JVM or instrumentation tests. `./gradlew test` may execute empty tasks; never report that as behavioral coverage.
 
-## Validation
+## OAuth, Networking, and Data Rules
 
-Run `./gradlew build`, `./gradlew test`, and relevant lint/instrumentation tasks. Test OAuth callback/state failure, session restore, rotate/process death, document round trips, offline/error states, Unicode, images, large fonts, and TalkBack semantics. Do not commit local SDK paths, signing keys, or build output.
+- OAuth sessions are JSON in `EncryptedSharedPreferences` backed by a MasterKey. Keep tokens, refresh state, PKCE/DPoP material, and authorization URLs out of logs and ordinary preferences. Account for deprecated/security-crypto migration before changing storage.
+- Runtime scope and `docs/oauth/client-metadata.json` currently align on publication/document/subscription/recommend/blob access and the custom callback. The production file is hosted by another repo/site; update and verify both together.
+- The manifest accepts every URI using the custom scheme, while `MainActivity` checks `/callback`. Preserve state validation inside the OAuth library, reject unrelated/deceptive callbacks, and test cold/warm `singleTask` delivery.
+- Authentication changes do not automatically rebuild an existing Navigation Compose graph merely because `startDestination` changes. Verify post-callback and logout navigation explicitly rather than assuming recomposition redirects.
+- Use structured concurrency and `Dispatchers.IO` for synchronous OkHttp. `DiscoverViewModel.search()` currently calls `execute()` from `viewModelScope` without switching dispatchers and can block the main thread; do not repeat that pattern.
+- URL-encode every XRPC query value. Current PDS/Constellation URL strings interpolate DIDs, collections, subjects, sources, limits, and cursors manually; responses are force-unwrapped/decoded without status checks or consistent closing. Harden these boundaries before expanding them.
+- Preserve DIDs, AT URIs, CIDs, rkeys, collection NSIDs, blob refs, UTF-8 facet byte offsets, unknown open-union variants, and author-PDS resolution. The current `ContentUnion` is intentionally incomplete and would lose unmodelled formats if round-tripped.
+
+## UI and Validation
+
+- Compose state must remain lifecycle-aware and process-recreatable. Avoid writes in composition/effects, duplicate OAuth callbacks, stale concurrent feed loads, and uncancelled requests. Validate back stack, rotation, process death, deep links, and logout.
+- Preserve Material 3 semantics, adaptive light/dark theme, edge-to-edge insets, font scaling, TalkBack labels/order, keyboard/IME actions, RTL, reduced motion, and accessible error feedback. The fixed light splash currently precedes themed content; test dark mode flashes.
+- Run `./gradlew clean assembleDebug lint test` with a valid local Android SDK/JDK, then add targeted unit/instrumentation tests for changed behavior. For release-sensitive work also run `./gradlew assembleRelease` and inspect R8 output.
+- Manually test OAuth success/cancel/state/error/restore/logout; navigation after callback; malformed/expired encrypted storage; cross-PDS reads; pagination/status/network failures; actual document records; Unicode/blob/theme decoding; rotation/process death; large fonts; and TalkBack.
+- Never commit `local.properties`, `.idea/`, `.gradle/`, `app/build/`, signing material, OAuth sessions, or local `.letta/` data.
