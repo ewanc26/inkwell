@@ -9,46 +9,46 @@ importers:
   .:
     devDependencies:
       '@lucide/svelte':
-        specifier: latest
+        specifier: ^1.21.0
         version: 1.21.0(svelte@5.56.3)
       '@sveltejs/adapter-vercel':
-        specifier: latest
+        specifier: ^6.3.4
         version: 6.3.4(@sveltejs/kit@2.66.0(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.3)(vite@8.0.16(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)))(svelte@5.56.3)(typescript@6.0.3)(vite@8.0.16(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)))
       '@sveltejs/kit':
-        specifier: latest
+        specifier: ^2.66.0
         version: 2.66.0(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.3)(vite@8.0.16(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)))(svelte@5.56.3)(typescript@6.0.3)(vite@8.0.16(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0))
       '@sveltejs/vite-plugin-svelte':
-        specifier: latest
+        specifier: ^7.1.2
         version: 7.1.2(svelte@5.56.3)(vite@8.0.16(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0))
       '@tailwindcss/vite':
-        specifier: latest
+        specifier: ^4.3.1
         version: 4.3.1(vite@8.0.16(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0))
       '@types/node':
-        specifier: latest
+        specifier: ^26.0.0
         version: 26.0.0
       prettier:
-        specifier: latest
+        specifier: ^3.8.4
         version: 3.8.4
       prettier-plugin-svelte:
-        specifier: latest
+        specifier: ^4.1.1
         version: 4.1.1(prettier@3.8.4)(svelte@5.56.3)
       prettier-plugin-tailwindcss:
-        specifier: latest
+        specifier: ^0.8.0
         version: 0.8.0(prettier-plugin-svelte@4.1.1(prettier@3.8.4)(svelte@5.56.3))(prettier@3.8.4)
       svelte:
-        specifier: latest
+        specifier: ^5.56.3
         version: 5.56.3
       svelte-check:
-        specifier: latest
+        specifier: ^4.6.0
         version: 4.6.0(picomatch@4.0.4)(svelte@5.56.3)(typescript@6.0.3)
       tailwindcss:
-        specifier: latest
+        specifier: ^4.3.1
         version: 4.3.1
       typescript:
-        specifier: latest
+        specifier: ^6.0.3
         version: 6.0.3
       vite:
-        specifier: latest
+        specifier: ^8.0.16
         version: 8.0.16(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)
 
 packages:
