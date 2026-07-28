@@ -36,8 +36,9 @@
   <p>
     Inkwell uses OAuth 2.1 to sign in to your AT Protocol account securely via
     the system browser. Your OAuth tokens are stored securely on your device
-    using Apple&rsquo;s native Keychain. Inkwell never sees or stores your account
-    password or app password.
+    using the platform&rsquo;s own secure storage — Apple&rsquo;s native Keychain
+    on iOS, and encrypted shared preferences on the experimental Android port.
+    Inkwell never sees or stores your account password or app password.
   </p>
 
   <h2>3. Third-Party Services</h2>

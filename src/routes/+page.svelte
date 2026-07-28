@@ -152,8 +152,9 @@
     <p>
       Inkwell uses OAuth 2.1 to sign in to your Personal Data Server.
       Your browser opens once to approve access — no password is ever
-      seen or stored by the app. Tokens are DPoP-bound and stored in
-      Apple&rsquo;s Keychain.
+      seen or stored by the app. Tokens are DPoP-bound and held in the
+      platform&rsquo;s secure store — Apple&rsquo;s Keychain on iOS,
+      encrypted shared preferences on Android.
     </p>
     <a href="/privacy" class="hover-lift">
       Read the Privacy Policy <ArrowRight class="h-3 w-3" />
