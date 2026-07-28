@@ -13,25 +13,45 @@
 
   let { children } = $props();
   let mobileOpen = $state(false);
+  let toggleEl = $state<HTMLButtonElement | null>(null);
 
-  function closeMobile() {
+  // Dismissing the drawer returns focus to the control that opened it,
+  // otherwise Escape/backdrop dismissal drops focus onto <body>.
+  function closeMobile(restoreFocus = false) {
+    if (mobileOpen && restoreFocus) toggleEl?.focus();
     mobileOpen = false;
   }
 
   // Dismiss mobile nav on Escape, matching native sheet behaviour
   function onKeydown(e: KeyboardEvent) {
-    if (e.key === "Escape") closeMobile();
+    if (e.key === "Escape") closeMobile(true);
   }
+
+  // The drawer's links close it on click, but history navigation
+  // (back/forward) would otherwise leave it open over the new route.
+  $effect(() => {
+    page.url.pathname;
+    mobileOpen = false;
+  });
+
+  // Absolute, per-route URL for canonical + og:url. Built from the
+  // configured origin so previews/localhost never leak into metadata.
+  const canonical = $derived(new URL(page.url.pathname, SITE.url).href);
 </script>
 
 <svelte:head>
   <title>{SITE.title}</title>
   <meta name="description" content={SITE.description} />
+  <link rel="canonical" href={canonical} />
+  <meta property="og:site_name" content={SITE.title} />
   <meta property="og:title" content={SITE.title} />
   <meta property="og:description" content={SITE.description} />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content={SITE.url} />
+  <meta property="og:url" content={canonical} />
+  <meta property="og:locale" content="en_GB" />
   <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content={SITE.title} />
+  <meta name="twitter:description" content={SITE.description} />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 </svelte:head>
 
@@ -76,8 +96,9 @@
 
       <!-- Mobile toggle — 44x44 tap target meets Apple HIG minimum -->
       <button
+        bind:this={toggleEl}
         class="nav-toggle"
-        aria-label="Toggle menu"
+        aria-label={mobileOpen ? "Close menu" : "Open menu"}
         aria-expanded={mobileOpen}
         aria-controls="mobile-nav"
         onclick={() => (mobileOpen = !mobileOpen)}
@@ -96,7 +117,7 @@
     <button
       class="nav-backdrop"
       aria-label="Close menu"
-      onclick={closeMobile}
+      onclick={() => closeMobile(true)}
       transition:fade={{ duration: 150 }}
     ></button>
   {/if}
@@ -113,7 +134,7 @@
         <a
           href={link.url}
           aria-current={page.url.pathname === link.url ? "page" : undefined}
-          onclick={closeMobile}
+          onclick={() => closeMobile()}
         >
           {link.label}
         </a>
