@@ -383,10 +383,20 @@
     line-height: 1.7;
   }
 
+  /* Tailwind's preflight strips list markers from ul/ol, which left the
+     legal pages' lists rendering as unindented paragraphs. Restore them. */
   .prose ul,
   .prose ol {
     margin-bottom: var(--spacing-sm);
     padding-left: var(--spacing-lg);
+  }
+
+  .prose ul {
+    list-style: disc;
+  }
+
+  .prose ol {
+    list-style: decimal;
   }
 
   .prose ul ::marker {
