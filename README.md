@@ -49,6 +49,13 @@ The app icon and in-app wordmark share one set of vector coordinates, so they al
 
 - **ATProtoKit** — via Swift Package Manager (`https://github.com/MasterJ93/ATProtoKit.git`)
 
+## Support
+
+If you find this project useful, consider supporting its development:
+
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/ewancroft)
+[![GitHub Sponsors](https://img.shields.io/badge/GitHub%20Sponsors-30363D?style=for-the-badge&logo=github&logoColor=white)](https://github.com/sponsors/ewanc26)
+
 ## Licence
 
 AGPL 3.0 — see `LICENCE`
