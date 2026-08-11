@@ -46,6 +46,10 @@ app/src/main/java/uk/ewancroft/inkwell/
 └── MainActivity.kt
 ```
 
+## Install
+
+Add `https://inkwell.ewancroft.uk/fdroid/repo` as a custom repo in [F-Droid](https://f-droid.org/), [Droid-ify](https://github.com/Iamlooker/Droid-ify), or [Obtainium](https://github.com/ImranR98/Obtainium). This is a self-hosted, signed F-Droid-compatible repo maintained directly from this project — not (yet) F-Droid's official default repo, which is a separate, longer-running submission tracked in `fdroid/README.md`.
+
 ## Getting started
 
 ```bash
