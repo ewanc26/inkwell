@@ -17,7 +17,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class GraphSubscription(
     @SerialName("\$type") val type: String = "site.standard.graph.subscription",
-    val publication: String
+    val publication: String,
+    val createdAt: String? = null
 )
 
 // ── standard.site: recommend (like) ──────────────────────────────────────
@@ -26,5 +27,6 @@ data class GraphSubscription(
 @Serializable
 data class GraphRecommend(
     @SerialName("\$type") val type: String = "site.standard.graph.recommend",
-    val document: String
+    val document: String,
+    val createdAt: String? = null
 )

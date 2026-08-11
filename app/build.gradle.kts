@@ -4,6 +4,9 @@
 // as the minimum, which covers the kotlinx.serialization and Compose runtime
 // requirements while still allowing access to ~95% of active devices.
 
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -11,6 +14,17 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+}
+
+// Release signing credentials live in a gitignored keystore.properties
+// (keystore path + passwords), never in this file or in version control.
+// Absent locally (e.g. on a fresh checkout or in CI without the secret),
+// release builds simply stay unsigned rather than failing the build.
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties()
+val hasReleaseSigning = keystorePropertiesFile.exists()
+if (hasReleaseSigning) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
 android {
@@ -27,10 +41,24 @@ android {
         manifestPlaceholders["appAuthRedirectScheme"] = "uk.ewancroft.inkwell"
     }
 
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = rootProject.file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
         debug {
             isDebuggable = true
@@ -104,4 +132,8 @@ dependencies {
 
     // Dagger 2.57+ unshaded kotlin-metadata-jvm; add explicit version for Kotlin 2.3.0 support
     ksp("org.jetbrains.kotlin:kotlin-metadata-jvm:2.3.0")
+
+    // -- JVM unit tests --
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
 }

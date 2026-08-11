@@ -11,3 +11,8 @@ local.properties
 /app/build
 gradle/gradle-daemon-jvm.properties
 .letta/
+
+# Release signing — never commit the keystore or its credentials.
+keystore.properties
+*.keystore
+*.jks

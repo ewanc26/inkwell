@@ -1,0 +1,1 @@
+First release. Read, Discover, and Write tabs. OAuth sign-in with AT Protocol handle. Leaflet and Markdown rendering. Publication search via Standard.site public index.
