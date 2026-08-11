@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -151,12 +152,30 @@ fun DiscoverScreen(
                                 Spacer(Modifier.height(4.dp))
                             }
                             items(publications, key = { it.uri }) { result ->
-                                SearchResultRow(result = result)
+                                SearchResultRow(
+                                    result = result,
+                                    isSubscribed = uiState.subscriptions.containsKey(result.uri),
+                                    isSubscriptionPending = result.uri in uiState.pendingSubscriptions,
+                                    onToggleSubscription = { viewModel.toggleSubscription(result) },
+                                )
                             }
                         }
                     }
                 }
             }
+        }
+    }
+
+    if (uiState.subscriptionError != null) {
+        Snackbar(
+            modifier = Modifier.padding(16.dp),
+            action = {
+                TextButton(onClick = { viewModel.dismissSubscriptionError() }) {
+                    Text("Dismiss")
+                }
+            }
+        ) {
+            Text(uiState.subscriptionError!!)
         }
     }
 
@@ -170,7 +189,12 @@ fun DiscoverScreen(
 }
 
 @Composable
-private fun SearchResultRow(result: SearchResult) {
+private fun SearchResultRow(
+    result: SearchResult,
+    isSubscribed: Boolean = false,
+    isSubscriptionPending: Boolean = false,
+    onToggleSubscription: (() -> Unit)? = null,
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -220,6 +244,29 @@ private fun SearchResultRow(result: SearchResult) {
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                    }
+                }
+            }
+
+            if (result.isPublication && onToggleSubscription != null) {
+                Box(contentAlignment = Alignment.Center) {
+                    if (isSubscriptionPending) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(28.dp),
+                            strokeWidth = 2.dp,
+                        )
+                    } else {
+                        OutlinedIconToggleButton(
+                            checked = isSubscribed,
+                            onCheckedChange = { onToggleSubscription() },
+                        ) {
+                            Icon(
+                                if (isSubscribed) Icons.Filled.Notifications else Icons.Outlined.NotificationAdd,
+                                contentDescription = if (isSubscribed) "Unsubscribe" else "Subscribe",
+                                tint = if (isSubscribed) MaterialTheme.colorScheme.primary
+                                       else MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                     }
                 }
             }

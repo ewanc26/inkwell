@@ -19,6 +19,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.net.URLEncoder
 import java.util.concurrent.TimeUnit
 import uk.ewancroft.inkwell.data.model.bluesky.ConstellationBacklink
 import uk.ewancroft.inkwell.data.model.bluesky.ConstellationResponse
@@ -35,6 +36,11 @@ object ConstellationClient {
 
     // ── Backlink Query ───────────────────────────────────────────────────
 
+    /** URL-encodes a query param value — subjects/sources/cursors can contain
+     * `:`, `/`, `#`, `[`, `]` (AT-URIs, NSID paths) which must not be
+     * interpolated raw into the query string. */
+    private fun enc(value: String): String = URLEncoder.encode(value, "UTF-8")
+
     /** Finds all records that link to the given subject via the given source. */
     suspend fun getBacklinks(
         subject: String,
@@ -43,14 +49,21 @@ object ConstellationClient {
         cursor: String? = null
     ): ConstellationResponse = withContext(Dispatchers.IO) {
         val urlBuilder = StringBuilder("$BASE_URL/xrpc/blue.microcosm.links.getBacklinks")
-            .append("?subject=").append(subject)
-            .append("&source=").append(source)
+            .append("?subject=").append(enc(subject))
+            .append("&source=").append(enc(source))
             .append("&limit=").append(limit)
-        cursor?.let { urlBuilder.append("&cursor=").append(it) }
+        cursor?.let { urlBuilder.append("&cursor=").append(enc(it)) }
 
         val request = Request.Builder().url(urlBuilder.toString()).get().build()
-        val response = client.newCall(request).execute()
-        json.decodeFromString(response.body!!.string())
+        client.newCall(request).execute().use { response ->
+            val bodyString = response.body?.string()
+            if (!response.isSuccessful || bodyString == null) {
+                throw java.io.IOException(
+                    "Constellation getBacklinks failed: HTTP ${response.code}"
+                )
+            }
+            json.decodeFromString(bodyString)
+        }
     }
 
     // ── Pagination ───────────────────────────────────────────────────────
@@ -81,6 +94,28 @@ object ConstellationClient {
     /** Recommends (standard.site graph edges) pointing at this document. */
     suspend fun getRecommendBacklinks(documentUri: String): List<ConstellationBacklink> =
         paginateBacklinks(documentUri, "site.standard.graph.recommend:document")
+
+    /**
+     * Total recommend count for a document, across the whole network.
+     *
+     * Mirrors Inkwell iOS `fetchRecommendCount(for:)`: request a single
+     * record first: if there's no next cursor the whole result set fit in
+     * that page, so its size is the count. Otherwise fall back to full
+     * pagination via [getRecommendBacklinks].
+     */
+    suspend fun getRecommendCount(documentUri: String): Int {
+        val first = try {
+            getBacklinks(
+                subject = documentUri,
+                source = "site.standard.graph.recommend:document",
+                limit = 1
+            )
+        } catch (_: Exception) {
+            return 0
+        }
+        if (first.cursor == null) return first.records.orEmpty().size
+        return getRecommendBacklinks(documentUri).size
+    }
 
     /**
      * Mentions in Bluesky posts: searches both link facets and embed.external URIs.
