@@ -6,11 +6,11 @@ A native reader and writer for the [Standard.site](https://standard.site) publis
 
 ## Features
 
-- **Read** — Fetches `site.standard.publication` and `site.standard.document` records from the author's PDS. Three-tab layout (Read / Discover / Write). Renders Leaflet blocks and Markpub/Offprint/pckt markdown.
-- **Discover** — Searches the Standard.site public index. Cross-repo comment discovery via Constellation. Paginated feed with prev/next navigation.
+- **Read** — Fetches `site.standard.publication` and `site.standard.document` records from the author's PDS. Three-tab layout (Read / Discover / Write). Tapping a post renders its real content: Leaflet blocks, Markpub/plain text, and a generic fallback for other formats so nothing is silently dropped. Comments and interactions aren't shown yet.
+- **Discover** — Searches the Standard.site public index. Subscribe to publications and recommend documents, with live recommend counts from Constellation. Paginated feed with prev/next navigation.
 - **Write** — Publishes `site.standard.document` records with portable metadata. Content format selection is presentation-only for now; every publish currently writes plain text content regardless of the selected format.
 - **AT Protocol Native** — OAuth with your AT Protocol handle (no app password). Session restores silently on relaunch.
-- **Verification** — Publication `.well-known` and document `<link>` checks.
+- **Verification** — Publication `.well-known` and document `<link>` checks, shown as a badge on the post detail screen.
 
 ## Relationship to Inkwell iOS
 
