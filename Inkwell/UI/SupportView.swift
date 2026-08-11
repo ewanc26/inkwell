@@ -2,8 +2,10 @@
 //  SupportView.swift
 //  Inkwell
 //
-//  Tip jar + alternate support methods. Uses StoreKit 2 ProductView
-//  for in-app tips, plus links to ko-fi, GitHub Sponsors, and crypto.
+//  Tip jar + alternate support methods. Inkwell is free on both
+//  platforms — these are external links (ko-fi, GitHub Sponsors,
+//  crypto), not in-app purchases, since AltStore distribution has
+//  no App Store billing to hook StoreKit into.
 //
 
 import SwiftUI
@@ -15,11 +17,11 @@ struct SupportView: View {
             List {
                 // MARK: - Support Methods
                 Section {
-                    Link(destination: URL(string: "https://ko-fi.com/ewancroft")!) {
+                    Link(destination: URL(string: "https://ko-fi.com/ewancroft?amount=2.99")!) {
                         supportRow(
                             icon: "cup.and.saucer.fill",
                             title: "Ko-fi",
-                            detail: "Buy me a tea"
+                            detail: "Buy me a tea — £2.99 suggested"
                         )
                     }
 
