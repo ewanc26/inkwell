@@ -12,6 +12,7 @@ import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -20,6 +21,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import uk.ewancroft.inkwell.data.model.bluesky.BlueskyProfile
 import uk.ewancroft.inkwell.data.model.common.AtUri
+import java.time.Instant
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -136,6 +138,113 @@ class PdsRepository @Inject constructor(
             inputSerializer = JsonObject.serializer(),
             responseSerializer = JsonObject.serializer(),
         )
+    }
+
+    // ── Graph: Subscriptions (site.standard.graph.subscription) ────────────
+    //
+    // A follow-style edge: the subscriber is whoever's repo the record lives
+    // in (same as app.bsky.graph.follow) — there is no separate subscriber
+    // field. Mirrors Inkwell iOS LoginStateManager.createSubscription /
+    // fetchSubscriptions / deleteSubscription.
+
+    private companion object {
+        const val SUBSCRIPTION_COLLECTION = "site.standard.graph.subscription"
+        const val RECOMMEND_COLLECTION = "site.standard.graph.recommend"
+    }
+
+    data class SubscriptionEntry(val uri: String, val rkey: String, val publicationUri: String)
+
+    /** Creates a `site.standard.graph.subscription` record: subscribes the signed-in user to [publicationUri]. */
+    suspend fun createSubscription(publicationUri: String): JsonObject {
+        require(AtUri.parse(publicationUri)?.collection == "site.standard.publication") {
+            "publicationUri must reference a site.standard.publication record"
+        }
+        val record = buildJsonObject {
+            put("\$type", SUBSCRIPTION_COLLECTION)
+            put("publication", publicationUri)
+            put("createdAt", Instant.now().toString())
+        }
+        return createRecord(SUBSCRIPTION_COLLECTION, record)
+    }
+
+    /** Lists the signed-in user's own subscriptions (paginated to completion). */
+    suspend fun fetchSubscriptions(did: String, pdsUrl: String? = null): List<SubscriptionEntry> =
+        listAllRecords(did, SUBSCRIPTION_COLLECTION, pdsUrl).mapNotNull { entry ->
+            try {
+                val publication = entry.value["publication"]?.jsonPrimitive?.content ?: return@mapNotNull null
+                val rkey = AtUri.parse(entry.uri)?.recordKey ?: return@mapNotNull null
+                SubscriptionEntry(entry.uri, rkey, publication)
+            } catch (_: Exception) { null }
+        }
+
+    /** Deletes a subscription record by its record key. */
+    suspend fun deleteSubscription(rkey: String) = deleteRecord(SUBSCRIPTION_COLLECTION, rkey)
+
+    // ── Graph: Recommends (site.standard.graph.recommend) ──────────────────
+    //
+    // A lightweight social signal (like/bookmark) pointing at a single
+    // document. Mirrors Inkwell iOS LoginStateManager.createRecommend /
+    // fetchRecommends / deleteRecommend. Cross-repo counts/discovery use
+    // ConstellationClient, not this (local-repo-only) list.
+
+    data class RecommendEntry(val uri: String, val rkey: String, val documentUri: String)
+
+    /** Creates a `site.standard.graph.recommend` record: recommends [documentUri]. */
+    suspend fun createRecommend(documentUri: String): JsonObject {
+        require(AtUri.parse(documentUri)?.collection == "site.standard.document") {
+            "documentUri must reference a site.standard.document record"
+        }
+        val record = buildJsonObject {
+            put("\$type", RECOMMEND_COLLECTION)
+            put("document", documentUri)
+            put("createdAt", Instant.now().toString())
+        }
+        return createRecord(RECOMMEND_COLLECTION, record)
+    }
+
+    /** Lists the signed-in user's own recommends (local repo only; paginated to completion). */
+    suspend fun fetchRecommends(did: String, pdsUrl: String? = null): List<RecommendEntry> =
+        listAllRecords(did, RECOMMEND_COLLECTION, pdsUrl).mapNotNull { entry ->
+            try {
+                val document = entry.value["document"]?.jsonPrimitive?.content ?: return@mapNotNull null
+                val rkey = AtUri.parse(entry.uri)?.recordKey ?: return@mapNotNull null
+                RecommendEntry(entry.uri, rkey, document)
+            } catch (_: Exception) { null }
+        }
+
+    /** Deletes a recommend record by its record key. */
+    suspend fun deleteRecommend(rkey: String) = deleteRecord(RECOMMEND_COLLECTION, rkey)
+
+    // ── Pagination helper ────────────────────────────────────────────────
+
+    private data class RawRecordEntry(val uri: String, val value: JsonObject)
+
+    /**
+     * Paginates `com.atproto.repo.listRecords` to completion. Capped at
+     * [maxRecords] so a misbehaving PDS returning an endless cursor can't
+     * hang the caller forever.
+     */
+    private suspend fun listAllRecords(
+        did: String,
+        collection: String,
+        pdsUrl: String? = null,
+        maxRecords: Int = 500,
+    ): List<RawRecordEntry> {
+        val all = mutableListOf<RawRecordEntry>()
+        var cursor: String? = null
+        do {
+            val response = listRecords(did = did, collection = collection, cursor = cursor, pdsUrl = pdsUrl)
+            val records = response["records"]?.jsonArray.orEmpty()
+            if (records.isEmpty()) break
+            for (r in records) {
+                val obj = r.jsonObject
+                val uri = obj["uri"]?.jsonPrimitive?.content ?: continue
+                val value = obj["value"]?.jsonObject ?: continue
+                all.add(RawRecordEntry(uri, value))
+            }
+            cursor = response["cursor"]?.jsonPrimitive?.contentOrNull
+        } while (cursor != null && all.size < maxRecords)
+        return all.take(maxRecords)
     }
 
     suspend fun resolveHandle(handle: String): String {
