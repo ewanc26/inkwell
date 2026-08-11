@@ -1,0 +1,13 @@
+Inkwell is a native reader and writer for the Standard.site publishing ecosystem on AT Protocol.
+
+This is an experimental Android companion to Inkwell for iOS, the primary client. It is a work in progress toward feature parity, so expect rough edges.
+
+Read site.standard.publication and site.standard.document records directly from the author's PDS. Renders Leaflet block content and Markpub/Offprint/pckt markdown formats. Resolves display themes from Leaflet's rich palette through basicTheme to Material 3 defaults.
+
+Discover publications via the cross-platform public index, then fetches authoritative records from the author. Cross-repo comment discovery via Constellation (microcosm.blue). Paginated feed with previous/next navigation.
+
+Write and publish Standard.site documents with portable metadata and selectable content formats.
+
+Authentication is OAuth-based with your AT Protocol handle — no app password required. Silent session restoration on relaunch.
+
+All code is AGPL-3.0.
