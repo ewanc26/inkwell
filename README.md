@@ -8,9 +8,9 @@ A native reader and writer for the [Standard.site](https://standard.site) publis
 
 - **Read** — Fetches `site.standard.publication` and `site.standard.document` records from the author's PDS. Three-tab layout (Read / Discover / Write). Renders Leaflet blocks and Markpub/Offprint/pckt markdown.
 - **Discover** — Searches the Standard.site public index. Cross-repo comment discovery via Constellation. Paginated feed with prev/next navigation.
-- **Write** — Publishes Standard.site documents with portable metadata and selectable content formats.
+- **Write** — Publishes `site.standard.document` records with portable metadata. Content format selection is presentation-only for now; every publish currently writes plain text content regardless of the selected format.
 - **AT Protocol Native** — OAuth with your AT Protocol handle (no app password). Session restores silently on relaunch.
-- **Verification** — Publication `.well-known` and document `<link>` checks. Background notification polling via WorkManager.
+- **Verification** — Publication `.well-known` and document `<link>` checks.
 
 ## Relationship to Inkwell iOS
 
@@ -66,14 +66,13 @@ Run on API 26+ device or emulator. Sign in with your AT Protocol handle via OAut
 - Navigation Compose
 - OkHttp + kotlinx.serialization
 - Hilt
-- WorkManager
 - Coil
 
 ## Support
 
-If you find this project useful, consider supporting its development:
+Inkwell is free on both iOS and Android. If you find it useful, a one-off tip (£2.99 suggested) is welcome but never required:
 
-[![Ko-fi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/ewancroft)
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/ewancroft?amount=2.99)
 [![GitHub Sponsors](https://img.shields.io/badge/GitHub%20Sponsors-30363D?style=for-the-badge&logo=github&logoColor=white)](https://github.com/sponsors/ewanc26)
 
 ## Licence

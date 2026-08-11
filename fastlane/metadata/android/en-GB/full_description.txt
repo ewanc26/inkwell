@@ -6,8 +6,8 @@ Read site.standard.publication and site.standard.document records directly from 
 
 Discover publications via the cross-platform public index, then fetches authoritative records from the author. Cross-repo comment discovery via Constellation (microcosm.blue). Paginated feed with previous/next navigation.
 
-Write and publish Standard.site documents with portable metadata and selectable content formats.
+Write and publish site.standard.document records with portable metadata. Content format selection is presentation-only for now; every publish currently writes plain text content regardless of the selected format.
 
 Authentication is OAuth-based with your AT Protocol handle — no app password required. Silent session restoration on relaunch.
 
-All code is AGPL-3.0.
+Inkwell is free, with no ads, tracking, or in-app purchases. All code is AGPL-3.0.
