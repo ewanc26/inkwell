@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -280,7 +281,17 @@ fun PostCard(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PostDetailScreen(uri: String, onBack: () -> Unit = {}) {
+fun PostDetailScreen(
+    uri: String,
+    onBack: () -> Unit = {},
+    viewModel: PostDetailViewModel = hiltViewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(uri) {
+        viewModel.load(uri)
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -322,6 +333,65 @@ fun PostDetailScreen(uri: String, onBack: () -> Unit = {}) {
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+
+            HorizontalDivider()
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                if (uiState.isTogglingRecommend) {
+                    Box(
+                        modifier = Modifier.size(48.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                    }
+                } else {
+                    IconToggleButton(
+                        checked = uiState.isRecommended,
+                        onCheckedChange = { viewModel.toggleRecommend() },
+                    ) {
+                        Icon(
+                            if (uiState.isRecommended) Icons.Filled.ThumbUp else Icons.Outlined.ThumbUp,
+                            contentDescription = if (uiState.isRecommended) "Unrecommend" else "Recommend",
+                            tint = if (uiState.isRecommended) MaterialTheme.colorScheme.primary
+                                   else MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+
+                if (uiState.isLoadingRecommendState) {
+                    Text(
+                        "Loading recommendations…",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                } else {
+                    Text(
+                        when (uiState.recommendCount) {
+                            0 -> "No recommendations yet"
+                            1 -> "1 recommendation"
+                            else -> "${uiState.recommendCount} recommendations"
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        }
+    }
+
+    if (uiState.error != null) {
+        Snackbar(
+            modifier = Modifier.padding(16.dp),
+            action = {
+                TextButton(onClick = { viewModel.dismissError() }) {
+                    Text("Dismiss")
+                }
+            }
+        ) {
+            Text(uiState.error!!)
         }
     }
 }
