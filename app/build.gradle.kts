@@ -104,4 +104,8 @@ dependencies {
 
     // Dagger 2.57+ unshaded kotlin-metadata-jvm; add explicit version for Kotlin 2.3.0 support
     ksp("org.jetbrains.kotlin:kotlin-metadata-jvm:2.3.0")
+
+    // -- JVM unit tests --
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
 }

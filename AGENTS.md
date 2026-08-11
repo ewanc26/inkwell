@@ -6,7 +6,7 @@ Guidance for agents working on the experimental Android Inkwell client. It is a 
 
 - Read `README.md`, Gradle/version catalog files, `AndroidManifest.xml`, `docs/oauth/client-metadata.json`, and all touched Kotlin. Compare shared wire behavior with the owned iOS `../inkwell` checkout, without copying Swift lifecycle or security assumptions.
 - `data/auth` stores the OAuth session, `data/repository/PdsRepository.kt` performs public/authenticated XRPC, `data/model` defines partial Standard.site/Leaflet shapes, and `ConstellationClient` queries backlinks.
-- Hilt modules construct OAuth/network services. ViewModels own `StateFlow`; Compose screens and `NavGraph` own UI/navigation. There is no Worker, notification manager, verification implementation, or test source tree despite README claims.
+- Hilt modules construct OAuth/network services. ViewModels own `StateFlow`; Compose screens and `NavGraph` own UI/navigation. There is no Worker or notification manager despite README claims. `data/remote/StandardSiteVerifier.kt` implements publication/document verification (see below); a JVM test source tree now exists but only covers that one file — nothing else in the app has test coverage.
 - Target facts: compile/target SDK 36, minimum SDK 26, Java/Kotlin JVM 17, release minification enabled, app ID `uk.ewancroft.inkwell`, and debug ID suffix `.debug`.
 
 ## Current Capability Gaps
@@ -14,8 +14,8 @@ Guidance for agents working on the experimental Android Inkwell client. It is a 
 - Writer format selection is presentation-only: `selectedFormat` is ignored and every publish writes only a `site.standard.document` with optional `textContent`. No path, content union, facets, blobs, update/edit, or revision handling is implemented.
 - Reader feeds collect document summaries. The detail screen explicitly says full content, comments, and interactions are future work; Leaflet rendering helpers/models do not prove they are wired into a complete read path.
 - Subscription/recommend models and Constellation convenience functions exist, but user-facing create/delete flows are absent. WorkManager is neither a dependency nor implemented; `POST_NOTIFICATIONS` alone does not provide background polling.
-- Publication/document verification is not implemented. Do not advertise these features or “feature parity” until exercised end to end.
-- There are no JVM or instrumentation tests. `./gradlew test` may execute empty tasks; never report that as behavioral coverage.
+- Publication/document verification is implemented in `data/remote/StandardSiteVerifier.kt` (`.well-known` fetch for publications, canonical-page `<link rel="site.standard.document">` regex check for documents; mirrors iOS's `SiteStandardLexicon.Verification` failure taxonomy and endpoint construction). It's wired into `PostDetailViewModel`/`PostDetailScreen` only — the reader feed cards do not show a badge, and there's no caching, so revisiting a document re-runs both the `.well-known` fetch (when `site` is an AT-URI) and the canonical-page fetch every time. Document verification for at://-sited documents costs an extra `getRecord` round-trip to resolve the publication's `url`; this isn't batched or cached either. Don't extend verification to list views without addressing that cost first.
+- There are no JVM or instrumentation tests for the app in general. `StandardSiteVerifierTest` (added alongside the verifier) is the only unit test source in the project, including three tests that hit the real `blog.ewancroft.uk` standard.site publication over the network — they'll fail offline. `./gradlew test` otherwise executes effectively empty tasks for the rest of the codebase; never report that as behavioral coverage beyond this one file.
 
 ## OAuth, Networking, and Data Rules
 
