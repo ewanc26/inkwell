@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
+import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -18,6 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import uk.ewancroft.inkwell.data.remote.VerificationResult
 import uk.ewancroft.inkwell.ui.components.CreditsView
 import uk.ewancroft.inkwell.ui.components.InkwellMark
 
@@ -280,11 +282,19 @@ fun PostCard(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PostDetailScreen(uri: String, onBack: () -> Unit = {}) {
+fun PostDetailScreen(
+    uri: String,
+    onBack: () -> Unit = {},
+    viewModel: PostDetailViewModel = hiltViewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(uri) { viewModel.load(uri) }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Post") },
+                title = { Text(uiState.title?.takeIf { it.isNotBlank() } ?: "Post") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
@@ -304,10 +314,15 @@ fun PostDetailScreen(uri: String, onBack: () -> Unit = {}) {
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
-                "Post",
+                uiState.title?.takeIf { it.isNotBlank() } ?: "Post",
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onBackground,
             )
+
+            // Verification is an unobtrusive, async annotation — the document above is
+            // already shown whether or not the check has finished, and regardless of the
+            // outcome. Nothing is rendered while it's still pending (null).
+            VerificationBadge(uiState.verification)
 
             HorizontalDivider()
 
@@ -317,11 +332,85 @@ fun PostDetailScreen(uri: String, onBack: () -> Unit = {}) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
+            if (uiState.description != null) {
+                Text(
+                    uiState.description!!,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+
+            if (uiState.loadError != null) {
+                Text(
+                    uiState.loadError!!,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
+
             Text(
                 "Full content rendering with Leaflet blocks, comments, and interactions will be available in a future update.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+        }
+    }
+}
+
+/**
+ * Small "verified source" indicator, shown once a check has resolved. Mirrors the
+ * `Label("Verified source" / "Unverified source", ...)` badge in Inkwell iOS's ReadView —
+ * silent while pending, an accent checkmark once verified, a muted warning (with the
+ * specific reason) otherwise. Never blocks or hides the surrounding content.
+ */
+@Composable
+private fun VerificationBadge(result: VerificationResult?) {
+    when (result) {
+        null -> Unit // Pending/unknown — say nothing rather than assert either way.
+
+        is VerificationResult.Verified -> {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                Icon(
+                    Icons.Filled.Verified,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(16.dp),
+                )
+                Text(
+                    "Verified source",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+        }
+
+        is VerificationResult.Failed -> {
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    Icon(
+                        Icons.Outlined.WarningAmber,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(16.dp),
+                    )
+                    Text(
+                        "Unverified source",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Text(
+                    result.failure.reason,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                )
+            }
         }
     }
 }
