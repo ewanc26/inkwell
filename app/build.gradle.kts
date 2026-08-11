@@ -13,6 +13,17 @@ plugins {
     alias(libs.plugins.hilt)
 }
 
+// Release signing credentials live in a gitignored keystore.properties
+// (keystore path + passwords), never in this file or in version control.
+// Absent locally (e.g. on a fresh checkout or in CI without the secret),
+// release builds simply stay unsigned rather than failing the build.
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = java.util.Properties()
+val hasReleaseSigning = keystorePropertiesFile.exists()
+if (hasReleaseSigning) {
+    keystoreProperties.load(java.io.FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace = "uk.ewancroft.inkwell"
     compileSdk = 36
@@ -27,10 +38,24 @@ android {
         manifestPlaceholders["appAuthRedirectScheme"] = "uk.ewancroft.inkwell"
     }
 
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = rootProject.file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
         debug {
             isDebuggable = true
