@@ -4,6 +4,9 @@
 // as the minimum, which covers the kotlinx.serialization and Compose runtime
 // requirements while still allowing access to ~95% of active devices.
 
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -18,10 +21,10 @@ plugins {
 // Absent locally (e.g. on a fresh checkout or in CI without the secret),
 // release builds simply stay unsigned rather than failing the build.
 val keystorePropertiesFile = rootProject.file("keystore.properties")
-val keystoreProperties = java.util.Properties()
+val keystoreProperties = Properties()
 val hasReleaseSigning = keystorePropertiesFile.exists()
 if (hasReleaseSigning) {
-    keystoreProperties.load(java.io.FileInputStream(keystorePropertiesFile))
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
 android {
