@@ -2,12 +2,13 @@
 //  SupportView.swift
 //  Inkwell
 //
-//  Tip jar + alternate support methods. Uses StoreKit 2 ProductView
-//  for in-app tips, plus links to ko-fi, GitHub Sponsors, and crypto.
+//  Tip jar + alternate support methods. Inkwell is free on both
+//  platforms — these are external links (ko-fi, GitHub Sponsors),
+//  not in-app purchases, since AltStore distribution has no App
+//  Store billing to hook StoreKit into.
 //
 
 import SwiftUI
-import UIKit
 
 struct SupportView: View {
     var body: some View {
@@ -15,11 +16,11 @@ struct SupportView: View {
             List {
                 // MARK: - Support Methods
                 Section {
-                    Link(destination: URL(string: "https://ko-fi.com/ewancroft")!) {
+                    Link(destination: URL(string: "https://ko-fi.com/ewancroft?amount=2.99")!) {
                         supportRow(
                             icon: "cup.and.saucer.fill",
                             title: "Ko-fi",
-                            detail: "Buy me a tea"
+                            detail: "Buy me a tea — £2.99 suggested"
                         )
                     }
 
@@ -32,29 +33,6 @@ struct SupportView: View {
                     }
                 } header: {
                     Text("Support Inkwell")
-                }
-
-                // MARK: - Crypto
-                Section {
-                    cryptoRow(
-                        currency: "Monero",
-                        detail: "Preferred — the only genuinely private option",
-                        address: "44yH2LpkSsrSmWQC3SVmrABw2MUhNjNCE365hG7Rr7veJYNPBD1f6dNgXNr2nc6ZcP3jEyj9vXnqmg7VBBPeS8uwMhJ4yXW"
-                    )
-
-                    cryptoRow(
-                        currency: "Ethereum",
-                        detail: nil,
-                        address: "0x4B8c9d62ff89bc7199a197C55dac2abef1808B77"
-                    )
-
-                    cryptoRow(
-                        currency: "Bitcoin",
-                        detail: nil,
-                        address: "bc1qp3l6e9pjc5jan7ulpd58av8wfdtyhrchj84clh"
-                    )
-                } header: {
-                    Text("Cryptocurrency")
                 }
 
                 // MARK: - Non-Monetary
@@ -107,42 +85,6 @@ struct SupportView: View {
         }
     }
 
-    private func cryptoRow(currency: String, detail: String?, address: String) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 12) {
-                Image(systemName: "bitcoinsign.circle.fill")
-                    .font(.title3)
-                    .foregroundStyle(.orange)
-                    .frame(width: 28)
-
-                Text(currency)
-                    .font(.body.weight(.medium))
-                    .foregroundStyle(.primary)
-
-                if let detail {
-                    Text(detail)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-
-                Spacer()
-
-                Button {
-                    UIPasteboard.general.string = address
-                } label: {
-                    Image(systemName: "doc.on.doc")
-                        .font(.caption)
-                }
-                .buttonStyle(.borderless)
-            }
-
-            Text(address)
-                .font(.caption2.monospaced())
-                .foregroundStyle(.tertiary)
-                .lineLimit(1)
-                .truncationMode(.middle)
-        }
-    }
 }
 
 #Preview {
