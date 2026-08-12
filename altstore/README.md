@@ -7,17 +7,16 @@ This directory contains the AltStore source JSON for distributing Inkwell via Al
 | File | Purpose |
 |------|---------|
 | `source.json` | AltStore source metadata — app listing, version, download URL |
-| `icon.png` | App icon for the AltStore listing (not yet created) |
+| `icon.png` | App icon for the AltStore listing (1024x1024, flat render of the app's letter+drop mark) |
 | `Inkwell-1.0.ipa` | The built IPA (not committed — build and host separately) |
 
 ## Setup
 
 1. Build the app in Xcode: Product > Archive, then export an unsigned `.ipa`.
 2. Place the `.ipa` in this directory (or host it directly on the server).
-3. Create an `icon.png` (1024x1024) for the AltStore listing.
-4. Upload `source.json`, `icon.png`, and the `.ipa` to the server at `inkwell.ewancroft.uk/altstore/`.
-5. Update the `size` field in `source.json` to match the `.ipa` file size in bytes.
-6. Users add `https://inkwell.ewancroft.uk/altstore/source.json` as a source in AltStore.
+3. Upload `source.json`, `icon.png`, and the `.ipa` to the server at `inkwell.ewancroft.uk/altstore/`.
+4. Update the `size` field in `source.json` to match the `.ipa` file size in bytes.
+5. Users add `https://inkwell.ewancroft.uk/altstore/source.json` as a source in AltStore.
 
 ## Updating
 
