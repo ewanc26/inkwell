@@ -16,47 +16,84 @@
 <article class="container prose py-16 animate-in">
   <h1>Privacy Policy</h1>
 
-  <p><strong>Effective Date: <time datetime="2026-06-21">21 June 2026</time></strong></p>
+  <p>
+    <strong>Version 1.1 &mdash; Effective Date: <time datetime="2026-08-13">13 August 2026</time></strong>
+  </p>
 
   <p>
     Inkwell is a decentralized client for the Standard.site ecosystem on the
-    AT Protocol. We believe your data belongs to you.
+    AT Protocol. We believe your data belongs to you. This policy applies to
+    Inkwell for iOS (version 1.0, build 49, distributed via AltStore) and
+    Inkwell for Android (version 1.0.0, distributed via a self-hosted F-Droid
+    repository).
   </p>
 
   <h2>1. Data Collection &amp; Usage</h2>
   <p>
     Inkwell is a localized client application. The developer (Ewan Croft) does
-    not collect, store, or harvest any personal data, analytics, or usage
-    metrics on proprietary servers. All data you read, write, or publish is
-    communicated directly between your device and your authenticated Personal
-    Data Server (PDS) or the wider AT Protocol network.
+    not collect, store, or harvest personal data, analytics, or usage metrics
+    on proprietary servers. Inkwell contains no ads, tracking, or analytics
+    software. All content you read, write, or publish is communicated directly
+    between your device and the relevant Personal Data Server (PDS) or the
+    wider AT Protocol network.
   </p>
 
-  <h2>2. Authentication</h2>
+  <h2>2. Data Stored on Your Device</h2>
+  <ul>
+    <li>
+      <strong>iOS:</strong> Your OAuth session (access and refresh tokens) and
+      the P-256 DPoP private key are stored in Apple&rsquo;s Keychain. Non-sensitive
+      handle and PDS hints, notification state, and a local record of recently
+      seen URIs are stored in UserDefaults.
+    </li>
+    <li>
+      <strong>Android:</strong> Your OAuth session is stored in
+      EncryptedSharedPreferences, backed by a hardware-backed MasterKey.
+    </li>
+  </ul>
+
+  <h2>3. Authentication</h2>
   <p>
     Inkwell uses OAuth 2.1 to sign in to your AT Protocol account securely via
-    the system browser. Your OAuth tokens are stored securely on your device
-    using the platform&rsquo;s own secure storage — Apple&rsquo;s native Keychain
-    on iOS, and encrypted shared preferences on the experimental Android port.
-    Inkwell never sees or stores your account password or app password.
+    the system browser. Inkwell never sees or stores your account password or
+    app password.
   </p>
 
-  <h2>3. Third-Party Services</h2>
+  <h2>4. Notifications</h2>
+  <p>
+    On iOS, with your permission, Inkwell may show local notifications when a
+    publication you follow publishes a new document. Notifications are
+    generated on-device from background refresh; Inkwell does not use push
+    notification services. Notification state and already-seen URIs are stored
+    locally. The Android build declares the notification permission but does
+    not yet send notifications.
+  </p>
+
+  <h2>5. Backup</h2>
+  <p>
+    The Android build allows Android&rsquo;s automatic cloud backup of app data,
+    which may include your stored OAuth session. You can disable this in your
+    device&rsquo;s backup settings or by signing out. iOS Keychain items are not
+    synchronized to iCloud or included in ordinary device backups.
+  </p>
+
+  <h2>6. Third-Party Services</h2>
   <p>To function, Inkwell communicates with external services:</p>
   <ul>
     <li><strong>Your PDS &amp; AT Protocol:</strong> Standard network infrastructure to fetch and publish your content.</li>
     <li><strong>AT Protocol identity services:</strong> Standard DNS and PLC directory lookups for identity resolution.</li>
     <li><strong>Leaflet Search:</strong> Used as a cross-platform search index for Standard.site records.</li>
+    <li><strong>Constellation (microcosm.blue):</strong> Used to discover cross-repository backlinks and recommend counts.</li>
   </ul>
   <p>Queries to these public services are subject to their respective privacy and data retention policies.</p>
 
-  <h2>4. Changes to this Policy</h2>
+  <h2>7. Changes to this Policy</h2>
   <p>
-    We may update this policy occasionally to reflect new features or App Store
+    We may update this policy occasionally to reflect new features or legal
     requirements. Continued use of the app constitutes acceptance of these changes.
   </p>
 
-  <h2>5. Contact</h2>
+  <h2>8. Contact</h2>
   <p>
     For privacy-related inquiries, please email
     <a href="mailto:contact@ewancroft.uk">contact@ewancroft.uk</a>
