@@ -158,6 +158,8 @@
         <a href="/privacy">Privacy</a>
         <a href="/terms">Terms</a>
         <a href="https://github.com/ewanc26/inkwell">GitHub</a>
+        <a href="https://ko-fi.com/ewancroft">Ko-fi</a>
+        <a href="https://github.com/sponsors/ewanc26">GitHub Sponsors</a>
       </nav>
     </div>
   </footer>
