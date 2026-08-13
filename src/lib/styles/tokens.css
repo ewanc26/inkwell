@@ -106,7 +106,7 @@
     --ink-200: light-dark(oklch(0.85 0.025 252), oklch(0.24 0.06 258));
     --ink-300: light-dark(oklch(0.72 0.035 252), oklch(0.32 0.07 260));
     --ink-500: light-dark(oklch(0.50 0.05 255), oklch(0.46 0.08 262));
-    --ink-600: light-dark(oklch(0.40 0.055 258), oklch(0.58 0.06 258));
+    --ink-600: light-dark(oklch(0.40 0.055 258), oklch(0.62 0.06 258));
     --ink-700: light-dark(oklch(0.30 0.06 260), oklch(0.68 0.05 255));
     --ink-900: light-dark(oklch(0.16 0.05 262), oklch(0.90 0.025 250));
 
@@ -124,7 +124,7 @@
     --accent-100: light-dark(oklch(0.91 0.10 142), oklch(0.26 0.09 140));
     --accent-200: light-dark(oklch(0.82 0.16 142), oklch(0.34 0.14 142));
     --accent-300: light-dark(oklch(0.52 0.26 142), oklch(0.58 0.16 144));
-    --accent-500: light-dark(oklch(0.48 0.28 142), oklch(0.56 0.22 146));
+    --accent-500: light-dark(oklch(0.48 0.28 142), oklch(0.60 0.22 146));
     --accent-700: light-dark(oklch(0.35 0.22 142), oklch(0.72 0.20 148));
     --accent-900: light-dark(oklch(0.24 0.15 140), oklch(0.88 0.12 148));
 
