@@ -16,7 +16,7 @@ colors:
     role: surface-bg
   muted:
     value: "oklch(0.40 0.055 258)"
-    dark: "oklch(0.58 0.06 258)"
+    dark: "oklch(0.62 0.06 258)"
     role: muted-text
   border:
     value: "oklch(0.90 0.03 248)"
@@ -24,7 +24,7 @@ colors:
     role: border
   accent:
     value: "oklch(0.48 0.28 142)"
-    dark: "oklch(0.56 0.22 146)"
+    dark: "oklch(0.60 0.22 146)"
     canonical: "#139500"
     role: primary-accent
   accent-light:
@@ -152,10 +152,10 @@ This system explicitly rejects: SaaS startup templates with gradient heroes and 
 A cool-toned ink/paper palette with one accent, each defined as a short ramp (50 / 100 / 200 / 300 / 500 / 700 / 900) rather than a single flat value, so one token family can serve text, borders, and surfaces without introducing new hues. Every step is a `light-dark(light, dark)` pair in OKLCH — light/dark parity lives in the token, not in per-component overrides.
 
 ### Primary — Accent (green)
-The single brand accent (hue ≈142, a vivid green) — chosen to match the ink-drop mark in the iOS app icon (canonical `#139500`, the wordmark SVG's fallback value). `accent-500` carries primary actions, links, and feature icons; `accent-50` / `accent-100` are tint backgrounds (feature-icon fill, outline-button hover fill); `accent-300` / `accent-700` are hover/active states; `accent-900` is reserved for high-contrast accent text if ever needed. Used with the same restraint as before — one focal accent per section.
+The single brand accent (hue ≈142, a vivid green) — chosen to match the ink-drop mark in the iOS app icon (canonical `#139500`, the wordmark SVG's fallback value). `accent-500` carries primary actions, links, and feature icons; `accent-50` / `accent-100` are tint backgrounds (feature-icon fill, outline-button hover fill); `accent-300` / `accent-700` are hover/active states; `accent-900` is reserved for high-contrast accent text if ever needed. Used with the same restraint as before — one focal accent per section. The dark-mode `accent-500` lightness (0.60) is tuned to clear 4.5:1 against `surface-color`/`paper-200` — the original 0.56 measured 4.41:1, just under AA for normal text.
 
 ### Neutral — Ink (text/foreground) & Paper (background/surface)
-Both ramps sit in the same cool hue family (≈240–262) so neutrals and surfaces read as one consistent world rather than competing temperatures. `ink-700` is default body text; `ink-900` is reserved for emphasis (`<strong>`, the nav brand mark, active nav state); `ink-600` is the muted/secondary-text alias. `paper-100` is the page background; `paper-200` (aliased `--surface-color`) lifts cards and callouts; `paper-50` (aliased `--surface-raised`) is the hover-lifted card surface; `paper-300` (aliased `--color-border`) is the hairline border used for every divider and card edge.
+Both ramps sit in the same cool hue family (≈240–262) so neutrals and surfaces read as one consistent world rather than competing temperatures. `ink-700` is default body text; `ink-900` is reserved for emphasis (`<strong>`, the nav brand mark, active nav state); `ink-600` is the muted/secondary-text alias — its dark-mode lightness (0.62) is tuned to clear 4.5:1 against `surface-color`/`paper-200`, since the original 0.58 measured 4.24:1. `paper-100` is the page background; `paper-200` (aliased `--surface-color`) lifts cards and callouts; `paper-50` (aliased `--surface-raised`) is the hover-lifted card surface; `paper-300` (aliased `--color-border`) is the hairline border used for every divider and card edge.
 
 ### Semantic aliases
 Day-to-day component CSS reaches for these flat aliases rather than the raw ramp steps:
@@ -259,7 +259,10 @@ A narrower, centered variant of the card surface (`max-width: 42rem`, same backg
 - Footer links (Privacy / Terms / GitHub): a separate labeled `<nav>`, color + hover-to-accent only, no underline — they're already visually set apart as a list, so color is a sufficient affordance.
 
 ### Hero CTA
-Currently a single `.btn.btn-outline` ("View on GitHub") with `.hover-lift` and `.active-press`. No App Store badge is wired in yet — the previous placeholder link (`apps.apple.com/app/inkwell/id0000000000`) pointed at a listing that doesn't exist. Once the app ships, pair a `.btn-primary` or a proper App Store badge image alongside the GitHub button, matching the original two-CTA layout.
+Two buttons: `.btn.btn-primary` ("Get Inkwell", anchors to `#download`) paired with `.btn.btn-outline` ("View source", GitHub), both with `.hover-lift` and `.active-press`. There is still no App Store or Play Store badge — the primary button scrolls to the Download section rather than linking a store listing that doesn't exist.
+
+### Download section
+A second feature-grid pair, directly below the hero, presenting the two real install paths: an AltStore source (iOS) and a self-hosted F-Droid repo (Android, labelled experimental). Each card follows the standard `.feature-card` shape (icon → heading → body) plus a `.btn-primary` install action and a `text-sm text-muted` follow-up line for prerequisites/alternate links. This is the only place `.btn-primary` appears outside the hero — kept to one per card so the accent-button budget stays deliberate.
 
 ### Feature Icons
 2.5rem (40px) square container, 0.5rem radius, `accent-50` background, accent fill on the Lucide icon. Icon size: 1.25rem (20px).
