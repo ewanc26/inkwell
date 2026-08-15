@@ -23,8 +23,8 @@ import java.nio.charset.StandardCharsets
 
 sealed class Screen(val route: String, val label: String, val icon: ImageVector, val selectedIcon: ImageVector) {
     data object Reader   : Screen("reader",   "Read",     Icons.Outlined.Book,    Icons.Filled.Book)
-    data object Discover : Screen("discover", "Discover", Icons.Outlined.Explore, Icons.Filled.Explore)
-    data object Writer   : Screen("writer",   "Write",    Icons.Outlined.Edit,    Icons.Filled.Edit)
+    data object Discover : Screen("discover", "Discover", Icons.Outlined.Explore,  Icons.Filled.Explore)
+    data object Writer   : Screen("writer",   "Write",    Icons.Outlined.Edit,     Icons.Filled.Edit)
 }
 
 val bottomNavItems = listOf(Screen.Reader, Screen.Discover, Screen.Writer)
@@ -39,7 +39,6 @@ fun InkwellNavHost(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-    // Show the bottom nav only on the three root tabs — hide it on post detail.
     val showBottomBar = isAuthenticated && currentDestination?.hierarchy?.any { dest ->
         bottomNavItems.any { it.route == dest.route }
     } == true
@@ -83,10 +82,13 @@ fun InkwellNavHost(
 
             composable(Screen.Reader.route) {
                 ReaderScreen(
-                    onNavigateToPost = { uri ->
-                        // AT URIs contain slashes — URL-encode before embedding in the path.
+                    onNavigateToPost = { uri, prevUri, prevTitle, nextUri, nextTitle ->
                         val encoded = URLEncoder.encode(uri, StandardCharsets.UTF_8.name())
-                        navController.navigate("post/$encoded")
+                        val prev = prevUri?.let { URLEncoder.encode(it, StandardCharsets.UTF_8.name()) } ?: ""
+                        val next = nextUri?.let { URLEncoder.encode(it, StandardCharsets.UTF_8.name()) } ?: ""
+                        val prevT = prevTitle?.let { URLEncoder.encode(it, StandardCharsets.UTF_8.name()) } ?: ""
+                        val nextT = nextTitle?.let { URLEncoder.encode(it, StandardCharsets.UTF_8.name()) } ?: ""
+                        navController.navigate("post/$encoded?prev=$prev&next=$next&prevTitle=$prevT&nextTitle=$nextT")
                     },
                     onSignOut = onSignOut,
                 )
@@ -100,11 +102,27 @@ fun InkwellNavHost(
                 WriterScreen(onSignOut = onSignOut)
             }
 
-            composable("post/{uri}") { backStackEntry ->
+            composable(
+                route = "post/{uri}?prev={prev}&next={next}&prevTitle={prevTitle}&nextTitle={nextTitle}",
+                arguments = listOf(
+                    androidx.navigation.navArgument("prev") { type = androidx.navigation.NavType.StringType; defaultValue = "" },
+                    androidx.navigation.navArgument("next") { type = androidx.navigation.NavType.StringType; defaultValue = "" },
+                    androidx.navigation.navArgument("prevTitle") { type = androidx.navigation.NavType.StringType; defaultValue = "" },
+                    androidx.navigation.navArgument("nextTitle") { type = androidx.navigation.NavType.StringType; defaultValue = "" },
+                )
+            ) { backStackEntry ->
                 val encoded = backStackEntry.arguments?.getString("uri") ?: return@composable
                 val uri = URLDecoder.decode(encoded, StandardCharsets.UTF_8.name())
+                val prev = backStackEntry.arguments?.getString("prev")?.takeIf { it.isNotBlank() }?.let { URLDecoder.decode(it, StandardCharsets.UTF_8.name()) }
+                val next = backStackEntry.arguments?.getString("next")?.takeIf { it.isNotBlank() }?.let { URLDecoder.decode(it, StandardCharsets.UTF_8.name()) }
+                val prevTitle = backStackEntry.arguments?.getString("prevTitle")?.takeIf { it.isNotBlank() }?.let { URLDecoder.decode(it, StandardCharsets.UTF_8.name()) }
+                val nextTitle = backStackEntry.arguments?.getString("nextTitle")?.takeIf { it.isNotBlank() }?.let { URLDecoder.decode(it, StandardCharsets.UTF_8.name()) }
                 PostDetailScreen(
                     uri = uri,
+                    previousUri = prev,
+                    previousTitle = prevTitle,
+                    nextUri = next,
+                    nextTitle = nextTitle,
                     onBack = { navController.popBackStack() },
                 )
             }

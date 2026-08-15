@@ -177,6 +177,8 @@ class WriterViewModel @Inject constructor(
             try {
                 val now = java.time.Instant.now().toString()
 
+                val content = MarkdownConverter.convert(state.markdown, state.selectedFormat)
+
                 val record = buildJsonObject {
                     put("\$type", "site.standard.document")
                     put("site", pub.uri)
@@ -185,6 +187,7 @@ class WriterViewModel @Inject constructor(
                     if (state.description.isNotBlank()) {
                         put("description", state.description.trim())
                     }
+                    put("content", content)
                     if (state.markdown.isNotBlank()) {
                         put("textContent", state.markdown)
                     }
