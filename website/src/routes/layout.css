@@ -1,0 +1,23 @@
+/* ================================================================
+ * layout.css — Global stylesheet entry point
+ *
+ * Tailwind v4 import + explicit @layer ordering, then all custom
+ * stylesheet imports in dependency order (fonts before tokens,
+ * tokens before components).  Every route inherits these via the
+ * root layout's <script> import — no per-page CSS duplication.
+ * ================================================================ */
+
+@import "tailwindcss";
+
+@layer theme, base, components, utilities;
+
+/* ── Fonts (must load before tokens that reference them) ── */
+@import "../lib/styles/fonts.css";
+/* ── Design tokens ── */
+@import "../lib/styles/tokens.css";
+/* ── System utilities ── */
+@import "../lib/styles/system.css";
+/* ── Motion ── */
+@import "../lib/styles/motion.css";
+/* ── Components ── */
+@import "../lib/styles/components.css";
