@@ -97,7 +97,7 @@ fun CreditsView(
                 SupportRow(url = "https://ewancroft.uk", openUrl = ::openUrl)
                 CreditRow(title = "Ko-fi", detail = "Buy me a tea", url = "https://ko-fi.com/ewancroft", openUrl = ::openUrl)
                 CreditRow(title = "GitHub Sponsors", detail = "Sponsor development work", url = "https://github.com/sponsors/ewanc26", openUrl = ::openUrl)
-                CreditRow(title = "Source on GitHub", detail = "ewanc26/inkwell", url = "https://github.com/ewanc26/inkwell", openUrl = ::openUrl)
+                CreditRow(title = "Source on GitHub", detail = "ewanc26/inkwell-android", url = "https://github.com/ewanc26/inkwell-android", openUrl = ::openUrl)
                 CreditRow(title = "Ewan Croft", detail = "Developer — support links on ewancroft.uk", url = "https://ewancroft.uk", openUrl = ::openUrl)
 
                 Spacer(Modifier.height(24.dp))
