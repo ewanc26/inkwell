@@ -1,6 +1,14 @@
 # AltStore Source
 
-This directory contains the AltStore source JSON for distributing Inkwell via AltStore Classic (sideloading).
+This directory contains the AltStore source JSON for distributing Inkwell via **AltStore Classic** (sideloading).
+
+> **Important:** this source is **AltStore Classic only**. Inkwell is not
+> notarized by Apple, so it has no `marketplaceID`. Adding this source to
+> **AltStore PAL** fails with *"One or more apps in source 'Inkwell' are
+> missing a marketplaceID"* — PAL only installs Apple-notarized marketplace
+> apps. Users must install AltStore Classic (the original, free sideloading
+> AltStore, which needs a computer for the first install and refreshes apps
+> every 7 days), not AltStore PAL.
 
 ## Files
 
@@ -34,4 +42,13 @@ Add a new object to the `versions` array in `source.json` with the new version, 
 
 ## AltStore PAL (EU marketplace)
 
-For distribution in the EU without the 7-day refresh limit, use AltStore PAL instead. This requires a paid Apple Developer account and Apple notarization. The source JSON format is the same, but `downloadURL` points to the ADP's `manifest.json` instead of a raw `.ipa`. See the [AltStore PAL docs](https://faq.altstore.io/developers/distribute-with-altstore-pal).
+AltStore PAL requires every app to be **notarized by Apple**, which assigns a
+`marketplaceID`. Inkwell is not notarized, so a PAL source cannot be created
+without first going through Apple's notarization process (paid Apple Developer
+account, submission via App Store Connect, and hosting the resulting ADP —
+the notarized alternative distribution package). See the [AltStore PAL docs](https://faq.altstore.io/developers/distribute-with-altstore-pal).
+
+Do **not** add a `marketplaceID` to this source.json: it is a PAL-only field,
+and AltStore Classic ignores or rejects sources that include it. If notarized
+distribution is ever set up, ship it as a **separate** source URL so Classic
+users keep working.
