@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Baseline Android theme for Inkwell.
+      Uses Material Light with no action bar — the Compose UI manages its
+      own top bars and navigation. Actual colour scheme is applied at
+      runtime by ui/theme/Theme.kt's InkwellTheme composable.
+
+      The window background matches the iOS LaunchBackground colorset
+      (white in light mode) so the launch transition feels seamless.
+      The values-night override switches to paper_dark for dark mode.
+    -->
+    <style name="Theme.Inkwell" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/paper_light</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+</resources>

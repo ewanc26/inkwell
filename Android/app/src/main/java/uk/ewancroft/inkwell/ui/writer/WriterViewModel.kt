@@ -1,0 +1,216 @@
+package uk.ewancroft.inkwell.ui.writer
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
+import uk.ewancroft.inkwell.data.model.common.AtUri
+import uk.ewancroft.inkwell.data.repository.PdsRepository
+import javax.inject.Inject
+
+data class PublicationItem(
+    val uri: String,
+    val name: String,
+    val did: String
+)
+
+data class WriterUiState(
+    val publications: List<PublicationItem> = emptyList(),
+    val selectedPublication: PublicationItem? = null,
+    val selectedFormat: String = "Leaflet",
+    val title: String = "",
+    val description: String = "",
+    val markdown: String = "",
+    val isPublishing: Boolean = false,
+    val publishError: String? = null,
+    val publishSuccess: String? = null,
+    val isLoadingPublications: Boolean = false,
+    val showCreateDialog: Boolean = false,
+    val createUrl: String = "",
+    val createName: String = "",
+    val createDescription: String = "",
+    val isCreating: Boolean = false,
+    val createError: String? = null,
+)
+
+@HiltViewModel
+class WriterViewModel @Inject constructor(
+    private val pdsRepository: PdsRepository,
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(WriterUiState())
+    val uiState: StateFlow<WriterUiState> = _uiState.asStateFlow()
+
+    fun selectPublication(publication: PublicationItem) {
+        _uiState.value = _uiState.value.copy(selectedPublication = publication)
+    }
+
+    fun selectFormat(format: String) {
+        _uiState.value = _uiState.value.copy(selectedFormat = format)
+    }
+
+    fun onTitleChanged(title: String) {
+        _uiState.value = _uiState.value.copy(title = title, publishError = null, publishSuccess = null)
+    }
+
+    fun onDescriptionChanged(description: String) {
+        _uiState.value = _uiState.value.copy(description = description)
+    }
+
+    fun onMarkdownChanged(markdown: String) {
+        _uiState.value = _uiState.value.copy(markdown = markdown)
+    }
+
+    fun showCreateDialog() {
+        _uiState.value = _uiState.value.copy(
+            showCreateDialog = true,
+            createUrl = "",
+            createName = "",
+            createDescription = "",
+            createError = null,
+        )
+    }
+
+    fun dismissCreateDialog() {
+        _uiState.value = _uiState.value.copy(showCreateDialog = false)
+    }
+
+    fun onCreateUrlChanged(url: String) {
+        _uiState.value = _uiState.value.copy(createUrl = url, createError = null)
+    }
+
+    fun onCreateNameChanged(name: String) {
+        _uiState.value = _uiState.value.copy(createName = name, createError = null)
+    }
+
+    fun onCreateDescriptionChanged(description: String) {
+        _uiState.value = _uiState.value.copy(createDescription = description)
+    }
+
+    fun createPublication() {
+        val state = _uiState.value
+        if (state.createUrl.isBlank() || state.createName.isBlank()) {
+            _uiState.value = state.copy(createError = "URL and Name are required")
+            return
+        }
+
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isCreating = true, createError = null)
+            try {
+                val url = state.createUrl.trim().trimEnd('/')
+                val name = state.createName.trim()
+                val desc = state.createDescription.trim().ifBlank { null }
+
+                val result = pdsRepository.createPublication(url = url, name = name, description = desc)
+                val newUri = result["uri"]?.jsonPrimitive?.content
+                _uiState.value = _uiState.value.copy(
+                    isCreating = false,
+                    showCreateDialog = false,
+                    publishSuccess = "Publication record created. Configure its verification endpoint before publishing.",
+                )
+                loadPublications(selecting = newUri)
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isCreating = false,
+                    createError = "Failed to create publication: ${e.message}",
+                )
+            }
+        }
+    }
+
+    fun loadPublications(selecting: String? = null) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoadingPublications = true)
+            try {
+                val session = pdsRepository.getSession() ?: return@launch
+                val response = pdsRepository.listRecords(
+                    did = session.did,
+                    collection = "site.standard.publication",
+                    pdsUrl = session.pdsUrl
+                )
+                val records = response["records"]?.jsonArray.orEmpty()
+                val pubs = records.mapNotNull { record ->
+                    try {
+                        val obj = record.jsonObject
+                        val uri = obj["uri"]?.jsonPrimitive?.content ?: return@mapNotNull null
+                        val value = obj["value"]?.jsonObject ?: return@mapNotNull null
+                        val name = value["name"]?.jsonPrimitive?.content ?: "Unnamed"
+                        val parsed = AtUri.parse(uri)
+                        PublicationItem(uri, name, parsed?.did ?: session.did)
+                    } catch (_: Exception) { null }
+                }
+                _uiState.value = _uiState.value.copy(
+                    publications = pubs,
+                    selectedPublication = selecting?.let { uri ->
+                        pubs.firstOrNull { it.uri == uri }
+                    } ?: pubs.firstOrNull(),
+                    isLoadingPublications = false
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoadingPublications = false,
+                    publishError = "Failed to load publications: ${e.message}"
+                )
+            }
+        }
+    }
+
+    fun publish() {
+        val state = _uiState.value
+        val pub = state.selectedPublication ?: return
+
+        if (state.title.isBlank()) {
+            _uiState.value = state.copy(publishError = "Title is required")
+            return
+        }
+
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isPublishing = true, publishError = null, publishSuccess = null)
+            try {
+                val now = java.time.Instant.now().toString()
+
+                val content = MarkdownConverter.convert(state.markdown, state.selectedFormat)
+
+                val record = buildJsonObject {
+                    put("\$type", "site.standard.document")
+                    put("site", pub.uri)
+                    put("title", state.title.trim())
+                    put("publishedAt", now)
+                    if (state.description.isNotBlank()) {
+                        put("description", state.description.trim())
+                    }
+                    put("content", content)
+                    if (state.markdown.isNotBlank()) {
+                        put("textContent", state.markdown)
+                    }
+                }
+
+                val result = pdsRepository.createRecord(
+                    collection = "site.standard.document",
+                    record = record,
+                )
+
+                _uiState.value = _uiState.value.copy(
+                    isPublishing = false,
+                    publishSuccess = "Published: ${result["uri"]?.jsonPrimitive?.content}",
+                    title = "",
+                    description = "",
+                    markdown = ""
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isPublishing = false,
+                    publishError = "Failed to publish: ${e.message}"
+                )
+            }
+        }
+    }
+}

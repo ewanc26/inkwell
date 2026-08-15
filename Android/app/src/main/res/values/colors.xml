@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Splash / launch background matching iOS LaunchBackground colorset. -->
+    <color name="paper_light">#FAFAF5</color>
+    <color name="paper_dark">#1C1C24</color>
+
+    <!-- Brand green for status bar tinting. -->
+    <color name="inkwell_green">#139500</color>
+</resources>

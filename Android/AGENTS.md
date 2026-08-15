@@ -1,0 +1,36 @@
+# AGENTS.md
+
+Guidance for agents working on the experimental Android Inkwell client. It is a Kotlin/Compose counterpart to iOS Inkwell, but the checked-in implementation is an incomplete prototype and source behavior—not README parity claims—is authoritative.
+
+## Read First and Architecture
+
+- Read `README.md`, Gradle/version catalog files, `AndroidManifest.xml`, `docs/oauth/client-metadata.json`, and all touched Kotlin. Compare shared wire behavior with the owned iOS `../inkwell` checkout, without copying Swift lifecycle or security assumptions.
+- `data/auth` stores the OAuth session, `data/repository/PdsRepository.kt` performs public/authenticated XRPC, `data/model` defines partial Standard.site/Leaflet shapes, and `ConstellationClient` queries backlinks.
+- Hilt modules construct OAuth/network services. ViewModels own `StateFlow`; Compose screens and `NavGraph` own UI/navigation. There is no Worker or notification manager despite README claims. `data/remote/StandardSiteVerifier.kt` implements publication/document verification (see below); a JVM test source tree now exists but only covers that one file — nothing else in the app has test coverage.
+- Target facts: compile/target SDK 36, minimum SDK 26, Java/Kotlin JVM 17, release minification enabled, app ID `uk.ewancroft.inkwell`, and debug ID suffix `.debug`.
+
+## Current Capability Gaps
+
+- Writer format selection is presentation-only: `selectedFormat` is ignored and every publish writes only a `site.standard.document` with optional `textContent`. No path, content union, facets, blobs, update/edit, or revision handling is implemented.
+- The detail screen (`PostDetailScreen`/`PostDetailViewModel`) fetches the real document and renders it — Leaflet blocks via the pre-existing `LeafletBlockRenderer`, Markpub/legacy `textContent` as plain paragraphs, and a generic plaintext-leaf walk for any other/unmodelled block-array format so content isn't silently dropped. Rich-text facets (bold/links inside Leaflet text/paragraph blocks) are still not rendered. Comments and interactions (likes, reposts, replies) remain unimplemented — the screen says so explicitly rather than pretending otherwise.
+- Subscribe/unsubscribe (on publications, from Discover) and recommend/unrecommend with a live count (on documents, from the detail screen) are wired end-to-end against real `site.standard.graph.subscription`/`site.standard.graph.recommend` records and Constellation backlink counts. Compiled and internally consistent with existing patterns, but not exercised against a live PDS/Constellation instance — treat as unverified for real-world edge cases (rate limits, pagination past the 500-record cap in `listAllRecords`, concurrent toggles) until manually tested. WorkManager is neither a dependency nor implemented; `POST_NOTIFICATIONS` alone does not provide background polling.
+- Publication/document verification is implemented in `data/remote/StandardSiteVerifier.kt` (`.well-known` fetch for publications, canonical-page `<link rel="site.standard.document">` regex check for documents; mirrors iOS's `SiteStandardLexicon.Verification` failure taxonomy and endpoint construction). It's wired into `PostDetailViewModel`/`PostDetailScreen` only — the reader feed cards do not show a badge, and there's no caching, so revisiting a document re-runs both the `.well-known` fetch (when `site` is an AT-URI) and the canonical-page fetch every time. Document verification for at://-sited documents costs an extra `getRecord` round-trip to resolve the publication's `url`; this isn't batched or cached either. Don't extend verification to list views without addressing that cost first.
+- There are no JVM or instrumentation tests for the app in general. `StandardSiteVerifierTest` (added alongside the verifier) is the only unit test source in the project, including three tests that hit the real `blog.ewancroft.uk` standard.site publication over the network — they'll fail offline. `./gradlew test` otherwise executes effectively empty tasks for the rest of the codebase; never report that as behavioral coverage beyond this one file.
+
+## OAuth, Networking, and Data Rules
+
+- OAuth sessions are JSON in `EncryptedSharedPreferences` backed by a MasterKey. Keep tokens, refresh state, PKCE/DPoP material, and authorization URLs out of logs and ordinary preferences. Account for deprecated/security-crypto migration before changing storage.
+- Runtime scope and `docs/oauth/client-metadata.json` currently align on publication/document/subscription/recommend/blob access and the custom callback. The production file is hosted by another repo/site; update and verify both together.
+- The manifest accepts every URI using the custom scheme, while `MainActivity` checks `/callback`. Preserve state validation inside the OAuth library, reject unrelated/deceptive callbacks, and test cold/warm `singleTask` delivery.
+- Authentication changes do not automatically rebuild an existing Navigation Compose graph merely because `startDestination` changes. Verify post-callback and logout navigation explicitly rather than assuming recomposition redirects.
+- Use structured concurrency and `Dispatchers.IO` for synchronous OkHttp. `DiscoverViewModel.search()` currently calls `execute()` from `viewModelScope` without switching dispatchers and can block the main thread; do not repeat that pattern.
+- URL-encode every XRPC query value. Current PDS/Constellation URL strings interpolate DIDs, collections, subjects, sources, limits, and cursors manually; responses are force-unwrapped/decoded without status checks or consistent closing. Harden these boundaries before expanding them.
+- Preserve DIDs, AT URIs, CIDs, rkeys, collection NSIDs, blob refs, UTF-8 facet byte offsets, unknown open-union variants, and author-PDS resolution. The current `ContentUnion` is intentionally incomplete and would lose unmodelled formats if round-tripped.
+
+## UI and Validation
+
+- Compose state must remain lifecycle-aware and process-recreatable. Avoid writes in composition/effects, duplicate OAuth callbacks, stale concurrent feed loads, and uncancelled requests. Validate back stack, rotation, process death, deep links, and logout.
+- Preserve Material 3 semantics, adaptive light/dark theme, edge-to-edge insets, font scaling, TalkBack labels/order, keyboard/IME actions, RTL, reduced motion, and accessible error feedback. The fixed light splash currently precedes themed content; test dark mode flashes.
+- Run `./gradlew clean assembleDebug lint test` with a valid local Android SDK/JDK, then add targeted unit/instrumentation tests for changed behavior. For release-sensitive work also run `./gradlew assembleRelease` and inspect R8 output.
+- Manually test OAuth success/cancel/state/error/restore/logout; navigation after callback; malformed/expired encrypted storage; cross-PDS reads; pagination/status/network failures; actual document records; Unicode/blob/theme decoding; rotation/process death; large fonts; and TalkBack.
+- Never commit `local.properties`, `.idea/`, `.gradle/`, `app/build/`, signing material, OAuth sessions, or local `.letta/` data.

@@ -1,0 +1,29 @@
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+/app/build
+gradle/gradle-daemon-jvm.properties
+.letta/
+
+# Release signing — never commit the keystore or its credentials.
+keystore.properties
+*.keystore
+*.jks
+
+# fdroid-repo/ — self-hosted F-Droid repo workspace. Never commit the
+# repo signing key, its config (contains the keystore passwords), or the
+# release APK keystore. The generated repo/, metadata/, and README are safe.
+/fdroid-repo/config.yml
+/fdroid-repo/keystore.p12
+
+# fdroidserver workspace artifacts — regenerated on every `fdroid update`.
+/fdroid-repo/tmp/
+/fdroid-repo/archive/
+/fdroid-repo/repo/status/
