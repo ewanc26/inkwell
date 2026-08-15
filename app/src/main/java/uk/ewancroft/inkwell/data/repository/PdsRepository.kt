@@ -150,6 +150,7 @@ class PdsRepository @Inject constructor(
     private companion object {
         const val SUBSCRIPTION_COLLECTION = "site.standard.graph.subscription"
         const val RECOMMEND_COLLECTION = "site.standard.graph.recommend"
+        const val COMMENT_COLLECTION = "pub.leaflet.comment"
     }
 
     data class SubscriptionEntry(val uri: String, val rkey: String, val publicationUri: String)
@@ -214,6 +215,43 @@ class PdsRepository @Inject constructor(
 
     /** Deletes a recommend record by its record key. */
     suspend fun deleteRecommend(rkey: String) = deleteRecord(RECOMMEND_COLLECTION, rkey)
+
+    // ── Comments (pub.leaflet.comment) ─────────────────────────────────────
+
+    data class CommentEntry(val uri: String, val rkey: String, val comment: uk.ewancroft.inkwell.data.model.graph.LeafletComment)
+
+    /** Creates a `pub.leaflet.comment` record. */
+    suspend fun createComment(
+        subject: String,
+        plaintext: String,
+        replyTo: String? = null,
+        onPage: String? = null
+    ): JsonObject {
+        val record = buildJsonObject {
+            put("\$type", COMMENT_COLLECTION)
+            put("subject", subject)
+            put("plaintext", plaintext)
+            if (replyTo != null) {
+                put("reply", buildJsonObject { put("parent", replyTo) })
+            }
+            if (onPage != null) put("onPage", onPage)
+        }
+        return createRecord(COMMENT_COLLECTION, record)
+    }
+
+    /** Lists the signed-in user's own comments (paginated to completion). */
+    suspend fun fetchComments(did: String, pdsUrl: String? = null): List<CommentEntry> =
+        listAllRecords(did, COMMENT_COLLECTION, pdsUrl).mapNotNull { entry ->
+            try {
+                val commentJson = entry.value
+                val comment = json.decodeFromJsonElement(uk.ewancroft.inkwell.data.model.graph.LeafletComment.serializer(), commentJson)
+                val rkey = AtUri.parse(entry.uri)?.recordKey ?: return@mapNotNull null
+                CommentEntry(entry.uri, rkey, comment)
+            } catch (_: Exception) { null }
+        }
+
+    /** Deletes a comment record by its record key. */
+    suspend fun deleteComment(rkey: String) = deleteRecord(COMMENT_COLLECTION, rkey)
 
     // ── Pagination helper ────────────────────────────────────────────────
 
