@@ -98,6 +98,8 @@
     For privacy-related inquiries, please email
     <a href="mailto:contact@ewancroft.uk">contact@ewancroft.uk</a>
     or create an issue on the
-    <a href="https://github.com/ewanc26/inkwell">GitHub repository</a>.
+    <a href="https://github.com/ewanc26/inkwell">iOS</a> or
+    <a href="https://github.com/ewanc26/inkwell-android">Android</a> GitHub
+    repository.
   </p>
 </article>
