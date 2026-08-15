@@ -1,12 +1,18 @@
 package uk.ewancroft.inkwell.ui.reader
 
+import android.content.Intent
+import android.net.Uri
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Article
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.outlined.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -14,17 +20,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.AsyncImage
-import uk.ewancroft.inkwell.data.model.common.AtUri
 import uk.ewancroft.inkwell.data.model.common.BlobRef
 import uk.ewancroft.inkwell.data.model.common.StrongRef
 import uk.ewancroft.inkwell.data.model.content.LeafletBlock
-import uk.ewancroft.inkwell.data.model.content.LeafletContent
 import uk.ewancroft.inkwell.data.model.content.LeafletFacet
-import uk.ewancroft.inkwell.data.model.content.LeafletPage
 import uk.ewancroft.inkwell.data.model.content.ListItem as ListItemModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,9 +44,9 @@ fun LeafletBlockContent(
     modifier: Modifier = Modifier,
 ) {
     when (block.type) {
-        "pub.leaflet.blocks.text" -> TextBlock(block)
-        "pub.leaflet.blocks.header" -> HeaderBlock(block)
-        "pub.leaflet.blocks.paragraph", "pub.leaflet.blocks.blockquote" -> ParagraphBlock(block)
+        "pub.leaflet.blocks.text" -> TextBlock(block, modifier)
+        "pub.leaflet.blocks.header" -> HeaderBlock(block, modifier)
+        "pub.leaflet.blocks.paragraph", "pub.leaflet.blocks.blockquote" -> ParagraphBlock(block, modifier)
         "pub.leaflet.blocks.code" -> CodeBlock(block)
         "pub.leaflet.blocks.math" -> MathBlock(block)
         "pub.leaflet.blocks.image" -> ImageBlock(block, authorDid)
@@ -51,54 +60,181 @@ fun LeafletBlockContent(
         "pub.leaflet.blocks.button" -> ButtonBlock(block)
         "pub.leaflet.blocks.divider" -> DividerBlock()
         "pub.leaflet.blocks.page" -> PageBlock(block)
+        "pub.leaflet.blocks.postsList" -> PostsListBlock(block)
+        "pub.leaflet.blocks.signup" -> SignupBlock()
         else -> UnknownBlock(block)
     }
 }
 
+// MARK: - Facet Rendering
+
+private fun buildAnnotatedString(text: String, facets: List<LeafletFacet>?): AnnotatedString {
+    if (facets.isNullOrEmpty() || text.isEmpty()) return AnnotatedString(text)
+
+    val builder = AnnotatedString.Builder(text)
+
+    for (facet in facets) {
+        val range = byteOffsetsToCharRange(text, facet.index.byteStart, facet.index.byteEnd) ?: continue
+
+        for (feature in facet.features) {
+            when (feature.type) {
+                "pub.leaflet.richtext.facet#bold",
+                "blog.pckt.richtext.facet#bold",
+                "app.offprint.richtext.facet#bold" -> {
+                    builder.addStyle(SpanStyle(fontWeight = FontWeight.Bold), range.start, range.endInclusive + 1)
+                }
+                "pub.leaflet.richtext.facet#italic",
+                "blog.pckt.richtext.facet#italic",
+                "app.offprint.richtext.facet#italic" -> {
+                    builder.addStyle(SpanStyle(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic), range.start, range.endInclusive + 1)
+                }
+                "pub.leaflet.richtext.facet#code",
+                "blog.pckt.richtext.facet#code",
+                "app.offprint.richtext.facet#code" -> {
+                    builder.addStyle(SpanStyle(fontFamily = FontFamily.Monospace), range.start, range.endInclusive + 1)
+                }
+                "pub.leaflet.richtext.facet#strikethrough",
+                "blog.pckt.richtext.facet#strikethrough",
+                "app.offprint.richtext.facet#strikethrough" -> {
+                    builder.addStyle(SpanStyle(textDecoration = TextDecoration.LineThrough), range.start, range.endInclusive + 1)
+                }
+                "pub.leaflet.richtext.facet#link",
+                "blog.pckt.richtext.facet#link",
+                "app.offprint.richtext.facet#link" -> {
+                    feature.uri?.let { uri ->
+                        builder.addStringAnnotation(tag = "URL", annotation = uri, start = range.start, end = range.endInclusive + 1)
+                    }
+                }
+            }
+        }
+    }
+
+    return builder.toAnnotatedString()
+}
+
+private fun byteOffsetsToCharRange(text: String, byteStart: Int, byteEnd: Int): IntRange? {
+    if (byteEnd <= byteStart || byteStart < 0) return null
+
+    var startChar = -1
+    var endChar = -1
+    var bytePos = 0
+
+    for (i in text.indices) {
+        val c = text[i]
+        val charBytes = when {
+            c.code < 0x80 -> 1
+            c.code < 0x800 -> 2
+            c.code < 0xD800 || c.code > 0xDFFF -> 3
+            else -> 4
+        }
+
+        if (startChar == -1 && bytePos + charBytes > byteStart) {
+            startChar = i
+        }
+        if (endChar == -1 && bytePos + charBytes > byteEnd) {
+            endChar = i
+        }
+
+        bytePos += charBytes
+        if (startChar != -1 && endChar != -1) break
+    }
+
+    if (startChar == -1) startChar = text.length
+    if (endChar == -1) endChar = text.length
+    if (bytePos < byteEnd) endChar = text.length
+
+    if (startChar >= endChar) return null
+    return startChar..endChar
+}
+
 @Composable
-fun TextBlock(block: LeafletBlock) {
-    Text(
-        block.plaintext ?: "",
+private fun FacetedText(
+    text: String,
+    facets: List<LeafletFacet>?,
+    style: TextStyle = MaterialTheme.typography.bodyLarge,
+    modifier: Modifier = Modifier,
+    onLinkClick: ((String, android.content.Context) -> Unit)? = null,
+    maxLines: Int = Int.MAX_VALUE,
+) {
+    val annotated = buildAnnotatedString(text, facets)
+    val hasLinks = annotated.getStringAnnotations("URL", 0, annotated.length).isNotEmpty()
+    val context = androidx.compose.ui.platform.LocalContext.current
+
+    if (hasLinks && onLinkClick != null) {
+        androidx.compose.foundation.text.ClickableText(
+            text = annotated,
+            style = style,
+            modifier = modifier,
+            onClick = { offset ->
+                val links = annotated.getStringAnnotations("URL", 0, annotated.length)
+                links.firstOrNull { offset >= it.start && offset < it.end }
+                    ?.let { onLinkClick(it.item, context) }
+            }
+        )
+    } else {
+        Text(
+            text = annotated,
+            style = style,
+            modifier = modifier,
+            maxLines = maxLines,
+            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+        )
+    }
+}
+
+// MARK: - Block Renderers
+
+@Composable
+fun TextBlock(block: LeafletBlock, modifier: Modifier = Modifier) {
+    FacetedText(
+        text = block.plaintext ?: "",
+        facets = block.facets,
         style = MaterialTheme.typography.bodyLarge,
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
+        onLinkClick = { url, ctx -> openUrl(ctx, url) }
     )
 }
 
 @Composable
-fun HeaderBlock(block: LeafletBlock) {
+fun HeaderBlock(block: LeafletBlock, modifier: Modifier = Modifier) {
     val level = when (block.level) {
         1 -> MaterialTheme.typography.headlineSmall
         2 -> MaterialTheme.typography.headlineSmall
         3 -> MaterialTheme.typography.titleMedium
         else -> MaterialTheme.typography.titleLarge
     }
-    Text(
-        block.plaintext ?: "",
+    FacetedText(
+        text = block.plaintext ?: "",
+        facets = block.facets,
         style = level,
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
+        onLinkClick = { url, ctx -> openUrl(ctx, url) }
     )
 }
 
 @Composable
-fun ParagraphBlock(block: LeafletBlock) {
+fun ParagraphBlock(block: LeafletBlock, modifier: Modifier = Modifier) {
     if (block.type == "pub.leaflet.blocks.blockquote") {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
                 Modifier.width(4.dp).height(40.dp).background(MaterialTheme.colorScheme.primary)
             )
             Spacer(Modifier.width(8.dp))
-            Text(
-                block.plaintext ?: "",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.fillMaxWidth()
+            FacetedText(
+                text = block.plaintext ?: "",
+                facets = block.facets,
+                style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+                modifier = Modifier.fillMaxWidth(),
+                onLinkClick = { url, ctx -> openUrl(ctx, url) }
             )
         }
     } else {
-        Text(
-            block.plaintext ?: "",
+        FacetedText(
+            text = block.plaintext ?: "",
+            facets = block.facets,
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.fillMaxWidth()
+            modifier = modifier.fillMaxWidth(),
+            onLinkClick = { url, ctx -> openUrl(ctx, url) }
         )
     }
 }
@@ -300,31 +436,51 @@ fun WebsiteEmbedBlock(block: LeafletBlock) {
 
 @Composable
 fun IframeEmbedBlock(block: LeafletBlock) {
+    val url = block.url ?: return
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
-        Column(Modifier.padding(12.dp)) {
-            Text(
-                "IFrame Embed: ${block.url}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
+        AndroidView(
+            factory = { context ->
+                WebView(context).apply {
+                    webViewClient = WebViewClient()
+                    settings.javaScriptEnabled = true
+                    loadUrl(url)
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(block.height?.dp ?: 300.dp)
+        )
     }
 }
 
 @Composable
 fun ButtonBlock(block: LeafletBlock) {
-    Button(
-        onClick = { /* TODO: Handle button click */ },
-        modifier = Modifier.fillMaxWidth(),
-        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-    ) {
-        Text(
-            block.text ?: "",
-            color = MaterialTheme.colorScheme.onPrimary
-        )
+    val url = block.url
+    val text = block.text ?: ""
+    val context = androidx.compose.ui.platform.LocalContext.current
+    if (url != null) {
+        OutlinedButton(
+            onClick = {
+                try {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                    context.startActivity(intent)
+                } catch (_: Exception) {}
+            },
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(text, color = MaterialTheme.colorScheme.primary)
+        }
+    } else {
+        Button(
+            onClick = { /* no-op without URL */ },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+        ) {
+            Text(text, color = MaterialTheme.colorScheme.onPrimary)
+        }
     }
 }
 
@@ -359,6 +515,56 @@ fun PageBlock(block: LeafletBlock) {
 }
 
 @Composable
+fun PostsListBlock(block: LeafletBlock) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+    ) {
+        Column(Modifier.padding(12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.AutoMirrored.Outlined.ViewList, contentDescription = null, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(8.dp))
+                Text("Posts", style = MaterialTheme.typography.labelMedium)
+            }
+            if (!block.websiteTitle.isNullOrBlank()) {
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    block.websiteTitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            if (block.websiteDescription != null) {
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    block.websiteDescription,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Spacer(Modifier.height(8.dp))
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                val tags = block.websiteTitle?.split(",")?.map { it.trim() } ?: emptyList()
+                if (tags.isEmpty()) {
+                    item {
+                        AssistChip(onClick = {}, label = { Text("All posts") }, enabled = false)
+                    }
+                } else {
+                    items(tags) { tag ->
+                        AssistChip(onClick = {}, label = { Text(tag) }, enabled = false)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SignupBlock() {
+    Spacer(modifier = Modifier.height(8.dp))
+}
+
+@Composable
 fun UnknownBlock(block: LeafletBlock) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -372,4 +578,11 @@ fun UnknownBlock(block: LeafletBlock) {
             )
         }
     }
+}
+
+private fun openUrl(context: android.content.Context, url: String) {
+    try {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        context.startActivity(intent)
+    } catch (_: Exception) {}
 }

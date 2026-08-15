@@ -115,7 +115,7 @@ class ReaderViewModel @Inject constructor(
             }
 
             _uiState.value = _uiState.value.copy(
-                followingPosts = posts,
+                followingPosts = posts.distinctBy { it.uri },
                 isLoadingFollowing = false
             )
         } catch (e: Exception) {

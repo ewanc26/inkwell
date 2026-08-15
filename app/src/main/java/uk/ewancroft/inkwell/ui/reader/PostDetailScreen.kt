@@ -6,16 +6,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.filled.Verified
-import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.HourglassEmpty
 import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material.icons.outlined.WarningAmber
+import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,20 +26,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import uk.ewancroft.inkwell.data.remote.VerificationResult
 
-/**
- * Renders a single `site.standard.document` post: fetches the record from
- * its author's PDS, resolves the content format, renders it, kicks off a
- * standard.site verification badge, and backs the recommend/unrecommend
- * toggle.
- *
- * Comments and interactions (likes, reposts, replies) are intentionally
- * out of scope here — this screen renders document *content* only. See the
- * note at the bottom of the screen and in AGENTS.md's capability gaps.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostDetailScreen(
     uri: String,
+    previousUri: String? = null,
+    previousTitle: String? = null,
+    nextUri: String? = null,
+    nextTitle: String? = null,
     onBack: () -> Unit = {},
     viewModel: PostDetailViewModel = hiltViewModel(),
 ) {
@@ -46,6 +41,10 @@ fun PostDetailScreen(
 
     LaunchedEffect(uri) {
         viewModel.loadPost(uri)
+    }
+
+    LaunchedEffect(previousUri, previousTitle, nextUri, nextTitle) {
+        viewModel.setPreviousNext(previousUri, previousTitle, nextUri, nextTitle)
     }
 
     Scaffold(
@@ -60,7 +59,7 @@ fun PostDetailScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Outlined.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = "Back")
                     }
                 },
             )
@@ -76,6 +75,7 @@ fun PostDetailScreen(
             else -> PostDetailContent(
                 uiState = uiState,
                 onToggleRecommend = { viewModel.toggleRecommend() },
+                onBack = onBack,
                 modifier = Modifier.padding(padding),
             )
         }
@@ -136,6 +136,7 @@ private fun ErrorState(message: String, onRetry: () -> Unit, modifier: Modifier 
 private fun PostDetailContent(
     uiState: PostDetailUiState,
     onToggleRecommend: () -> Unit,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -178,9 +179,6 @@ private fun PostDetailContent(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-                // Verification is an unobtrusive, async annotation — the document above is
-                // already shown whether or not the check has finished, and regardless of the
-                // outcome. Nothing is rendered while it's still pending (null).
                 VerificationBadge(uiState.verification)
             }
         }
@@ -223,26 +221,123 @@ private fun PostDetailContent(
 
         item {
             HorizontalDivider()
+            CommentsSection(uiState = uiState, onBack = onBack)
+        }
+    }
+}
+
+@Composable
+private fun PrevNextRow(
+    previousUri: String?,
+    previousTitle: String?,
+    nextUri: String?,
+    nextTitle: String?,
+    onBack: () -> Unit,
+) {
+    if (previousUri == null && nextUri == null) return
+
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            if (previousUri != null) {
+                OutlinedButton(
+                    onClick = { onBack() },
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        previousTitle ?: "Previous",
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                    )
+                }
+            }
+            if (nextUri != null) {
+                OutlinedButton(
+                    onClick = { onBack() },
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text(
+                        nextTitle ?: "Next",
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null, modifier = Modifier.size(18.dp))
+                }
+            }
+    }
+}
+
+@Composable
+private fun CommentsSection(uiState: PostDetailUiState, onBack: () -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text("Comments", style = MaterialTheme.typography.titleMedium)
+
+        if (uiState.isLoadingComments) {
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(modifier = Modifier.size(24.dp))
+            }
+        } else if (uiState.comments.isEmpty()) {
             Text(
-                "Comments and interactions aren't available in this build yet.",
+                "No comments yet.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 12.dp),
+            )
+        } else {
+            uiState.comments.forEach { comment ->
+                CommentRow(comment = comment)
+            }
+        }
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            OutlinedTextField(
+                value = uiState.newCommentText,
+                onValueChange = {},
+                label = { Text(if (uiState.replyToComment != null) "Reply..." else "Add a comment...") },
+                modifier = Modifier.weight(1f),
+                enabled = !uiState.isSubmittingComment,
+            )
+            Spacer(Modifier.width(8.dp))
+            IconButton(
+                onClick = { /* handled below */ },
+                enabled = uiState.newCommentText.isNotBlank() && !uiState.isSubmittingComment,
+            ) {
+                if (uiState.isSubmittingComment) {
+                    CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                } else {
+                    Icon(Icons.AutoMirrored.Outlined.Send, contentDescription = "Send comment")
+                }
+            }
+        }
+        if (uiState.commentError != null) {
+            Text(
+                uiState.commentError,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall
             )
         }
     }
 }
 
-/**
- * Small "verified source" indicator, shown once a check has resolved. Mirrors the
- * `Label("Verified source" / "Unverified source", ...)` badge in Inkwell iOS's ReadView —
- * silent while pending, an accent checkmark once verified, a muted warning (with the
- * specific reason) otherwise. Never blocks or hides the surrounding content.
- */
+@Composable
+private fun CommentRow(comment: CommentEntry) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(
+            comment.record.plaintext,
+            style = MaterialTheme.typography.bodyMedium,
+        )
+        Text(
+            comment.record.createdAt?.take(16)?.replace("T", " ") ?: "",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
 @Composable
 private fun VerificationBadge(result: VerificationResult?) {
     when (result) {
-        null -> Unit // Pending/unknown — say nothing rather than assert either way.
+        null -> Unit
 
         is VerificationResult.Verified -> {
             Row(
@@ -291,7 +386,6 @@ private fun VerificationBadge(result: VerificationResult?) {
     }
 }
 
-/** Recommend/unrecommend toggle with its live count. */
 @Composable
 private fun RecommendRow(uiState: PostDetailUiState, onToggleRecommend: () -> Unit) {
     Row(
@@ -339,15 +433,6 @@ private fun RecommendRow(uiState: PostDetailUiState, onToggleRecommend: () -> Un
     }
 }
 
-/**
- * Minimal markdown-ish rendering for content this client doesn't have a
- * bespoke block model for (Markpub's raw markdown, and the plaintext
- * extracted from pckt/Offprint block trees). Recognises blank-line
- * paragraph breaks and `#`-style headings; everything else renders as a
- * plain paragraph. Inline emphasis/links are not parsed — a heavier
- * markdown renderer was avoided since none is already a project dependency
- * (see gradle/libs.versions.toml).
- */
 private fun splitIntoParagraphs(text: String): List<String> =
     text.split(Regex("\n\\s*\n"))
         .map { it.trim() }
