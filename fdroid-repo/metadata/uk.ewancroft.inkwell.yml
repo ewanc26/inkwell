@@ -1,0 +1,55 @@
+Categories:
+  - Internet
+  - Reading
+License: AGPL-3.0-only
+AuthorName: Ewan Croft
+AuthorWebSite: https://ewancroft.uk
+WebSite: https://inkwell.ewancroft.uk
+SourceCode: https://github.com/ewanc26/inkwell-android
+IssueTracker: https://github.com/ewanc26/inkwell-android/issues
+Changelog: https://github.com/ewanc26/inkwell-android/releases
+
+Summary: AT Protocol reader and writer for Standard.site
+
+Description: |-
+  Inkwell is a native reader and writer for the Standard.site publishing
+  ecosystem on AT Protocol.
+
+  This is an experimental Android companion to Inkwell for iOS, the primary
+  client. It is a work in progress toward feature parity, so expect rough
+  edges.
+
+  Read site.standard.publication and site.standard.document records directly
+  from the author's PDS. Renders Leaflet block content, Markpub/plain text,
+  and other formats generically so nothing is silently dropped. Resolves
+  display themes from Leaflet's rich palette through basicTheme to Material 3
+  defaults. Comments and interactions aren't shown yet.
+
+  Discover publications via the cross-platform public index, then fetches
+  authoritative records from the author. Subscribe to publications and
+  recommend documents, with live recommend counts from Constellation
+  (microcosm.blue). Paginated feed with previous/next navigation.
+
+  Write and publish site.standard.document records with portable metadata.
+  Content format selection is presentation-only for now; every publish
+  currently writes plain text content regardless of the selected format.
+
+  Verifies publications and documents against their claimed domain via
+  Standard.site's .well-known and link-tag checks, shown as a badge on the
+  post detail screen.
+
+  Authentication is OAuth-based with your AT Protocol handle — no app
+  password required. Silent session restoration on relaunch.
+
+  Inkwell is free, with no ads, tracking, or in-app purchases. All code is
+  AGPL-3.0.
+
+# This is a self-hosted repo distributing pre-built signed APKs directly
+# (dropped into repo/ and indexed with `fdroid update`), not a
+# build-from-source recipe for the official fdroiddata infrastructure.
+# See ../fdroid/uk.ewancroft.inkwell.yml in the app repo for that separate,
+# still-pending submission.
+AutoUpdateMode: None
+UpdateCheckMode: None
+CurrentVersion: '1.0.0'
+CurrentVersionCode: 1

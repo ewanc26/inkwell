@@ -16,3 +16,9 @@ gradle/gradle-daemon-jvm.properties
 keystore.properties
 *.keystore
 *.jks
+
+# fdroid-repo/ — self-hosted F-Droid repo workspace. Never commit the
+# repo signing key, its config (contains the keystore passwords), or the
+# release APK keystore. The generated repo/, metadata/, and README are safe.
+/fdroid-repo/config.yml
+/fdroid-repo/keystore.p12
