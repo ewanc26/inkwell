@@ -1,0 +1,29 @@
+Categories:
+  - Internet
+  - Reading
+License: AGPL-3.0-only
+AuthorName: Ewan Croft
+AuthorWebSite: https://ewancroft.uk
+WebSite: https://inkwell.ewancroft.uk
+SourceCode: https://github.com/ewanc26/inkwell-android
+IssueTracker: https://github.com/ewanc26/inkwell-android/issues
+Changelog: https://github.com/ewanc26/inkwell-android/releases
+
+RepoType: git
+Repo: https://github.com/ewanc26/inkwell-android.git
+
+Builds:
+  # NOTE: tag v1.0.1 does not exist yet — it must be created and pushed
+  # (matching app/build.gradle.kts versionName) before this build entry
+  # is valid. See fdroid/README.md Prerequisites.
+  - versionName: '1.0.1'
+    versionCode: 2
+    commit: v1.0.1
+    subdir: app
+    gradle:
+      - yes
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+CurrentVersion: '1.0.1'
+CurrentVersionCode: 2

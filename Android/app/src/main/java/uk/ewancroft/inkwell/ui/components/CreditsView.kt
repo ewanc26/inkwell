@@ -1,0 +1,217 @@
+package uk.ewancroft.inkwell.ui.components
+
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+
+@Composable
+fun CreditsView(
+    appVersion: String,
+    onSignOut: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val context = LocalContext.current
+
+    fun openUrl(url: String) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        context.startActivity(intent)
+    }
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+    ) {
+        Surface(
+            modifier = Modifier.fillMaxSize().padding(top = 32.dp),
+            shape = MaterialTheme.shapes.extraLarge,
+            tonalElevation = 6.dp,
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                InkwellMark(
+                    modifier = Modifier.height(56.dp),
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Spacer(Modifier.height(12.dp))
+                Text("Inkwell", style = MaterialTheme.typography.titleLarge)
+                Text(
+                    appVersion,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
+                Spacer(Modifier.height(24.dp))
+                HorizontalDivider()
+                Spacer(Modifier.height(16.dp))
+
+                // About
+                SectionHeader("About")
+                Text(
+                    "A native reader and writer for the Standard.site publishing ecosystem on AT Protocol — read, discover, and publish portable writing from your own PDS.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
+                Spacer(Modifier.height(24.dp))
+                HorizontalDivider()
+                Spacer(Modifier.height(16.dp))
+
+                // Built On
+                SectionHeader("Built On")
+                CreditRow(title = "atproto-kotlin", detail = "AT Protocol SDK + OAuth 2.1 by kikin81", url = "https://github.com/kikin81/atproto-kotlin", openUrl = ::openUrl)
+                CreditRow(title = "Standard.site", detail = "The publishing protocol Inkwell reads and writes", url = "https://standard.site", openUrl = ::openUrl)
+                CreditRow(title = "pub search", detail = "Cross-platform Standard.site search index", url = "https://leaflet-search-backend.fly.dev", openUrl = ::openUrl)
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    "Inkwell reads and writes Leaflet, Markpub, pckt, and Offprint content alongside the shared site.standard.* records.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
+                Spacer(Modifier.height(24.dp))
+                HorizontalDivider()
+                Spacer(Modifier.height(16.dp))
+
+                // Support
+                SectionHeader("Support")
+                SupportRow(url = "https://ewancroft.uk", openUrl = ::openUrl)
+                CreditRow(title = "Ko-fi", detail = "Buy me a tea", url = "https://ko-fi.com/ewancroft", openUrl = ::openUrl)
+                CreditRow(title = "GitHub Sponsors", detail = "Sponsor development work", url = "https://github.com/sponsors/ewanc26", openUrl = ::openUrl)
+                CreditRow(title = "Source on GitHub", detail = "ewanc26/inkwell-android", url = "https://github.com/ewanc26/inkwell-android", openUrl = ::openUrl)
+                CreditRow(title = "Ewan Croft", detail = "Developer — support links on ewancroft.uk", url = "https://ewancroft.uk", openUrl = ::openUrl)
+
+                Spacer(Modifier.height(24.dp))
+                HorizontalDivider()
+                Spacer(Modifier.height(16.dp))
+
+                // Legal
+                SectionHeader("Legal")
+                Text(
+                    "Privacy Policy",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.fillMaxWidth().clickable { openUrl("https://inkwell.ewancroft.uk/privacy") },
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    "Terms of Service",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.fillMaxWidth().clickable { openUrl("https://inkwell.ewancroft.uk/terms") },
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    "AGPL 3.0 License",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+
+                Spacer(Modifier.height(24.dp))
+                HorizontalDivider()
+                Spacer(Modifier.height(16.dp))
+
+                // Sign Out
+                TextButton(
+                    onClick = {
+                        onDismiss()
+                        onSignOut()
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null, Modifier.size(18.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text("Sign Out")
+                }
+
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    "Inkwell for iOS is also available on GitHub.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
+                Spacer(Modifier.height(24.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun SectionHeader(text: String) {
+    Text(
+        text,
+        style = MaterialTheme.typography.titleSmall,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier.fillMaxWidth(),
+    )
+    Spacer(Modifier.height(8.dp))
+}
+
+@Composable
+private fun CreditRow(title: String, detail: String, url: String, openUrl: (String) -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth().clickable { openUrl(url) }.padding(vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.bodyMedium)
+            Text(
+                detail,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Icon(
+            Icons.AutoMirrored.Filled.OpenInNew,
+            contentDescription = null,
+            Modifier.size(16.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+@Composable
+private fun SupportRow(url: String, openUrl: (String) -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth().clickable { openUrl(url) }.padding(vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            Icons.Filled.Favorite,
+            contentDescription = null,
+            Modifier.size(18.dp),
+            tint = MaterialTheme.colorScheme.error,
+        )
+        Spacer(Modifier.width(8.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text("Support Inkwell", style = MaterialTheme.typography.bodyMedium)
+        }
+        Icon(
+            Icons.AutoMirrored.Filled.OpenInNew,
+            contentDescription = null,
+            Modifier.size(16.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}

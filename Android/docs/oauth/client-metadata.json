@@ -1,0 +1,12 @@
+{
+  "client_id": "https://inkwell.ewancroft.uk/client-metadata.json",
+  "client_name": "Inkwell",
+  "client_uri": "https://inkwell.ewancroft.uk",
+  "application_type": "native",
+  "redirect_uris": ["uk.ewancroft.inkwell:/callback"],
+  "scope": "atproto blob:*/* repo:site.standard.publication repo:site.standard.document repo:site.standard.graph.subscription repo:site.standard.graph.recommend",
+  "grant_types": ["authorization_code", "refresh_token"],
+  "dpop_bound_access_tokens": true,
+  "token_endpoint_auth_method": "none",
+  "response_types": ["code"]
+}

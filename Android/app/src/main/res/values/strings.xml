@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Application display name shown in the launcher and title bar. -->
+    <string name="app_name">Inkwell</string>
+</resources>
