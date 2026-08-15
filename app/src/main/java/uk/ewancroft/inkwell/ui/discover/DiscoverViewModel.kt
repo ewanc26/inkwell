@@ -63,7 +63,7 @@ class DiscoverViewModel @Inject constructor(
             try {
                 val url = "https://leaflet-search-backend.fly.dev/search?q=${
                     java.net.URLEncoder.encode(query, "UTF-8")
-                }"
+                }&mode=keyword&limit=40&format=v2"
                 val body = withContext(Dispatchers.IO) {
                     val request = Request.Builder().url(url).get().build()
                     client.newCall(request).execute().use { it.body!!.string() }
