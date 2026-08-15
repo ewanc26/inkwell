@@ -26,7 +26,7 @@ import uk.ewancroft.inkwell.ui.components.InkwellMark
 @Composable
 fun ReaderScreen(
     viewModel: ReaderViewModel = hiltViewModel(),
-    onNavigateToPost: (String) -> Unit = {},
+    onNavigateToPost: (String, String?, String?, String?, String?) -> Unit = { _, _, _, _, _ -> },
     onSignOut: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -46,7 +46,6 @@ fun ReaderScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    // InkwellMark as the brand header — mirrors iOS's nav title.
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -95,14 +94,30 @@ fun ReaderScreen(
                     isLoading = uiState.isLoadingFollowing,
                     feedType = "following",
                     onRefresh = { viewModel.loadData() },
-                    onPostClick = onNavigateToPost,
+                    onPostClick = { index, post ->
+                        val prev = if (index > 0) uiState.followingPosts[index - 1] else null
+                        val next = if (index < uiState.followingPosts.lastIndex) uiState.followingPosts[index + 1] else null
+                        onNavigateToPost(
+                            post.uri,
+                            prev?.uri, prev?.title,
+                            next?.uri, next?.title
+                        )
+                    },
                 )
                 1 -> FeedContent(
                     posts = uiState.yoursPosts,
                     isLoading = uiState.isLoadingYours,
                     feedType = "yours",
                     onRefresh = { viewModel.loadData() },
-                    onPostClick = onNavigateToPost,
+                    onPostClick = { index, post ->
+                        val prev = if (index > 0) uiState.yoursPosts[index - 1] else null
+                        val next = if (index < uiState.yoursPosts.lastIndex) uiState.yoursPosts[index + 1] else null
+                        onNavigateToPost(
+                            post.uri,
+                            prev?.uri, prev?.title,
+                            next?.uri, next?.title
+                        )
+                    },
                 )
             }
         }
@@ -136,7 +151,7 @@ private fun FeedContent(
     isLoading: Boolean,
     feedType: String,
     onRefresh: () -> Unit,
-    onPostClick: (String) -> Unit = {},
+    onPostClick: (Int, PostItem) -> Unit = { _, _ -> },
 ) {
     if (isLoading && posts.isEmpty()) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -170,6 +185,7 @@ private fun FeedContent(
             verticalArrangement = Arrangement.spacedBy(18.dp),
         ) {
             items(posts, key = { it.uri }) { post ->
+                val index = posts.indexOf(post)
                 PostCard(
                     title = post.title,
                     description = post.description,
@@ -178,7 +194,7 @@ private fun FeedContent(
                     coverUrl = post.coverUrl,
                     authorDisplayName = post.authorDisplayName,
                     authorAvatar = post.authorAvatar,
-                    onClick = { onPostClick(post.uri) },
+                    onClick = { onPostClick(index, post) },
                 )
             }
         }
@@ -278,5 +294,3 @@ fun PostCard(
         }
     }
 }
-// PostDetailScreen (content rendering, verification badge, recommend toggle) lives in
-// PostDetailScreen.kt — this file owns the feed/tabs only.

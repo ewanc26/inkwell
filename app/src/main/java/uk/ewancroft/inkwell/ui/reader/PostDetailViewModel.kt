@@ -21,6 +21,8 @@ import uk.ewancroft.inkwell.data.model.atproto.PublicationRecord
 import uk.ewancroft.inkwell.data.model.common.AtUri
 import uk.ewancroft.inkwell.data.model.content.LeafletContent
 import uk.ewancroft.inkwell.data.model.content.LeafletPage
+import uk.ewancroft.inkwell.data.model.graph.LeafletComment
+import uk.ewancroft.inkwell.data.model.bluesky.ConstellationBacklink
 import uk.ewancroft.inkwell.data.remote.ConstellationClient
 import uk.ewancroft.inkwell.data.remote.StandardSiteVerifier
 import uk.ewancroft.inkwell.data.remote.VerificationFailure
@@ -28,16 +30,6 @@ import uk.ewancroft.inkwell.data.remote.VerificationResult
 import uk.ewancroft.inkwell.data.repository.PdsRepository
 import javax.inject.Inject
 
-/**
- * A `site.standard.document` record's `content` union, normalised into
- * something the UI can render without knowing every possible format.
- *
- * Known formats get first-class rendering (Leaflet). Formats this client
- * doesn't model yet (Markpub, pckt, Offprint) degrade to a best-effort
- * plaintext extraction rather than being dropped — see AGENTS.md's note
- * that `ContentUnion` is intentionally incomplete and must not silently
- * lose unmodelled variants.
- */
 sealed class DocumentContent {
     data class Leaflet(val pages: List<LeafletPage>, val authorDid: String) : DocumentContent()
     data class PlainText(val text: String) : DocumentContent()
@@ -45,14 +37,7 @@ sealed class DocumentContent {
     data class Unsupported(val formatType: String?) : DocumentContent()
 }
 
-/**
- * Combined UI state for [PostDetailScreen]: the document itself (content,
- * metadata, load state), its standard.site verification badge, and the
- * signed-in user's recommend/unrecommend state — all keyed off the same
- * [uri] since they describe one post.
- */
 data class PostDetailUiState(
-    // Document content + metadata.
     val uri: String = "",
     val isLoading: Boolean = true,
     val loadError: String? = null,
@@ -63,12 +48,8 @@ data class PostDetailUiState(
     val coverUrl: String? = null,
     val content: DocumentContent = DocumentContent.Empty,
 
-    // standard.site verification badge. Null while pending/unknown — the
-    // document is shown regardless, since verification is an unobtrusive
-    // annotation, not a gate on reading.
     val verification: VerificationResult? = null,
 
-    // Recommend/unrecommend toggle + count.
     val isRecommended: Boolean = false,
     val recommendRkey: String? = null,
     val recommendCount: Int = 0,
@@ -76,22 +57,20 @@ data class PostDetailUiState(
     val hasLoadedRecommendState: Boolean = false,
     val isTogglingRecommend: Boolean = false,
     val recommendError: String? = null,
+
+    val comments: List<CommentEntry> = emptyList(),
+    val newCommentText: String = "",
+    val isSubmittingComment: Boolean = false,
+    val isLoadingComments: Boolean = false,
+    val replyToComment: CommentEntry? = null,
+    val commentError: String? = null,
+
+    val previousUri: String? = null,
+    val previousTitle: String? = null,
+    val nextUri: String? = null,
+    val nextTitle: String? = null,
 )
 
-/**
- * Backs [PostDetailScreen]: fetches a single `site.standard.document` record
- * and renders its content, kicks off standard.site verification against the
- * domain it claims (never blocking the screen on the result), and backs the
- * recommend/unrecommend toggle with its live count.
- *
- * The signed-in user's own recommend state is checked against their local
- * repo (``PdsRepository.fetchRecommends``); the global count comes from the
- * Constellation backlink index (``ConstellationClient.getRecommendCount``)
- * since recommends from other users live in their own repos and are only
- * discoverable through the network-wide index. Mirrors Inkwell iOS
- * LoginStateManager.createRecommend/fetchRecommends/fetchRecommendCount/
- * deleteRecommend and ReadView's verification badge.
- */
 @HiltViewModel
 class PostDetailViewModel @Inject constructor(
     private val pdsRepository: PdsRepository,
@@ -103,21 +82,14 @@ class PostDetailViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(PostDetailUiState())
     val uiState: StateFlow<PostDetailUiState> = _uiState.asStateFlow()
 
-    /** Tracks which URI is currently loaded/loading so repeated calls for the
-     * same URI (e.g. recomposition) don't re-trigger a fetch. */
     private var loadedUri: String? = null
 
-    /** Loads a post's document content, verification, and recommend state. Safe to call
-     * repeatedly (e.g. on recomposition) — only re-fetches when [uri] changes, the
-     * previous load errored, or [forceRefresh] is set. */
     fun loadPost(uri: String, forceRefresh: Boolean = false) {
         val current = _uiState.value
         if (!forceRefresh && loadedUri == uri && current.loadError == null) return
         loadedUri = uri
 
         _uiState.value = if (current.uri == uri) {
-            // Retrying the same post: keep whatever recommend state already loaded
-            // rather than throwing it away along with the failed document fetch.
             current.copy(isLoading = true, loadError = null, verification = null)
         } else {
             PostDetailUiState(uri = uri, isLoading = true)
@@ -125,6 +97,16 @@ class PostDetailViewModel @Inject constructor(
 
         loadDocument(uri)
         loadRecommendState(uri)
+        loadComments(uri)
+    }
+
+    fun setPreviousNext(previousUri: String?, previousTitle: String?, nextUri: String?, nextTitle: String?) {
+        _uiState.value = _uiState.value.copy(
+            previousUri = previousUri,
+            previousTitle = previousTitle,
+            nextUri = nextUri,
+            nextTitle = nextTitle,
+        )
     }
 
     private fun loadDocument(uri: String) {
@@ -133,8 +115,6 @@ class PostDetailViewModel @Inject constructor(
                 val parsed = AtUri.parse(uri)
                     ?: throw IllegalArgumentException("Malformed post link.")
 
-                // PdsRepository.getRecord already resolves the author's PDS
-                // from the DID and performs the fetch on Dispatchers.IO.
                 val record = pdsRepository.getRecord(uri)
                 val value = record["value"]?.jsonObject
                     ?: throw IllegalStateException("This post's record could not be read.")
@@ -151,8 +131,6 @@ class PostDetailViewModel @Inject constructor(
                 val contentObj = value["content"]?.jsonObject
                 val docContent = parseContent(contentObj, textContent, parsed.did)
 
-                // Guard against a stale response landing after the user navigated to a
-                // different post.
                 if (_uiState.value.uri != uri) return@launch
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
@@ -178,13 +156,6 @@ class PostDetailViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Runs standard.site verification for the document against the domain it claims, and
-     * records the outcome once it resolves. Deliberately only invoked from here — the
-     * post detail screen — and never from the feed, so scrolling a list of cards doesn't
-     * trigger a `.well-known` fetch (and, when `site` is an AT-URI, an extra `getRecord`
-     * to resolve the publication) per card.
-     */
     private suspend fun verify(
         documentURI: String,
         site: String,
@@ -212,10 +183,6 @@ class PostDetailViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(verification = result)
     }
 
-    /** Resolves the publication a document belongs to, when `site` is an AT-URI rather
-     * than a direct URL. Best-effort: any failure here surfaces as a verification failure
-     * downstream (an unresolvable publication means the document's canonical URL — and
-     * thus its verification — can't be established), not a crash. */
     private suspend fun resolvePublication(site: String): PublicationRecord? {
         if (!site.startsWith("at://")) return null
         val publicationJson = pdsRepository.getRecord(site)
@@ -225,13 +192,10 @@ class PostDetailViewModel @Inject constructor(
         return PublicationRecord(url = url, name = name)
     }
 
-    /** Loads recommend state + count for [documentUri]. Safe to call repeatedly (e.g. on
-     * recomposition) — only re-fetches if it hasn't already loaded/started loading for
-     * this document. */
     private fun loadRecommendState(documentUri: String) {
         val current = _uiState.value
         if (current.uri == documentUri && (current.isLoadingRecommendState || current.hasLoadedRecommendState)) {
-            return // already loaded (or loading) for this document
+            return
         }
         _uiState.value = _uiState.value.copy(isLoadingRecommendState = true)
 
@@ -254,7 +218,6 @@ class PostDetailViewModel @Inject constructor(
             }
 
             val count = countDeferred.await()
-            // Guard against a stale response landing after the user navigated to a different post.
             if (_uiState.value.uri != documentUri) return@launch
             _uiState.value = _uiState.value.copy(
                 recommendCount = count,
@@ -266,7 +229,6 @@ class PostDetailViewModel @Inject constructor(
         }
     }
 
-    /** Toggles the signed-in user's recommendation of the currently loaded document. */
     fun toggleRecommend() {
         val state = _uiState.value
         if (state.isTogglingRecommend || state.uri.isBlank()) return
@@ -308,12 +270,6 @@ class PostDetailViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(recommendError = null)
     }
 
-    /**
-     * Resolves the record's `content` union to something renderable.
-     * Unrecognised or partially-malformed content never throws here — the
-     * worst case is falling back to plaintext extraction or an explicit
-     * "unsupported" state, never a crash on untrusted PDS data.
-     */
     private fun parseContent(
         contentObj: JsonObject?,
         textContent: String?,
@@ -335,11 +291,6 @@ class PostDetailViewModel @Inject constructor(
                 if (!markdown.isNullOrBlank()) return DocumentContent.PlainText(markdown)
             }
 
-            // blog.pckt.content, app.offprint.content, and any other
-            // block-array format: no bespoke model yet, so fall back to a
-            // generic walk that pulls every "plaintext" leaf out of the
-            // block tree in document order. Lossy (loses block structure,
-            // facets, embeds) but shows real content instead of nothing.
             val extracted = StringBuilder()
             collectPlaintext(contentObj, extracted)
             if (extracted.isNotBlank()) return DocumentContent.PlainText(extracted.toString())
@@ -371,4 +322,107 @@ class PostDetailViewModel @Inject constructor(
             else -> {}
         }
     }
+
+    // MARK: - Comments
+
+    fun loadComments(documentUri: String) {
+        val current = _uiState.value
+        if (current.uri == documentUri && (current.isLoadingComments || current.comments.isNotEmpty())) return
+        _uiState.value = _uiState.value.copy(isLoadingComments = true, comments = emptyList())
+
+        viewModelScope.launch {
+            try {
+                val repoComments = mutableListOf<PdsRepository.CommentEntry>()
+                val session = pdsRepository.getSession()
+
+                if (session != null) {
+                    val local = runCatching { pdsRepository.fetchComments(session.did, session.pdsUrl) }.getOrNull()
+                    if (local != null) repoComments.addAll(local)
+                }
+
+                val backlinks = runCatching { constellationClient.getCommentBacklinks(documentUri) }.getOrNull()
+                if (backlinks != null) {
+                    val seen = repoComments.map { it.uri }.toSet()
+                    val hydrated = backlinks.filter { !seen.contains(it.recordUri) }
+                    for (backlink in hydrated) {
+                        try {
+                            val record = pdsRepository.getRecord(backlink.recordUri)
+                            val value = record["value"]?.jsonObject ?: continue
+                            val comment = json.decodeFromJsonElement(LeafletComment.serializer(), value)
+                            repoComments.add(
+                                PdsRepository.CommentEntry(
+                                    uri = backlink.recordUri,
+                                    rkey = backlink.rkey,
+                                    comment = comment
+                                )
+                            )
+                        } catch (_: Exception) {}
+                    }
+                }
+
+                val sorted = repoComments.sortedByDescending { it.comment.plaintext }
+                if (_uiState.value.uri != documentUri) return@launch
+                _uiState.value = _uiState.value.copy(
+                    comments = sorted.map { c ->
+                        CommentEntry(
+                            uri = c.uri,
+                            recordKey = c.rkey,
+                            record = c.comment
+                        )
+                    },
+                    isLoadingComments = false,
+                )
+            } catch (e: Exception) {
+                if (_uiState.value.uri != documentUri) return@launch
+                _uiState.value = _uiState.value.copy(isLoadingComments = false)
+            }
+        }
+    }
+
+    fun onNewCommentTextChanged(text: String) {
+        _uiState.value = _uiState.value.copy(newCommentText = text, commentError = null)
+    }
+
+    fun submitComment() {
+        val state = _uiState.value
+        val text = state.newCommentText.trim()
+        if (text.isEmpty() || state.uri.isBlank()) return
+
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isSubmittingComment = true, commentError = null)
+            try {
+                pdsRepository.createComment(
+                    subject = state.uri,
+                    plaintext = text,
+                    replyTo = state.replyToComment?.uri,
+                    onPage = null
+                )
+                _uiState.value = _uiState.value.copy(
+                    isSubmittingComment = false,
+                    newCommentText = "",
+                    replyToComment = null,
+                )
+                loadComments(state.uri)
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isSubmittingComment = false,
+                    commentError = e.message ?: "Failed to post comment",
+                )
+            }
+        }
+    }
+
+    fun setReplyTo(comment: CommentEntry?) {
+        _uiState.value = _uiState.value.copy(replyToComment = comment)
+    }
+
+    fun dismissCommentError() {
+        _uiState.value = _uiState.value.copy(commentError = null)
+    }
 }
+
+data class CommentEntry(
+    val uri: String,
+    val recordKey: String,
+    val record: uk.ewancroft.inkwell.data.model.graph.LeafletComment,
+)
