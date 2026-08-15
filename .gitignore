@@ -122,11 +122,12 @@ iOSInjectionProject/
 Packages
 xcuserdata
 *.xcodeproj
+!iOS/Inkwell.xcodeproj/
 
 
 ### SwiftPM ###
 
 
 # End of https://www.toptal.com/developers/gitignore/api/swift,swiftpackagemanager,swiftpm,macos
-Inkwell.xcodeproj/project.xcworkspace/xcuserdata/ewan.xcuserdatad/UserInterfaceState.xcuserstate
+iOS/Inkwell.xcodeproj/project.xcworkspace/xcuserdata/ewan.xcuserdatad/UserInterfaceState.xcuserstate
 .letta/
