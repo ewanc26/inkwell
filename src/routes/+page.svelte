@@ -104,9 +104,12 @@
         Add AltStore source
       </a>
       <p class="mt-3 text-sm text-muted">
-        New to AltStore? Install it first at
-        <a href="https://altstore.io" class="text-accent underline">altstore.io</a>,
-        then tap the button above again.
+        This source works with
+        <a href="https://altstore.io" class="text-accent underline">AltStore Classic</a> —
+        the free, worldwide sideloading AltStore (requires a computer for the
+        first install, apps refresh every 7 days). It will
+        <em>not</em> work in AltStore PAL, which only installs Apple-notarized
+        marketplace apps.
       </p>
     </div>
 
