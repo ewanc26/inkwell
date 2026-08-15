@@ -36,9 +36,10 @@ downloadable files when this was set up.
 
 ## Publishing a new version
 
-1. Build a signed release APK from the `inkwell-android` repo (needs
-   `keystore.properties` + `inkwell-release.keystore` in that repo's root —
-   both are gitignored, copy them there if missing):
+1. Build a signed release APK from the `inkwell-android` repo (needs the
+   gitignored `keystore.properties` at that repo's root pointing at
+   `fdroid-repo/inkwell-release.keystore` — both are gitignored, restore them
+   if missing):
    ```bash
    cd /path/to/inkwell-android
    ./gradlew assembleRelease
