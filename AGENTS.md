@@ -5,7 +5,7 @@ Guidance for agents working on Inkwell, a native reader and writer for the Stand
 ## Read First and Source Boundaries
 
 - Read `README.md`, platform-specific build files, and all source in the touched flow.
-- **iOS:** `Inkwell/` is authoritative; `.letta/worktrees/` contains local shadow checkouts and must not be edited as product source.
+- **iOS:** `iOS/` is authoritative; `.letta/worktrees/` contains local shadow checkouts and must not be edited as product source.
   - `Authentication/LoginStateManager.swift` is the large central boundary for OAuth/DPoP, PDS resolution, public and authenticated XRPC, records, blobs, subscriptions, recommends, Leaflet comments, profiles, and caches.
   - `Protocols/StandardSite/` and `Protocols/ContentFormats/` define tolerant wire models and association/verification rules. `Rendering/` handles Markpub Markdown, Leaflet block/blob pages, pckt, Offprint, Bluesky embeds, polls, and themes.
   - `Features/` owns Read/Discover/Write and background subscription polling. `InkwellTests/StandardSiteTests.swift` is a focused unit suite, not end-to-end OAuth/editor/rendering coverage.
