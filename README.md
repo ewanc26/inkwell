@@ -6,13 +6,16 @@
   <img alt="Inkwell" src="logo-light.svg" width="110">
 </picture>
 
-A native SwiftUI reader and writer for the [Standard.site](https://standard.site) publishing ecosystem on AT Protocol.
+A native reader and writer for the [Standard.site](https://standard.site) publishing ecosystem on AT Protocol.
 
-An [experimental Android version](https://github.com/ewanc26/inkwell-android) is also available.
+This monorepo contains:
+
+- **iOS** — SwiftUI app in `Inkwell/`
+- **Android** — Kotlin/Compose app in `Android/`
 
 ## Features
 
-- Reads `site.standard.publication` and `site.standard.document` records from the author's PDS. Three-tab layout (Read / Discover / Write).
+- Reads `site.standard.publication` and `site.standard.document` records from the author's PDS.
 - Renders Markpub Markdown plus Leaflet, pckt, and Offprint content. Uses `textContent` as a fallback. Native block rendering for Leaflet (including blob-stored pages), Markdown for everything else.
 - Theme resolution: Leaflet's light/dark palette → `basicTheme` → system defaults. Publication-level by default, overridable per document.
 - Publishes Standard.site documents with portable metadata and selectable content formats.
@@ -24,12 +27,27 @@ An [experimental Android version](https://github.com/ewanc26/inkwell-android) is
 
 ## Getting started
 
+### iOS
+
 ```bash
 git clone https://github.com/ewanc26/inkwell.git
 cd inkwell
 ```
 
 Open `Inkwell.xcodeproj` in Xcode, build and run. Sign in with your AT Protocol handle via OAuth.
+
+### Android
+
+```bash
+git clone https://github.com/ewanc26/inkwell.git
+cd inkwell/Android
+```
+
+Build with Gradle:
+
+```bash
+./gradlew assembleDebug
+```
 
 ## Interoperability
 
@@ -43,11 +61,18 @@ The app icon and in-app wordmark share one set of vector coordinates, so they al
 
 ## Testing
 
+### iOS
+
 `InkwellTests` covers AT-URI parsing, record encoding/decoding, publication/document association rules, theme and verification-endpoint resolution, and tolerant decoding of malformed records.
+
+### Android
+
+Run `./gradlew test` from the `Android/` directory.
 
 ## Dependencies
 
-- **ATProtoKit** — via Swift Package Manager (`https://github.com/MasterJ93/ATProtoKit.git`)
+- **iOS:** **ATProtoKit** — via Swift Package Manager (`https://github.com/MasterJ93/ATProtoKit.git`)
+- **Android:** **atproto-kotlin** — via Gradle version catalog
 
 ## Support
 
