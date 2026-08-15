@@ -2,10 +2,12 @@
 
 The marketing, legal, and OAuth-metadata site for [Inkwell](https://github.com/ewanc26/inkwell), a native reader and writer for the [Standard.site](https://standard.site) publishing ecosystem on [AT Protocol](https://atproto.com). Lives at [inkwell.ewancroft.uk](https://inkwell.ewancroft.uk).
 
-Inkwell is primarily an iOS app (SwiftUI), with an experimental Android port ([Jetpack Compose](https://github.com/ewanc26/inkwell-android)). Neither ships through the App Store or Play Store — this site hosts the real install sources instead:
+This repository is part of the [Inkwell monorepo](https://github.com/ewanc26/inkwell). The website source lives under `website/` in that repo. The old standalone `inkwell-website` repository has been archived; please open issues and PRs against the monorepo instead.
 
-- **iOS** — a self-hosted [AltStore](https://altstore.io) source at [`/altstore/source.json`](static/altstore/source.json)
-- **Android** — a self-hosted, signed [F-Droid](https://f-droid.org) repo at [`/fdroid/repo`](static/fdroid/repo)
+Inkwell is primarily an iOS app (SwiftUI), with an experimental Android port (Kotlin/Compose). Neither ships through the App Store or Play Store — this site hosts the real install sources instead:
+
+- **iOS** — a self-hosted [AltStore](https://altstore.io) source at [`iOS/altstore/source.json`](../iOS/altstore/source.json)
+- **Android** — a self-hosted, signed [F-Droid](https://f-droid.org) repo at [`Android/fdroid-repo/repo`](../Android/fdroid-repo/repo)
 
 The landing page's "Get Inkwell" section (`#download`) links both.
 
@@ -35,4 +37,4 @@ pnpm format    # prettier --write
 
 ## Contributing
 
-Read [`AGENTS.md`](AGENTS.md) first — it covers product/legal accuracy requirements, the OAuth contract, and design/accessibility constraints that apply to any change here. [`DESIGN.md`](DESIGN.md) documents the visual system in full; [`PRODUCT.md`](PRODUCT.md) covers brand voice and audience.
+Read [`../AGENTS.md`](../AGENTS.md) first — it covers product/legal accuracy requirements, the OAuth contract, and design/accessibility constraints that apply to any change here. [`DESIGN.md`](DESIGN.md) documents the visual system in full; [`PRODUCT.md`](PRODUCT.md) covers brand voice and audience.

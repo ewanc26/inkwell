@@ -1,0 +1,43 @@
+name: Bug Report
+description: Report a bug or unexpected behavior
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      description: Which client is affected?
+      options:
+        - iOS
+        - Android
+        - Website
+        - All
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened? What did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: How can we reproduce this?
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or error output
+      description: Paste any relevant logs, stack traces, or error messages.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: What version are you running? (e.g. iOS 1.0, Android 1.1.0, website commit hash)
+    validations:
+      required: true
