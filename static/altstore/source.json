@@ -26,7 +26,7 @@
           "date": "2026-06-27",
           "localizedDescription": "First AltStore release. Read, Discover, and Write tabs. OAuth sign-in with AT Protocol handle. Leaflet and Markdown rendering. Publication search via Standard.site public index. Background notification polling.",
           "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-1.0.ipa",
-          "size": 6998105
+          "size": 10362393
         }
       ],
       "appPermissions": {
