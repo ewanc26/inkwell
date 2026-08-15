@@ -84,9 +84,11 @@ final class StandardSiteTests: XCTestCase {
     }
 
     func testSearchV2ResponseDecoding() throws {
-        let data = Data(#"{"results":[{"type":"article","uri":"at://did:plc:alice/site.standard.document/3doc","did":"did:plc:alice","title":"Hello","platform":"pckt","path":"/hello","basePath":"alice.pckt.blog"}],"total":1,"hasMore":false}"#.utf8)
+        // The pub search backend sends total: null and camelCase field names.
+        let data = Data(#"{"results":[{"type":"article","uri":"at://did:plc:alice/site.standard.document/3doc","did":"did:plc:alice","title":"Hello","platform":"pckt","path":"/hello","basePath":"alice.pckt.blog","createdAt":"2026-06-01T12:00:00Z"}],"total":null,"hasMore":false}"#.utf8)
         let response = try JSONDecoder().decode(ReaderSearchResponse.self, from: data)
 
+        XCTAssertNil(response.total)
         XCTAssertEqual(response.results.first?.webURL?.absoluteString, "https://alice.pckt.blog/hello")
         XCTAssertTrue(response.results.first?.isStandardSiteDocument == true)
     }
