@@ -57,7 +57,7 @@ struct ReaderSearchResult: Identifiable, Codable, Equatable, Hashable {
 
 struct ReaderSearchResponse: Decodable {
     let results: [ReaderSearchResult]
-    let total: Int
+    let total: Int?
     let hasMore: Bool
 }
 
