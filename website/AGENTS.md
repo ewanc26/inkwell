@@ -1,11 +1,11 @@
 # AGENTS.md
 
-Guidance for agents working on `inkwell.ewancroft.uk`, the SvelteKit/Vercel product, legal, and OAuth-metadata site shared by the primary iOS Inkwell app and its experimental Android port.
+Guidance for agents working on `inkwell.ewancroft.uk`, the SvelteKit/Vercel product, legal, and OAuth-metadata site shared by the primary iOS Inkwell app and its experimental Android port. This site lives under `website/` in the Inkwell monorepo.
 
 ## Read First and Authority
 
 - Read `README.md`, `PRODUCT.md`, `DESIGN.md`, `.impeccable/design.json`, `src/lib/config.ts`, and every touched route/style.
-- Audit claims against the owned sibling repos `../inkwell` and `../inkwell-android` before changing product, security, privacy, moderation, platform, or availability copy. The website must not turn planned/model-only code into a shipped feature.
+- Audit claims against the owned sibling directories `../iOS/` and `../Android/` before changing product, security, privacy, moderation, platform, or availability copy. The website must not turn planned/model-only code into a shipped feature.
 - `+page.svelte` is the landing page; `/privacy` and `/terms` are substantive legal promises; `/client-metadata.json` is a live OAuth client identity consumed by PDS servers. `+layout.svelte` owns metadata/navigation/footer and client-side mobile navigation.
 - `src/lib/styles/` is a token-first Tailwind v4/CSS system. `static/` currently contains only favicon, robots, and wordmark—font CSS references `/fonts/inter.woff2` and `/fonts/jetbrains-mono.woff2`, but those assets are absent and therefore fall back to system fonts.
 
