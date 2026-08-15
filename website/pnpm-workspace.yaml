@@ -1,0 +1,6 @@
+# ── PNPM workspace config ────────────────────────────────────────
+# esbuild uses a native binary; allow its postinstall build step
+# so Tailwind v4's CSS plugin can compile during install.
+
+allowBuilds:
+  esbuild: true

@@ -1,0 +1,7 @@
+# All crawlers welcome — no pages blocked.
+# Sitemap is served by src/routes/sitemap.xml/+server.ts.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://inkwell.ewancroft.uk/sitemap.xml
