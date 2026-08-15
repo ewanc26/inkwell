@@ -23,7 +23,7 @@
   <p>
     By downloading or using Inkwell (the &ldquo;App&rdquo;), you agree to these
     terms. Inkwell is provided for iOS (version 1.0, build 49) via AltStore and
-    for Android (version 1.0.0) via a self-hosted F-Droid repository. It is not
+    for Android (version 1.0.1) via a self-hosted F-Droid repository. It is not
     distributed through the Apple App Store or Google Play.
   </p>
 
