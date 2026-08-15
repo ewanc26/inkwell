@@ -30,3 +30,30 @@ data class GraphRecommend(
     val document: String,
     val createdAt: String? = null
 )
+
+// ── Leaflet: comments ─────────────────────────────────────────────────────
+
+/** A comment on a document, stored as `pub.leaflet.comment`. */
+@Serializable
+data class LeafletComment(
+    @SerialName("\$type") val type: String = "pub.leaflet.comment",
+    val subject: String,
+    val plaintext: String,
+    val reply: ReplyRef? = null,
+    val onPage: String? = null,
+    val createdAt: String? = null
+) {
+    @Serializable
+    data class ReplyRef(
+        val parent: String
+    )
+}
+
+/** A hydrated comment entry from the network. */
+data class CommentEntry(
+    val uri: String,
+    val recordKey: String,
+    val record: LeafletComment,
+    val authorDid: String? = null,
+    val authorDisplayName: String? = null
+)
