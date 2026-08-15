@@ -23,7 +23,8 @@ Description: |-
   from the author's PDS. Renders Leaflet block content, Markpub/plain text,
   and other formats generically so nothing is silently dropped. Resolves
   display themes from Leaflet's rich palette through basicTheme to Material 3
-  defaults. Comments and interactions aren't shown yet.
+  defaults. Rich-text facets (bold, italic, code, links) are rendered inline.
+  Comments are supported: load, submit, and reply on any document.
 
   Discover publications via the cross-platform public index, then fetches
   authoritative records from the author. Subscribe to publications and
@@ -31,8 +32,10 @@ Description: |-
   (microcosm.blue). Paginated feed with previous/next navigation.
 
   Write and publish site.standard.document records with portable metadata.
-  Content format selection is presentation-only for now; every publish
-  currently writes plain text content regardless of the selected format.
+  Content format selection now determines the actual published content union:
+  Leaflet block arrays, Markpub markdown, pckt, or Offprint formats are all
+  supported, with inline facets preserved. textContent is always stored as
+  portable plaintext.
 
   Verifies publications and documents against their claimed domain via
   Standard.site's .well-known and link-tag checks, shown as a badge on the
@@ -51,5 +54,5 @@ Description: |-
 # still-pending submission.
 AutoUpdateMode: None
 UpdateCheckMode: None
-CurrentVersion: '1.0.1'
-CurrentVersionCode: 2
+CurrentVersion: '1.1.0'
+CurrentVersionCode: 3
