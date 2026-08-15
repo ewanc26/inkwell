@@ -39,7 +39,7 @@ fun ReaderScreen(
         try {
             val pkg = context.packageManager.getPackageInfo(context.packageName, 0)
             "Version ${pkg.versionName} (${pkg.longVersionCode})"
-        } catch (_: Exception) { "Version 1.0.0 (1)" }
+        } catch (_: Exception) { "Version 1.0.1 (2)" }
     }
 
     Scaffold(

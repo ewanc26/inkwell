@@ -13,17 +13,17 @@ RepoType: git
 Repo: https://github.com/ewanc26/inkwell-android.git
 
 Builds:
-  # NOTE: tag v1.0.0 does not exist yet — it must be created and pushed
+  # NOTE: tag v1.0.1 does not exist yet — it must be created and pushed
   # (matching app/build.gradle.kts versionName) before this build entry
   # is valid. See fdroid/README.md Prerequisites.
-  - versionName: '1.0.0'
-    versionCode: 1
-    commit: v1.0.0
+  - versionName: '1.0.1'
+    versionCode: 2
+    commit: v1.0.1
     subdir: app
     gradle:
       - yes
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
-CurrentVersion: '1.0.0'
-CurrentVersionCode: 1
+CurrentVersion: '1.0.1'
+CurrentVersionCode: 2
