@@ -10,7 +10,7 @@ A native reader and writer for the [Standard.site](https://standard.site) publis
 
 This monorepo contains:
 
-- **iOS** — SwiftUI app in `Inkwell/`
+- **iOS** — SwiftUI app in `iOS/`
 - **Android** — Kotlin/Compose app in `Android/`
 
 ## Features
@@ -34,7 +34,7 @@ git clone https://github.com/ewanc26/inkwell.git
 cd inkwell
 ```
 
-Open `Inkwell.xcodeproj` in Xcode, build and run. Sign in with your AT Protocol handle via OAuth.
+Open `iOS/Inkwell.xcodeproj` in Xcode, build and run. Sign in with your AT Protocol handle via OAuth.
 
 ### Android
 
