@@ -97,20 +97,20 @@ private fun DrawScope.drawMark(letterColor: Color) {
     )
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFFFAFAF5)
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable
 private fun InkwellMarkPreviewLight() {
     InkwellMark(
         modifier = Modifier.aspectRatio(DESIGN_WIDTH / DESIGN_HEIGHT),
-        color = Color(0xFF1A1A2E),
+        color = Color(0xFF000000),
     )
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF1C1C24)
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
 private fun InkwellMarkPreviewDark() {
     InkwellMark(
         modifier = Modifier.aspectRatio(DESIGN_WIDTH / DESIGN_HEIGHT),
-        color = Color(0xFFE8E6F0),
+        color = Color(0xFFFFFFFF),
     )
 }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
@@ -15,8 +16,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -41,7 +48,7 @@ fun ReaderScreen(
         try {
             val pkg = context.packageManager.getPackageInfo(context.packageName, 0)
             "Version ${pkg.versionName} (${pkg.longVersionCode})"
-        } catch (_: Exception) { "Version 1.2.0 (4)" }
+        } catch (_: Exception) { "Version 1.3.0 (5)" }
     }
 
     Scaffold(
@@ -238,11 +245,21 @@ fun PostCard(
     authorAvatar: String? = null,
     onClick: () -> Unit = {},
 ) {
+    val cardBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+    val cardContainerColor = MaterialTheme.colorScheme.surface
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(role = Role.Button, onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            .clickable(role = Role.Button, onClick = onClick)
+            .drawBehind {
+                drawRect(
+                    color = cardBorderColor,
+                    topLeft = Offset(0.5f, 0.5f),
+                    size = Size(size.width - 1f, size.height - 1f),
+                    style = Stroke(width = 1f),
+                )
+            },
+        colors = CardDefaults.cardColors(containerColor = cardContainerColor),
         shape = MaterialTheme.shapes.large,
     ) {
         Column {
@@ -301,20 +318,36 @@ fun PostCard(
                     )
                 }
 
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
                     Text(
                         date,
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     if (publicationName != null) {
-                        Text("·", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(
+                            "·",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
                         Text(
                             publicationName,
                             style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.primary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                         )
                     }
+                    Spacer(Modifier.weight(1f))
+                    Icon(
+                        Icons.AutoMirrored.Outlined.ArrowForward,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.55f),
+                        modifier = Modifier.size(16.dp),
+                    )
                 }
             }
         }
