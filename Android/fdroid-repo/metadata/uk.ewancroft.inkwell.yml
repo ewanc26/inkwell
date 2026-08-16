@@ -54,5 +54,5 @@ Description: |-
 # still-pending submission.
 AutoUpdateMode: None
 UpdateCheckMode: None
-CurrentVersion: '1.1.0'
-CurrentVersionCode: 3
+CurrentVersion: '1.2.0'
+CurrentVersionCode: 4
