@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -68,6 +69,8 @@ class MainActivity : ComponentActivity() {
             }
 
             InkwellTheme {
+                val splashBg = if (isSystemInDarkTheme()) Color(0xFF000000) else Color(0xFFFFFFFF)
+                val splashMarkColor = if (isSystemInDarkTheme()) Color(0xFFFFFFFF) else Color(0xFF000000)
                 Box(Modifier.fillMaxSize()) {
                     when {
                         ScreenshotConfig.enabled -> {
@@ -103,13 +106,13 @@ class MainActivity : ComponentActivity() {
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(Color(0xFFFAFAF5))
+                                .background(splashBg)
                                 .graphicsLayer(alpha = splashOpacity.value),
                             contentAlignment = Alignment.Center,
                         ) {
                             InkwellMark(
                                 modifier = Modifier.height(48.dp),
-                                color = Color(0xFF1A1A2E),
+                                color = splashMarkColor,
                             )
                         }
                     }

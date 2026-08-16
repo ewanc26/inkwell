@@ -32,7 +32,7 @@ fun WriterScreen(
         try {
             val pkg = context.packageManager.getPackageInfo(context.packageName, 0)
             "Version ${pkg.versionName} (${pkg.longVersionCode})"
-        } catch (_: Exception) { "Version 1.2.0 (4)" }
+        } catch (_: Exception) { "Version 1.3.0 (5)" }
     }
 
     LaunchedEffect(Unit) {

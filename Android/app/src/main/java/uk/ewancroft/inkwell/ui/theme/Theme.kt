@@ -2,12 +2,13 @@
  * Inkwell design tokens and Material 3 theme.
  *
  * Brand identity: "The Writer's Desk" — a clean, well-lit workspace.
- * Single green accent (#139500) used sparingly on a cool-toned ink/paper
- * palette. Typography-first; colour recedes so the words can speak.
+ * Single green accent (#139500) used sparingly on a pure white/black
+ * ink/paper palette. Typography-first; colour recedes so the words can speak.
  *
- * Mirrors the OKLCH-based token system in Inkwell iOS (InkwellTheme.swift)
- * and inkwell-website (tokens.css). Every colour is a light/dark pair,
- * defined once per token.
+ * Color tokens align with iOS system colours: pure white page backgrounds
+ * with secondarySystemGroupedBackground for cards, pure black/white label
+ * text, and the single brand green #139500 accent. Every colour is a
+ * light/dark pair, defined once per token.
  */
 package uk.ewancroft.inkwell.ui.theme
 
@@ -23,8 +24,8 @@ import uk.ewancroft.inkwell.data.model.atproto.RgbColor
 // ── Brand Tokens ─────────────────────────────────────────────────────────
 //
 // Canonical brand green: #139500 (Display P3: 0.07611, 0.58470, 0.00000).
-// The ink/paper palette uses cool off-white and cool dark tones so the
-// single green accent reads vividly against both light and dark surfaces.
+// The ink/paper palette uses pure white and pure black so the single green
+// accent reads vividly against both light and dark surfaces.
 
 /** Canonical Inkwell brand green. */
 val InkwellGreen = Color(0xFF139500)
@@ -36,24 +37,29 @@ val InkwellGreenLight = Color(0xFF2DB84D)
 val InkwellGreenTint = Color(0xFFE8F5E0)
 
 // ── Ink (text) palette ──
-private val InkLight = Color(0xFF1A1A2E)       // ink-900: strong emphasis
-private val InkBodyLight = Color(0xFF4A4A5A)   // ink-700: body text
-private val InkMutedLight = Color(0xFF6E6E7E)  // ink-600: secondary
-private val InkBorderLight = Color(0xFFC5C5CC) // ink-300: borders
+// Aligns with iOS system colours: label is #000000 on light, #FFFFFF on dark.
+// Secondary/tertiary text uses fixed muted tones approximating iOS
+// secondaryLabel (~48% opacity) and tertiaryLabel (~36% opacity).
+private val InkLight = Color(0xFF000000)       // ink-900: strong emphasis (iOS label)
+private val InkBodyLight = Color(0xFF000000)   // body text (iOS label)
+private val InkMutedLight = Color(0xFF6E6E7E)  // ink-600: secondary (iOS secondaryLabel)
+private val InkBorderLight = Color(0xFFC5C5CC) // ink-300: borders (iOS separator)
 
-private val InkDark = Color(0xFFE8E6F0)        // ink-900 dark: emphasis
-private val InkBodyDark = Color(0xFFB5B5C0)    // ink-700 dark: body
-private val InkMutedDark = Color(0xFF8E8E9A)   // ink-600 dark: secondary
-private val InkBorderDark = Color(0xFF3E3E48)  // ink-300 dark: borders
+private val InkDark = Color(0xFFFFFFFF)        // ink-900 dark: emphasis (iOS label)
+private val InkBodyDark = Color(0xFFFFFFFF)    // body text (iOS label)
+private val InkMutedDark = Color(0xFF8E8E9A)   // ink-600 dark: secondary (iOS secondaryLabel)
+private val InkBorderDark = Color(0xFF38383A)  // ink-300 dark: borders (iOS separator)
 
 // ── Paper (background) palette ──
-private val PaperLight = Color(0xFFFAFAF5)     // paper-100: page bg
-private val PaperSurfaceLight = Color(0xFFF5F5F0) // paper-200: surface/card
-private val PaperRaisedLight = Color(0xFFFCFCFA)  // paper-50: raised
+// Aligns with iOS system colours: systemBackground is pure white/black,
+// secondarySystemGroupedBackground for cards is #F2F2F7 / #1C1C1E.
+private val PaperLight = Color(0xFFFFFFFF)     // paper-100: page bg (iOS systemBackground)
+private val PaperSurfaceLight = Color(0xFFF2F2F7) // paper-200: surface/card (iOS secondarySystemGroupedBackground)
+private val PaperRaisedLight = Color(0xFFFFFFFF)  // paper-50: raised (iOS systemBackground)
 
-private val PaperDark = Color(0xFF1C1C24)      // paper-100 dark: page bg
-private val PaperSurfaceDark = Color(0xFF2A2A33)  // paper-200 dark: surface
-private val PaperRaisedDark = Color(0xFF141418)   // paper-50 dark: raised
+private val PaperDark = Color(0xFF000000)      // paper-100 dark: page bg (iOS systemBackground)
+private val PaperSurfaceDark = Color(0xFF1C1C1E)  // paper-200 dark: surface (iOS secondarySystemGroupedBackground)
+private val PaperRaisedDark = Color(0xFF121212)   // paper-50 dark: raised (iOS systemGroupedBackground)
 
 // ── Resolved Theme ───────────────────────────────────────────────────────
 
@@ -132,9 +138,9 @@ fun resolveTheme(
 /**
  * Material 3 colour scheme for the Inkwell app.
  *
- * Uses the ink/paper brand palette: cool off-white paper tones for
- * backgrounds, cool ink tones for text, and a single vivid green accent
- * used sparingly. Full light/dark parity.
+ * Uses the ink/paper brand palette: pure white paper tones for
+ * backgrounds, pure black/white ink tones for text, and a single vivid
+ * green accent used sparingly. Full light/dark parity.
  *
  * When a resolved theme is available (from a publication/document), it maps
  * the document's palette directly to Material 3 colour roles.

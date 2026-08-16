@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
@@ -14,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -37,7 +39,7 @@ fun DiscoverScreen(
         try {
             val pkg = context.packageManager.getPackageInfo(context.packageName, 0)
             "Version ${pkg.versionName} (${pkg.longVersionCode})"
-        } catch (_: Exception) { "Version 1.2.0 (4)" }
+        } catch (_: Exception) { "Version 1.3.0 (5)" }
     }
 
     Scaffold(
@@ -223,7 +225,7 @@ private fun SearchResultRow(
                     model = result.coverImage,
                     contentDescription = null,
                     modifier = Modifier
-                        .size(52.dp)
+                        .size(if (result.isPublication) 44.dp else 52.dp)
                         .clip(MaterialTheme.shapes.small),
                     contentScale = ContentScale.Crop,
                 )
@@ -233,6 +235,7 @@ private fun SearchResultRow(
                 Text(
                     result.title,
                     style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -283,6 +286,13 @@ private fun SearchResultRow(
                         }
                     }
                 }
+            } else if (result.isStandardSiteDocument) {
+                Icon(
+                    Icons.AutoMirrored.Outlined.ArrowForward,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.55f),
+                    modifier = Modifier.size(16.dp),
+                )
             }
         }
     }
