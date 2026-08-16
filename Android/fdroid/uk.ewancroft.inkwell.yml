@@ -5,12 +5,12 @@ License: AGPL-3.0-only
 AuthorName: Ewan Croft
 AuthorWebSite: https://ewancroft.uk
 WebSite: https://inkwell.ewancroft.uk
-SourceCode: https://github.com/ewanc26/inkwell-android
+SourceCode: https://github.com/ewanc26/inkwell
 IssueTracker: https://github.com/ewanc26/inkwell/issues
 Changelog: https://github.com/ewanc26/inkwell/releases
 
 RepoType: git
-Repo: https://github.com/ewanc26/inkwell-android.git
+Repo: https://github.com/ewanc26/inkwell.git
 
 Builds:
   # NOTE: tag v1.0.1 does not exist yet — it must be created and pushed

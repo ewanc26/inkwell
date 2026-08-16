@@ -5,7 +5,7 @@ License: AGPL-3.0-only
 AuthorName: Ewan Croft
 AuthorWebSite: https://ewancroft.uk
 WebSite: https://inkwell.ewancroft.uk
-SourceCode: https://github.com/ewanc26/inkwell-android
+SourceCode: https://github.com/ewanc26/inkwell
 IssueTracker: https://github.com/ewanc26/inkwell/issues
 Changelog: https://github.com/ewanc26/inkwell/releases
 
@@ -54,5 +54,5 @@ Description: |-
 # still-pending submission.
 AutoUpdateMode: None
 UpdateCheckMode: None
-CurrentVersion: '1.2.0'
-CurrentVersionCode: 4
+CurrentVersion: '1.3.1'
+CurrentVersionCode: 6
