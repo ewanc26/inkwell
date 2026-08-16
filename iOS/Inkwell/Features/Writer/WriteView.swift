@@ -189,6 +189,21 @@ struct WriteView: View {
                 CreditsView()
             }
             .task {
+                if CommandLine.arguments.contains("-screenshot") {
+                    let mockPub = SiteStandardLexicon.PublicationRecord(
+                        url: "https://ewancroft.uk",
+                        name: "Ewan's Corner",
+                        description: "Essays on open protocols, software, and digital garden notes."
+                    )
+                    isLoadingPublications = false
+                    publications = [PublicationEntry(uri: "at://did:plc:ewan/site.standard.publication/1", authorDID: "did:plc:ewan", record: mockPub)]
+                    selectedPublication = publications.first
+                    title = "Building Decentralized Sites with AT Protocol"
+                    path = "building-decentralized-sites"
+                    markdown = "# Building Decentralized Sites\n\nPublishing directly to your Personal Data Server ensures full ownership of your content.\n\n## Why Metadata Matters\n- Full portability across PDS hosts\n- Cryptographic verification"
+                }
+            }
+            .task {
                 await loadPublications()
             }
             .task(id: selectedPublication?.uri) {

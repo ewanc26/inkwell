@@ -19,6 +19,7 @@ import uk.ewancroft.inkwell.data.remote.StandardSiteVerifier
 import uk.ewancroft.inkwell.data.remote.VerificationResult
 import uk.ewancroft.inkwell.data.remote.VerificationFailure
 import uk.ewancroft.inkwell.data.repository.PdsRepository
+import uk.ewancroft.inkwell.ScreenshotConfig
 import javax.inject.Inject
 
 data class PublicationItem(
@@ -192,6 +193,10 @@ class WriterViewModel @Inject constructor(
     }
 
     fun loadPublications(selecting: String? = null) {
+        if (ScreenshotConfig.enabled) {
+            loadMockData()
+            return
+        }
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoadingPublications = true)
             try {
@@ -226,6 +231,30 @@ class WriterViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    private fun loadMockData() {
+        val pub = PublicationItem(
+            uri = "at://did:plc:ewan/site.standard.publication/1",
+            name = "Ewan's Corner",
+            did = "did:plc:ewan",
+        )
+        _uiState.value = _uiState.value.copy(
+            publications = listOf(pub),
+            selectedPublication = pub,
+            selectedFormat = "Leaflet",
+            title = "Building Decentralized Sites with AT Protocol",
+            description = "",
+            path = "building-decentralized-sites",
+            markdown = "# Building Decentralized Sites\n\nPublishing directly to your Personal Data Server ensures full ownership of your content.\n\n## Why Metadata Matters\n- Full portability across PDS hosts\n- Cryptographic verification",
+            isPublishing = false,
+            publishError = null,
+            publishSuccess = null,
+            isVerifyingPublication = false,
+            verifiedPublicationUri = null,
+            verificationMessage = null,
+            isLoadingPublications = false,
+        )
     }
 
     fun publish() {

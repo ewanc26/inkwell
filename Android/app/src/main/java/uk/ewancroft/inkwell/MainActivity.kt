@@ -38,11 +38,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        ScreenshotConfig.enabled = intent.getBooleanExtra("screenshot", false)
+        ScreenshotConfig.tab = intent.getStringExtra("tab") ?: "reader"
         setContent {
             val viewModel: AuthViewModel = hiltViewModel()
 
             val authState by viewModel.uiState.collectAsStateWithLifecycle()
-            val isAuthenticated = authState is AuthUiState.LoggedIn
+            val isAuthenticated = ScreenshotConfig.enabled || (authState is AuthUiState.LoggedIn)
 
             val intentToHandle = pendingIntent.value ?: intent
             LaunchedEffect(intentToHandle) {
@@ -53,7 +55,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            var showSplash by remember { mutableStateOf(true) }
+            var showSplash by remember { mutableStateOf(!ScreenshotConfig.enabled) }
             val splashOpacity = remember { Animatable(1f) }
 
             LaunchedEffect(Unit) {
@@ -67,8 +69,14 @@ class MainActivity : ComponentActivity() {
 
             InkwellTheme {
                 Box(Modifier.fillMaxSize()) {
-                    when (authState) {
-                        is AuthUiState.Loading -> {
+                    when {
+                        ScreenshotConfig.enabled -> {
+                            InkwellNavHost(
+                                isAuthenticated = true,
+                                onSignOut = { viewModel.logout() },
+                            )
+                        }
+                        authState is AuthUiState.Loading -> {
                             Box(
                                 modifier = Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center,

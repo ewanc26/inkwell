@@ -61,9 +61,11 @@ struct InkwellApp: App {
                     await SiteStandardLexicon.registerRecordTypes()
                     await ContentFormatRegistration.registerRecordTypes()
 
-                    // Attempt a silent session resume once per launch, before
-                    // the user sees anything other than the loading state.
-                    await loginStateManager.restoreSessionIfPossible()
+                    if CommandLine.arguments.contains("-screenshot") {
+                        loginStateManager.setMockAuthenticated()
+                    } else {
+                        await loginStateManager.restoreSessionIfPossible()
+                    }
 
                     BackgroundRefreshManager.shared.configure {
                         await NotificationManager.shared.pollForNewDocuments(

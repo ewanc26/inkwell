@@ -24,6 +24,15 @@ struct ContentView: View {
                 LoginView()
             }
         }
+        .onAppear {
+            if CommandLine.arguments.contains("-tab-discover") {
+                selectedTab = 1
+            } else if CommandLine.arguments.contains("-tab-writer") {
+                selectedTab = 2
+            } else if CommandLine.arguments.contains("-tab-reader") {
+                selectedTab = 0
+            }
+        }
         // Routes App Intent tab-switch notifications to the matching
         // TabView index. Posted by OpenReaderIntent, OpenWriterIntent,
         // and OpenDiscoverIntent when run via Siri or Shortcuts.
@@ -74,10 +83,10 @@ struct ContentView: View {
                 .tag(2)
         }
         .task {
-            // Request notification permission and poll for new documents
-            // from subscribed publications on launch.
-            await NotificationManager.shared.requestPermission()
-            await NotificationManager.shared.pollForNewDocuments(loginStateManager: loginStateManager)
+            if !CommandLine.arguments.contains("-screenshot") {
+                await NotificationManager.shared.requestPermission()
+                await NotificationManager.shared.pollForNewDocuments(loginStateManager: loginStateManager)
+            }
         }
         .onChange(of: scenePhase) { _, phase in
             guard phase == .active else { return }
