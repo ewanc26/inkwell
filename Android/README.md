@@ -10,7 +10,7 @@ Inkwell for Android — the experimental Kotlin/Compose client.
 - `fdroid/` — F-Droid build recipe (for the official fdroiddata submission)
 - `fdroid-repo/` — Self-hosted F-Droid repo workspace (signed APKs, index, metadata)
 - `docs/` — OAuth client metadata and other docs
-- `fastlane/` — Fastlane metadata (for potential Play Store / alternative distribution)
+- `fastlane/` — Fastlane metadata, including phone screenshots for store listings
 
 ## Building
 
