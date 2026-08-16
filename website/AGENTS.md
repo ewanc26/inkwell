@@ -2,6 +2,13 @@
 
 Guidance for agents working on `inkwell.ewancroft.uk`, the SvelteKit/Vercel product, legal, and OAuth-metadata site shared by the primary iOS Inkwell app and its experimental Android port. This site lives under `website/` in the Inkwell monorepo.
 
+## Principles
+
+1. **Platform fidelity first** — SvelteKit SSR, Vercel deployment, and the site's calm editorial system come first. Don't port app UI patterns without explicit adaptation.
+2. **Legal accuracy** — privacy, terms, and OAuth metadata are live promises to users and PDS servers. Claims must match both apps' actual behavior.
+3. **Honest stubs** — unimplemented features say so explicitly. Never fabricate distribution channels or capabilities.
+4. **No duplication** — reuse config, metadata, and legal text from sibling directories rather than copy-pasting.
+
 For monorepo-wide rules, see [`../AGENTS.md`](../AGENTS.md). For iOS-specific boundaries, see [`../iOS/AGENTS.md`](../iOS/AGENTS.md). For Android-specific boundaries, see [`../Android/AGENTS.md`](../Android/AGENTS.md).
 
 ## Read First and Authority
@@ -39,3 +46,8 @@ For monorepo-wide rules, see [`../AGENTS.md`](../AGENTS.md). For iOS-specific bo
 - There is no `lint` or test script. `pnpm format` writes files, so use `pnpm exec prettier --check --ignore-unknown .` for a non-mutating formatting check.
 - Preview home/privacy/terms, inspect `/client-metadata.json`, check all external/CTA/legal links, production metadata, 404s, missing font/network requests, light/dark contrast, reduced motion, keyboard/mobile navigation, and narrow/zoomed layouts.
 - Do not commit `node_modules/`, `.svelte-kit/`, `.vercel/`, build output, `.env`, local design-tool settings, or generated deployment state.
+
+## Things that look wrong but are not
+
+- **Website links to self-hosted AltStore and F-Droid** rather than App Store / Play Store listings — those stores do not have published listings yet.
+- **`static/` contains only favicon, robots, and wordmark** — font assets are referenced but absent, falling back to system fonts by design.

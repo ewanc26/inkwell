@@ -2,6 +2,40 @@
 
 Guidance for agents working on Inkwell, a native reader and writer for the Standard.site publishing ecosystem on AT Protocol. This monorepo contains all three clients: iOS (`iOS/`), Android (`Android/`), and the marketing/legal site (`website/`).
 
+## Principles
+
+1. **Platform fidelity** — each platform's native conventions, security model, and UX come first. Don't port iOS patterns to Android or vice versa without explicit adaptation.
+2. **Protocol truth over README claims** — if the README says something the code doesn't actually do, the code is right and the README is wrong. Update both together.
+3. **Honest stubs** — unimplemented features say so explicitly in the UI, return errors, or are gated behind runtime checks. Never silent no-ops or fabricated successes.
+4. **Security material stays put** — OAuth tokens, DPoP keys, PKCE state, and session secrets belong in platform secure storage (Keychain / EncryptedSharedPreferences) only. Never in UserDefaults, SharedPreferences, logs, or git.
+5. **AT Protocol correctness** — cross-reference the atproto spec and upstream reference implementations for wire formats (DAG-CBOR, MST, XRPC, DID documents). Don't infer protocol behavior from observation.
+6. **No duplication** — if a piece of logic already exists in the codebase, reuse it. Two independent implementations of the same rule silently drift apart.
+
+## Current state
+
+- **iOS** (`uk.ewancroft.Inkwell`): primary SwiftUI client, marketing version `1.0` build `50`. OAuth with DPoP complete. Reader, Discover, Writer tabs functional. Leaflet blocks, Markpub/Offprint/pckt rendering. Background notification polling. Comments, subscriptions, recommends, publication/document verification, and blob handling implemented. AltStore distribution with live screenshots.
+- **Android** (`uk.ewancroft.inkwell`): experimental Kotlin/Compose client, version `1.3.0` build `5`. OAuth complete. Reader, Discover, Writer functional. Comments, interactions (likes/reposts/replies), and WorkManager notifications are unimplemented. Verification is wired to post detail only with no caching. F-Droid self-hosted repo with fastlane screenshots.
+- **Website** (`inkwell.ewancroft.uk`): SvelteKit/Vercel marketing, legal, and OAuth-metadata site. Hosts live `/client-metadata.json`, AltStore `source.json`, F-Droid repo index, and web-optimized screenshots for both platforms.
+
+## Commits
+
+Conventional commits, scoped by area:
+```
+feat(ios): add post-detail screenshot to AltStore
+fix(android): correct F-Droid repo URLs to monorepo
+docs(website): update OAuth contract for comment scope
+chore(fdroid): regenerate signed index with screenshots
+```
+
+Never mix unrelated changes in a single commit. No `Co-authored-by:` trailers crediting AI agents.
+
+## Things that look wrong but are not
+
+- **Android has no Worker or notification manager** despite some README claims — background polling is not implemented.
+- **Android's `ContentUnion` is intentionally incomplete** — it would silently lose unmodelled formats if round-tripped, so the partial set is deliberate.
+- **iOS `UserDefaults` stores only non-secret hints** (handle/PDS hints, notification state, seen URIs) — credentials and proof material stay in Keychain.
+- **Website links to self-hosted AltStore and F-Droid** rather than App Store / Play Store listings — those stores do not have published listings yet.
+
 Platform-specific guidance lives in:
 - [`iOS/AGENTS.md`](iOS/AGENTS.md) — iOS app source boundaries, Keychain/DPoP rules, and Xcode build/test workflow
 - [`Android/AGENTS.md`](Android/AGENTS.md) — Android app source boundaries, EncryptedSharedPreferences, and Gradle workflow
@@ -40,13 +74,11 @@ Platform-specific guidance lives in:
 
 ## Build, Tests, and Distribution
 
-- **iOS:** The checked-in project uses Swift 5 mode, app deployment target iOS 26.0, test target iOS 26.5, bundle `uk.ewancroft.Inkwell`, marketing version `1.0`, and build `49`. Resolve Swift packages through Xcode and build the `Inkwell` scheme on an installed compatible simulator.
+- **iOS:** The checked-in project uses Swift 5 mode, app deployment target iOS 26.0, test target iOS 26.5, bundle `uk.ewancroft.Inkwell`, marketing version `1.0`, and build `50`. Resolve Swift packages through Xcode and build the `Inkwell` scheme on an installed compatible simulator.
   - Run `xcodebuild -project iOS/Inkwell.xcodeproj -scheme Inkwell -destination 'platform=iOS Simulator,name=<available iOS 26.5 device>' build test`, adapting only the destination to installed runtimes.
   - Unit tests cover AT-URI parsing, association/canonical URLs, verification endpoint paths, wire keys, search decoding, notification JSON, and tolerant record pages.
   - `iOS/altstore/source.json` must match bundle/version/build, privacy/permissions, hosted icon/IPA, byte size, and release notes. See `iOS/AGENTS.md` for iOS-specific distribution requirements.
-- **Android:** Target facts: compile/target SDK 36, minimum SDK 26, Java/Kotlin JVM 17, release minification enabled, app ID `uk.ewancroft.inkwell`, and debug ID suffix `.debug`.
-  - Run `./gradlew clean assembleDebug lint test` from `Android/` with a valid local Android SDK/JDK. For release work also run `./gradlew assembleRelease` and inspect R8 output.
-  - There are no JVM or instrumentation tests for the app in general. `StandardSiteVerifierTest` is the only unit test source, including three tests that hit the real `blog.ewancroft.uk` standard.site publication over the network. See `Android/AGENTS.md` for Android-specific capability gaps.
+- **Android:** Target facts: compile/target SDK 36, minimum SDK 26, Java/Kotlin JVM 17, release minification enabled, app ID `uk.ewancroft.inkwell`, debug ID suffix `.debug`, version `1.3.0`, versionCode `5`. Run `./gradlew clean assembleDebug lint test` from `Android/` with a valid local Android SDK/JDK. For release work also run `./gradlew assembleRelease` and inspect R8 output. See `Android/AGENTS.md` for Android-specific capability gaps.
 - **Website:** pnpm is authoritative (`pnpm-lock.yaml` and `pnpm-workspace.yaml`; no npm lock). Vercel installs with `pnpm install` on Node 22. Run `pnpm install --frozen-lockfile`, `pnpm check`, and `pnpm build`. There is no `lint` or test script; use `pnpm exec prettier --check --ignore-unknown .` for formatting checks. See `website/AGENTS.md` for website-specific design/accessibility constraints.
 - **All:** Manually exercise fresh/cancelled OAuth, bad state/issuer/nonce, restore/refresh/revocation/logout, every reader format, Unicode facets, blobs, create/edit/delete, subscriptions/recommends/comments, verification, pagination, offline errors, and background/local notifications.
 - Never commit `local.properties`, `.idea/`, `.gradle/`, `app/build/`, signing material, OAuth sessions, or real credentials.

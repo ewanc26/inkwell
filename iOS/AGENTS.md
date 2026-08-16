@@ -2,6 +2,14 @@
 
 Guidance for agents working on Inkwell for iOS, the primary SwiftUI client in the Inkwell monorepo. This directory contains the iOS app, tests, AltStore metadata, and OAuth configuration.
 
+## Principles
+
+1. **Platform fidelity first** — SwiftUI lifecycle, Keychain security, and iOS human interface guidelines govern every decision. Don't port Android patterns here.
+2. **Protocol truth** — wire formats, record schemas, and OAuth flows come from the atproto spec and upstream references, not inference. Update README claims when the code diverges.
+3. **Honest stubs** — unimplemented code returns errors or shows explicit UI placeholders. Never silent no-ops.
+4. **Security stays in Keychain** — OAuth tokens, DPoP private keys, PKCE state, and session secrets never leave Keychain or enter logs.
+5. **No duplication** — reuse shared logic from the Android checkout or website rather than copy-pasting Swift equivalents.
+
 For monorepo-wide rules, see [`../AGENTS.md`](../AGENTS.md). For Android-specific boundaries, see [`../Android/AGENTS.md`](../Android/AGENTS.md). For website/legal accuracy, see [`../website/AGENTS.md`](../website/AGENTS.md).
 
 ## Read First and Source Boundaries
@@ -30,8 +38,13 @@ For monorepo-wide rules, see [`../AGENTS.md`](../AGENTS.md). For Android-specifi
 
 ## Build, Tests, and Distribution
 
-- The checked-in project uses Swift 5 mode, app deployment target iOS 26.0, test target iOS 26.5, bundle `uk.ewancroft.Inkwell`, marketing version `1.0`, and build `49`. Resolve Swift packages through Xcode and build the `Inkwell` scheme on an installed compatible simulator.
+- The checked-in project uses Swift 5 mode, app deployment target iOS 26.0, test target iOS 26.5, bundle `uk.ewancroft.Inkwell`, marketing version `1.0`, and build `50`. Resolve Swift packages through Xcode and build the `Inkwell` scheme on an installed compatible simulator.
 - Run `xcodebuild -project Inkwell.xcodeproj -scheme Inkwell -destination 'platform=iOS Simulator,name=<available iOS 26.5 device>' build test`, adapting only the destination to installed runtimes. Inspect failures from ATProtoKit, OAuthenticator, and ATResolve resolution separately.
 - Unit tests cover AT-URI parsing, association/canonical URLs, verification endpoint paths, wire keys, search decoding, notification JSON, and tolerant record pages. Manually exercise fresh/cancelled OAuth, bad state/issuer/nonce, restore/refresh/revocation/logout, every reader format, Unicode facets, blobs, create/edit/delete, subscriptions/recommends/comments, verification, pagination, offline errors, and background/local notifications.
-- `altstore/source.json` must match bundle/version/build, privacy/permissions, hosted icon/IPA, byte size, and release notes. It currently has a zero-byte placeholder size and empty privacy declaration, so it is not release-ready proof.
+- `altstore/source.json` must match bundle/version/build, privacy/permissions, hosted icon/IPA, byte size, and release notes. Screenshots are hosted at `https://inkwell.ewancroft.uk/screenshots/ios/`.
 - Never commit IPA archives, signing profiles, DerivedData, xcuserdata/UI state, or real credentials.
+
+## Things that look wrong but are not
+
+- **iOS `UserDefaults` stores only non-secret hints** (handle/PDS hints, notification state, seen URIs) — credentials and proof material stay in Keychain.
+- **`.letta/worktrees/` exists but is not product source** — it contains local shadow checkouts and must not be edited.
