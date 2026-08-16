@@ -16,6 +16,7 @@ import okhttp3.Request
 import uk.ewancroft.inkwell.data.model.common.SearchResponse
 import uk.ewancroft.inkwell.data.model.common.SearchResult
 import uk.ewancroft.inkwell.data.repository.PdsRepository
+import uk.ewancroft.inkwell.ScreenshotConfig
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -47,7 +48,60 @@ class DiscoverViewModel @Inject constructor(
         .build()
 
     init {
-        loadSubscriptions()
+        if (ScreenshotConfig.enabled) {
+            loadMockData()
+        } else {
+            loadSubscriptions()
+        }
+    }
+
+    private fun loadMockData() {
+        _uiState.value = _uiState.value.copy(
+            query = "Standard.site",
+            results = listOf(
+                SearchResult(
+                    type = "publication",
+                    uri = "at://did:plc:ewan/site.standard.publication/1",
+                    did = "did:plc:ewan",
+                    title = "Ewan's Corner",
+                    snippet = "Essays on open protocols, software, and digital garden notes.",
+                    createdAt = "2026-06-20T12:00:00Z",
+                    rkey = "1",
+                    basePath = "ewancroft.uk",
+                    platform = "leaflet",
+                    handle = "ewancroft.uk",
+                ),
+                SearchResult(
+                    type = "publication",
+                    uri = "at://did:plc:atproto/site.standard.publication/2",
+                    did = "did:plc:atproto",
+                    title = "AT Protocol Weekly",
+                    snippet = "Weekly round-up of lexicons and PDS updates across the network.",
+                    createdAt = "2026-06-18T10:00:00Z",
+                    rkey = "2",
+                    basePath = "atproto.news",
+                    platform = "leaflet",
+                    handle = "atproto.news",
+                ),
+                SearchResult(
+                    type = "publication",
+                    uri = "at://did:plc:leaflet/site.standard.publication/3",
+                    did = "did:plc:leaflet",
+                    title = "Leaflet Lab",
+                    snippet = "Deep dives into block-based document design and web publishing.",
+                    createdAt = "2026-06-15T08:00:00Z",
+                    rkey = "3",
+                    basePath = "leaflet.pub",
+                    platform = "leaflet",
+                    handle = "leaflet.pub",
+                ),
+            ),
+            isSearching = false,
+            error = null,
+            subscriptions = mapOf("at://did:plc:ewan/site.standard.publication/1" to "1"),
+            pendingSubscriptions = emptySet(),
+            subscriptionError = null,
+        )
     }
 
     fun onQueryChanged(query: String) {
@@ -84,6 +138,7 @@ class DiscoverViewModel @Inject constructor(
 
     /** Loads the signed-in user's existing subscriptions so publication rows can show "Subscribed". */
     fun loadSubscriptions() {
+        if (ScreenshotConfig.enabled) return
         viewModelScope.launch {
             val session = pdsRepository.getSession() ?: return@launch
             try {

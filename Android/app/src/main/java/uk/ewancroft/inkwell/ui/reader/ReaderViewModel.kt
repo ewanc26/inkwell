@@ -14,6 +14,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import uk.ewancroft.inkwell.data.model.bluesky.BlueskyProfile
 import uk.ewancroft.inkwell.data.model.common.AtUri
 import uk.ewancroft.inkwell.data.repository.PdsRepository
+import uk.ewancroft.inkwell.ScreenshotConfig
 import javax.inject.Inject
 
 data class PostItem(
@@ -53,7 +54,36 @@ class ReaderViewModel @Inject constructor(
     private val followingCursors = mutableMapOf<String, String>()
 
     init {
-        loadData()
+        if (ScreenshotConfig.enabled) {
+            loadMockData()
+        } else {
+            loadData()
+        }
+    }
+
+    private fun loadMockData() {
+        _uiState.value = _uiState.value.copy(
+            followingPosts = listOf(
+                PostItem(
+                    uri = "at://did:plc:ewan/site.standard.document/1",
+                    title = "Publishing on the Open Web with Standard.site",
+                    description = "The Standard.site publishing spec brings structured, portable records to AT Protocol.",
+                    publicationName = "Ewan's Corner",
+                    publishedAt = "2026-06-20T12:00:00Z",
+                    coverUrl = null,
+                    site = "https://ewancroft.uk",
+                    authorDisplayName = "Ewan Croft",
+                    authorAvatar = null,
+                )
+            ),
+            yoursPosts = emptyList(),
+            isLoadingFollowing = false,
+            isLoadingYours = false,
+            isLoadingMoreFollowing = false,
+            hasMoreFollowing = false,
+            error = null,
+            selectedTab = 0,
+        )
     }
 
     fun selectTab(index: Int) {
@@ -61,6 +91,10 @@ class ReaderViewModel @Inject constructor(
     }
 
     fun loadData() {
+        if (ScreenshotConfig.enabled) {
+            loadMockData()
+            return
+        }
         viewModelScope.launch {
             val session = pdsRepository.getSession()
             if (session != null) {

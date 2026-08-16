@@ -153,6 +153,14 @@ final class LoginStateManager {
         self.defaults = defaults
     }
 
+    func setMockAuthenticated() {
+        self.isAuthenticated = true
+        self.currentHandle = "ewancroft.uk"
+        self.currentDID = "did:plc:ewancroft"
+        self.displayName = "Ewan Croft"
+        self.isRestoringSession = false
+    }
+
     // MARK: - Authentication
 
     /// Starts the OAuth sign-in flow for the given handle.

@@ -63,6 +63,7 @@ final class NotificationManager {
     /// Requests permission to send local notifications. Call this on
     /// first launch or when the user first subscribes.
     func requestPermission() async {
+        if CommandLine.arguments.contains("-screenshot") { return }
         let center = UNUserNotificationCenter.current()
         do {
             try await center.requestAuthorization(options: [.alert, .badge, .sound])

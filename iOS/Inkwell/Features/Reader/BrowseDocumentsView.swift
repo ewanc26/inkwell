@@ -85,8 +85,31 @@ struct BrowseDocumentsView: View {
                 CreditsView()
             }
             .task {
-                await loadData()
-                notificationManager.markAllAsRead()
+                if CommandLine.arguments.contains("-screenshot") {
+                    let mockDoc = SiteStandardLexicon.DocumentRecord(
+                        site: "https://ewancroft.uk",
+                        title: "Publishing on the Open Web with Standard.site",
+                        publishedAt: Date(),
+                        path: "/publishing-on-open-web",
+                        description: "The Standard.site publishing spec brings structured, portable records to AT Protocol."
+                    )
+                    let mockPub = SiteStandardLexicon.PublicationRecord(
+                        url: "https://ewancroft.uk",
+                        name: "Ewan's Corner",
+                        description: "Essays on open protocols, software, and digital garden notes."
+                    )
+                    let mockItem = ReaderFeedItem(
+                        document: DocumentEntry(uri: "at://did:plc:ewan/site.standard.document/1", authorDID: "did:plc:ewan", record: mockDoc),
+                        publication: nil,
+                        authorProfile: nil
+                    )
+                    followingState.items = [mockItem]
+                    followingState.isLoading = false
+                    followingState.hasLoaded = true
+                } else {
+                    await loadData()
+                    notificationManager.markAllAsRead()
+                }
             }
         }
     }
