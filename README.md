@@ -8,11 +8,15 @@
 
 A native reader and writer for the [Standard.site](https://standard.site) publishing ecosystem on AT Protocol.
 
-This monorepo contains:
+Inkwell is a **native app** available on iOS and Android. This monorepo also contains the marketing/legal site that hosts the app's install sources and OAuth metadata.
 
-- **iOS** — SwiftUI app in `iOS/`
-- **Android** — Kotlin/Compose app in `Android/`
-- **Website** — SvelteKit marketing/legal site in `website/`
+## Repository structure
+
+| Directory | Purpose |
+|-----------|---------|
+| `iOS/` | iOS app (SwiftUI) |
+| `Android/` | Android app (Kotlin/Compose) |
+| `website/` | Marketing/legal site and OAuth metadata (`inkwell.ewancroft.uk`) |
 
 ## Features
 
@@ -86,4 +90,4 @@ If you find this project useful, consider supporting its development:
 
 ## Licence
 
-AGPL 3.0 — see `iOS/LICENSE`
+AGPL 3.0 — see `LICENSE`
