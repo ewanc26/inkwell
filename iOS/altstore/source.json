@@ -27,6 +27,14 @@
       "versions": [
         {
           "version": "1.0",
+          "buildVersion": "50",
+          "date": "2026-08-16",
+          "localizedDescription": "Fixes OAuth token exchange failures on PDS providers that don't expose DPoP nonces on GET requests. The token endpoint is now pre-flown via POST with a sanitized body to obtain the nonce before presenting the real authorization code, preventing invalid_grant errors on retry.",
+          "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-1.0.ipa",
+          "size": 10219763
+        },
+        {
+          "version": "1.0",
           "buildVersion": "49",
           "date": "2026-06-27",
           "localizedDescription": "First AltStore release. Read, Discover, and Write tabs. OAuth sign-in with AT Protocol handle. Leaflet and Markdown rendering. Publication search via Standard.site public index. Background notification polling.",
