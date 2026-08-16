@@ -77,3 +77,9 @@ website/.env.local
 website/.env.*.local
 website/package-lock.json
 website/.letta/
+.xcuserdata/
+*.xcuserstate
+iOS-Design-References/
+Design-References/
+iOS/screenshots/
+Android/screenshots/
