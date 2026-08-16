@@ -244,33 +244,100 @@ final class LoginStateManager {
 
             // Wrapping loader: intercept the first POST to the token
             // endpoint for nonce pre-warming.
+            struct TokenRequestBody: Codable {
+                let code: String
+                let code_verifier: String
+                let redirect_uri: String
+                let grant_type: String
+                let client_id: String
+            }
+
+            var didPreflight = false
             let loader: URLResponseProvider = { [logger] request in
                 guard request.url?.absoluteString == tokenEndpoint,
                       request.httpMethod == "POST" else {
                     return try await debugLoader(request)
                 }
 
-                // First POST to token endpoint — don't send it yet.
+                // Does the request's DPoP proof already carry a nonce? The
+                // library primes it from other AS responses (e.g. the PAR
+                // flow), so the first token request may already be signed
+                // with a valid nonce. Intercepting such a request and
+                // answering with a use_dpop_nonce whose nonce matches the one
+                // the signer already holds would suppress the retry and fail
+                // decoding — so pass it straight through.
+                func dpopCarriesNonce(_ request: URLRequest) -> Bool {
+                    guard let header = request.value(forHTTPHeaderField: "DPoP") else { return false }
+                    let segments = header.split(separator: ".")
+                    guard segments.count >= 2 else { return false }
+                    var b64 = String(segments[1])
+                        .replacingOccurrences(of: "-", with: "+")
+                        .replacingOccurrences(of: "_", with: "/")
+                    while b64.count % 4 != 0 { b64.append("=") }
+                    guard let data = Data(base64Encoded: b64),
+                          let json = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
+                          let nonce = json["nonce"] as? String,
+                          !nonce.isEmpty else { return false }
+                    return true
+                }
+
+                // Only the first nonce-less POST needs pre-warming; anything
+                // already signed with a nonce (and the library's retry) must
+                // pass through.
+                if didPreflight || dpopCarriesNonce(request) {
+                    return try await debugLoader(request)
+                }
+                didPreflight = true
+
+                // Build a fake use_dpop_nonce response so the library's
+                // DPoP layer caches the correct nonce and retries.
+                func fakeNonceResponse(_ nonce: String) -> (Data, HTTPURLResponse) {
+                    let errorBody = Data("{\"error\":\"use_dpop_nonce\"}".utf8)
+                    let fakeResponse = HTTPURLResponse(
+                        url: request.url!,
+                        statusCode: 401,
+                        httpVersion: nil,
+                        headerFields: ["DPoP-Nonce": nonce]
+                    )!
+                    return (errorBody, fakeResponse)
+                }
+
                 // Pre-flight to get the token endpoint's own DPoP nonce.
                 var preflight = URLRequest(url: URL(string: tokenEndpoint)!)
                 preflight.httpMethod = "GET"
                 let (_, preResp) = try await URLSession.defaultProvider(preflight)
-                guard let dpopNonce = (preResp as? HTTPURLResponse)?.value(forHTTPHeaderField: "DPoP-Nonce") else {
-                    return try await debugLoader(request)
+                if let dpopNonce = (preResp as? HTTPURLResponse)?.value(forHTTPHeaderField: "DPoP-Nonce") {
+                    logger.info("[SignIn] token endpoint nonce pre-flighted via GET, retrying with correct nonce")
+                    return fakeNonceResponse(dpopNonce)
                 }
 
-                logger.info("[SignIn] token endpoint nonce pre-flighted, retrying with correct nonce")
+                // Some PDSes (e.g. pds.croft.click) don't expose the nonce
+                // on a GET. Re-run the pre-flight as a POST whose JSON body
+                // swaps the real auth code for a dummy, so the code is never
+                // presented without a valid nonce — otherwise the PDS consumes
+                // the code on the use_dpop_nonce response and the retry fails
+                // with invalid_grant.
+                if let body = request.httpBody,
+                   let tokenRequest = try? JSONDecoder().decode(TokenRequestBody.self, from: body) {
+                    let sanitized = TokenRequestBody(
+                        code: "preflight-invalid-code",
+                        code_verifier: tokenRequest.code_verifier,
+                        redirect_uri: tokenRequest.redirect_uri,
+                        grant_type: tokenRequest.grant_type,
+                        client_id: tokenRequest.client_id
+                    )
+                    var post = URLRequest(url: request.url!)
+                    post.httpMethod = request.httpMethod
+                    post.allHTTPHeaderFields = request.allHTTPHeaderFields
+                    post.httpBody = try? JSONEncoder().encode(sanitized)
+                    let (_, postResp) = try await debugLoader(post)
+                    if let dpopNonce = (postResp as? HTTPURLResponse)?.value(forHTTPHeaderField: "DPoP-Nonce") {
+                        logger.info("[SignIn] token endpoint nonce pre-flighted via POST, retrying with correct nonce")
+                        return fakeNonceResponse(dpopNonce)
+                    }
+                }
 
-                // Return a fake use_dpop_nonce response so the library's
-                // DPoP layer caches the correct nonce and retries.
-                let errorBody = Data("{\"error\":\"use_dpop_nonce\"}".utf8)
-                let fakeResponse = HTTPURLResponse(
-                    url: request.url!,
-                    statusCode: 401,
-                    httpVersion: nil,
-                    headerFields: ["DPoP-Nonce": dpopNonce]
-                )!
-                return (errorBody, fakeResponse)
+                return try await debugLoader(request)
             }
 
             let config = Authenticator.Configuration(
