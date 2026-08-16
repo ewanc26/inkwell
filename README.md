@@ -1,9 +1,9 @@
 # Inkwell
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="logo-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="logo-light.svg">
-  <img alt="Inkwell" src="logo-light.svg" width="110">
+  <source media="(prefers-color-scheme: dark)" srcset="iOS/logo-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="iOS/logo-light.svg">
+  <img alt="Inkwell" src="iOS/logo-light.svg" width="110">
 </picture>
 
 A native reader and writer for the [Standard.site](https://standard.site) publishing ecosystem on AT Protocol.
@@ -12,6 +12,7 @@ This monorepo contains:
 
 - **iOS** — SwiftUI app in `iOS/`
 - **Android** — Kotlin/Compose app in `Android/`
+- **Website** — SvelteKit marketing/legal site in `website/`
 
 ## Features
 
@@ -23,7 +24,7 @@ This monorepo contains:
 - Searches the cross-platform Standard.site public index, fetches records directly from the author.
 - Publication `.well-known` and document `<link>` verification.
 - Polls subscribed publications for notifications (in-app + local), including background app refresh.
-- OAuth sign-in with your AT Protocol handle (no app password). Session resumes silently from the Keychain on relaunch.
+- OAuth sign-in with your AT Protocol handle (no app password). Session resumes silently on relaunch.
 
 ## Getting started
 
@@ -49,6 +50,8 @@ Build with Gradle:
 ./gradlew assembleDebug
 ```
 
+Run on API 26+ device or emulator. Sign in with your AT Protocol handle via OAuth.
+
 ## Interoperability
 
 Standard.site standardises publishing metadata rather than one body format. Inkwell always publishes `textContent` and defaults to `at.markpub.markdown`, while retaining readers for `pub.leaflet.content`, `blog.pckt.content`, and `app.offprint.content`.
@@ -63,7 +66,7 @@ The app icon and in-app wordmark share one set of vector coordinates, so they al
 
 ### iOS
 
-`InkwellTests` covers AT-URI parsing, record encoding/decoding, publication/document association rules, theme and verification-endpoint resolution, and tolerant decoding of malformed records.
+`iOS/InkwellTests/StandardSiteTests.swift` covers AT-URI parsing, record encoding/decoding, publication/document association rules, theme and verification-endpoint resolution, and tolerant decoding of malformed records.
 
 ### Android
 
@@ -83,4 +86,4 @@ If you find this project useful, consider supporting its development:
 
 ## Licence
 
-AGPL 3.0 — see `LICENCE`
+AGPL 3.0 — see `iOS/LICENSE`
