@@ -18,6 +18,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 fun WriterScreen(
     viewModel: WriterViewModel = hiltViewModel(),
     onSignOut: () -> Unit = {},
+    onNavigateToPost: (String, String?, String?, String?, String?) -> Unit = { _, _, _, _, _ -> },
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var pubExpanded by remember { mutableStateOf(false) }
@@ -31,7 +32,7 @@ fun WriterScreen(
         try {
             val pkg = context.packageManager.getPackageInfo(context.packageName, 0)
             "Version ${pkg.versionName} (${pkg.longVersionCode})"
-        } catch (_: Exception) { "Version 1.0.1 (2)" }
+        } catch (_: Exception) { "Version 1.2.0 (4)" }
     }
 
     LaunchedEffect(Unit) {
@@ -118,6 +119,30 @@ fun WriterScreen(
                 }
             }
 
+            // Verification status
+            if (uiState.isVerifyingPublication) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)
+                    Text(
+                        "Verifying publication...",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            } else if (uiState.verificationMessage != null) {
+                Text(
+                    uiState.verificationMessage!!,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (uiState.verifiedPublicationUri != null)
+                        MaterialTheme.colorScheme.primary
+                    else
+                        MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+
             // Format picker
             Box {
                 OutlinedButton(
@@ -155,6 +180,12 @@ fun WriterScreen(
             )
 
             OutlinedTextField(
+                value = uiState.path, onValueChange = { viewModel.onPathChanged(it) },
+                label = { Text("Path (optional, e.g. my-post)") }, singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
                 value = uiState.markdown, onValueChange = { viewModel.onMarkdownChanged(it) },
                 label = { Text("Content (Markdown)") },
                 modifier = Modifier.fillMaxWidth().weight(1f),
@@ -169,16 +200,35 @@ fun WriterScreen(
                 )
             }
             if (uiState.publishSuccess != null) {
-                Text(
-                    uiState.publishSuccess!!,
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.bodySmall
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Text(
+                        uiState.publishSuccess!!,
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(1f),
+                    )
+                    if (uiState.publishedUri != null) {
+                        val publishedUri = requireNotNull(uiState.publishedUri)
+                        TextButton(
+                            onClick = {
+                                onNavigateToPost(publishedUri, null, null, null, null)
+                            },
+                            contentPadding = PaddingValues(horizontal = 12.dp),
+                        ) {
+                            Text("View post")
+                            Spacer(Modifier.width(4.dp))
+                            Icon(Icons.AutoMirrored.Outlined.Send, contentDescription = null, Modifier.size(16.dp))
+                        }
+                    }
+                }
             }
 
             Button(
                 onClick = { viewModel.publish() },
-                enabled = uiState.title.isNotBlank() && uiState.selectedPublication != null && !uiState.isPublishing,
+                enabled = uiState.title.isNotBlank() && uiState.selectedPublication != null && !uiState.isPublishing && !uiState.isVerifyingPublication,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 if (uiState.isPublishing) {
