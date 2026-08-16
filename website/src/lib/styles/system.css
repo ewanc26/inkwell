@@ -1,42 +1,57 @@
 /* ================================================================
  * system.css — System-level utilities and accessibility
  *
- * Skip-to-content link, screen-reader-only, keyframes,
- * and other utilities that apply globally.
+ * Skip-to-content link, screen-reader-only, focus rings,
+ * keyframes, and the reduced-motion override.  Mirrors the
+ * accessibility register of ewancroft.uk: a high-contrast,
+ * visible focus ring on the primary green.
  * ================================================================ */
 
-/* ── Skip to content ─────────────────────────────────────────── */
+@layer utilities {
+  /* ── Skip to content ─────────────────────────────────────────── */
 
-.skip-to-content {
-  position: absolute;
-  left: -9999px;
-  top: var(--spacing-sm);
-  z-index: 9999;
-  padding: var(--spacing-xs) var(--spacing-lg);
-  background-color: var(--accent-500);
-  color: white;
-  font-weight: 600;
-  font-size: var(--text-sm);
-  border-radius: var(--radius-md);
-  text-decoration: none;
-}
+  .skip-to-content {
+    position: fixed;
+    left: var(--space-md);
+    top: var(--space-md);
+    transform: translateY(calc(-100% - var(--space-lg)));
+    z-index: 999;
+    padding: var(--space-sm) var(--space-md);
+    background-color: var(--color-text-950);
+    color: var(--color-background-50);
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    transition: transform var(--duration-fast) var(--ease-out-quart);
+  }
 
-.skip-to-content:focus {
-  left: var(--spacing-sm);
-}
+  .skip-to-content:focus {
+    transform: translateY(0);
+    outline: 3px solid var(--color-primary-500);
+    outline-offset: 2px;
+  }
 
-/* ── Screen reader only ──────────────────────────────────────── */
+  /* ── Focus ring ──────────────────────────────────────────────── */
 
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+  *:focus-visible {
+    outline: 3px solid var(--color-primary-500);
+    outline-offset: 2px;
+    border-radius: var(--radius-lg);
+  }
+
+  /* ── Screen reader only ──────────────────────────────────────── */
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
 }
 
 /* ── Keyframes ────────────────────────────────────────────────── */
@@ -44,7 +59,7 @@
 @keyframes fade-slide-up {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -64,20 +79,26 @@
 @keyframes hero-reveal {
   from {
     opacity: 0;
-    transform: scale(0.96) translateY(8px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
-    transform: scale(1) translateY(0);
+    transform: translateY(0);
   }
 }
 
-@keyframes live-pulse {
-  0%,
-  100% {
-    opacity: 1;
+/* ── Reduced motion ────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
-  50% {
-    opacity: 0.6;
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

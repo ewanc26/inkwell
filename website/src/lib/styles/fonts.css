@@ -1,14 +1,25 @@
 /* ================================================================
  * fonts.css — Web font declarations
  *
- * There are currently no self-hosted font files in `static/`.
- * The previous @font-face rules pointed at /fonts/inter.woff2 and
- * /fonts/jetbrains-mono.woff2, which do not exist, so every page
- * load fired two requests that 404'd before falling back to the
- * system stack declared in tokens.css (--font-sans / --font-mono).
- *
- * The declarations are removed rather than left dangling: rendering
- * is identical, minus the failed requests. Restore them here — and
- * drop the .woff2 files into static/fonts/ — if the variable fonts
- * are ever shipped with the site.
+ * Self-hosted to match the ewancroft.uk design system: no third-party
+ * font CDN, no runtime tracking. The woff2 files live in static/fonts
+ * and are the only custom fonts the site loads; everything else falls
+ * back to the system stack declared in tokens.css.
  * ================================================================ */
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("/fonts/inter-variable.woff2") format("woff2-variations");
+  src: url("/fonts/inter-variable.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/jetbrains-mono.woff2") format("woff2");
+}
