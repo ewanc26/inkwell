@@ -26,7 +26,7 @@
 </svelte:head>
 
 <!-- Hero -->
-<section class="container page-hd hero-reveal">
+<section class="site-container page-hd hero-reveal">
   <!--
     Wordmark SVG — mirrors InkwellMark.swift in the iOS app.
     The capsule shapes and ink-drop circle are the app icon's
@@ -37,7 +37,7 @@
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 400 952"
     fill="none"
-    class="mx-auto mb-8 h-20 w-auto sm:h-24"
+    class="mb-8 h-20 w-auto sm:h-24"
     aria-label="Inkwell"
     role="img"
   >
@@ -80,11 +80,11 @@
 </section>
 
 <!-- Download -->
-<section id="download" class="container scroll-mt-24 pb-12">
+<section id="download" class="site-container scroll-mt-24 pb-12">
   <h2 class="section-title">
     Get Inkwell
   </h2>
-  <p class="mx-auto mb-12 max-w-[42rem] text-center text-lg leading-relaxed text-pretty">
+  <p class="mb-12 max-w-[42rem] text-lg leading-relaxed text-pretty">
     No App Store, no Play Store — Inkwell installs straight from its own
     hosted sources, so updates ship the moment they&rsquo;re built.
   </p>
@@ -116,9 +116,9 @@
       <div class="feature-icon"><Smartphone class="h-5 w-5" /></div>
       <h3>Android, via F-Droid</h3>
       <p>
-        The Android port built with Jetpack Compose and Material 3. Add this
-        self-hosted repo in F-Droid, Droid-ify, or Obtainium to install
-        it and receive updates.
+        The experimental Android port is built with Jetpack Compose and
+        Material 3. Add this self-hosted repo in F-Droid, Droid-ify, or
+        Obtainium to install it and receive updates.
       </p>
       <a href={FDROID_REPO_LINK} class="btn btn-primary active-press">
         <Download class="h-4 w-4" />
@@ -137,47 +137,47 @@
 </section>
 
 <!-- Screenshots -->
-<section class="container py-12">
+<section class="site-container py-12">
   <h2 class="section-title">
     See it in action
   </h2>
-  <p class="mx-auto mb-12 max-w-[42rem] text-center text-lg leading-relaxed text-pretty">
+  <p class="mb-12 max-w-[42rem] text-lg leading-relaxed text-pretty">
     The same calm, three-tab workspace on iOS and Android — read,
     discover, and write, all from your own PDS.
   </p>
 
   <div class="mb-16">
     <h3 class="section-heading">iOS</h3>
-    <div class="flex flex-wrap items-center justify-center gap-8">
+    <div class="flex flex-wrap items-center justify-start gap-8">
       <figure class="animate-in stagger-1">
         <img
-          src="/screenshots/ios/reader-6.5.svg"
+          src="/screenshots/ios/reader.png"
           alt="Inkwell reader on iOS showing a published document"
           class="h-72 w-auto screenshot-frame sm:h-80"
-          width="400"
-          height="865"
+          width="428"
+          height="930"
           loading="lazy"
         />
         <figcaption class="screenshot-caption">Read</figcaption>
       </figure>
       <figure class="animate-in stagger-2">
         <img
-          src="/screenshots/ios/reader-5.5.svg"
+          src="/screenshots/ios/discover.png"
           alt="Inkwell discover on iOS showing search results"
           class="h-72 w-auto screenshot-frame sm:h-80"
-          width="400"
-          height="711"
+          width="428"
+          height="930"
           loading="lazy"
         />
         <figcaption class="screenshot-caption">Discover</figcaption>
       </figure>
       <figure class="animate-in stagger-3">
         <img
-          src="/screenshots/ios/writer.svg"
+          src="/screenshots/ios/writer.png"
           alt="Inkwell writer on iOS showing the compose screen"
           class="h-72 w-auto screenshot-frame sm:h-80"
-          width="400"
-          height="865"
+          width="428"
+          height="930"
           loading="lazy"
         />
         <figcaption class="screenshot-caption">Write</figcaption>
@@ -187,49 +187,46 @@
 
   <div>
     <h3 class="section-heading">Android</h3>
-    <div class="flex flex-wrap items-center justify-center gap-8">
+    <div class="flex flex-wrap items-center justify-start gap-8">
       <figure class="animate-in stagger-1">
         <img
-          src="/screenshots/android/reader.svg"
+          src="/screenshots/android/reader.png"
           alt="Inkwell reader on Android showing a published document"
           class="h-72 w-auto screenshot-frame sm:h-80"
-          width="400"
-          height="800"
+          width="412"
+          height="915"
           loading="lazy"
         />
         <figcaption class="screenshot-caption">Read</figcaption>
       </figure>
       <figure class="animate-in stagger-2">
         <img
-          src="/screenshots/android/discover.svg"
+          src="/screenshots/android/discover.png"
           alt="Inkwell discover on Android showing search results"
           class="h-72 w-auto screenshot-frame sm:h-80"
-          width="400"
-          height="800"
+          width="412"
+          height="915"
           loading="lazy"
         />
         <figcaption class="screenshot-caption">Discover</figcaption>
       </figure>
       <figure class="animate-in stagger-3">
         <img
-          src="/screenshots/android/writer.svg"
+          src="/screenshots/android/writer.png"
           alt="Inkwell writer on Android showing the compose screen"
           class="h-72 w-auto screenshot-frame sm:h-80"
-          width="400"
-          height="800"
+          width="412"
+          height="915"
           loading="lazy"
         />
         <figcaption class="screenshot-caption">Write</figcaption>
       </figure>
     </div>
   </div>
-  <p class="mt-10 text-center text-sm text-muted">
-    Screenshots are mockups — real captures coming soon.
-  </p>
 </section>
 
 <!-- Features -->
-<section class="container pb-12">
+<section class="site-container pb-12">
   <h2 class="section-title">
     What Inkwell does
   </h2>
@@ -249,9 +246,9 @@
       <div class="feature-icon"><Compass class="h-5 w-5" /></div>
       <h3>Discover</h3>
       <p>
-        Search the cross-platform public index. Subscribe to publications
-        and get notified when new documents appear. Background refresh
-        keeps your feed current.
+        Search the cross-platform public index and subscribe to publications.
+        On iOS, background refresh can keep your feed current and notify you
+        when new documents appear.
       </p>
     </div>
 
@@ -288,14 +285,16 @@
       <div class="feature-icon"><Apple class="h-5 w-5" /></div>
       <h3>iOS &amp; Android</h3>
       <p>
-        Primary iOS app built with SwiftUI. Respects Dynamic Type, accessibility, and system theme. Android port built with Jetpack Compose and Material 3 — feature-matched with the iOS app.
+        The primary iOS app is built with SwiftUI and respects Dynamic Type,
+        accessibility, and system theme. The Jetpack Compose Android port is
+        experimental and does not yet include every iOS feature.
       </p>
     </div>
   </div>
 </section>
 
 <!-- Secure by design -->
-<section class="container py-12">
+<section class="site-container py-12">
   <div class="callout animate-in stagger-3">
     <h2>Secure by design</h2>
     <p>
@@ -312,22 +311,15 @@
 </section>
 
 <!-- What's new -->
-<section class="container py-12">
-  <h2 class="section-title">What's new</h2>
+<section class="site-container py-12">
+  <h2 class="section-title">Availability</h2>
   <div class="callout">
-    <h3>Android 1.2.0</h3>
-    <ul class="callout-list">
-      <li>Publication verification — publications are now verified against their .well-known endpoints before publishing</li>
-      <li>Path field — set a custom URL path for each post (e.g. <code class="text-sm">my-post</code>)</li>
-      <li>View post button — jump straight to your published post from the writer</li>
-      <li>Comments sorted by newest first</li>
-      <li>Pull-to-refresh on the reader</li>
-      <li>Previous/next navigation between posts</li>
-      <li>Discover results are tappable</li>
-    </ul>
-    <p class="mt-4 text-sm text-pretty">
-      iOS remains at 1.0 (build 49). The next iOS release will bring
-      feature parity with these Android improvements.
+    <h3>iOS first, Android in progress</h3>
+    <p class="text-pretty">
+      Inkwell&rsquo;s iOS app is the primary implementation. The Android app is
+      available as an experimental build for readers who would like to follow
+      its development; its writer, detail, comment, and notification features
+      are still catching up.
     </p>
   </div>
 </section>
