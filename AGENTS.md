@@ -2,6 +2,11 @@
 
 Guidance for agents working on Inkwell, a native reader and writer for the Standard.site publishing ecosystem on AT Protocol. This monorepo contains all three clients: iOS (`iOS/`), Android (`Android/`), and the marketing/legal site (`website/`).
 
+Platform-specific guidance lives in:
+- [`iOS/AGENTS.md`](iOS/AGENTS.md) — iOS app source boundaries, Keychain/DPoP rules, and Xcode build/test workflow
+- [`Android/AGENTS.md`](Android/AGENTS.md) — Android app source boundaries, EncryptedSharedPreferences, and Gradle workflow
+- [`website/AGENTS.md`](website/AGENTS.md) — SvelteKit site authority, legal/oauth accuracy, and Vercel deployment
+
 ## Read First and Source Boundaries
 
 - Read `README.md`, platform-specific build files, and all source in the touched flow.
@@ -20,8 +25,8 @@ Guidance for agents working on Inkwell, a native reader and writer for the Stand
 
 ## OAuth and Data Invariants
 
-- **iOS:** OAuth tokens and the P-256 DPoP private key belong in Keychain. `UserDefaults` stores non-secret handle/PDS hints plus notification state and seen URIs; never move credentials, tokens, auth codes, or proof material there or into logs. Keep client ID, custom callback scheme, scopes, metadata hosted at `inkwell.ewancroft.uk`, Info.plist URL type, and runtime credentials identical. Preserve issuer/subject/PDS validation, PKCE/authenticator state, DPoP key continuity, nonce retry behavior, refresh rotation, and logout deletion.
-- **Android:** OAuth sessions are JSON in `EncryptedSharedPreferences` backed by a MasterKey. Keep tokens, refresh state, PKCE/DPoP material, and authorization URLs out of logs and ordinary preferences. The manifest accepts every URI using the custom scheme, while `MainActivity` checks `/callback`. Preserve state validation inside the OAuth library, reject unrelated/deceptive callbacks, and test cold/warm `singleTask` delivery. Authentication changes do not automatically rebuild an existing Navigation Compose graph merely because `startDestination` changes.
+- **iOS:** OAuth tokens and the P-256 DPoP private key belong in Keychain. `UserDefaults` stores non-secret handle/PDS hints plus notification state and seen URIs; never move credentials, tokens, auth codes, or proof material there or into logs. Keep client ID, custom callback scheme, scopes, metadata hosted at `inkwell.ewancroft.uk`, Info.plist URL type, and runtime credentials identical. Preserve issuer/subject/PDS validation, PKCE/authenticator state, DPoP key continuity, nonce retry behavior, refresh rotation, and logout deletion. See `iOS/AGENTS.md` for iOS-specific OAuth details.
+- **Android:** OAuth sessions are JSON in `EncryptedSharedPreferences` backed by a MasterKey. Keep tokens, refresh state, PKCE/DPoP material, and authorization URLs out of logs and ordinary preferences. The manifest accepts every URI using the custom scheme, while `Android/app/src/main/java/uk/ewancroft/inkwell/MainActivity.kt` checks `/callback`. Preserve state validation inside the OAuth library, reject unrelated/deceptive callbacks, and test cold/warm `singleTask` delivery. Authentication changes do not automatically rebuild an existing Navigation Compose graph merely because `startDestination` changes. See `Android/AGENTS.md` for Android-specific networking rules.
 - **Both:** Keep handles, DIDs, PDS origins, AT URIs, CIDs, rkeys, revisions, canonical site URLs, and verification proofs distinct. Public cross-repo reads must resolve the owning DID's PDS rather than assume the signed-in service.
 
 ## Content, Concurrency, and Lifecycle
@@ -30,7 +35,7 @@ Guidance for agents working on Inkwell, a native reader and writer for the Stand
 - Facet byte offsets are UTF-8 offsets, not platform character indices. Blob MIME/size/ref, record `$type`, `site`, `path`, timestamps, themes, and publication association must round-trip exactly.
 - **iOS:** `LoginStateManager`, notification/background managers, and UI state are `@MainActor`; network calls are async but much orchestration still runs on the main actor. Do not introduce blocking I/O, shared DPoP nonce races, detached unsafe mutation, or uncancelled view tasks. Background refresh identifiers, Info.plist permitted identifiers, scheduling, expiry handlers, notification permission, first-poll baseline, 50-item display retention, and 500-URI seen retention form one contract.
 - **Android:** Compose state must remain lifecycle-aware and process-recreatable. Avoid writes in composition/effects, duplicate OAuth callbacks, stale concurrent feed loads, and uncancelled requests. Validate back stack, rotation, process death, deep links, and logout. Use structured concurrency and `Dispatchers.IO` for synchronous OkHttp. URL-encode every XRPC query value.
-- **Website:** `+page.svelte` and `+layout.svelte` must remain server-rendered and static where possible. The OAuth endpoint (`/client-metadata.json`) must remain dynamic. Do not globally prerender without verifying deployment semantics.
+- **Website:** `website/src/routes/+page.svelte` and `website/src/routes/+layout.svelte` must remain server-rendered and static where possible. The OAuth endpoint (`/client-metadata.json`) must remain dynamic. Do not globally prerender without verifying deployment semantics.
 - **Both apps:** Preserve native accessibility, Dynamic Type, dark/light behavior, reduced motion, safe-area behavior, and platform-appropriate mark/wordmark coordinates.
 
 ## Build, Tests, and Distribution
@@ -38,10 +43,10 @@ Guidance for agents working on Inkwell, a native reader and writer for the Stand
 - **iOS:** The checked-in project uses Swift 5 mode, app deployment target iOS 26.0, test target iOS 26.5, bundle `uk.ewancroft.Inkwell`, marketing version `1.0`, and build `49`. Resolve Swift packages through Xcode and build the `Inkwell` scheme on an installed compatible simulator.
   - Run `xcodebuild -project iOS/Inkwell.xcodeproj -scheme Inkwell -destination 'platform=iOS Simulator,name=<available iOS 26.5 device>' build test`, adapting only the destination to installed runtimes.
   - Unit tests cover AT-URI parsing, association/canonical URLs, verification endpoint paths, wire keys, search decoding, notification JSON, and tolerant record pages.
-  - `iOS/altstore/source.json` must match bundle/version/build, privacy/permissions, hosted icon/IPA, byte size, and release notes.
+  - `iOS/altstore/source.json` must match bundle/version/build, privacy/permissions, hosted icon/IPA, byte size, and release notes. See `iOS/AGENTS.md` for iOS-specific distribution requirements.
 - **Android:** Target facts: compile/target SDK 36, minimum SDK 26, Java/Kotlin JVM 17, release minification enabled, app ID `uk.ewancroft.inkwell`, and debug ID suffix `.debug`.
   - Run `./gradlew clean assembleDebug lint test` from `Android/` with a valid local Android SDK/JDK. For release work also run `./gradlew assembleRelease` and inspect R8 output.
-  - There are no JVM or instrumentation tests for the app in general. `StandardSiteVerifierTest` is the only unit test source, including three tests that hit the real `blog.ewancroft.uk` standard.site publication over the network.
-- **Website:** pnpm is authoritative (`pnpm-lock.yaml` and `pnpm-workspace.yaml`; no npm lock). Vercel installs with `pnpm install` on Node 22. Run `pnpm install --frozen-lockfile`, `pnpm check`, and `pnpm build`. There is no `lint` or test script; use `pnpm exec prettier --check --ignore-unknown .` for formatting checks.
+  - There are no JVM or instrumentation tests for the app in general. `StandardSiteVerifierTest` is the only unit test source, including three tests that hit the real `blog.ewancroft.uk` standard.site publication over the network. See `Android/AGENTS.md` for Android-specific capability gaps.
+- **Website:** pnpm is authoritative (`pnpm-lock.yaml` and `pnpm-workspace.yaml`; no npm lock). Vercel installs with `pnpm install` on Node 22. Run `pnpm install --frozen-lockfile`, `pnpm check`, and `pnpm build`. There is no `lint` or test script; use `pnpm exec prettier --check --ignore-unknown .` for formatting checks. See `website/AGENTS.md` for website-specific design/accessibility constraints.
 - **All:** Manually exercise fresh/cancelled OAuth, bad state/issuer/nonce, restore/refresh/revocation/logout, every reader format, Unicode facets, blobs, create/edit/delete, subscriptions/recommends/comments, verification, pagination, offline errors, and background/local notifications.
 - Never commit `local.properties`, `.idea/`, `.gradle/`, `app/build/`, signing material, OAuth sessions, or real credentials.

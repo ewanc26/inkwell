@@ -2,6 +2,8 @@
 
 Guidance for agents working on Inkwell for iOS, the primary SwiftUI client in the Inkwell monorepo. This directory contains the iOS app, tests, AltStore metadata, and OAuth configuration.
 
+For monorepo-wide rules, see [`../AGENTS.md`](../AGENTS.md). For Android-specific boundaries, see [`../Android/AGENTS.md`](../Android/AGENTS.md). For website/legal accuracy, see [`../website/AGENTS.md`](../website/AGENTS.md).
+
 ## Read First and Source Boundaries
 
 - Read `../README.md`, `../AGENTS.md`, `Inkwell.xcodeproj` project settings, `oauth/client-metadata.json`, privacy/entitlement files, and all source in the touched flow.
@@ -15,9 +17,9 @@ Guidance for agents working on Inkwell for iOS, the primary SwiftUI client in th
 ## OAuth and Data Invariants
 
 - OAuth tokens and the P-256 DPoP private key belong in Keychain. `UserDefaults` stores non-secret handle/PDS hints plus notification state and seen URIs; never move credentials, tokens, auth codes, or proof material there or into logs.
-- Keep client ID, custom callback scheme, scopes, metadata hosted at `inkwell.ewancroft.uk`, Info.plist URL type, and runtime credentials identical.
+- Keep client ID, custom callback scheme, scopes, metadata hosted at `inkwell.ewancroft.uk`, Info.plist URL type, and runtime credentials identical. The hosted metadata at `inkwell.ewancroft.uk` must stay aligned with the checked-in `oauth/client-metadata.json`.
 - Preserve issuer/subject/PDS validation, PKCE/authenticator state, DPoP key continuity, nonce retry behavior, refresh rotation, and logout deletion.
-- Comment creation writes `pub.leaflet.comment`. Verify authorization for every mutation and ensure the hosted metadata declares this scope.
+- Comment creation writes `pub.leaflet.comment`. Verify authorization for every mutation and ensure the hosted metadata declares this scope. See `../website/AGENTS.md` for OAuth contract details shared with the website and Android.
 
 ## Content, Concurrency, and Lifecycle
 
