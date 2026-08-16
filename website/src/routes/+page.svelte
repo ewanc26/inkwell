@@ -221,6 +221,17 @@
         />
         <figcaption class="screenshot-caption">Write</figcaption>
       </figure>
+      <figure class="animate-in stagger-4">
+        <img
+          src="/screenshots/android/post.png"
+          alt="A verified article open in Inkwell on Android"
+          class="h-72 w-auto screenshot-frame sm:h-80"
+          width="412"
+          height="915"
+          loading="lazy"
+        />
+        <figcaption class="screenshot-caption">Article</figcaption>
+      </figure>
     </div>
   </div>
 </section>
