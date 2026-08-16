@@ -243,6 +243,20 @@ object StandardSiteVerifier {
         }
     }
 
+    /** Builds the `<link>` discovery tag a document page must serve in its
+     *  `<head>` to point back at its AT-URI record — the mirror image of
+     *  [verifyDocument]. Mirrors iOS's
+     *  `SiteStandardLexicon.Verification.discoveryLinkTag`.
+     *
+     *  @param forRecordUri The AT-URI of the `site.standard.publication` or
+     *  `site.standard.document` record.
+     *  @param relation Either `"site.standard.publication"` or
+     *  `"site.standard.document"`, matching the kind of record [forRecordUri]
+     *  points to.
+     */
+    fun discoveryLinkTag(forRecordUri: String, relation: String): String =
+        "<link rel=\"$relation\" href=\"$forRecordUri\" />"
+
     /**
      * Regex-based `<link>` search, tolerant of either attribute order and quote style.
      * Mirrors the iOS implementation's approach rather than pulling in an HTML parser.

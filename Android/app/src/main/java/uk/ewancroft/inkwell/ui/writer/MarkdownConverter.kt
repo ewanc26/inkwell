@@ -458,104 +458,115 @@ object MarkdownConverter {
     }
 
     private fun facetsFromMarkdown(text: String): Pair<String, List<JsonObject>> {
-        val facets = mutableListOf<JsonObject>()
-        var plaintext = text
-        var byteStart = 0
-
         val boldRegex = Regex("\\*\\*(.+?)\\*\\*")
         val italicRegex = Regex("\\*(.+?)\\*")
         val codeRegex = Regex("`(.+?)`")
         val linkRegex = Regex("\\[(.+?)\\]\\((.+?)\\)")
 
-        val replacements = mutableListOf<Triple<Int, Int, String>>()
+        // Every format span is resolved against the original text with its
+        // marker-strip ranges. Later matches skip any span already claimed so
+        // nested/overlapping formatting can't double-strip or emit conflicting
+        // facets (e.g. the italic pass inside `**bold**`).
+        data class Span(
+            val start: Int,
+            val innerStart: Int,
+            val innerEnd: Int,
+            val end: Int,
+            val type: String,
+            val url: String? = null,
+        )
+
+        val spans = mutableListOf<Span>()
+
+        fun claim(span: Span) {
+            if (spans.any { span.innerStart < it.end && it.innerStart < span.end }) return
+            spans.add(span)
+        }
 
         for (match in boldRegex.findAll(text)) {
-            val start = match.range.first
-            val end = match.range.last + 1
-            val inner = match.groupValues[1]
-            val utf8Start = text.substring(0, start).toByteArray(Charsets.UTF_8).size
-            val utf8End = text.substring(0, end).toByteArray(Charsets.UTF_8).size
-            facets.add(buildJsonObject {
-                put("\$type", "pub.leaflet.richtext.facet")
-                put("index", buildJsonObject {
-                    put("byteStart", utf8Start)
-                    put("byteEnd", utf8End)
-                })
-                put("features", buildJsonArray {
-                    add(buildJsonObject { put("\$type", "pub.leaflet.richtext.facet#bold") })
-                })
-            })
-            replacements.add(Triple(start, end, inner))
+            val innerStart = match.range.first + 2
+            claim(Span(match.range.first, innerStart, innerStart + match.groupValues[1].length, match.range.last + 1, "bold"))
         }
-
         for (match in italicRegex.findAll(text)) {
             if (match.value.startsWith("**")) continue
-            val start = match.range.first
-            val end = match.range.last + 1
-            val inner = match.groupValues[1]
-            val utf8Start = text.substring(0, start).toByteArray(Charsets.UTF_8).size
-            val utf8End = text.substring(0, end).toByteArray(Charsets.UTF_8).size
-            facets.add(buildJsonObject {
-                put("\$type", "pub.leaflet.richtext.facet")
-                put("index", buildJsonObject {
-                    put("byteStart", utf8Start)
-                    put("byteEnd", utf8End)
-                })
-                put("features", buildJsonArray {
-                    add(buildJsonObject { put("\$type", "pub.leaflet.richtext.facet#italic") })
-                })
-            })
-            replacements.add(Triple(start, end, inner))
+            val innerStart = match.range.first + 1
+            claim(Span(match.range.first, innerStart, innerStart + match.groupValues[1].length, match.range.last + 1, "italic"))
         }
-
         for (match in codeRegex.findAll(text)) {
-            val start = match.range.first
-            val end = match.range.last + 1
-            val inner = match.groupValues[1]
-            val utf8Start = text.substring(0, start).toByteArray(Charsets.UTF_8).size
-            val utf8End = text.substring(0, end).toByteArray(Charsets.UTF_8).size
-            facets.add(buildJsonObject {
-                put("\$type", "pub.leaflet.richtext.facet")
-                put("index", buildJsonObject {
-                    put("byteStart", utf8Start)
-                    put("byteEnd", utf8End)
-                })
-                put("features", buildJsonArray {
-                    add(buildJsonObject { put("\$type", "pub.leaflet.richtext.facet#code") })
-                })
-            })
-            replacements.add(Triple(start, end, inner))
+            val innerStart = match.range.first + 1
+            claim(Span(match.range.first, innerStart, innerStart + match.groupValues[1].length, match.range.last + 1, "code"))
+        }
+        for (match in linkRegex.findAll(text)) {
+            val innerStart = match.range.first + 1
+            claim(Span(match.range.first, innerStart, innerStart + match.groupValues[1].length, match.range.last + 1, "link", match.groupValues[2]))
         }
 
-        for (match in linkRegex.findAll(text)) {
-            val start = match.range.first
-            val end = match.range.last + 1
-            val inner = match.groupValues[1]
-            val url = match.groupValues[2]
-            val utf8Start = text.substring(0, start).toByteArray(Charsets.UTF_8).size
-            val utf8End = text.substring(0, end).toByteArray(Charsets.UTF_8).size
-            facets.add(buildJsonObject {
+        // Mark every character that belongs to a formatting marker.
+        val removed = BooleanArray(text.length)
+        for (span in spans) {
+            for (i in span.start until span.innerStart) removed[i] = true
+            for (i in span.innerEnd until span.end) removed[i] = true
+        }
+
+        // removedBefore[i] = markers stripped in text[0..i), mapping original
+        // character indices to their position in the stripped plaintext.
+        val removedBefore = IntArray(text.length + 1)
+        for (i in text.indices) {
+            removedBefore[i + 1] = removedBefore[i] + (if (removed[i]) 1 else 0)
+        }
+
+        val plaintext = buildString {
+            for (i in text.indices) if (!removed[i]) append(text[i])
+        }
+
+        // Cumulative UTF-8 byte offset of each character index in the
+        // plaintext. Facet byte ranges are byte offsets, not character
+        // indices, and must index the *plaintext* — not the original text
+        // (markers were stripped from it).
+        val bytePrefix = IntArray(plaintext.length + 1)
+        var byteCount = 0
+        var ci = 0
+        while (ci < plaintext.length) {
+            val cp = plaintext.codePointAt(ci)
+            val charCount = Character.charCount(cp)
+            byteCount += when {
+                cp < 0x80 -> 1
+                cp < 0x800 -> 2
+                cp < 0x10000 -> 3
+                else -> 4
+            }
+            ci += charCount
+            bytePrefix[ci] = byteCount
+        }
+        for (i in 1 until bytePrefix.size) {
+            if (bytePrefix[i] == 0) bytePrefix[i] = bytePrefix[i - 1]
+        }
+
+        val facets = spans.map { span ->
+            val pStart = span.innerStart - removedBefore[span.innerStart]
+            val pEnd = span.innerEnd - removedBefore[span.innerEnd]
+            buildJsonObject {
                 put("\$type", "pub.leaflet.richtext.facet")
                 put("index", buildJsonObject {
-                    put("byteStart", utf8Start)
-                    put("byteEnd", utf8End)
+                    put("byteStart", bytePrefix[pStart])
+                    put("byteEnd", bytePrefix[pEnd])
                 })
                 put("features", buildJsonArray {
                     add(buildJsonObject {
-                        put("\$type", "pub.leaflet.richtext.facet#link")
-                        put("uri", url)
+                        when (span.type) {
+                            "bold" -> put("\$type", "pub.leaflet.richtext.facet#bold")
+                            "italic" -> put("\$type", "pub.leaflet.richtext.facet#italic")
+                            "code" -> put("\$type", "pub.leaflet.richtext.facet#code")
+                            else -> {
+                                put("\$type", "pub.leaflet.richtext.facet#link")
+                                put("uri", span.url)
+                            }
+                        }
                     })
                 })
-            })
-            replacements.add(Triple(start, end, inner))
+            }
         }
 
-        var result = text
-        replacements.sortByDescending { it.first }
-        for ((start, end, replacement) in replacements) {
-            result = result.substring(0, start) + replacement + result.substring(end)
-        }
-
-        return result to facets
+        return plaintext to facets
     }
 }
