@@ -1,40 +1,44 @@
 /* ================================================================
  * motion.css — Entrance animations and interaction feedback
  *
- * Utility classes for staggered entrance animations,
- * hover/press micro-interactions, and reveal effects.
- * All respect prefers-reduced-motion via tokens.css.
+ * Entrance is always exponential easing at --duration-slow, a calm
+ * fade with a small upward drift — never a bounce.  Direct-manipulation
+ * feedback (press) is a quick, decisive scale.  All durations and
+ * easings come from tokens.css and collapse under reduced motion via
+ * system.css.
  * ================================================================ */
 
 /* ── Entrance animation ──────────────────────────────────────── */
 
 .animate-in {
-  animation: fade-slide-up var(--duration-slow) var(--ease-out-expo) backwards;
+  animation: fade-slide-up var(--duration-slow) var(--ease-out-expo) both;
 }
 
 /* ── Staggered delays ────────────────────────────────────────── */
 
-.stagger-1 { animation-delay: 50ms; }
-.stagger-2 { animation-delay: 120ms; }
-.stagger-3 { animation-delay: 200ms; }
-.stagger-4 { animation-delay: 280ms; }
-.stagger-5 { animation-delay: 360ms; }
+.stagger-1 {
+  animation-delay: 100ms;
+}
+.stagger-2 {
+  animation-delay: 200ms;
+}
+.stagger-3 {
+  animation-delay: 300ms;
+}
+.stagger-4 {
+  animation-delay: 400ms;
+}
+.stagger-5 {
+  animation-delay: 500ms;
+}
 
 /* ── Hero reveal ─────────────────────────────────────────────── */
 
 .hero-reveal {
-  animation: hero-reveal var(--duration-slow) var(--ease-out-expo) backwards;
+  animation: hero-reveal var(--duration-slow) var(--ease-out-expo) both;
 }
 
 /* ── Interaction feedback ────────────────────────────────────── */
-
-.hover-lift {
-  transition: transform var(--duration-fast) var(--ease-out-quart);
-}
-
-.hover-lift:hover {
-  transform: translateY(-2px);
-}
 
 .active-press {
   transition: transform var(--duration-fast) var(--ease-out-quart);

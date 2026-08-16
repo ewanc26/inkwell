@@ -5,94 +5,115 @@
  * stylesheet consumes these variables; none define their own.
  * If you're hardcoding a number, it should be here.
  *
- * Architecture mirrors ewancroft.uk: dual-definition pattern
- * (Tailwind v4 @theme → CSS custom properties via var())
- * with light-dark() inversion on every colour step.
+ * Shares its architecture and values with ewancroft.uk: dual
+ * definition (Tailwind v4 @theme → CSS custom properties via var()),
+ * light-dark() inversion on every colour step, a high-contrast
+ * green-tinted ramp, Variable Inter, and a 4pt spacing scale.
  * ================================================================ */
 
 /* ── Tailwind v4 Theme — maps palette steps to utility classes ── */
 @theme {
-  /* Ink palette (text hierarchy) */
-  --color-ink-50: var(--ink-50);
-  --color-ink-100: var(--ink-100);
-  --color-ink-200: var(--ink-200);
-  --color-ink-300: var(--ink-300);
-  --color-ink-500: var(--ink-500);
-  --color-ink-600: var(--ink-600);
-  --color-ink-700: var(--ink-700);
-  --color-ink-900: var(--ink-900);
+  /* Text ramp (foreground hierarchy) */
+  --color-text-50: var(--text-50);
+  --color-text-100: var(--text-100);
+  --color-text-200: var(--text-200);
+  --color-text-300: var(--text-300);
+  --color-text-400: var(--text-400);
+  --color-text-500: var(--text-500);
+  --color-text-600: var(--text-600);
+  --color-text-700: var(--text-700);
+  --color-text-800: var(--text-800);
+  --color-text-900: var(--text-900);
+  --color-text-950: var(--text-950);
 
-  /* Paper palette (background hierarchy) */
-  --color-paper-50: var(--paper-50);
-  --color-paper-100: var(--paper-100);
-  --color-paper-200: var(--paper-200);
-  --color-paper-300: var(--paper-300);
-  --color-paper-500: var(--paper-500);
-  --color-paper-700: var(--paper-700);
-  --color-paper-900: var(--paper-900);
+  /* Background ramp (surface hierarchy) */
+  --color-background-50: var(--background-50);
+  --color-background-100: var(--background-100);
+  --color-background-200: var(--background-200);
+  --color-background-300: var(--background-300);
+  --color-background-400: var(--background-400);
+  --color-background-500: var(--background-500);
+  --color-background-600: var(--background-600);
+  --color-background-700: var(--background-700);
+  --color-background-800: var(--background-800);
+  --color-background-900: var(--background-900);
+  --color-background-950: var(--background-950);
 
-  /* Accent palette (brand green) */
+  /* Primary ramp (brand green, actions/links) */
+  --color-primary-50: var(--primary-50);
+  --color-primary-100: var(--primary-100);
+  --color-primary-200: var(--primary-200);
+  --color-primary-300: var(--primary-300);
+  --color-primary-400: var(--primary-400);
+  --color-primary-500: var(--primary-500);
+  --color-primary-600: var(--primary-600);
+  --color-primary-700: var(--primary-700);
+  --color-primary-800: var(--primary-800);
+  --color-primary-900: var(--primary-900);
+  --color-primary-950: var(--primary-950);
+
+  /* Secondary ramp */
+  --color-secondary-50: var(--secondary-50);
+  --color-secondary-100: var(--secondary-100);
+  --color-secondary-200: var(--secondary-200);
+  --color-secondary-300: var(--secondary-300);
+  --color-secondary-400: var(--secondary-400);
+  --color-secondary-500: var(--secondary-500);
+  --color-secondary-600: var(--secondary-600);
+  --color-secondary-700: var(--secondary-700);
+  --color-secondary-800: var(--secondary-800);
+  --color-secondary-900: var(--secondary-900);
+  --color-secondary-950: var(--secondary-950);
+
+  /* Accent ramp */
   --color-accent-50: var(--accent-50);
   --color-accent-100: var(--accent-100);
   --color-accent-200: var(--accent-200);
   --color-accent-300: var(--accent-300);
+  --color-accent-400: var(--accent-400);
   --color-accent-500: var(--accent-500);
+  --color-accent-600: var(--accent-600);
   --color-accent-700: var(--accent-700);
+  --color-accent-800: var(--accent-800);
   --color-accent-900: var(--accent-900);
+  --color-accent-950: var(--accent-950);
 
-  /* Backward-compatible flat aliases — keep existing classes working */
-  --color-ink: var(--ink-700);
-  --color-paper: var(--paper-100);
-  --color-surface: var(--paper-200);
-  --color-muted: var(--ink-600);
-  --color-border: var(--paper-300);
+  /* Backward-compatible ramp aliases (ink→text, paper→background) */
+  --color-ink-50: var(--color-text-50);
+  --color-ink-100: var(--color-text-100);
+  --color-ink-200: var(--color-text-200);
+  --color-ink-300: var(--color-text-300);
+  --color-ink-400: var(--color-text-400);
+  --color-ink-500: var(--color-text-500);
+  --color-ink-600: var(--color-text-600);
+  --color-ink-700: var(--color-text-700);
+  --color-ink-800: var(--color-text-800);
+  --color-ink-900: var(--color-text-900);
+  --color-ink-950: var(--color-text-950);
+  --color-paper-50: var(--color-background-50);
+  --color-paper-100: var(--color-background-100);
+  --color-paper-200: var(--color-background-200);
+  --color-paper-300: var(--color-background-300);
+  --color-paper-400: var(--color-background-400);
+  --color-paper-500: var(--color-background-500);
+  --color-paper-600: var(--color-background-600);
+  --color-paper-700: var(--color-background-700);
+  --color-paper-800: var(--color-background-800);
+  --color-paper-900: var(--color-background-900);
+  --color-paper-950: var(--color-background-950);
+
+  /* Flat aliases — keep existing utility classes working */
   --color-accent: var(--accent-500);
-  --color-accent-light: var(--accent-300);
+  --color-accent-light: var(--accent-400);
+  --color-muted: var(--text-600);
+  --color-border: var(--background-200);
+  --color-surface: var(--background-200);
 
   /* Typography */
-  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
-
-  /* Spacing — 4pt scale, Tailwind-compatible naming */
-  --spacing-4xs: 0.125rem;
-  --spacing-3xs: 0.25rem;
-  --spacing-2xs: 0.5rem;
-  --spacing-xs: 0.75rem;
-  --spacing-sm: 1rem;
-  --spacing-md: 1.5rem;
-  --spacing-lg: 2rem;
-  --spacing-xl: 3rem;
-  --spacing-2xl: 4rem;
-  --spacing-3xl: 6rem;
-
-  /* Type scale — 1.25 modular ratio, fluid at display sizes */
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.25rem;
-  --text-xl: 1.563rem;
-  --text-2xl: 1.953rem;
-  --text-3xl: clamp(1.75rem, 3vw + 1rem, 2.441rem);
-  --text-4xl: clamp(2rem, 4vw + 1rem, 3.052rem);
-  --text-5xl: clamp(2.25rem, 5vw + 1rem, 3.815rem);
-
-  /* Radii */
-  --radius-xs: 0.25rem;
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  --radius-full: 9999px;
-
-  /* Motion — durations & easing curves.
-     --ease-spring approximates SwiftUI .spring(response: 0.3, dampingFraction: 0.7) */
-  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --duration-instant: 100ms;
-  --duration-fast: 150ms;
-  --duration-normal: 250ms;
-  --duration-slow: 400ms;
+  --font-sans: "InterVariable", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:
+    "JetBrains Mono", ui-monospace, "Cascadia Code", "Fira Code", Menlo,
+    monospace;
 }
 
 /* ── CSS Custom Properties (runtime, light-dark() resolution) ── */
@@ -100,38 +121,129 @@
   :root {
     color-scheme: light dark;
 
-    /* ── Ink palette (text/foreground, warm navy) ───────────────── */
-    --ink-50: light-dark(oklch(0.97 0.01 250), oklch(0.14 0.04 255));
-    --ink-100: light-dark(oklch(0.92 0.015 250), oklch(0.18 0.05 255));
-    --ink-200: light-dark(oklch(0.85 0.025 252), oklch(0.24 0.06 258));
-    --ink-300: light-dark(oklch(0.72 0.035 252), oklch(0.32 0.07 260));
-    --ink-500: light-dark(oklch(0.50 0.05 255), oklch(0.46 0.08 262));
-    --ink-600: light-dark(oklch(0.40 0.055 258), oklch(0.62 0.06 258));
-    --ink-700: light-dark(oklch(0.30 0.06 260), oklch(0.68 0.05 255));
-    --ink-900: light-dark(oklch(0.16 0.05 262), oklch(0.90 0.025 250));
+    /* ── Text ramp (foreground, green-tinted near-black/white) ── */
+    --text-50: light-dark(rgb(241 246 238), rgb(11 17 9));
+    --text-100: light-dark(rgb(226 238 221), rgb(22 34 17));
+    --text-200: light-dark(rgb(197 221 187), rgb(44 68 34));
+    --text-300: light-dark(rgb(168 204 153), rgb(66 102 51));
+    --text-400: light-dark(rgb(140 187 119), rgb(89 136 68));
+    --text-500: light-dark(rgb(111 170 85), rgb(111 170 85));
+    --text-600: light-dark(rgb(89 136 68), rgb(140 187 119));
+    --text-700: light-dark(rgb(66 102 51), rgb(168 204 153));
+    --text-800: light-dark(rgb(44 68 34), rgb(197 221 187));
+    --text-900: light-dark(rgb(22 34 17), rgb(226 238 221));
+    --text-950: light-dark(rgb(11 17 9), rgb(241 246 238));
 
-    /* ── Paper palette (background/surface, warm off-white) ─────── */
-    --paper-50: light-dark(oklch(0.99 0.006 240), oklch(0.10 0.03 255));
-    --paper-100: light-dark(oklch(0.98 0.01 240), oklch(0.14 0.04 255));
-    --paper-200: light-dark(oklch(0.96 0.02 245), oklch(0.20 0.05 258));
-    --paper-300: light-dark(oklch(0.90 0.03 248), oklch(0.28 0.06 260));
-    --paper-500: light-dark(oklch(0.78 0.04 250), oklch(0.44 0.07 260));
-    --paper-700: light-dark(oklch(0.55 0.05 255), oklch(0.68 0.05 255));
-    --paper-900: light-dark(oklch(0.30 0.05 255), oklch(0.90 0.025 248));
+    /* ── Background ramp (surfaces) ────────────────────────────── */
+    --background-50: light-dark(rgb(239 249 236), rgb(10 19 6));
+    --background-100: light-dark(rgb(224 242 217), rgb(19 39 12));
+    --background-200: light-dark(rgb(193 230 179), rgb(39 77 25));
+    --background-300: light-dark(rgb(162 217 140), rgb(58 116 37));
+    --background-400: light-dark(rgb(131 204 102), rgb(78 154 50));
+    --background-500: light-dark(rgb(100 191 64), rgb(97 193 62));
+    --background-600: light-dark(rgb(80 153 51), rgb(129 205 101));
+    --background-700: light-dark(rgb(60 115 38), rgb(160 218 139));
+    --background-800: light-dark(rgb(40 77 25), rgb(192 230 178));
+    --background-900: light-dark(rgb(20 38 13), rgb(223 243 216));
+    --background-950: light-dark(rgb(10 19 6), rgb(239 249 236));
 
-    /* ── Accent palette (vivid brand green, hue ~142) ───────────── */
-    --accent-50: light-dark(oklch(0.96 0.06 142), oklch(0.20 0.06 138));
-    --accent-100: light-dark(oklch(0.91 0.10 142), oklch(0.26 0.09 140));
-    --accent-200: light-dark(oklch(0.82 0.16 142), oklch(0.34 0.14 142));
-    --accent-300: light-dark(oklch(0.52 0.26 142), oklch(0.58 0.16 144));
-    --accent-500: light-dark(oklch(0.48 0.28 142), oklch(0.60 0.22 146));
-    --accent-700: light-dark(oklch(0.35 0.22 142), oklch(0.72 0.20 148));
-    --accent-900: light-dark(oklch(0.24 0.15 140), oklch(0.88 0.12 148));
+    /* ── Primary ramp (brand green) ────────────────────────────── */
+    --primary-50: light-dark(rgb(240 247 237), rgb(10 18 8));
+    --primary-100: light-dark(rgb(225 240 219), rgb(21 36 15));
+    --primary-200: light-dark(rgb(194 224 184), rgb(41 71 31));
+    --primary-300: light-dark(rgb(164 209 148), rgb(62 107 46));
+    --primary-400: light-dark(rgb(134 194 112), rgb(83 143 61));
+    --primary-500: light-dark(rgb(104 179 77), rgb(104 179 77));
+    --primary-600: light-dark(rgb(83 143 61), rgb(134 194 112));
+    --primary-700: light-dark(rgb(62 107 46), rgb(164 209 148));
+    --primary-800: light-dark(rgb(41 71 31), rgb(194 224 184));
+    --primary-900: light-dark(rgb(21 36 15), rgb(225 240 219));
+    --primary-950: light-dark(rgb(10 18 8), rgb(240 247 237));
 
-    /* ── Surface semantic aliases ───────────────────────────────── */
-    --surface-sunken: var(--paper-100);
-    --surface-color: var(--paper-200);
-    --surface-raised: var(--paper-50);
+    /* ── Secondary ramp ────────────────────────────────────────── */
+    --secondary-50: light-dark(rgb(240 248 237), rgb(10 18 7));
+    --secondary-100: light-dark(rgb(224 241 218), rgb(20 37 14));
+    --secondary-200: light-dark(rgb(194 226 182), rgb(41 73 29));
+    --secondary-300: light-dark(rgb(163 212 145), rgb(61 110 43));
+    --secondary-400: light-dark(rgb(132 198 108), rgb(81 147 57));
+    --secondary-500: light-dark(rgb(101 184 71), rgb(101 184 71));
+    --secondary-600: light-dark(rgb(81 147 57), rgb(132 198 108));
+    --secondary-700: light-dark(rgb(61 110 43), rgb(163 212 145));
+    --secondary-800: light-dark(rgb(41 73 29), rgb(194 226 182));
+    --secondary-900: light-dark(rgb(20 37 14), rgb(224 241 218));
+    --secondary-950: light-dark(rgb(10 18 7), rgb(240 248 237));
+
+    /* ── Accent ramp ───────────────────────────────────────────── */
+    --accent-50: light-dark(rgb(239 248 236), rgb(10 19 7));
+    --accent-100: light-dark(rgb(224 241 218), rgb(20 37 14));
+    --accent-200: light-dark(rgb(193 228 180), rgb(40 75 27));
+    --accent-300: light-dark(rgb(162 214 143), rgb(60 112 41));
+    --accent-400: light-dark(rgb(131 201 105), rgb(80 150 54));
+    --accent-500: light-dark(rgb(100 187 68), rgb(100 187 68));
+    --accent-600: light-dark(rgb(80 150 54), rgb(131 201 105));
+    --accent-700: light-dark(rgb(60 112 41), rgb(162 214 143));
+    --accent-800: light-dark(rgb(40 75 27), rgb(193 228 180));
+    --accent-900: light-dark(rgb(20 37 14), rgb(224 241 218));
+    --accent-950: light-dark(rgb(10 19 7), rgb(239 248 236));
+
+    /* ── Surface semantic aliases ──────────────────────────────── */
+    --surface-color: var(--background-200);
+    --surface-raised: var(--background-100);
+    --surface-sunken: var(--background-50);
+
+    /* ── Spacing — 4pt scale ──────────────────────────────────── */
+    --space-2xs: 2px;
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-3: 12px;
+    --space-md: 16px;
+    --space-6: 24px;
+    --space-lg: 32px;
+    --space-12: 48px;
+    --space-xl: 64px;
+    --space-2xl: 96px;
+
+    /* ── Layout geometry ──────────────────────────────────────── */
+    --shell-wide: 72rem;
+    --shell-narrow: 48rem;
+    --measure-prose: 70ch;
+    --measure-copy: 60ch;
+    --control-size: 44px;
+    --nav-height: 68px;
+    --nav-height-compact: 60px;
+    --icon-sm: 16px;
+    --icon-md: 24px;
+
+    /* ── Typography ───────────────────────────────────────────── */
+    --font-family: "InterVariable", "Inter", sans-serif;
+    --font-mono:
+      "JetBrains Mono", ui-monospace, "Cascadia Code", "Fira Code", Menlo,
+      monospace;
+
+    /* Type scale — modular 1.25 ratio, fluid */
+    --text-xs: clamp(0.64rem, 0.6vw + 0.5rem, 0.8rem);
+    --text-sm: clamp(0.8rem, 0.75vw + 0.6rem, 1rem);
+    --text-md: clamp(1rem, 1vw + 0.8rem, 1.25rem);
+    --text-lg: clamp(1.25rem, 1.5vw + 1rem, 2rem);
+    --text-xl: clamp(2rem, 2vw + 1.5rem, 3rem);
+    --text-2xl: clamp(2rem, 5vw, 3.5rem);
+    --text-micro: 0.625rem;
+
+    /* ── Radii ────────────────────────────────────────────────── */
+    --radius-xs: 4px;
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --radius-full: 9999px;
+
+    /* ── Animation ───────────────────────────────────────────── */
+    --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --duration-instant: 100ms;
+    --duration-fast: 200ms;
+    --duration-normal: 300ms;
+    --duration-slow: 500ms;
   }
 
   /* ── Base element defaults ──────────────────────────────────── */
@@ -143,43 +255,136 @@
   }
 
   body {
-    background-color: var(--paper-100);
-    color: var(--ink-700);
-    font-family: var(--font-sans);
-    font-size: var(--text-base);
-    line-height: 1.5;
+    background-color: var(--color-background-50);
+    color: var(--color-text-900);
+    font-family: var(--font-family);
+    font-size: var(--text-md);
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: clip;
     margin: 0;
   }
 
+  /* ── Headings ───────────────────────────────────────────────── */
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--color-text-950);
+    font-family: var(--font-family);
+    line-height: 1.1;
+    margin-top: var(--space-lg);
+    margin-bottom: var(--space-sm);
+    scroll-margin-top: var(--space-2xl);
+    text-wrap: balance;
+  }
+
+  h1 {
+    font-size: var(--text-xl);
+    font-weight: 900;
+    letter-spacing: -0.04em;
+  }
+
+  h2 {
+    font-size: var(--text-lg);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+
+  h3 {
+    font-size: var(--text-md);
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+
+  h4 {
+    font-size: var(--text-md);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--color-text-900);
+  }
+
+  h5 {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  h6 {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text-800);
+  }
+
+  :is(h1, h2, h3, h4, h5, h6):first-child {
+    margin-top: 0;
+  }
+
+  /* ── Paragraphs ─────────────────────────────────────────────── */
+
+  p {
+    margin-top: 0;
+    margin-bottom: var(--space-md);
+  }
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* ── Links ──────────────────────────────────────────────────── */
+
+  a {
+    color: var(--color-text-950);
+    text-decoration: underline;
+    text-decoration-color: color-mix(
+      in oklch,
+      var(--color-text-950) 35%,
+      transparent
+    );
+    text-underline-offset: 3px;
+    transition:
+      color var(--duration-fast) var(--ease-out-quart),
+      text-decoration-color var(--duration-fast) var(--ease-out-quart),
+      text-underline-offset var(--duration-fast) var(--ease-out-quart);
+  }
+
+  a:hover {
+    color: var(--color-primary-500);
+    text-decoration-color: var(--color-primary-500);
+    text-underline-offset: 4px;
+  }
+
+  a:active {
+    transform: translateY(0.5px);
+  }
+
+  /* ── Inline text semantics ──────────────────────────────────── */
+
+  strong,
+  b {
+    font-weight: 700;
+    color: var(--color-text-950);
+  }
+
+  em,
+  i {
+    font-style: italic;
+    color: var(--color-text-800);
+  }
+
+  code,
+  pre {
+    font-family: var(--font-mono);
+  }
+
   /* ── Selection ───────────────────────────────────────────────── */
 
   ::selection {
-    background-color: var(--accent-200);
-  }
-
-  /* ── Focus ring ──────────────────────────────────────────────── */
-
-  :focus-visible {
-    outline: 2px solid var(--accent-500);
-    outline-offset: 2px;
-    border-radius: var(--radius-xs);
-  }
-
-  /* ── Reduced motion ──────────────────────────────────────────── */
-
-  @media (prefers-reduced-motion: reduce) {
-    html {
-      scroll-behavior: auto;
-    }
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-    }
+    background-color: var(--color-primary-200);
+    color: var(--color-primary-950);
   }
 }
