@@ -24,7 +24,7 @@
     Inkwell is a decentralized client for the Standard.site ecosystem on the
     AT Protocol. We believe your data belongs to you. This policy applies to
     Inkwell for iOS (version 1.0, build 49, distributed via AltStore) and
-    Inkwell for Android (version 1.0.1, distributed via a self-hosted F-Droid
+    Inkwell for Android (version 1.2.0, distributed via a self-hosted F-Droid
     repository).
   </p>
 

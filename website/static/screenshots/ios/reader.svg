@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" width="400" height="800">
+  <rect width="400" height="800" fill="#F5F5F7"/>
+  <rect x="0" y="0" width="400" height="48" fill="#FAFAFA"/>
+  <rect x="0" y="48" width="400" height="72" fill="#FAFAFA"/>
+  <rect x="0" y="120" width="400" height="1" fill="#E0E0E0"/>
+  <rect x="120" y="160" width="160" height="160" rx="20" fill="#139500"/>
+  <rect x="140" y="180" width="120" height="120" rx="10" fill="#FAFAFA"/>
+  <circle cx="200" cy="220" r="16" fill="#139500"/>
+  <text x="200" y="280" font-family="system-ui, sans-serif" font-size="28" font-weight="700" fill="#303030" text-anchor="middle">Inkwell</text>
+  <rect x="0" y="760" width="400" height="40" fill="#FAFAFA"/>
+  <rect x="0" y="759" width="400" height="1" fill="#E0E0E0"/>
+  <rect x="24" y="360" width="352" height="160" rx="12" fill="#FAFAFA"/>
+  <rect x="24" y="372" width="352" height="1" fill="#E0E0E0"/>
+  <rect x="40" y="400" width="200" height="20" rx="4" fill="#E8E8ED"/>
+  <rect x="40" y="432" width="320" height="14" rx="3" fill="#E8E8ED"/>
+  <rect x="24" y="560" width="352" height="160" rx="12" fill="#FAFAFA"/>
+  <rect x="24" y="572" width="352" height="1" fill="#E0E0E0"/>
+  <rect x="40" y="600" width="240" height="20" rx="4" fill="#E8E8ED"/>
+  <rect x="40" y="632" width="280" height="14" rx="3" fill="#E8E8ED"/>
+  <rect x="160" y="784" width="80" height="3" rx="1.5" fill="#303030" opacity="0.3"/>
+</svg>
