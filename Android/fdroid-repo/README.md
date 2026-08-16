@@ -82,3 +82,7 @@ silently breaks fdroidserver's icon extraction (no error — the app just
 shows no icon in the F-Droid listing). Don't remove that flag without
 re-testing icon extraction (`fdroid update -v` and check `repo/icons-640/`
 for a real per-app icon file after building).
+
+## AI-assisted contributions
+
+AI tools may be used when contributing, but do not add `Co-authored-by:` trailers crediting AI agents. Attribution is reserved for human contributors only.

@@ -66,4 +66,11 @@
     performance may be incomplete or change without notice. Install and use at
     your own risk.
   </p>
+
+  <h2>5. AI-assisted contributions</h2>
+  <p>
+    AI tools may be used when contributing to Inkwell, but contributors should
+    not add <code>Co-authored-by:</code> trailers crediting AI agents.
+    Attribution is reserved for human contributors only.
+  </p>
 </article>

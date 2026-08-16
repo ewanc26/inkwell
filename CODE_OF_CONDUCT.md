@@ -25,6 +25,10 @@ Examples of unacceptable behavior:
 
 This Code of Conduct applies to all Inkwell project spaces — GitHub issues, pull requests, discussions, and any other communication channels associated with the project.
 
+## AI-assisted contributions
+
+AI tools may be used when contributing, but do not add `Co-authored-by:` trailers crediting AI agents. Attribution is reserved for human contributors only.
+
 ## Enforcement
 
 Project maintainers are responsible for clarifying and enforcing this Code of Conduct. Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the maintainer at [contact@ewancroft.uk](mailto:contact@ewancroft.uk). All complaints will be reviewed and investigated promptly and fairly.

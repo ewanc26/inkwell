@@ -146,6 +146,10 @@ iOS is the primary implementation. Android is experimental and materially incomp
 - Target WCAG 2.1 AA for the website.
 - Test with TalkBack (Android) and VoiceOver (iOS) for new or changed screens.
 
+## AI-assisted contributions
+
+AI tools may be used when contributing, but do not add `Co-authored-by:` trailers crediting AI agents. Attribution is reserved for human contributors only.
+
 ## Questions?
 
 Open an issue or reach out via [Bluesky](https://bsky.app/profile/ewancroft.uk).

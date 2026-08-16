@@ -25,6 +25,10 @@ pnpm format    # prettier --write
 
 Deployed to Vercel. The `vercel.json` configures pnpm as the install command and points to the SvelteKit Vercel adapter.
 
+## AI-assisted contributions
+
+AI tools may be used when contributing, but do not add `Co-authored-by:` trailers crediting AI agents. Attribution is reserved for human contributors only.
+
 ## Licence
 
 AGPL 3.0 — see `../LICENSE`

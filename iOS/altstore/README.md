@@ -52,3 +52,7 @@ Do **not** add a `marketplaceID` to this source.json: it is a PAL-only field,
 and AltStore Classic ignores or rejects sources that include it. If notarized
 distribution is ever set up, ship it as a **separate** source URL so Classic
 users keep working.
+
+## AI-assisted contributions
+
+AI tools may be used when contributing, but do not add `Co-authored-by:` trailers crediting AI agents. Attribution is reserved for human contributors only.

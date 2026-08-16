@@ -32,3 +32,7 @@ This directory contains the F-Droid build metadata file ready for submission to 
 - [x] Fastlane metadata is present in `fastlane/metadata/android/en-GB/` (already in this repo).
 - [x] Confirmed all dependencies are FOSS — `./gradlew app:dependencies --configuration releaseRuntimeClasspath` resolved cleanly with no Firebase/GMS. The only `com.google.*` packages present (Gson, Guava, Tink, Dagger/Hilt, Accompanist) are FOSS, Apache 2.0-licensed. Re-run this check before actually submitting if dependencies have changed since.
 - [ ] `./gradlew assembleRelease` builds cleanly (verified — see repo history), but there is no `signingConfigs` block in `app/build.gradle.kts`, so the release build is currently unsigned. F-Droid signs its own builds from source, so this is fine for F-Droid specifically — but confirm this is still true (or add one) before using the same build for any other signed-release channel.
+
+## AI-assisted contributions
+
+AI tools may be used when contributing, but do not add `Co-authored-by:` trailers crediting AI agents. Attribution is reserved for human contributors only.
