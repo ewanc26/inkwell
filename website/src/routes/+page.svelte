@@ -128,7 +128,7 @@
         Or open
         <a href="/fdroid/repo" class="text-accent underline">inkwell.ewancroft.uk/fdroid/repo</a>
         directly to browse it or scan its QR code. Source on
-        <a href="https://github.com/ewanc26/inkwell-android" class="text-accent underline"
+        <a href="https://github.com/ewanc26/inkwell" class="text-accent underline"
           >GitHub</a
         >.
       </p>
