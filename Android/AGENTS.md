@@ -17,7 +17,7 @@ For monorepo-wide rules, see [`../AGENTS.md`](../AGENTS.md). For iOS-specific bo
 - Read `README.md`, Gradle/version catalog files, `AndroidManifest.xml`, `docs/oauth/client-metadata.json`, and all touched Kotlin. Compare shared wire behavior with the owned iOS `../iOS/` checkout, without copying Swift lifecycle or security assumptions.
 - `app/src/main/java/uk/ewancroft/inkwell/data/auth` stores the OAuth session, `app/src/main/java/uk/ewancroft/inkwell/data/repository/PdsRepository.kt` performs public/authenticated XRPC, `app/src/main/java/uk/ewancroft/inkwell/data/model` defines partial Standard.site/Leaflet shapes, and `app/src/main/java/uk/ewancroft/inkwell/data/remote/ConstellationClient.kt` queries backlinks.
 - Hilt modules construct OAuth/network services. ViewModels own `StateFlow`; Compose screens and `NavGraph` own UI/navigation. There is no Worker or notification manager despite README claims. `app/src/main/java/uk/ewancroft/inkwell/data/remote/StandardSiteVerifier.kt` implements publication/document verification (see below); a JVM test source tree now exists but only covers that one file — nothing else in the app has test coverage.
-- Target facts: compile/target SDK 36, minimum SDK 26, Java/Kotlin JVM 17, release minification enabled, app ID `uk.ewancroft.inkwell`, debug ID suffix `.debug`, version `1.3.0`, versionCode `5`.
+- Target facts: compile/target SDK 36, minimum SDK 26, Java/Kotlin JVM 17, release minification enabled, app ID `uk.ewancroft.inkwell`, debug ID suffix `.debug`, version `1.3.1`, versionCode `6`.
 
 ## Current Capability Gaps
 
