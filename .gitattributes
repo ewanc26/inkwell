@@ -1,0 +1,25 @@
+# Agent / tooling configuration — not project source
+.agents/** linguist-vendored
+.claude/** linguist-vendored
+.factory/** linguist-vendored
+.letta/** linguist-vendored
+.opencode/** linguist-vendored
+.qwen/** linguist-vendored
+.rovodev/** linguist-vendored
+
+# Build outputs and caches
+.gradle/** linguist-generated
+**/build/** linguist-generated
+**/.svelte-kit/** linguist-generated
+**/node_modules/** linguist-generated
+.vercel/** linguist-generated
+
+# Generated distribution artifacts
+Android/fdroid-repo/repo/** linguist-generated
+Android/fdroid-repo/archive/** linguist-generated
+Android/fdroid-repo/tmp/** linguist-generated
+website/static/fdroid/repo/** linguist-generated
+
+# OS metadata
+.DS_Store linguist-generated
+**/.DS_Store linguist-generated
