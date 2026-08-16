@@ -2,6 +2,8 @@
 
 Guidance for agents working on the experimental Android Inkwell client. It is a Kotlin/Compose counterpart to iOS Inkwell, but the checked-in implementation is an incomplete prototype and source behavior—not README parity claims—is authoritative.
 
+For monorepo-wide rules, see [`../AGENTS.md`](../AGENTS.md). For iOS-specific boundaries, see [`../iOS/AGENTS.md`](../iOS/AGENTS.md). For website/legal accuracy, see [`../website/AGENTS.md`](../website/AGENTS.md).
+
 ## Read First and Architecture
 
 - Read `README.md`, Gradle/version catalog files, `AndroidManifest.xml`, `docs/oauth/client-metadata.json`, and all touched Kotlin. Compare shared wire behavior with the owned iOS `../iOS/` checkout, without copying Swift lifecycle or security assumptions.
@@ -20,8 +22,8 @@ Guidance for agents working on the experimental Android Inkwell client. It is a 
 ## OAuth, Networking, and Data Rules
 
 - OAuth sessions are JSON in `EncryptedSharedPreferences` backed by a MasterKey. Keep tokens, refresh state, PKCE/DPoP material, and authorization URLs out of logs and ordinary preferences. Account for deprecated/security-crypto migration before changing storage.
-- Runtime scope and `docs/oauth/client-metadata.json` currently align on publication/document/subscription/recommend/blob access and the custom callback. The production file is hosted by another repo/site; update and verify both together.
-- The manifest accepts every URI using the custom scheme, while `MainActivity` checks `/callback`. Preserve state validation inside the OAuth library, reject unrelated/deceptive callbacks, and test cold/warm `singleTask` delivery.
+- Runtime scope and `docs/oauth/client-metadata.json` currently align on publication/document/subscription/recommend/blob access and the custom callback. The production file is hosted by another repo/site; update and verify both together. See `../website/AGENTS.md` for OAuth contract details shared with the website.
+- The manifest accepts every URI using the custom scheme, while `app/src/main/java/uk/ewancroft/inkwell/MainActivity.kt` checks `/callback`. Preserve state validation inside the OAuth library, reject unrelated/deceptive callbacks, and test cold/warm `singleTask` delivery.
 - Authentication changes do not automatically rebuild an existing Navigation Compose graph merely because `startDestination` changes. Verify post-callback and logout navigation explicitly rather than assuming recomposition redirects.
 - Use structured concurrency and `Dispatchers.IO` for synchronous OkHttp. `DiscoverViewModel.search()` currently calls `execute()` from `viewModelScope` without switching dispatchers and can block the main thread; do not repeat that pattern.
 - URL-encode every XRPC query value. Current PDS/Constellation URL strings interpolate DIDs, collections, subjects, sources, limits, and cursors manually; responses are force-unwrapped/decoded without status checks or consistent closing. Harden these boundaries before expanding them.
