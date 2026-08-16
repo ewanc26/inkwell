@@ -184,7 +184,7 @@
       </figure>
       <figure class="animate-in stagger-4">
         <img
-          src="/screenshots/ios/article.png"
+          src="/screenshots/ios/post.png"
           alt="A verified article open in Inkwell on iOS"
           class="h-72 w-auto screenshot-frame sm:h-80"
           width="428"
