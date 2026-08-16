@@ -12,6 +12,10 @@ Guidance for agents working on Inkwell for iOS, the primary SwiftUI client in th
 
 For monorepo-wide rules, see [`../AGENTS.md`](../AGENTS.md). For Android-specific boundaries, see [`../Android/AGENTS.md`](../Android/AGENTS.md). For website/legal accuracy, see [`../website/AGENTS.md`](../website/AGENTS.md).
 
+## AI-assisted contributions
+
+AI tools may be used when contributing, but do not add `Co-authored-by:` trailers crediting AI agents. Attribution is reserved for human contributors only.
+
 ## Read First and Source Boundaries
 
 - Read `../README.md`, `../AGENTS.md`, `Inkwell.xcodeproj` project settings, `oauth/client-metadata.json`, privacy/entitlement files, and all source in the touched flow.

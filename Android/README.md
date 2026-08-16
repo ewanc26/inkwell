@@ -30,6 +30,10 @@ Run on API 26+ device or emulator.
 
 Self-hosted signed F-Droid repo is maintained in `fdroid-repo/`. The official F-Droid submission recipe is in `fdroid/`.
 
+## AI-assisted contributions
+
+AI tools may be used when contributing, but do not add `Co-authored-by:` trailers crediting AI agents. Attribution is reserved for human contributors only.
+
 ## Licence
 
 AGPL 3.0 — see `../LICENSE`
