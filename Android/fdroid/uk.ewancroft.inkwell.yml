@@ -6,8 +6,8 @@ AuthorName: Ewan Croft
 AuthorWebSite: https://ewancroft.uk
 WebSite: https://inkwell.ewancroft.uk
 SourceCode: https://github.com/ewanc26/inkwell-android
-IssueTracker: https://github.com/ewanc26/inkwell-android/issues
-Changelog: https://github.com/ewanc26/inkwell-android/releases
+IssueTracker: https://github.com/ewanc26/inkwell/issues
+Changelog: https://github.com/ewanc26/inkwell/releases
 
 RepoType: git
 Repo: https://github.com/ewanc26/inkwell-android.git
