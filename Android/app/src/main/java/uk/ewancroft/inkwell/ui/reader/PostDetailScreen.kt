@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.HourglassEmpty
 import androidx.compose.material.icons.outlined.ThumbUp
@@ -35,6 +36,7 @@ fun PostDetailScreen(
     nextUri: String? = null,
     nextTitle: String? = null,
     onBack: () -> Unit = {},
+    onNavigateToPost: (String, String?, String?, String?, String?) -> Unit = { _, _, _, _, _ -> },
     viewModel: PostDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -75,7 +77,14 @@ fun PostDetailScreen(
             else -> PostDetailContent(
                 uiState = uiState,
                 onToggleRecommend = { viewModel.toggleRecommend() },
-                onBack = onBack,
+                previousUri = uiState.previousUri,
+                previousTitle = uiState.previousTitle,
+                nextUri = uiState.nextUri,
+                nextTitle = uiState.nextTitle,
+                onNavigateToPost = onNavigateToPost,
+                onNewCommentTextChanged = { viewModel.onNewCommentTextChanged(it) },
+                onSubmitComment = { viewModel.submitComment() },
+                onSetReplyTo = { viewModel.setReplyTo(it) },
                 modifier = Modifier.padding(padding),
             )
         }
@@ -91,6 +100,19 @@ fun PostDetailScreen(
             }
         ) {
             Text(uiState.recommendError!!)
+        }
+    }
+
+    if (uiState.commentError != null) {
+        Snackbar(
+            modifier = Modifier.padding(16.dp),
+            action = {
+                TextButton(onClick = { viewModel.dismissCommentError() }) {
+                    Text("Dismiss")
+                }
+            }
+        ) {
+            Text(uiState.commentError!!)
         }
     }
 }
@@ -136,7 +158,14 @@ private fun ErrorState(message: String, onRetry: () -> Unit, modifier: Modifier 
 private fun PostDetailContent(
     uiState: PostDetailUiState,
     onToggleRecommend: () -> Unit,
-    onBack: () -> Unit,
+    previousUri: String?,
+    previousTitle: String?,
+    nextUri: String?,
+    nextTitle: String?,
+    onNavigateToPost: (String, String?, String?, String?, String?) -> Unit,
+    onNewCommentTextChanged: (String) -> Unit,
+    onSubmitComment: () -> Unit,
+    onSetReplyTo: (CommentEntry?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -221,7 +250,22 @@ private fun PostDetailContent(
 
         item {
             HorizontalDivider()
-            CommentsSection(uiState = uiState, onBack = onBack)
+            CommentsSection(
+                uiState = uiState,
+                onTextChanged = onNewCommentTextChanged,
+                onSubmitComment = onSubmitComment,
+                onSetReplyTo = onSetReplyTo,
+            )
+        }
+
+        item {
+            PrevNextRow(
+                previousUri = previousUri,
+                previousTitle = previousTitle,
+                nextUri = nextUri,
+                nextTitle = nextTitle,
+                onNavigateToPost = onNavigateToPost,
+            )
         }
     }
 }
@@ -232,46 +276,63 @@ private fun PrevNextRow(
     previousTitle: String?,
     nextUri: String?,
     nextTitle: String?,
-    onBack: () -> Unit,
+    onNavigateToPost: (String, String?, String?, String?, String?) -> Unit,
 ) {
     if (previousUri == null && nextUri == null) return
 
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            if (previousUri != null) {
-                OutlinedButton(
-                    onClick = { onBack() },
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        previousTitle ?: "Previous",
-                        maxLines = 1,
-                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                    )
-                }
+        if (previousUri != null) {
+            OutlinedButton(
+                onClick = { onNavigateToPost(previousUri, null, null, null, null) },
+                modifier = Modifier.weight(1f),
+            ) {
+                Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    previousTitle ?: "Previous",
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                )
             }
-            if (nextUri != null) {
-                OutlinedButton(
-                    onClick = { onBack() },
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Text(
-                        nextTitle ?: "Next",
-                        maxLines = 1,
-                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null, modifier = Modifier.size(18.dp))
-                }
+        }
+        if (nextUri != null) {
+            OutlinedButton(
+                onClick = { onNavigateToPost(nextUri, null, null, null, null) },
+                modifier = Modifier.weight(1f),
+            ) {
+                Text(
+                    nextTitle ?: "Next",
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                )
+                Spacer(Modifier.width(8.dp))
+                Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null, modifier = Modifier.size(18.dp))
             }
+        }
     }
 }
 
 @Composable
-private fun CommentsSection(uiState: PostDetailUiState, onBack: () -> Unit) {
+private fun CommentsSection(
+    uiState: PostDetailUiState,
+    onTextChanged: (String) -> Unit,
+    onSubmitComment: () -> Unit,
+    onSetReplyTo: (CommentEntry?) -> Unit,
+) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("Comments", style = MaterialTheme.typography.titleMedium)
+
+        if (uiState.replyToComment != null) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    "Replying to \"${uiState.replyToComment.record.plaintext.take(40)}\"",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.weight(1f),
+                )
+                TextButton(onClick = { onSetReplyTo(null) }) { Text("Cancel") }
+            }
+        }
 
         if (uiState.isLoadingComments) {
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
@@ -285,21 +346,25 @@ private fun CommentsSection(uiState: PostDetailUiState, onBack: () -> Unit) {
             )
         } else {
             uiState.comments.forEach { comment ->
-                CommentRow(comment = comment)
+                CommentRow(
+                    comment = comment,
+                    isReplyTo = uiState.replyToComment?.uri == comment.uri,
+                    onReply = { onSetReplyTo(comment) },
+                )
             }
         }
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             OutlinedTextField(
                 value = uiState.newCommentText,
-                onValueChange = {},
+                onValueChange = onTextChanged,
                 label = { Text(if (uiState.replyToComment != null) "Reply..." else "Add a comment...") },
                 modifier = Modifier.weight(1f),
                 enabled = !uiState.isSubmittingComment,
             )
             Spacer(Modifier.width(8.dp))
             IconButton(
-                onClick = { /* handled below */ },
+                onClick = onSubmitComment,
                 enabled = uiState.newCommentText.isNotBlank() && !uiState.isSubmittingComment,
             ) {
                 if (uiState.isSubmittingComment) {
@@ -309,28 +374,27 @@ private fun CommentsSection(uiState: PostDetailUiState, onBack: () -> Unit) {
                 }
             }
         }
-        if (uiState.commentError != null) {
-            Text(
-                uiState.commentError,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
     }
 }
 
 @Composable
-private fun CommentRow(comment: CommentEntry) {
+private fun CommentRow(comment: CommentEntry, isReplyTo: Boolean, onReply: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(
             comment.record.plaintext,
             style = MaterialTheme.typography.bodyMedium,
         )
-        Text(
-            comment.record.createdAt?.take(16)?.replace("T", " ") ?: "",
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                comment.record.createdAt?.take(16)?.replace("T", " ") ?: "",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.width(12.dp))
+            TextButton(onClick = onReply, contentPadding = PaddingValues(0.dp)) {
+                Text(if (isReplyTo) "Replying" else "Reply", style = MaterialTheme.typography.labelSmall)
+            }
+        }
     }
 }
 

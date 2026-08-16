@@ -9,6 +9,8 @@ import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,7 +41,7 @@ fun ReaderScreen(
         try {
             val pkg = context.packageManager.getPackageInfo(context.packageName, 0)
             "Version ${pkg.versionName} (${pkg.longVersionCode})"
-        } catch (_: Exception) { "Version 1.0.1 (2)" }
+        } catch (_: Exception) { "Version 1.2.0 (4)" }
     }
 
     Scaffold(
@@ -94,6 +96,9 @@ fun ReaderScreen(
                     isLoading = uiState.isLoadingFollowing,
                     feedType = "following",
                     onRefresh = { viewModel.loadData() },
+                    isLoadingMore = uiState.isLoadingMoreFollowing,
+                    hasMore = uiState.hasMoreFollowing,
+                    onLoadMore = { viewModel.loadNextFollowingPage() },
                     onPostClick = { index, post ->
                         val prev = if (index > 0) uiState.followingPosts[index - 1] else null
                         val next = if (index < uiState.followingPosts.lastIndex) uiState.followingPosts[index + 1] else null
@@ -151,8 +156,18 @@ private fun FeedContent(
     isLoading: Boolean,
     feedType: String,
     onRefresh: () -> Unit,
+    isLoadingMore: Boolean = false,
+    hasMore: Boolean = false,
+    onLoadMore: () -> Unit = {},
     onPostClick: (Int, PostItem) -> Unit = { _, _ -> },
 ) {
+    val pullToRefreshState = rememberPullToRefreshState()
+    PullToRefreshBox(
+        state = pullToRefreshState,
+        isRefreshing = isLoading,
+        onRefresh = onRefresh,
+        modifier = Modifier.fillMaxSize(),
+    ) {
     if (isLoading && posts.isEmpty()) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
@@ -197,7 +212,18 @@ private fun FeedContent(
                     onClick = { onPostClick(index, post) },
                 )
             }
+            if (hasMore) {
+                item(key = "sentinel") {
+                    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        if (isLoadingMore) {
+                            CircularProgressIndicator(modifier = Modifier.size(28.dp))
+                        }
+                    }
+                    LaunchedEffect(Unit) { onLoadMore() }
+                }
+            }
         }
+    }
     }
 }
 
