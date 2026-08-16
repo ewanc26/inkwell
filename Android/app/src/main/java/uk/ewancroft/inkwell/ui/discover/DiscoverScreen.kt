@@ -1,5 +1,6 @@
 package uk.ewancroft.inkwell.ui.discover
 
+import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,6 +27,7 @@ import uk.ewancroft.inkwell.data.model.common.SearchResult
 fun DiscoverScreen(
     viewModel: DiscoverViewModel = hiltViewModel(),
     onSignOut: () -> Unit = {},
+    onNavigateToPost: (String, String?, String?, String?, String?) -> Unit = { _, _, _, _, _ -> },
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showCredits by remember { mutableStateOf(false) }
@@ -35,7 +37,7 @@ fun DiscoverScreen(
         try {
             val pkg = context.packageManager.getPackageInfo(context.packageName, 0)
             "Version ${pkg.versionName} (${pkg.longVersionCode})"
-        } catch (_: Exception) { "Version 1.0.1 (2)" }
+        } catch (_: Exception) { "Version 1.2.0 (4)" }
     }
 
     Scaffold(
@@ -140,7 +142,16 @@ fun DiscoverScreen(
                                 Spacer(Modifier.height(4.dp))
                             }
                             items(documents, key = { it.uri }) { result ->
-                                SearchResultRow(result = result)
+                                SearchResultRow(
+                                    result = result,
+                                    onClick = {
+                                        if (result.isStandardSiteDocument) {
+                                            onNavigateToPost(result.uri, null, null, null, null)
+                                        } else {
+                                            openWebUrl(context, result.uri)
+                                        }
+                                    },
+                                )
                             }
                         }
 
@@ -191,12 +202,15 @@ fun DiscoverScreen(
 @Composable
 private fun SearchResultRow(
     result: SearchResult,
+    onClick: () -> Unit = {},
     isSubscribed: Boolean = false,
     isSubscriptionPending: Boolean = false,
     onToggleSubscription: (() -> Unit)? = null,
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Row(
@@ -272,4 +286,11 @@ private fun SearchResultRow(
             }
         }
     }
+}
+
+private fun openWebUrl(context: android.content.Context, url: String) {
+    try {
+        val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, Uri.parse(url))
+        context.startActivity(intent)
+    } catch (_: Exception) {}
 }

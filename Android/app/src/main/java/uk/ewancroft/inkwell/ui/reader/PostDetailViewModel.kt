@@ -325,9 +325,9 @@ class PostDetailViewModel @Inject constructor(
 
     // MARK: - Comments
 
-    fun loadComments(documentUri: String) {
+    fun loadComments(documentUri: String, forceRefresh: Boolean = false) {
         val current = _uiState.value
-        if (current.uri == documentUri && (current.isLoadingComments || current.comments.isNotEmpty())) return
+        if (!forceRefresh && current.uri == documentUri && (current.isLoadingComments || current.comments.isNotEmpty())) return
         _uiState.value = _uiState.value.copy(isLoadingComments = true, comments = emptyList())
 
         viewModelScope.launch {
@@ -360,7 +360,9 @@ class PostDetailViewModel @Inject constructor(
                     }
                 }
 
-                val sorted = repoComments.sortedByDescending { it.comment.plaintext }
+                // Newest-first, matching iOS LoginStateManager.fetchComments
+                // (sorted by createdAt descending).
+                val sorted = repoComments.sortedByDescending { it.comment.createdAt ?: "" }
                 if (_uiState.value.uri != documentUri) return@launch
                 _uiState.value = _uiState.value.copy(
                     comments = sorted.map { c ->
@@ -402,7 +404,7 @@ class PostDetailViewModel @Inject constructor(
                     newCommentText = "",
                     replyToComment = null,
                 )
-                loadComments(state.uri)
+                loadComments(state.uri, forceRefresh = true)
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isSubmittingComment = false,

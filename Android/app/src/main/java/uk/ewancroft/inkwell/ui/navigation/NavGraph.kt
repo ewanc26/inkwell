@@ -43,6 +43,17 @@ fun InkwellNavHost(
         bottomNavItems.any { it.route == dest.route }
     } == true
 
+    fun navigateToPost(uri: String, prevUri: String?, prevTitle: String?, nextUri: String?, nextTitle: String?) {
+        val encoded = URLEncoder.encode(uri, StandardCharsets.UTF_8.name())
+        val prev = prevUri?.let { URLEncoder.encode(it, StandardCharsets.UTF_8.name()) } ?: ""
+        val next = nextUri?.let { URLEncoder.encode(it, StandardCharsets.UTF_8.name()) } ?: ""
+        val prevT = prevTitle?.let { URLEncoder.encode(it, StandardCharsets.UTF_8.name()) } ?: ""
+        val nextT = nextTitle?.let { URLEncoder.encode(it, StandardCharsets.UTF_8.name()) } ?: ""
+        navController.navigate("post/$encoded?prev=$prev&next=$next&prevTitle=$prevT&nextTitle=$nextT") {
+            launchSingleTop = true
+        }
+    }
+
     Scaffold(
         bottomBar = {
             if (showBottomBar) {
@@ -83,23 +94,28 @@ fun InkwellNavHost(
             composable(Screen.Reader.route) {
                 ReaderScreen(
                     onNavigateToPost = { uri, prevUri, prevTitle, nextUri, nextTitle ->
-                        val encoded = URLEncoder.encode(uri, StandardCharsets.UTF_8.name())
-                        val prev = prevUri?.let { URLEncoder.encode(it, StandardCharsets.UTF_8.name()) } ?: ""
-                        val next = nextUri?.let { URLEncoder.encode(it, StandardCharsets.UTF_8.name()) } ?: ""
-                        val prevT = prevTitle?.let { URLEncoder.encode(it, StandardCharsets.UTF_8.name()) } ?: ""
-                        val nextT = nextTitle?.let { URLEncoder.encode(it, StandardCharsets.UTF_8.name()) } ?: ""
-                        navController.navigate("post/$encoded?prev=$prev&next=$next&prevTitle=$prevT&nextTitle=$nextT")
+                        navigateToPost(uri, prevUri, prevTitle, nextUri, nextTitle)
                     },
                     onSignOut = onSignOut,
                 )
             }
 
             composable(Screen.Discover.route) {
-                DiscoverScreen(onSignOut = onSignOut)
+                DiscoverScreen(
+                    onNavigateToPost = { uri, prevUri, prevTitle, nextUri, nextTitle ->
+                        navigateToPost(uri, prevUri, prevTitle, nextUri, nextTitle)
+                    },
+                    onSignOut = onSignOut,
+                )
             }
 
             composable(Screen.Writer.route) {
-                WriterScreen(onSignOut = onSignOut)
+                WriterScreen(
+                    onSignOut = onSignOut,
+                    onNavigateToPost = { uri, prevUri, prevTitle, nextUri, nextTitle ->
+                        navigateToPost(uri, prevUri, prevTitle, nextUri, nextTitle)
+                    },
+                )
             }
 
             composable(
@@ -124,6 +140,9 @@ fun InkwellNavHost(
                     nextUri = next,
                     nextTitle = nextTitle,
                     onBack = { navController.popBackStack() },
+                    onNavigateToPost = { target, pUri, pTitle, nUri, nTitle ->
+                        navigateToPost(target, pUri, pTitle, nUri, nTitle)
+                    },
                 )
             }
         }

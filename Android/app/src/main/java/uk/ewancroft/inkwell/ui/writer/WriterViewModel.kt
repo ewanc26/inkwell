@@ -8,11 +8,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
+import uk.ewancroft.inkwell.data.model.atproto.PublicationRecord
 import uk.ewancroft.inkwell.data.model.common.AtUri
+import uk.ewancroft.inkwell.data.remote.StandardSiteVerifier
+import uk.ewancroft.inkwell.data.remote.VerificationResult
+import uk.ewancroft.inkwell.data.remote.VerificationFailure
 import uk.ewancroft.inkwell.data.repository.PdsRepository
 import javax.inject.Inject
 
@@ -28,10 +33,14 @@ data class WriterUiState(
     val selectedFormat: String = "Leaflet",
     val title: String = "",
     val description: String = "",
+    val path: String = "",
     val markdown: String = "",
     val isPublishing: Boolean = false,
     val publishError: String? = null,
     val publishSuccess: String? = null,
+    val isVerifyingPublication: Boolean = false,
+    val verifiedPublicationUri: String? = null,
+    val verificationMessage: String? = null,
     val isLoadingPublications: Boolean = false,
     val showCreateDialog: Boolean = false,
     val createUrl: String = "",
@@ -39,6 +48,7 @@ data class WriterUiState(
     val createDescription: String = "",
     val isCreating: Boolean = false,
     val createError: String? = null,
+    val publishedUri: String? = null,
 )
 
 @HiltViewModel
@@ -50,7 +60,58 @@ class WriterViewModel @Inject constructor(
     val uiState: StateFlow<WriterUiState> = _uiState.asStateFlow()
 
     fun selectPublication(publication: PublicationItem) {
-        _uiState.value = _uiState.value.copy(selectedPublication = publication)
+        _uiState.value = _uiState.value.copy(
+            selectedPublication = publication,
+            verifiedPublicationUri = null,
+            verificationMessage = null,
+            publishSuccess = null,
+            publishError = null,
+        )
+        verifySelectedPublication()
+    }
+
+    private fun verifySelectedPublication() {
+        val pub = _uiState.value.selectedPublication ?: return
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isVerifyingPublication = true,
+                verifiedPublicationUri = null,
+                verificationMessage = null,
+            )
+            try {
+                val record = pdsRepository.getRecord(pub.uri)
+                val value = record["value"]?.jsonObject
+                val url = value?.get("url")?.jsonPrimitive?.content
+                if (url.isNullOrBlank()) {
+                    _uiState.value = _uiState.value.copy(
+                        isVerifyingPublication = false,
+                        verificationMessage = "Publication has no URL to verify.",
+                    )
+                    return@launch
+                }
+                val publication = PublicationRecord(url = url, name = pub.name)
+                val result = StandardSiteVerifier.verifyPublication(
+                    publicationURI = pub.uri,
+                    publication = publication,
+                )
+                _uiState.value = when (result) {
+                    is VerificationResult.Verified -> _uiState.value.copy(
+                        isVerifyingPublication = false,
+                        verifiedPublicationUri = pub.uri,
+                        verificationMessage = "Publication verified.",
+                    )
+                    is VerificationResult.Failed -> _uiState.value.copy(
+                        isVerifyingPublication = false,
+                        verificationMessage = result.failure.reason,
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isVerifyingPublication = false,
+                    verificationMessage = "Verification failed: ${e.message}",
+                )
+            }
+        }
     }
 
     fun selectFormat(format: String) {
@@ -58,11 +119,15 @@ class WriterViewModel @Inject constructor(
     }
 
     fun onTitleChanged(title: String) {
-        _uiState.value = _uiState.value.copy(title = title, publishError = null, publishSuccess = null)
+        _uiState.value = _uiState.value.copy(title = title, publishError = null, publishSuccess = null, publishedUri = null)
     }
 
     fun onDescriptionChanged(description: String) {
         _uiState.value = _uiState.value.copy(description = description)
+    }
+
+    fun onPathChanged(path: String) {
+        _uiState.value = _uiState.value.copy(path = path)
     }
 
     fun onMarkdownChanged(markdown: String) {
@@ -187,6 +252,9 @@ class WriterViewModel @Inject constructor(
                     if (state.description.isNotBlank()) {
                         put("description", state.description.trim())
                     }
+                    if (state.path.isNotBlank()) {
+                        put("path", state.path.trim())
+                    }
                     put("content", content)
                     if (state.markdown.isNotBlank()) {
                         put("textContent", state.markdown)
@@ -198,11 +266,14 @@ class WriterViewModel @Inject constructor(
                     record = record,
                 )
 
+                val publishedUri = result["uri"]?.jsonPrimitive?.content
                 _uiState.value = _uiState.value.copy(
                     isPublishing = false,
-                    publishSuccess = "Published: ${result["uri"]?.jsonPrimitive?.content}",
+                    publishSuccess = "Published successfully.",
+                    publishedUri = publishedUri,
                     title = "",
                     description = "",
+                    path = "",
                     markdown = ""
                 )
             } catch (e: Exception) {

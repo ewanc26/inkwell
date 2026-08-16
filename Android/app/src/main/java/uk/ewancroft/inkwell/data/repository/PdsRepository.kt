@@ -21,6 +21,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import uk.ewancroft.inkwell.data.model.bluesky.BlueskyProfile
 import uk.ewancroft.inkwell.data.model.common.AtUri
+import java.net.URLEncoder
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -56,6 +57,23 @@ class PdsRepository @Inject constructor(
         )
     }
 
+    /** URL-encodes a query param value — DIDs/AT-URIs can contain `:`, `/`,
+     *  `.`, and other characters that must not be interpolated raw into a
+     *  query string. */
+    private fun enc(value: String): String = URLEncoder.encode(value, "UTF-8")
+
+    /** Executes a GET and returns the raw body, throwing on non-2xx statuses
+     *  or a missing body instead of decoding an error payload as success. */
+    private suspend fun executeGet(urlStr: String): String = withContext(Dispatchers.IO) {
+        val request = Request.Builder().url(urlStr).get().build()
+        publicHttpClient.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) {
+                throw java.io.IOException("PDS request failed: HTTP ${response.code}")
+            }
+            response.body?.string() ?: throw java.io.IOException("PDS request returned no body")
+        }
+    }
+
     suspend fun listRecords(
         did: String,
         collection: String,
@@ -66,27 +84,24 @@ class PdsRepository @Inject constructor(
         val baseUrl = pdsUrl ?: resolvePdsUrl(did) ?: "https://public.api.bsky.app"
         val urlStr = buildString {
             append("$baseUrl/xrpc/com.atproto.repo.listRecords")
-            append("?repo=$did")
-            append("&collection=$collection")
+            append("?repo=").append(enc(did))
+            append("&collection=").append(enc(collection))
             append("&limit=$limit")
-            cursor?.let { append("&cursor=$it") }
+            cursor?.let { append("&cursor=").append(enc(it)) }
         }
-        return withContext(Dispatchers.IO) {
-            val request = Request.Builder().url(urlStr).get().build()
-            val response = publicHttpClient.newCall(request).execute()
-            json.decodeFromString(response.body!!.string())
-        }
+        return json.decodeFromString(executeGet(urlStr))
     }
 
     suspend fun getRecord(uri: String, pdsUrl: String? = null): JsonObject {
         val parsed = requireNotNull(AtUri.parse(uri))
         val baseUrl = pdsUrl ?: resolvePdsUrl(parsed.did) ?: "https://public.api.bsky.app"
-        val urlStr = "$baseUrl/xrpc/com.atproto.repo.getRecord?repo=${parsed.did}&collection=${parsed.collection}&rkey=${parsed.recordKey}"
-        return withContext(Dispatchers.IO) {
-            val request = Request.Builder().url(urlStr).get().build()
-            val response = publicHttpClient.newCall(request).execute()
-            json.decodeFromString(response.body!!.string())
+        val urlStr = buildString {
+            append("$baseUrl/xrpc/com.atproto.repo.getRecord")
+            append("?repo=").append(enc(parsed.did))
+            append("&collection=").append(enc(parsed.collection))
+            append("&rkey=").append(enc(parsed.recordKey))
         }
+        return json.decodeFromString(executeGet(urlStr))
     }
 
     suspend fun createRecord(
@@ -280,45 +295,38 @@ class PdsRepository @Inject constructor(
                 val value = obj["value"]?.jsonObject ?: continue
                 all.add(RawRecordEntry(uri, value))
             }
-            cursor = response["cursor"]?.jsonPrimitive?.contentOrNull
-        } while (cursor != null && all.size < maxRecords)
+            val nextCursor = response["cursor"]?.jsonPrimitive?.contentOrNull
+            // A PDS echoing the same cursor (no new page) would otherwise loop
+            // until maxRecords; treat it as the end of the list.
+            if (nextCursor == null || nextCursor == cursor) break
+            cursor = nextCursor
+        } while (all.size < maxRecords)
         return all.take(maxRecords)
     }
 
     suspend fun resolveHandle(handle: String): String {
-        val urlStr = "https://public.api.bsky.app/xrpc/com.atproto.identity.resolveHandle?handle=$handle"
-        return withContext(Dispatchers.IO) {
-            val request = Request.Builder().url(urlStr).get().build()
-            val response = publicHttpClient.newCall(request).execute()
-            val body: JsonObject = json.decodeFromString(response.body!!.string())
-            body["did"]!!.jsonPrimitive.content
-        }
+        val urlStr = "https://public.api.bsky.app/xrpc/com.atproto.identity.resolveHandle?handle=${enc(handle)}"
+        val body: JsonObject = json.decodeFromString(executeGet(urlStr))
+        return body["did"]?.jsonPrimitive?.content
+            ?: throw IllegalStateException("resolveHandle returned no did")
     }
 
     suspend fun getProfile(did: String): BlueskyProfile {
-        val urlStr = "https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=$did"
-        return withContext(Dispatchers.IO) {
-            val request = Request.Builder().url(urlStr).get().build()
-            val response = publicHttpClient.newCall(request).execute()
-            json.decodeFromString(response.body!!.string())
-        }
+        val urlStr = "https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=${enc(did)}"
+        return json.decodeFromString(executeGet(urlStr))
     }
 
     private suspend fun resolvePdsUrl(did: String): String? {
-        return withContext(Dispatchers.IO) {
-            try {
-                val urlStr = "https://plc.directory/$did"
-                val request = Request.Builder().url(urlStr).get().build()
-                val response = publicHttpClient.newCall(request).execute()
-                val body = json.parseToJsonElement(response.body!!.string()).jsonObject
-                val services = body["service"]?.jsonArray
-                    ?: body["services"]?.jsonArray
-                services?.firstOrNull { service ->
-                    val type = service.jsonObject["type"]?.jsonPrimitive?.content
-                    type == "AtprotoPersonalDataServer" || type == "PersonalDataServer"
-                }?.jsonObject?.get("serviceEndpoint")?.jsonPrimitive?.content
-                    ?: body["pdsUrl"]?.jsonPrimitive?.content
-            } catch (_: Exception) { null }
-        }
+        return try {
+            val urlStr = "https://plc.directory/${enc(did)}"
+            val body = json.parseToJsonElement(executeGet(urlStr)).jsonObject
+            val services = body["service"]?.jsonArray
+                ?: body["services"]?.jsonArray
+            services?.firstOrNull { service ->
+                val type = service.jsonObject["type"]?.jsonPrimitive?.content
+                type == "AtprotoPersonalDataServer" || type == "PersonalDataServer"
+            }?.jsonObject?.get("serviceEndpoint")?.jsonPrimitive?.content
+                ?: body["pdsUrl"]?.jsonPrimitive?.content
+        } catch (_: Exception) { null }
     }
 }

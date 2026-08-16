@@ -11,6 +11,7 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import uk.ewancroft.inkwell.data.model.bluesky.BlueskyProfile
 import uk.ewancroft.inkwell.data.model.common.AtUri
 import uk.ewancroft.inkwell.data.repository.PdsRepository
 import javax.inject.Inject
@@ -20,20 +21,24 @@ data class PostItem(
     val title: String,
     val description: String?,
     val publicationName: String?,
-    val date: String,
+    val publishedAt: String,
     val coverUrl: String?,
     val site: String,
     val authorDisplayName: String? = null,
     val authorAvatar: String? = null,
-)
+) {
+    val date: String get() = publishedAt.take(10)
+}
 
 data class ReaderUiState(
     val followingPosts: List<PostItem> = emptyList(),
     val yoursPosts: List<PostItem> = emptyList(),
     val isLoadingFollowing: Boolean = false,
     val isLoadingYours: Boolean = false,
+    val isLoadingMoreFollowing: Boolean = false,
+    val hasMoreFollowing: Boolean = false,
     val error: String? = null,
-    val selectedTab: Int = 0
+    val selectedTab: Int = 0,
 )
 
 @HiltViewModel
@@ -43,6 +48,9 @@ class ReaderViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(ReaderUiState())
     val uiState: StateFlow<ReaderUiState> = _uiState.asStateFlow()
+
+    /** Per-publication-DID cursors for the next page of documents. */
+    private val followingCursors = mutableMapOf<String, String>()
 
     init {
         loadData()
@@ -62,6 +70,68 @@ class ReaderViewModel @Inject constructor(
         }
     }
 
+    fun loadNextFollowingPage() {
+        val state = _uiState.value
+        if (state.isLoadingFollowing || state.isLoadingMoreFollowing || followingCursors.isEmpty()) return
+        viewModelScope.launch {
+            val session = pdsRepository.getSession() ?: return@launch
+            _uiState.value = _uiState.value.copy(isLoadingMoreFollowing = true, error = null)
+            try {
+                val cursors = followingCursors.toMap()
+                val posts = mutableListOf<PostItem>()
+                for ((did, cursor) in cursors) {
+                    try {
+                        val profile = runCatching { pdsRepository.getProfile(did) }.getOrNull()
+                        val docsResponse = pdsRepository.listRecords(
+                            did = did,
+                            collection = "site.standard.document",
+                            limit = 25,
+                            cursor = cursor,
+                        )
+                        val docsJson = docsResponse["records"]?.jsonArray.orEmpty()
+                        val nextCursor = docsResponse["cursor"]?.jsonPrimitive?.contentOrNull
+                        if (nextCursor != null && nextCursor != cursor) {
+                            followingCursors[did] = nextCursor
+                        } else {
+                            followingCursors.remove(did)
+                        }
+                        for (docJson in docsJson) {
+                            try {
+                                val docValue = docJson.jsonObject["value"]?.jsonObject ?: continue
+                                val docUri = docJson.jsonObject["uri"]?.jsonPrimitive?.content ?: continue
+                                posts.add(PostItem(
+                                    uri = docUri,
+                                    title = docValue["title"]?.jsonPrimitive?.content ?: "Untitled",
+                                    description = docValue["description"]?.jsonPrimitive?.contentOrNull,
+                                    publicationName = profile?.displayName ?: profile?.handle,
+                                    publishedAt = docValue["publishedAt"]?.jsonPrimitive?.content ?: "",
+                                    coverUrl = docValue["coverImage"]?.jsonObject?.get("link")?.jsonPrimitive?.content
+                                        ?: docValue["coverImage"]?.jsonObject?.get("\$link")?.jsonPrimitive?.content,
+                                    site = docValue["site"]?.jsonPrimitive?.content ?: "",
+                                    authorDisplayName = profile?.displayName,
+                                    authorAvatar = profile?.avatar,
+                                ))
+                            } catch (_: Exception) {}
+                        }
+                    } catch (_: Exception) {}
+                }
+                val merged = (state.followingPosts + posts)
+                    .distinctBy { it.uri }
+                    .sortedByDescending { it.publishedAt }
+                _uiState.value = _uiState.value.copy(
+                    followingPosts = merged,
+                    isLoadingMoreFollowing = false,
+                    hasMoreFollowing = followingCursors.isNotEmpty(),
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoadingMoreFollowing = false,
+                    error = e.message,
+                )
+            }
+        }
+    }
+
     private suspend fun loadFollowingFeed(session: uk.ewancroft.inkwell.data.repository.UserSessionInfo) {
         _uiState.value = _uiState.value.copy(isLoadingFollowing = true, error = null)
         try {
@@ -73,7 +143,8 @@ class ReaderViewModel @Inject constructor(
 
             val subscriptionsJson = subscriptionsResponse["records"]?.jsonArray.orEmpty()
 
-            val didToProfile = mutableMapOf<String, uk.ewancroft.inkwell.data.model.bluesky.BlueskyProfile>()
+            followingCursors.clear()
+            val didToProfile = mutableMapOf<String, BlueskyProfile>()
             val posts = mutableListOf<PostItem>()
 
             for (subJson in subscriptionsJson) {
@@ -89,9 +160,12 @@ class ReaderViewModel @Inject constructor(
 
                     val docsResponse = pdsRepository.listRecords(
                         did = parsed.did,
-                        collection = "site.standard.document"
+                        collection = "site.standard.document",
+                        limit = 25
                     )
                     val docsJson = docsResponse["records"]?.jsonArray.orEmpty()
+                    val cursor = docsResponse["cursor"]?.jsonPrimitive?.contentOrNull
+                    if (cursor != null) followingCursors[parsed.did] = cursor
                     val profile = didToProfile[parsed.did]
                     for (docJson in docsJson) {
                         try {
@@ -102,7 +176,7 @@ class ReaderViewModel @Inject constructor(
                                 title = docValue["title"]?.jsonPrimitive?.content ?: "Untitled",
                                 description = docValue["description"]?.jsonPrimitive?.contentOrNull,
                                 publicationName = profile?.displayName ?: profile?.handle,
-                                date = docValue["publishedAt"]?.jsonPrimitive?.content?.take(10) ?: "",
+                                publishedAt = docValue["publishedAt"]?.jsonPrimitive?.content ?: "",
                                 coverUrl = docValue["coverImage"]?.jsonObject?.get("link")?.jsonPrimitive?.content
                                     ?: docValue["coverImage"]?.jsonObject?.get("\$link")?.jsonPrimitive?.content,
                                 site = docValue["site"]?.jsonPrimitive?.content ?: "",
@@ -115,8 +189,9 @@ class ReaderViewModel @Inject constructor(
             }
 
             _uiState.value = _uiState.value.copy(
-                followingPosts = posts.distinctBy { it.uri },
-                isLoadingFollowing = false
+                followingPosts = posts.distinctBy { it.uri }.sortedByDescending { it.publishedAt },
+                isLoadingFollowing = false,
+                hasMoreFollowing = followingCursors.isNotEmpty(),
             )
         } catch (e: Exception) {
             _uiState.value = _uiState.value.copy(
@@ -146,7 +221,7 @@ class ReaderViewModel @Inject constructor(
                         title = valueObj["title"]?.jsonPrimitive?.content ?: "Untitled",
                         description = valueObj["description"]?.jsonPrimitive?.contentOrNull,
                         publicationName = profile?.displayName ?: profile?.handle,
-                        date = valueObj["publishedAt"]?.jsonPrimitive?.content?.take(10) ?: "",
+                        publishedAt = valueObj["publishedAt"]?.jsonPrimitive?.content ?: "",
                         coverUrl = valueObj["coverImage"]?.jsonObject?.get("link")?.jsonPrimitive?.content
                             ?: valueObj["coverImage"]?.jsonObject?.get("\$link")?.jsonPrimitive?.content,
                         site = valueObj["site"]?.jsonPrimitive?.content ?: "",
@@ -157,7 +232,7 @@ class ReaderViewModel @Inject constructor(
             }
 
             _uiState.value = _uiState.value.copy(
-                yoursPosts = posts,
+                yoursPosts = posts.sortedByDescending { it.publishedAt },
                 isLoadingYours = false
             )
         } catch (e: Exception) {
