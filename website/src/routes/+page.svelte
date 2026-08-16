@@ -55,7 +55,7 @@
 
     <p class="mb-8 text-lg leading-relaxed text-pretty">
       Inkwell is a reader and writer for the Standard.site
-      publishing ecosystem on AT Protocol. Available for iOS, with an experimental Android port. Your writing lives on your
+      publishing ecosystem on AT Protocol. Available for iOS and Android. Your writing lives on your
       Personal Data Server — no silos, no lock-in.
     </p>
 
@@ -115,9 +115,9 @@
 
     <div class="feature-card animate-in stagger-1">
       <div class="feature-icon"><Smartphone class="h-5 w-5" /></div>
-      <h3>Android, via F-Droid (experimental)</h3>
+      <h3>Android, via F-Droid</h3>
       <p class="mb-4">
-        The Android port is an early, experimental build. Add this
+        The Android port built with Jetpack Compose and Material 3. Add this
         self-hosted repo in F-Droid, Droid-ify, or Obtainium to install
         it and receive updates.
       </p>
@@ -136,6 +136,33 @@
           >GitHub</a
         >.
       </p>
+    </div>
+  </div>
+</section>
+
+<!-- Screenshots -->
+<section class="container py-12">
+  <h2 class="mb-12 text-center text-3xl font-extrabold text-balance">
+    See it in action
+  </h2>
+  <div class="flex flex-wrap justify-center gap-8">
+    <div class="w-64 animate-in stagger-1">
+      <img
+        src="/screenshots/ios/reader.svg"
+        alt="Inkwell on iOS"
+        class="w-full h-auto rounded-2xl shadow-lg"
+        loading="lazy"
+      />
+      <p class="mt-3 text-center text-sm text-muted">iOS</p>
+    </div>
+    <div class="w-64 animate-in stagger-2">
+      <img
+        src="/screenshots/android/reader.svg"
+        alt="Inkwell on Android"
+        class="w-full h-auto rounded-2xl shadow-lg"
+        loading="lazy"
+      />
+      <p class="mt-3 text-center text-sm text-muted">Android</p>
     </div>
   </div>
 </section>
@@ -200,7 +227,7 @@
       <div class="feature-icon"><Apple class="h-5 w-5" /></div>
       <h3>iOS &amp; Android</h3>
       <p>
-        Primary iOS app built with SwiftUI. Respects Dynamic Type, accessibility, and system theme. Also available as an experimental Android port with Jetpack Compose and Material 3.
+        Primary iOS app built with SwiftUI. Respects Dynamic Type, accessibility, and system theme. Android port built with Jetpack Compose and Material 3 — feature-matched with the iOS app.
       </p>
     </div>
   </div>
@@ -220,5 +247,26 @@
     <a href="/privacy" class="hover-lift">
       Read the Privacy Policy <ArrowRight class="h-3 w-3" />
     </a>
+  </div>
+</section>
+
+<!-- What's new -->
+<section class="container py-12">
+  <h2 class="mb-6">What's new</h2>
+  <div class="callout">
+    <h3>Android 1.2.0</h3>
+    <ul class="list-disc pl-6 space-y-1">
+      <li>Publication verification — publications are now verified against their .well-known endpoints before publishing</li>
+      <li>Path field — set a custom URL path for each post (e.g. <code class="text-sm">my-post</code>)</li>
+      <li>View post button — jump straight to your published post from the writer</li>
+      <li>Comments sorted by newest first</li>
+      <li>Pull-to-refresh on the reader</li>
+      <li>Previous/next navigation between posts</li>
+      <li>Discover results are tappable</li>
+    </ul>
+    <p class="mt-4 text-sm text-pretty">
+      iOS remains at 1.0 (build 49). The next iOS release will bring
+      feature parity with these Android improvements.
+    </p>
   </div>
 </section>
