@@ -142,29 +142,94 @@
 
 <!-- Screenshots -->
 <section class="container py-12">
-  <h2 class="mb-12 text-center text-3xl font-extrabold text-balance">
+  <h2 class="mb-4 text-center text-3xl font-extrabold text-balance">
     See it in action
   </h2>
-  <div class="flex flex-wrap justify-center gap-8">
-    <div class="w-64 animate-in stagger-1">
-      <img
-        src="/screenshots/ios/reader.svg"
-        alt="Inkwell on iOS"
-        class="w-full h-auto rounded-2xl shadow-lg"
-        loading="lazy"
-      />
-      <p class="mt-3 text-center text-sm text-muted">iOS</p>
-    </div>
-    <div class="w-64 animate-in stagger-2">
-      <img
-        src="/screenshots/android/reader.svg"
-        alt="Inkwell on Android"
-        class="w-full h-auto rounded-2xl shadow-lg"
-        loading="lazy"
-      />
-      <p class="mt-3 text-center text-sm text-muted">Android</p>
+  <p class="mx-auto mb-12 max-w-[42rem] text-center text-lg leading-relaxed text-pretty">
+    The same calm, three-tab workspace on iOS and Android — read,
+    discover, and write, all from your own PDS.
+  </p>
+
+  <div class="mb-16">
+    <h3 class="mb-8 text-center text-xl font-bold">iOS</h3>
+    <div class="flex flex-wrap items-center justify-center gap-8">
+      <figure class="animate-in stagger-1">
+        <img
+          src="/screenshots/ios/reader-6.5.svg"
+          alt="Inkwell reader on iOS showing a published document"
+          class="h-72 w-auto rounded-2xl shadow-lg sm:h-80"
+          width="400"
+          height="865"
+          loading="lazy"
+        />
+        <figcaption class="mt-3 text-center text-sm text-muted">Read</figcaption>
+      </figure>
+      <figure class="animate-in stagger-2">
+        <img
+          src="/screenshots/ios/reader-5.5.svg"
+          alt="Inkwell discover on iOS showing search results"
+          class="h-72 w-auto rounded-2xl shadow-lg sm:h-80"
+          width="400"
+          height="711"
+          loading="lazy"
+        />
+        <figcaption class="mt-3 text-center text-sm text-muted">Discover</figcaption>
+      </figure>
+      <figure class="animate-in stagger-3">
+        <img
+          src="/screenshots/ios/writer.svg"
+          alt="Inkwell writer on iOS showing the compose screen"
+          class="h-72 w-auto rounded-2xl shadow-lg sm:h-80"
+          width="400"
+          height="865"
+          loading="lazy"
+        />
+        <figcaption class="mt-3 text-center text-sm text-muted">Write</figcaption>
+      </figure>
     </div>
   </div>
+
+  <div>
+    <h3 class="mb-8 text-center text-xl font-bold">Android</h3>
+    <div class="flex flex-wrap items-center justify-center gap-8">
+      <figure class="animate-in stagger-1">
+        <img
+          src="/screenshots/android/reader.svg"
+          alt="Inkwell reader on Android showing a published document"
+          class="h-72 w-auto rounded-2xl shadow-lg sm:h-80"
+          width="400"
+          height="800"
+          loading="lazy"
+        />
+        <figcaption class="mt-3 text-center text-sm text-muted">Read</figcaption>
+      </figure>
+      <figure class="animate-in stagger-2">
+        <img
+          src="/screenshots/android/discover.svg"
+          alt="Inkwell discover on Android showing search results"
+          class="h-72 w-auto rounded-2xl shadow-lg sm:h-80"
+          width="400"
+          height="800"
+          loading="lazy"
+        />
+        <figcaption class="mt-3 text-center text-sm text-muted">Discover</figcaption>
+      </figure>
+      <figure class="animate-in stagger-3">
+        <img
+          src="/screenshots/android/writer.svg"
+          alt="Inkwell writer on Android showing the compose screen"
+          class="h-72 w-auto rounded-2xl shadow-lg sm:h-80"
+          width="400"
+          height="800"
+          loading="lazy"
+        />
+        <figcaption class="mt-3 text-center text-sm text-muted">Write</figcaption>
+      </figure>
+    </div>
+  </div>
+  <p class="mt-10 text-center text-sm text-muted">
+    Screenshots are mockups — real captures coming soon.
+  </p>
 </section>
 
 <!-- Features -->
