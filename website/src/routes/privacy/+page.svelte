@@ -13,7 +13,7 @@
   <title>Privacy Policy — {SITE.title}</title>
 </svelte:head>
 
-<article class="container prose py-16 animate-in">
+<article class="site-container prose py-16 animate-in">
   <h1>Privacy Policy</h1>
 
   <p>

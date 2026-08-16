@@ -12,7 +12,7 @@
 @layer components {
   /* ── Layout shells ─────────────────────────────────────────── */
 
-  .container,
+  .site-container,
   .shell-wide {
     max-width: var(--shell-wide);
     margin-inline: auto;
@@ -28,7 +28,7 @@
   /* ── Page header ───────────────────────────────────────────── */
 
   .page-hd {
-    padding: var(--space-xl) 0 var(--space-lg);
+    padding-block: var(--space-xl) var(--space-lg);
     display: flex;
     flex-direction: column;
     gap: var(--space-sm);
@@ -417,8 +417,7 @@
 
   .callout {
     max-width: 42rem;
-    margin-inline: auto;
-    text-align: center;
+    text-align: left;
   }
 
   .callout h2 {

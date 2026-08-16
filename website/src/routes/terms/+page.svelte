@@ -13,7 +13,7 @@
   <title>Terms of Service — {SITE.title}</title>
 </svelte:head>
 
-<article class="container prose py-16 animate-in">
+<article class="site-container prose py-16 animate-in">
   <h1>Terms of Service &amp; EULA</h1>
 
   <p>
