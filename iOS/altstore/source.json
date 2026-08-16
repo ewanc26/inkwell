@@ -18,7 +18,10 @@
       "iconURL": "https://inkwell.ewancroft.uk/altstore/icon.png",
       "tintColor": "#a6e3a1",
       "category": "social",
-      "screenshots": [],
+      "screenshots": [
+        "https://inkwell.ewancroft.uk/screenshots/ios/reader-6.5.svg",
+        "https://inkwell.ewancroft.uk/screenshots/ios/reader-5.5.svg"
+      ],
       "versions": [
         {
           "version": "1.0",
