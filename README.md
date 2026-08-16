@@ -22,6 +22,7 @@ Inkwell is a **native app** available on iOS and Android. This monorepo also con
 
 - Reads `site.standard.publication` and `site.standard.document` records from the author's PDS.
 - Renders Markpub Markdown plus Leaflet, pckt, and Offprint content. Uses `textContent` as a fallback. Native block rendering for Leaflet (including blob-stored pages), Markdown for everything else.
+- SVG screenshot placeholders are checked in under `iOS/screenshots/`, `Android/fastlane/metadata/.../images/phoneScreenshots/`, and `website/static/screenshots/`.
 - Theme resolution: Leaflet's light/dark palette → `basicTheme` → system defaults. Publication-level by default, overridable per document.
 - Publishes Standard.site documents with portable metadata and selectable content formats.
 - Creates and removes `site.standard.graph.subscription` records and recommends.
