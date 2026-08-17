@@ -428,7 +428,7 @@ class PostDetailViewModel @Inject constructor(
             }
 
             if (PcktOffprintConverter.isSupported(formatType)) {
-                val markdown = PcktOffprintConverter.toMarkdown(contentObj, formatType!!)
+                val markdown = PcktOffprintConverter.toMarkdown(contentObj, formatType!!, authorDid)
                 if (!markdown.isNullOrBlank()) return DocumentContent.Markdown(markdown)
             }
 
