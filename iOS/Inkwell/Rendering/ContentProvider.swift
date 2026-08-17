@@ -11,6 +11,7 @@
 //
 
 import Foundation
+import InkwellShared
 import ATProtoKit
 
 // MARK: - ContentProvider Protocol
@@ -78,74 +79,6 @@ private func harvestImageBlobs(from value: Any, into out: inout [String: ComAtpr
     }
 }
 
-// MARK: - Facet Schema
-
-/// Maps a format's facet `$type` strings to the markdown marks we support.
-/// Only the `$type` strings differ between formats; the facet structure is
-/// identical across Leaflet, Pckt, and Offprint.
-struct FacetSchema {
-    let facet: String
-    let byteSlice: String
-    let bold: String
-    let italic: String
-    let code: String
-    let strike: String
-    let link: String
-    /// Feature `$type` → human label, for features markdown can't represent.
-    /// Matching standard.horse's `lossy` pattern.
-    let lossy: [String: String]
-
-    static let leaflet = FacetSchema(
-        facet: "pub.leaflet.richtext.facet",
-        byteSlice: "pub.leaflet.richtext.facet#byteSlice",
-        bold: "pub.leaflet.richtext.facet#bold",
-        italic: "pub.leaflet.richtext.facet#italic",
-        code: "pub.leaflet.richtext.facet#code",
-        strike: "pub.leaflet.richtext.facet#strikethrough",
-        link: "pub.leaflet.richtext.facet#link",
-        lossy: [
-            "pub.leaflet.richtext.facet#highlight": "highlight",
-            "pub.leaflet.richtext.facet#underline": "underline",
-            "pub.leaflet.richtext.facet#atMention": "mentions",
-            "pub.leaflet.richtext.facet#didMention": "mentions",
-            "pub.leaflet.richtext.facet#footnote": "footnotes",
-        ]
-    )
-
-    static let pckt = FacetSchema(
-        facet: "blog.pckt.richtext.facet",
-        byteSlice: "blog.pckt.richtext.facet#byteSlice",
-        bold: "blog.pckt.richtext.facet#bold",
-        italic: "blog.pckt.richtext.facet#italic",
-        code: "blog.pckt.richtext.facet#code",
-        strike: "blog.pckt.richtext.facet#strikethrough",
-        link: "blog.pckt.richtext.facet#link",
-        lossy: [
-            "blog.pckt.richtext.facet#highlight": "highlight",
-            "blog.pckt.richtext.facet#underline": "underline",
-            "blog.pckt.richtext.facet#atMention": "mentions",
-            "blog.pckt.richtext.facet#didMention": "mentions",
-            "blog.pckt.richtext.facet#id": "anchors",
-        ]
-    )
-
-    static let offprint = FacetSchema(
-        facet: "app.offprint.richtext.facet",
-        byteSlice: "app.offprint.richtext.facet#byteSlice",
-        bold: "app.offprint.richtext.facet#bold",
-        italic: "app.offprint.richtext.facet#italic",
-        code: "app.offprint.richtext.facet#code",
-        strike: "app.offprint.richtext.facet#strikethrough",
-        link: "app.offprint.richtext.facet#link",
-        lossy: [
-            "app.offprint.richtext.facet#highlight": "highlight",
-            "app.offprint.richtext.facet#underline": "underline",
-            "app.offprint.richtext.facet#mention": "mentions",
-            "app.offprint.richtext.facet#webMention": "mentions",
-        ]
-    )
-}
-
 // MARK: - Facet Converter
 
 /// Converts between AT Protocol facets (plaintext + byte-range features) and
@@ -155,98 +88,63 @@ enum FacetConverter {
     /// Convert facets to markdown inline text. Unknown features are tracked
     /// in `lost` using schema.lossy labels.
     static func facetsToMarkdown(_ plaintext: String, facets: [LeafletFacet]?, schema: FacetSchema, lost: inout Set<String>) -> String {
+        guard let facets, !facets.isEmpty else { return plaintext }
 
-        guard let facets = facets, !facets.isEmpty else {
-            return plaintext
-        }
+        var insertions: [(offset: Int, text: String)] = []
 
-        // Convert to UTF-8 bytes once for efficient byte-range extraction.
-        let utf8Bytes = Array(plaintext.utf8)
-        let totalBytes = utf8Bytes.count
-
-        // Collect all byte boundaries where the active mark-set may change.
-        var boundaries = Set<Int>([0, totalBytes])
         for facet in facets {
-            boundaries.insert(facet.index.byteStart)
-            boundaries.insert(facet.index.byteEnd)
-        }
-        let sortedBounds = boundaries.sorted()
+            for feature in facet.features {
+                let type = feature.type
+                var markdown: String?
 
-        // For each segment, determine which marks are active.
-        struct Segment {
-            let text: String
-            let bold: Bool
-            let italic: Bool
-            let code: Bool
-            let strike: Bool
-            let link: String?
-        }
+                switch type {
+                case schema.bold:
+                    markdown = "**"
+                case schema.italic:
+                    markdown = "*"
+                case schema.code:
+                    markdown = "`"
+                case schema.strike:
+                    markdown = "~~"
+                case schema.link:
+                    if let uri = feature.uri, !uri.isEmpty {
+                        markdown = "["
+                    } else {
+                        markdown = nil
+                    }
+                default:
+                    if let label = schema.lossy[type] {
+                        lost.insert(label)
+                    } else {
+                        lost.insert("unsupported inline feature")
+                    }
+                    markdown = nil
+                }
 
-        var segments: [Segment] = []
-        for idx in 0..<(sortedBounds.count - 1) {
-            let start = sortedBounds[idx]
-            let end = sortedBounds[idx + 1]
-            if start >= end || start >= totalBytes { continue }
-            let clampedEnd = min(end, totalBytes)
-
-            // Extract the text for this byte range by decoding UTF-8 bytes.
-            let byteSlice = Array(utf8Bytes[start..<clampedEnd])
-            let text = String(bytes: byteSlice, encoding: .utf8) ?? ""
-            if text.isEmpty { continue }
-
-            // Determine active marks at this byte position.
-            var bold = false, italic = false, code = false, strike = false
-            var link: String? = nil
-            for facet in facets {
-                if start >= facet.index.byteStart && start < facet.index.byteEnd {
-                    for feature in facet.features {
-                        switch feature.type {
-                        case schema.bold: bold = true
-                        case schema.italic: italic = true
-                        case schema.code: code = true
-                        case schema.strike: strike = true
-                        case schema.link: link = feature.uri
-                        default:
-                            if let label = schema.lossy[feature.type] {
-                                lost.insert(label)
-                            }
-                        }
+                if let open = markdown {
+                    let close = type == schema.link && feature.uri != nil ? "](\(feature.uri ?? ""))" : open
+                    let start = facet.index.byteStart
+                    let end = facet.index.byteEnd
+                    if start < end && start >= 0 && end <= plaintext.utf8.count {
+                        insertions.append((offset: start, text: open))
+                        insertions.append((offset: end, text: close))
                     }
                 }
             }
+        }
 
-            let seg = Segment(text: text, bold: bold, italic: italic, code: code, strike: strike, link: link)
+        guard !insertions.isEmpty else { return plaintext }
 
-            // Merge with previous segment if marks are identical.
-            if let last = segments.last,
-               last.bold == seg.bold, last.italic == seg.italic,
-               last.code == seg.code, last.strike == seg.strike,
-               last.link == seg.link {
-                segments[segments.count - 1] = Segment(
-                    text: last.text + seg.text, bold: seg.bold, italic: seg.italic,
-                    code: seg.code, strike: seg.strike, link: seg.link
-                )
-            } else {
-                segments.append(seg)
+        insertions.sort { $0.offset > $1.offset }
+
+        var result = plaintext
+        for (offset, text) in insertions {
+            let idx = result.utf8.index(result.utf8.startIndex, offsetBy: offset, limitedBy: result.utf8.endIndex)
+            if let idx {
+                result.insert(contentsOf: text, at: idx)
             }
         }
 
-        // Build markdown from segments.
-        var result = ""
-        for seg in segments {
-            var wrapped = seg.text
-            if seg.code {
-                wrapped = "`\(wrapped)`"
-            } else {
-                if seg.strike { wrapped = "~~\(wrapped)~~" }
-                if seg.italic { wrapped = "*\(wrapped)*" }
-                if seg.bold { wrapped = "**\(wrapped)**" }
-            }
-            if let link = seg.link {
-                wrapped = "[\(wrapped)](\(link))"
-            }
-            result += wrapped
-        }
         return result
     }
 
@@ -410,13 +308,11 @@ enum MarkdownParser {
         while i < lines.count {
             let trimmed = lines[i].trimmingCharacters(in: .whitespaces)
 
-            // Skip empty lines
             if trimmed.isEmpty {
                 i += 1
                 continue
             }
 
-            // Code block / math block
             if trimmed.hasPrefix("```") {
                 let lang = String(trimmed.dropFirst(3))
                 var codeLines: [String] = []
@@ -425,7 +321,7 @@ enum MarkdownParser {
                     codeLines.append(lines[i])
                     i += 1
                 }
-                i += 1  // skip closing ```
+                i += 1
                 let content = codeLines.joined(separator: "\n")
                 if lang == "math" {
                     blocks.append(.math(tex: content))
@@ -435,7 +331,6 @@ enum MarkdownParser {
                 continue
             }
 
-            // Heading
             if trimmed.hasPrefix("#") {
                 let level = trimmed.prefix(while: { $0 == "#" }).count
                 if level >= 1 && level <= 6 {
@@ -446,14 +341,12 @@ enum MarkdownParser {
                 }
             }
 
-            // Horizontal rule
             if trimmed == "---" || trimmed == "***" || trimmed == "___" {
                 blocks.append(.horizontalRule)
                 i += 1
                 continue
             }
 
-            // Blockquote
             if trimmed.hasPrefix(">") {
                 var quoteLines: [String] = []
                 while i < lines.count {
@@ -472,7 +365,6 @@ enum MarkdownParser {
                 continue
             }
 
-            // Image (on its own line)
             if trimmed.hasPrefix("![") {
                 if let closeBracket = trimmed.firstIndex(of: "]"),
                    trimmed.index(after: closeBracket) < trimmed.endIndex,
@@ -487,7 +379,6 @@ enum MarkdownParser {
                 }
             }
 
-            // Unordered list / Task list
             if trimmed.hasPrefix("- ") || trimmed.hasPrefix("* ") {
                 let (items, nextI) = parseList(lines, from: i, ordered: false)
                 if items.allSatisfy({ $0.checked != nil }) && !items.isEmpty {
@@ -499,8 +390,6 @@ enum MarkdownParser {
                 continue
             }
 
-            // Ordered list: "1. Item" or "1) Item" — match leading digits
-            // followed by a period or parenthesis
             var numberStart = trimmed.startIndex
             var numberStr = ""
             while numberStart < trimmed.endIndex, trimmed[numberStart].isNumber {
@@ -510,7 +399,7 @@ enum MarkdownParser {
             if !numberStr.isEmpty, numberStart < trimmed.endIndex,
                (trimmed[numberStart] == "." || trimmed[numberStart] == ")"),
                trimmed.index(after: numberStart) < trimmed.endIndex,
-               trimmed[trimmed.index(after: numberStart)].isWhitespace,
+               trimmed[trimmed.index(after: numberStart)] == " ",
                let number = Int(numberStr) {
                 let (items, nextI) = parseList(lines, from: i, ordered: true)
                 blocks.append(.orderedList(start: number, items: items))
@@ -518,7 +407,6 @@ enum MarkdownParser {
                 continue
             }
 
-            // Paragraph (collect consecutive non-special lines)
             var paraLines: [String] = []
             while i < lines.count {
                 let l = lines[i].trimmingCharacters(in: .whitespaces)
@@ -552,13 +440,11 @@ enum MarkdownParser {
                 continue
             }
 
-            // Check if this line is a list item at the base indent level
             let indent = line.prefix(while: { $0 == " " }).count
             if indent < baseIndent {
                 break
             }
 
-            // Check for list markers
             let isUnordered = trimmed.hasPrefix("- ") || trimmed.hasPrefix("* ")
             let isOrdered = ordered && trimmed.range(of: #"^\d+[.)]\s"#, options: .regularExpression) != nil
 
@@ -566,12 +452,10 @@ enum MarkdownParser {
                 break
             }
 
-            // Extract item text (strip the marker)
             var itemText: String
             if isUnordered {
                 itemText = String(trimmed.dropFirst(2))
             } else {
-                // Find the first space after the ordered list marker (e.g. "1. ")
                 if let markerEnd = trimmed.firstIndex(of: " ") {
                     itemText = String(trimmed[trimmed.index(after: markerEnd)...])
                 } else {
@@ -579,7 +463,6 @@ enum MarkdownParser {
                 }
             }
 
-            // Check for task list checkbox
             var checked: Bool? = nil
             if itemText.hasPrefix("[x] ") || itemText.hasPrefix("[X] ") {
                 checked = true
@@ -589,7 +472,6 @@ enum MarkdownParser {
                 itemText = String(itemText.dropFirst(4))
             }
 
-            // Check for nested list items (more indented)
             var children: [MarkdownListItem] = []
             if i + 1 < lines.count {
                 let nextIndent = lines[i + 1].prefix(while: { $0 == " " }).count
@@ -621,34 +503,25 @@ enum MarkdownSerializer {
         switch block {
         case .heading(let level, let text):
             return String(repeating: "#", count: level) + " " + text
-
         case .paragraph(let text):
             return text
-
         case .code(let language, let content):
             let lang = language ?? ""
             return "```\(lang)\n\(content)\n```"
-
         case .math(let tex):
             return "```math\n\(tex)\n```"
-
         case .blockquote(let text):
             return text.components(separatedBy: "\n").map { "> " + $0 }.joined(separator: "\n")
-
         case .image(let alt, let url):
             return "![\(alt)](\(url))"
-
         case .horizontalRule:
             return "---"
-
         case .unorderedList(let items):
             return items.map { listItemToString($0, prefix: "- ") }.joined(separator: "\n")
-
         case .orderedList(let start, let items):
             return items.enumerated().map { (idx, item) in
                 listItemToString(item, prefix: "\(start + idx). ")
             }.joined(separator: "\n")
-
         case .taskList(let items):
             return items.map { item in
                 let checkbox = item.checked == true ? "[x] " : item.checked == false ? "[ ] " : ""
@@ -975,6 +848,8 @@ struct PcktProvider: ContentProvider {
         "blog.pckt.block.iframe": "embeds",
         "blog.pckt.block.website": "website cards",
         "blog.pckt.block.blueskyEmbed": "Bluesky posts",
+        "blog.pckt.block.noteEmbed": "note embeds",
+        "blog.pckt.block.hardBreak": "hard breaks",
     ]
 
     func matches(_ content: UnknownType?) -> Bool {
@@ -1242,7 +1117,7 @@ struct OffprintProvider: ContentProvider {
             return .blockquote(text: text)
 
         case b("codeBlock"):
-            return .code(language: block.language, content: block.plaintext ?? "")
+            return .code(language: block.language, content: block.code ?? "")
 
         case b("mathBlock"):
             return .math(tex: block.plaintext ?? "")
@@ -1334,7 +1209,7 @@ struct OffprintProvider: ContentProvider {
 
         case .code(let language, let content):
             return OffprintBlock(
-                type: b("codeBlock"), plaintext: content, language: language
+                type: b("codeBlock"), code: content, language: language
             )
 
         case .math(let tex):
@@ -1367,15 +1242,9 @@ struct OffprintProvider: ContentProvider {
             type: b("text"), plaintext: plaintext,
             facets: facets.isEmpty ? nil : facets
         )
-        let itemType: String
-        if item.checked != nil {
-            itemType = "app.offprint.block.taskList#taskItem"
-        } else {
-            itemType = ordered ? "app.offprint.block.orderedList#listItem" : "app.offprint.block.bulletList#listItem"
-        }
         let children = item.children?.map { markdownToOffprintListItem($0, ordered: ordered) }
         return OffprintListItem(
-            type: itemType, content: textBlock, checked: item.checked, children: children
+            content: textBlock, checked: item.checked, children: children
         )
     }
 }
