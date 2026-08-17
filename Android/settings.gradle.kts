@@ -27,3 +27,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "inkwell-android"
 include(":app")
+include(":shared")

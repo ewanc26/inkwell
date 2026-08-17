@@ -139,4 +139,7 @@ dependencies {
     // -- JVM unit tests --
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
+
+    // -- Shared KMP core --
+    implementation(project(":shared"))
 }
