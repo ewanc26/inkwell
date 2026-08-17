@@ -130,6 +130,31 @@ class PdsRepository @Inject constructor(
         )
     }
 
+    suspend fun updateRecord(
+        uri: String,
+        record: JsonObject,
+        revision: String,
+    ): JsonObject {
+        val session = sessionStore.load() ?: throw Exception("Not authenticated")
+        val parsed = AtUri.parse(uri) ?: throw IllegalArgumentException("Invalid AT-URI: $uri")
+        val authClient = atOAuth.createClient()
+        return authClient.procedure(
+            nsid = "com.atproto.repo.putRecord",
+            params = Unit,
+            paramsSerializer = Unit.serializer(),
+            input = buildJsonObject {
+                put("repo", session.did)
+                put("collection", parsed.collection)
+                put("rkey", parsed.recordKey)
+                put("record", record)
+                put("validate", true)
+                put("swapCommit", revision)
+            },
+            inputSerializer = JsonObject.serializer(),
+            responseSerializer = JsonObject.serializer(),
+        )
+    }
+
     suspend fun createPublication(
         url: String,
         name: String,

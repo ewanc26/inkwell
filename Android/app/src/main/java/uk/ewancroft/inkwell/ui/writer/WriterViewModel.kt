@@ -50,6 +50,14 @@ data class WriterUiState(
     val isCreating: Boolean = false,
     val createError: String? = null,
     val publishedUri: String? = null,
+    val editingDocumentUri: String? = null,
+    val editingDocumentTitle: String? = null,
+    val editingDocumentDescription: String? = null,
+    val editingDocumentPath: String? = null,
+    val editingDocumentMarkdown: String? = null,
+    val editingDocumentFormat: String? = null,
+    val editingDocumentRevision: String? = null,
+    val isEditing: Boolean = false,
 )
 
 @HiltViewModel
@@ -273,38 +281,80 @@ class WriterViewModel @Inject constructor(
 
                 val content = MarkdownConverter.convert(state.markdown, state.selectedFormat)
 
-                val record = buildJsonObject {
-                    put("\$type", "site.standard.document")
-                    put("site", pub.uri)
-                    put("title", state.title.trim())
-                    put("publishedAt", now)
-                    if (state.description.isNotBlank()) {
-                        put("description", state.description.trim())
+                if (state.editingDocumentUri != null) {
+                    val revision = state.editingDocumentRevision
+                    if (revision == null) {
+                        _uiState.value = _uiState.value.copy(
+                            isPublishing = false,
+                            publishError = "Missing revision for existing document",
+                        )
+                        return@launch
                     }
-                    if (state.path.isNotBlank()) {
-                        put("path", state.path.trim())
+
+                    val record = buildJsonObject {
+                        put("\$type", "site.standard.document")
+                        put("site", pub.uri)
+                        put("title", state.title.trim())
+                        put("publishedAt", now)
+                        if (state.description.isNotBlank()) {
+                            put("description", state.description.trim())
+                        }
+                        if (state.path.isNotBlank()) {
+                            put("path", state.path.trim())
+                        }
+                        put("content", content)
+                        if (state.markdown.isNotBlank()) {
+                            put("textContent", state.markdown)
+                        }
                     }
-                    put("content", content)
-                    if (state.markdown.isNotBlank()) {
-                        put("textContent", state.markdown)
+
+                    val result = pdsRepository.updateRecord(
+                        uri = state.editingDocumentUri,
+                        record = record,
+                        revision = revision,
+                    )
+
+                    _uiState.value = _uiState.value.copy(
+                        isPublishing = false,
+                        publishSuccess = "Updated successfully.",
+                        publishedUri = state.editingDocumentUri,
+                        editingDocumentUri = null,
+                        editingDocumentRevision = null,
+                    )
+                } else {
+                    val record = buildJsonObject {
+                        put("\$type", "site.standard.document")
+                        put("site", pub.uri)
+                        put("title", state.title.trim())
+                        put("publishedAt", now)
+                        if (state.description.isNotBlank()) {
+                            put("description", state.description.trim())
+                        }
+                        if (state.path.isNotBlank()) {
+                            put("path", state.path.trim())
+                        }
+                        put("content", content)
+                        if (state.markdown.isNotBlank()) {
+                            put("textContent", state.markdown)
+                        }
                     }
+
+                    val result = pdsRepository.createRecord(
+                        collection = "site.standard.document",
+                        record = record,
+                    )
+
+                    val publishedUri = result["uri"]?.jsonPrimitive?.content
+                    _uiState.value = _uiState.value.copy(
+                        isPublishing = false,
+                        publishSuccess = "Published successfully.",
+                        publishedUri = publishedUri,
+                        title = "",
+                        description = "",
+                        path = "",
+                        markdown = "",
+                    )
                 }
-
-                val result = pdsRepository.createRecord(
-                    collection = "site.standard.document",
-                    record = record,
-                )
-
-                val publishedUri = result["uri"]?.jsonPrimitive?.content
-                _uiState.value = _uiState.value.copy(
-                    isPublishing = false,
-                    publishSuccess = "Published successfully.",
-                    publishedUri = publishedUri,
-                    title = "",
-                    description = "",
-                    path = "",
-                    markdown = ""
-                )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isPublishing = false,
@@ -312,5 +362,51 @@ class WriterViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    fun loadDocumentForEditing(uri: String) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isEditing = true, publishError = null)
+            try {
+                val record = pdsRepository.getRecord(uri)
+                val value = record["value"]?.jsonObject ?: throw IllegalStateException("Missing document value")
+                val cid = record["cid"]?.jsonPrimitive?.content ?: throw IllegalStateException("Missing revision")
+
+                val title = value["title"]?.jsonPrimitive?.content ?: ""
+                val description = value["description"]?.jsonPrimitive?.contentOrNull ?: ""
+                val path = value["path"]?.jsonPrimitive?.contentOrNull ?: ""
+                val textContent = value["textContent"]?.jsonPrimitive?.contentOrNull ?: ""
+
+                _uiState.value = _uiState.value.copy(
+                    editingDocumentUri = uri,
+                    editingDocumentTitle = title,
+                    editingDocumentDescription = description,
+                    editingDocumentPath = path,
+                    editingDocumentMarkdown = textContent,
+                    editingDocumentRevision = cid,
+                    title = title,
+                    description = description,
+                    path = path,
+                    markdown = textContent,
+                    isEditing = false,
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isEditing = false,
+                    publishError = "Failed to load document: ${e.message}",
+                )
+            }
+        }
+    }
+
+    fun cancelEditing() {
+        _uiState.value = _uiState.value.copy(
+            editingDocumentUri = null,
+            editingDocumentRevision = null,
+            editingDocumentTitle = null,
+            editingDocumentDescription = null,
+            editingDocumentPath = null,
+            editingDocumentMarkdown = null,
+        )
     }
 }
