@@ -9,9 +9,9 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import uk.ewancroft.inkwell.shared.facets.FacetSchema
 import uk.ewancroft.inkwell.shared.facets.FacetDefinition
+import uk.ewancroft.inkwell.shared.facets.FacetConverter
 import uk.ewancroft.inkwell.shared.facets.RichTextFacet
 import uk.ewancroft.inkwell.shared.facets.RichTextFeature
-import uk.ewancroft.inkwell.shared.facets.facetsToMarkdown
 
 data class ConvertResult(
     val markdown: String?,
@@ -342,7 +342,7 @@ object PcktOffprintConverter {
             RichTextFacet(byteStart = byteStart, byteEnd = byteEnd, features = features)
         }
 
-        return uk.ewancroft.inkwell.shared.facets.facetsToMarkdown(
+        return FacetConverter.facetsToMarkdown(
             plaintext = plaintext,
             facets = sharedFacets,
             boldType = schema.bold,
