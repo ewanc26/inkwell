@@ -35,6 +35,8 @@ fun InkwellNavHost(
     isAuthenticated: Boolean,
     onSignOut: () -> Unit = {},
     navController: NavHostController = rememberNavController(),
+    pendingDocumentUri: String? = null,
+    onDocumentNavigated: () -> Unit = {},
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -42,6 +44,16 @@ fun InkwellNavHost(
     val showBottomBar = isAuthenticated && currentDestination?.hierarchy?.any { dest ->
         bottomNavItems.any { it.route == dest.route }
     } == true
+
+    LaunchedEffect(pendingDocumentUri) {
+        if (pendingDocumentUri != null) {
+            val encoded = URLEncoder.encode(pendingDocumentUri, StandardCharsets.UTF_8.name())
+            navController.navigate("post/$encoded") {
+                launchSingleTop = true
+            }
+            onDocumentNavigated()
+        }
+    }
 
     fun navigateToPost(uri: String, prevUri: String?, prevTitle: String?, nextUri: String?, nextTitle: String?) {
         val encoded = URLEncoder.encode(uri, StandardCharsets.UTF_8.name())

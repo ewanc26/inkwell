@@ -31,16 +31,21 @@ import uk.ewancroft.inkwell.ui.components.InkwellMark
 import uk.ewancroft.inkwell.ui.navigation.InkwellNavHost
 import uk.ewancroft.inkwell.ui.theme.InkwellTheme
 
+import uk.ewancroft.inkwell.util.TipPromptManager
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val pendingIntent = mutableStateOf<Intent?>(null)
+    private val pendingDocumentUri = mutableStateOf<String?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        TipPromptManager.recordLaunch(this)
         enableEdgeToEdge()
         ScreenshotConfig.enabled = intent.getBooleanExtra("screenshot", false)
         ScreenshotConfig.tab = intent.getStringExtra("tab") ?: "reader"
+        pendingDocumentUri.value = intent.getStringExtra("documentURI")
         setContent {
             val viewModel: AuthViewModel = hiltViewModel()
 
@@ -77,6 +82,8 @@ class MainActivity : ComponentActivity() {
                             InkwellNavHost(
                                 isAuthenticated = true,
                                 onSignOut = { viewModel.logout() },
+                                pendingDocumentUri = pendingDocumentUri.value,
+                                onDocumentNavigated = { pendingDocumentUri.value = null },
                             )
                         }
                         authState is AuthUiState.Loading -> {
@@ -98,6 +105,8 @@ class MainActivity : ComponentActivity() {
                             InkwellNavHost(
                                 isAuthenticated = isAuthenticated,
                                 onSignOut = { viewModel.logout() },
+                                pendingDocumentUri = pendingDocumentUri.value,
+                                onDocumentNavigated = { pendingDocumentUri.value = null },
                             )
                         }
                     }
@@ -125,5 +134,6 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         pendingIntent.value = intent
+        pendingDocumentUri.value = intent.getStringExtra("documentURI")
     }
 }

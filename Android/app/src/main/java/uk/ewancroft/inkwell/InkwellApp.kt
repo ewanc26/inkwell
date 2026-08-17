@@ -11,7 +11,21 @@
 package uk.ewancroft.inkwell
 
 import android.app.Application
+import androidx.work.Configuration
+import androidx.work.WorkManager
+import androidx.hilt.work.HiltWorkerFactory
 import dagger.hilt.android.HiltAndroidApp
+import uk.ewancroft.inkwell.data.remote.InkwellNotificationManager
+import javax.inject.Inject
 
 @HiltAndroidApp
-class InkwellApp : Application()
+class InkwellApp : Application() {
+    @Inject lateinit var workerFactory: HiltWorkerFactory
+    @Inject lateinit var notificationManager: InkwellNotificationManager
+
+    override fun onCreate() {
+        super.onCreate()
+        WorkManager.initialize(this, Configuration.Builder().setWorkerFactory(workerFactory).build())
+        notificationManager.schedulePeriodicPoll()
+    }
+}
