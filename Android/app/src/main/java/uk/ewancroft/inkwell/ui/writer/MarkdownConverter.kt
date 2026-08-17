@@ -3,28 +3,33 @@ package uk.ewancroft.inkwell.ui.writer
 import kotlinx.serialization.json.*
 import uk.ewancroft.inkwell.data.model.content.*
 import uk.ewancroft.inkwell.shared.facets.FacetSchema
+import uk.ewancroft.inkwell.shared.markdown.MarkdownBlock as SharedMarkdownBlock
+import uk.ewancroft.inkwell.shared.markdown.MarkdownParser as SharedMarkdownParser
+import uk.ewancroft.inkwell.shared.markdown.MarkdownListItem as SharedMarkdownListItem
 
 object MarkdownConverter {
 
     fun convert(markdown: String, format: String, uploadedBlobs: Map<String, JsonObject> = emptyMap()): JsonObject {
+        val blocks = SharedMarkdownParser.parse(markdown)
         return when (format) {
-            "Leaflet" -> buildLeafletContent(markdown, uploadedBlobs)
+            "Leaflet" -> buildLeafletContent(blocks, uploadedBlobs)
             "Markpub" -> buildMarkpubContent(markdown)
-            "pckt" -> buildPcktContent(markdown, uploadedBlobs)
-            "Offprint" -> buildOffprintContent(markdown, uploadedBlobs)
-            else -> buildLeafletContent(markdown, uploadedBlobs)
+            "pckt" -> buildPcktContent(blocks, uploadedBlobs)
+            "Offprint" -> buildOffprintContent(blocks, uploadedBlobs)
+            else -> buildLeafletContent(blocks, uploadedBlobs)
         }
     }
 
-    private fun buildLeafletContent(markdown: String, uploadedBlobs: Map<String, JsonObject>): JsonObject = buildJsonObject {
+    private fun buildLeafletContent(blocks: List<SharedMarkdownBlock>, uploadedBlobs: Map<String, JsonObject>): JsonObject = buildJsonObject {
         put("\$type", "pub.leaflet.content")
-        val blocks = parseMarkdownToLeafletBlocks(markdown, uploadedBlobs)
         put("pages", buildJsonArray {
             add(buildJsonObject {
                 put("\$type", "pub.leaflet.pages.linearDocument")
                 put("id", "page-1")
                 put("blocks", buildJsonArray {
-                    blocks.forEach { add(it) }
+                    blocks.forEach { block ->
+                        leafletBlockToJson(block, uploadedBlobs)?.let { add(it) }
+                    }
                 })
             })
         })
@@ -38,521 +43,301 @@ object MarkdownConverter {
         })
     }
 
-    private fun buildPcktContent(markdown: String, uploadedBlobs: Map<String, JsonObject>): JsonObject = buildJsonObject {
+    private fun buildPcktContent(blocks: List<SharedMarkdownBlock>, uploadedBlobs: Map<String, JsonObject>): JsonObject = buildJsonObject {
         put("\$type", "blog.pckt.content")
-        val blocks = parseMarkdownToPcktBlocks(markdown, uploadedBlobs)
         put("items", buildJsonArray {
-            blocks.forEach { add(it) }
+            blocks.forEach { block ->
+                pcktBlockToJson(block, uploadedBlobs)?.let { add(it) }
+            }
         })
     }
 
-    private fun buildOffprintContent(markdown: String, uploadedBlobs: Map<String, JsonObject>): JsonObject = buildJsonObject {
+    private fun buildOffprintContent(blocks: List<SharedMarkdownBlock>, uploadedBlobs: Map<String, JsonObject>): JsonObject = buildJsonObject {
         put("\$type", "app.offprint.content")
-        val blocks = parseMarkdownToOffprintBlocks(markdown, uploadedBlobs)
         put("items", buildJsonArray {
-            blocks.forEach { add(it) }
+            blocks.forEach { block ->
+                offprintBlockToJson(block, uploadedBlobs)?.let { add(it) }
+            }
         })
     }
 
-    // MARK: - Markdown Parsing
+    // MARK: - Shared Block → Format JSON
 
-    private fun parseMarkdownToLeafletBlocks(markdown: String, uploadedBlobs: Map<String, JsonObject>): List<JsonObject> {
-        val lines = markdown.lines()
-        val blocks = mutableListOf<JsonObject>()
-        var i = 0
-
-        while (i < lines.size) {
-            val line = lines[i]
-            when {
-                line.startsWith("# ") -> {
-                    val text = line.drop(2).trim()
-                    val (plaintext, facets) = facetsFromMarkdown(text, "Leaflet")
-                    blocks.add(buildJsonObject {
-                        put("\$type", "pub.leaflet.blocks.header")
-                        put("plaintext", plaintext)
-                        put("level", 1)
-                        if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
-                    })
-                    i++
-                }
-                line.startsWith("## ") -> {
-                    val text = line.drop(3).trim()
-                    val (plaintext, facets) = facetsFromMarkdown(text, "Leaflet")
-                    blocks.add(buildJsonObject {
-                        put("\$type", "pub.leaflet.blocks.header")
-                        put("plaintext", plaintext)
-                        put("level", 2)
-                        if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
-                    })
-                    i++
-                }
-                line.startsWith("### ") -> {
-                    val text = line.drop(4).trim()
-                    val (plaintext, facets) = facetsFromMarkdown(text, "Leaflet")
-                    blocks.add(buildJsonObject {
-                        put("\$type", "pub.leaflet.blocks.header")
-                        put("plaintext", plaintext)
-                        put("level", 3)
-                        if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
-                    })
-                    i++
-                }
-                line.startsWith("```") -> {
-                    val lang = line.drop(3).trim()
-                    val codeLines = mutableListOf<String>()
-                    i++
-                    while (i < lines.size && !lines[i].startsWith("```")) {
-                        codeLines.add(lines[i])
-                        i++
-                    }
-                    i++ // skip closing ```
-                    blocks.add(buildJsonObject {
-                        put("\$type", "pub.leaflet.blocks.code")
-                        put("plaintext", codeLines.joinToString("\n"))
-                        if (lang.isNotBlank()) put("language", lang)
-                    })
-                }
-                line.startsWith("- ") || line.startsWith("* ") -> {
-                    val (items, nextI) = parseList(lines, i, ordered = false)
-                    blocks.add(buildJsonObject {
-                        put("\$type", "pub.leaflet.blocks.unorderedList")
-                        put("children", buildJsonArray {
-                            items.forEach { item ->
-                                add(buildJsonObject {
-                                    put("\$type", "pub.leaflet.blocks.unorderedList#listItem")
-                                    val (plaintext, facets) = facetsFromMarkdown(item.text, "Leaflet")
-                                    put("content", buildJsonObject {
-                                        put("\$type", "pub.leaflet.blocks.text")
-                                        put("plaintext", plaintext)
-                                        if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
-                                    })
-                                    if (item.checked != null) put("checked", item.checked)
-                                })
-                            }
-                        })
-                    })
-                    i = nextI
-                }
-                line.startsWith("> ") -> {
-                    val quoteLines = mutableListOf<String>()
-                    while (i < lines.size && (lines[i].startsWith("> ") || lines[i].isEmpty())) {
-                        if (lines[i].startsWith("> ")) {
-                            quoteLines.add(lines[i].drop(2).trim())
-                        }
-                        i++
-                    }
-                    blocks.add(buildJsonObject {
-                        put("\$type", "pub.leaflet.blocks.blockquote")
-                        put("plaintext", quoteLines.joinToString("\n"))
-                    })
-                }
-                line == "---" || line == "***" -> {
-                    blocks.add(buildJsonObject { put("\$type", "pub.leaflet.blocks.horizontalRule") })
-                    i++
-                }
-                line.startsWith("![") -> {
-                    val match = Regex("^!\\[([^\\]]*)\\]\\(([^)]+)\\)$").find(line)
-                    if (match != null) {
-                        val alt = match.groupValues[1]
-                        val url = match.groupValues[2]
-                        val blob = uploadedBlobs[url] ?: buildJsonObject { put("\$link", url) }
-                        blocks.add(buildJsonObject {
-                            put("\$type", "pub.leaflet.blocks.image")
-                            put("alt", alt)
-                            put("image", blob)
-                        })
-                    } else {
-                        val paraLines = mutableListOf<String>()
-                        while (i < lines.size && lines[i].isNotBlank() &&
-                            !lines[i].startsWith("#") && !lines[i].startsWith(">") &&
-                            !lines[i].startsWith("```") && !lines[i].startsWith("- ") &&
-                            !lines[i].startsWith("* ") && lines[i] != "---" && lines[i] != "***"
-                        ) {
-                            paraLines.add(lines[i])
-                            i++
-                        }
-                        val text = paraLines.joinToString(" ")
-                        val (plaintext, facets) = facetsFromMarkdown(text, "Leaflet")
-                        blocks.add(buildJsonObject {
-                            put("\$type", "pub.leaflet.blocks.text")
-                            put("plaintext", plaintext)
-                            if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
-                        })
-                    }
-                    i++
-                }
-                line.isEmpty() -> i++
-                else -> {
-                    val paraLines = mutableListOf<String>()
-                    while (i < lines.size && lines[i].isNotBlank() &&
-                        !lines[i].startsWith("#") && !lines[i].startsWith(">") &&
-                        !lines[i].startsWith("```") && !lines[i].startsWith("- ") &&
-                        !lines[i].startsWith("* ") && lines[i] != "---" && lines[i] != "***"
-                    ) {
-                        paraLines.add(lines[i])
-                        i++
-                    }
-                    val text = paraLines.joinToString(" ")
-                    val (plaintext, facets) = facetsFromMarkdown(text, "Leaflet")
-                    blocks.add(buildJsonObject {
-                        put("\$type", "pub.leaflet.blocks.text")
-                        put("plaintext", plaintext)
-                        if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
-                    })
-                }
+    private fun leafletBlockToJson(block: SharedMarkdownBlock, uploadedBlobs: Map<String, JsonObject>): JsonObject? = when (block) {
+        is SharedMarkdownBlock.Heading -> {
+            val (plaintext, facets) = facetsFromMarkdown(block.text, "Leaflet")
+            buildJsonObject {
+                put("\$type", "pub.leaflet.blocks.header")
+                put("plaintext", plaintext)
+                put("level", block.level)
+                if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
             }
         }
-        return blocks
+        is SharedMarkdownBlock.Paragraph -> {
+            val (plaintext, facets) = facetsFromMarkdown(block.text, "Leaflet")
+            buildJsonObject {
+                put("\$type", "pub.leaflet.blocks.text")
+                put("plaintext", plaintext)
+                if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
+            }
+        }
+        is SharedMarkdownBlock.Code -> buildJsonObject {
+            put("\$type", "pub.leaflet.blocks.code")
+            put("plaintext", block.content)
+            if (block.language != null) put("language", block.language)
+        }
+        is SharedMarkdownBlock.Math -> buildJsonObject {
+            put("\$type", "pub.leaflet.blocks.code")
+            put("plaintext", block.tex)
+            put("language", "math")
+        }
+        is SharedMarkdownBlock.Blockquote -> {
+            val (plaintext, facets) = facetsFromMarkdown(block.text, "Leaflet")
+            buildJsonObject {
+                put("\$type", "pub.leaflet.blocks.blockquote")
+                put("plaintext", plaintext)
+                if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
+            }
+        }
+        is SharedMarkdownBlock.Image -> {
+            val blob = uploadedBlobs[block.url] ?: buildJsonObject { put("\$link", block.url) }
+            buildJsonObject {
+                put("\$type", "pub.leaflet.blocks.image")
+                put("alt", block.alt)
+                put("image", blob)
+            }
+        }
+        SharedMarkdownBlock.HorizontalRule -> buildJsonObject {
+            put("\$type", "pub.leaflet.blocks.horizontalRule")
+        }
+        is SharedMarkdownBlock.UnorderedList -> buildJsonObject {
+            put("\$type", "pub.leaflet.blocks.unorderedList")
+            put("children", buildJsonArray {
+                block.items.forEach { item ->
+                    add(leafletListItemToJson(item, ordered = false, uploadedBlobs))
+                }
+            })
+        }
+        is SharedMarkdownBlock.OrderedList -> buildJsonObject {
+            put("\$type", "pub.leaflet.blocks.orderedList")
+            put("children", buildJsonArray {
+                block.items.forEach { item ->
+                    add(leafletListItemToJson(item, ordered = true, uploadedBlobs))
+                }
+            })
+        }
+        is SharedMarkdownBlock.TaskList -> buildJsonObject {
+            put("\$type", "pub.leaflet.blocks.unorderedList")
+            put("children", buildJsonArray {
+                block.items.forEach { item ->
+                    add(leafletListItemToJson(item, ordered = false, uploadedBlobs, task = true))
+                }
+            })
+        }
     }
 
-    private fun parseMarkdownToPcktBlocks(markdown: String, uploadedBlobs: Map<String, JsonObject>): List<JsonObject> {
-        val lines = markdown.lines()
-        val blocks = mutableListOf<JsonObject>()
-        var i = 0
+    private fun leafletListItemToJson(
+        item: SharedMarkdownListItem,
+        ordered: Boolean,
+        uploadedBlobs: Map<String, JsonObject>,
+        task: Boolean = false
+    ): JsonObject = buildJsonObject {
+        val itemType = if (ordered) "pub.leaflet.blocks.orderedList#listItem" else "pub.leaflet.blocks.unorderedList#listItem"
+        put("\$type", itemType)
+        val (plaintext, facets) = facetsFromMarkdown(item.text, "Leaflet")
+        put("content", buildJsonObject {
+            put("\$type", "pub.leaflet.blocks.text")
+            put("plaintext", plaintext)
+            if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
+        })
+        if (task && item.checked != null) put("checked", item.checked)
+    }
 
-        while (i < lines.size) {
-            val line = lines[i]
-            when {
-                line.startsWith("# ") -> {
-                    val text = line.drop(2).trim()
-                    val (plaintext, facets) = facetsFromMarkdown(text, "pckt")
-                    blocks.add(buildJsonObject {
-                        put("\$type", "blog.pckt.block.heading")
-                        put("plaintext", plaintext)
-                        put("level", 1)
-                        if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
-                    })
-                    i++
-                }
-                line.startsWith("## ") -> {
-                    val text = line.drop(3).trim()
-                    val (plaintext, facets) = facetsFromMarkdown(text, "pckt")
-                    blocks.add(buildJsonObject {
-                        put("\$type", "blog.pckt.block.heading")
-                        put("plaintext", plaintext)
-                        put("level", 2)
-                        if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
-                    })
-                    i++
-                }
-                line.startsWith("### ") -> {
-                    val text = line.drop(4).trim()
-                    val (plaintext, facets) = facetsFromMarkdown(text, "pckt")
-                    blocks.add(buildJsonObject {
-                        put("\$type", "blog.pckt.block.heading")
-                        put("plaintext", plaintext)
-                        put("level", 3)
-                        if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
-                    })
-                    i++
-                }
-                line.startsWith("```") -> {
-                    val lang = line.drop(3).trim()
-                    val codeLines = mutableListOf<String>()
-                    i++
-                    while (i < lines.size && !lines[i].startsWith("```")) {
-                        codeLines.add(lines[i])
-                        i++
-                    }
-                    i++
-                    blocks.add(buildJsonObject {
-                        put("\$type", "blog.pckt.block.codeBlock")
-                        put("plaintext", codeLines.joinToString("\n"))
-                        if (lang.isNotBlank()) put("language", lang)
-                    })
-                }
-                line.startsWith("- ") || line.startsWith("* ") -> {
-                    val (items, nextI) = parseList(lines, i, ordered = false)
-                    blocks.add(buildJsonObject {
-                        put("\$type", "blog.pckt.block.bulletList")
-                        put("listContent", buildJsonArray {
-                            items.forEach { item ->
-                                add(buildJsonObject {
-                                    put("\$type", "blog.pckt.block.listItem")
-                                    val (plaintext, facets) = facetsFromMarkdown(item.text, "pckt")
-                                    put("content", buildJsonArray {
-                                        add(buildJsonObject {
-                                            put("\$type", "blog.pckt.block.text")
-                                            put("plaintext", plaintext)
-                                            if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
-                                        })
-                                    })
-                                    if (item.checked != null) put("checked", item.checked)
-                                })
-                            }
-                        })
-                    })
-                    i = nextI
-                }
-                line.startsWith("> ") -> {
-                    val quoteLines = mutableListOf<String>()
-                    while (i < lines.size && (lines[i].startsWith("> ") || lines[i].isEmpty())) {
-                        if (lines[i].startsWith("> ")) quoteLines.add(lines[i].drop(2).trim())
-                        i++
-                    }
-                    blocks.add(buildJsonObject {
-                        put("\$type", "blog.pckt.block.blockquote")
-                        put("content", buildJsonArray {
-                            add(buildJsonObject {
-                                put("\$type", "blog.pckt.block.text")
-                                put("plaintext", quoteLines.joinToString("\n"))
-                            })
-                        })
-                    })
-                }
-                line == "---" || line == "***" -> {
-                    blocks.add(buildJsonObject { put("\$type", "blog.pckt.block.horizontalRule") })
-                    i++
-                }
-                line.startsWith("![") -> {
-                    val match = Regex("^!\\[([^\\]]*)\\]\\(([^)]+)\\)$").find(line)
-                    if (match != null) {
-                        val alt = match.groupValues[1]
-                        val url = match.groupValues[2]
-                        val blob = uploadedBlobs[url] ?: buildJsonObject { put("\$link", url) }
-                        blocks.add(buildJsonObject {
-                            put("\$type", "blog.pckt.block.image")
-                            put("alt", alt)
-                            put("attrs", buildJsonObject {
-                                put("src", url)
-                                put("blob", blob)
-                            })
-                        })
-                    } else {
-                        val paraLines = mutableListOf<String>()
-                        while (i < lines.size && lines[i].isNotBlank() &&
-                            !lines[i].startsWith("#") && !lines[i].startsWith(">") &&
-                            !lines[i].startsWith("```") && !lines[i].startsWith("- ") &&
-                            !lines[i].startsWith("* ") && lines[i] != "---" && lines[i] != "***"
-                        ) {
-                            paraLines.add(lines[i])
-                            i++
-                        }
-                        val text = paraLines.joinToString(" ")
-                        val (plaintext, facets) = facetsFromMarkdown(text, "pckt")
-                        blocks.add(buildJsonObject {
-                            put("\$type", "blog.pckt.block.text")
-                            put("plaintext", plaintext)
-                            if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
-                        })
-                    }
-                    i++
-                }
-                line.isEmpty() -> i++
-                else -> {
-                    val paraLines = mutableListOf<String>()
-                    while (i < lines.size && lines[i].isNotBlank() &&
-                        !lines[i].startsWith("#") && !lines[i].startsWith(">") &&
-                        !lines[i].startsWith("```") && !lines[i].startsWith("- ") &&
-                        !lines[i].startsWith("* ") && lines[i] != "---" && lines[i] != "***"
-                    ) {
-                        paraLines.add(lines[i])
-                        i++
-                    }
-                    val text = paraLines.joinToString(" ")
-                    val (plaintext, facets) = facetsFromMarkdown(text, "pckt")
-                    blocks.add(buildJsonObject {
+    private fun pcktBlockToJson(block: SharedMarkdownBlock, uploadedBlobs: Map<String, JsonObject>): JsonObject? = when (block) {
+        is SharedMarkdownBlock.Heading -> {
+            val (plaintext, facets) = facetsFromMarkdown(block.text, "pckt")
+            buildJsonObject {
+                put("\$type", "blog.pckt.block.heading")
+                put("plaintext", plaintext)
+                put("level", block.level)
+                if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
+            }
+        }
+        is SharedMarkdownBlock.Paragraph -> {
+            val (plaintext, facets) = facetsFromMarkdown(block.text, "pckt")
+            buildJsonObject {
+                put("\$type", "blog.pckt.block.text")
+                put("plaintext", plaintext)
+                if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
+            }
+        }
+        is SharedMarkdownBlock.Code -> buildJsonObject {
+            put("\$type", "blog.pckt.block.codeBlock")
+            put("plaintext", block.content)
+            if (block.language != null) put("language", block.language)
+        }
+        is SharedMarkdownBlock.Math -> buildJsonObject {
+            put("\$type", "blog.pckt.block.codeBlock")
+            put("plaintext", block.tex)
+            put("language", "math")
+        }
+        is SharedMarkdownBlock.Blockquote -> {
+            val (plaintext, facets) = facetsFromMarkdown(block.text, "pckt")
+            buildJsonObject {
+                put("\$type", "blog.pckt.block.blockquote")
+                put("content", buildJsonArray {
+                    add(buildJsonObject {
                         put("\$type", "blog.pckt.block.text")
                         put("plaintext", plaintext)
                         if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
                     })
-                }
+                })
             }
         }
-        return blocks
+        is SharedMarkdownBlock.Image -> {
+            val blob = uploadedBlobs[block.url] ?: buildJsonObject { put("\$link", block.url) }
+            buildJsonObject {
+                put("\$type", "blog.pckt.block.image")
+                put("alt", block.alt)
+                put("attrs", buildJsonObject {
+                    put("src", block.url)
+                    put("blob", blob)
+                })
+            }
+        }
+        SharedMarkdownBlock.HorizontalRule -> buildJsonObject {
+            put("\$type", "blog.pckt.block.horizontalRule")
+        }
+        is SharedMarkdownBlock.UnorderedList -> buildJsonObject {
+            put("\$type", "blog.pckt.block.bulletList")
+            put("listContent", buildJsonArray {
+                block.items.forEach { item ->
+                    add(pcktListItemToJson(item, uploadedBlobs))
+                }
+            })
+        }
+        is SharedMarkdownBlock.OrderedList -> buildJsonObject {
+            put("\$type", "blog.pckt.block.bulletList")
+            put("listContent", buildJsonArray {
+                block.items.forEach { item ->
+                    add(pcktListItemToJson(item, uploadedBlobs))
+                }
+            })
+        }
+        is SharedMarkdownBlock.TaskList -> buildJsonObject {
+            put("\$type", "blog.pckt.block.bulletList")
+            put("listContent", buildJsonArray {
+                block.items.forEach { item ->
+                    add(pcktListItemToJson(item, uploadedBlobs, task = true))
+                }
+            })
+        }
     }
 
-    private fun parseMarkdownToOffprintBlocks(markdown: String, uploadedBlobs: Map<String, JsonObject>): List<JsonObject> {
-        val lines = markdown.lines()
-        val blocks = mutableListOf<JsonObject>()
-        var i = 0
+    private fun pcktListItemToJson(item: SharedMarkdownListItem, uploadedBlobs: Map<String, JsonObject>, task: Boolean = false): JsonObject = buildJsonObject {
+        put("\$type", "blog.pckt.block.listItem")
+        val (plaintext, facets) = facetsFromMarkdown(item.text, "pckt")
+        put("content", buildJsonArray {
+            add(buildJsonObject {
+                put("\$type", "blog.pckt.block.text")
+                put("plaintext", plaintext)
+                if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
+            })
+        })
+        if (task && item.checked != null) put("checked", item.checked)
+    }
 
-        while (i < lines.size) {
-            val line = lines[i]
-            when {
-                line.startsWith("# ") -> {
-                    val text = line.drop(2).trim()
-                    val (plaintext, facets) = facetsFromMarkdown(text, "Offprint")
-                    blocks.add(buildJsonObject {
-                        put("\$type", "app.offprint.block.heading")
-                        put("plaintext", plaintext)
-                        put("level", 1)
-                        if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
-                    })
-                    i++
-                }
-                line.startsWith("## ") -> {
-                    val text = line.drop(3).trim()
-                    val (plaintext, facets) = facetsFromMarkdown(text, "Offprint")
-                    blocks.add(buildJsonObject {
-                        put("\$type", "app.offprint.block.heading")
-                        put("plaintext", plaintext)
-                        put("level", 2)
-                        if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
-                    })
-                    i++
-                }
-                line.startsWith("### ") -> {
-                    val text = line.drop(4).trim()
-                    val (plaintext, facets) = facetsFromMarkdown(text, "Offprint")
-                    blocks.add(buildJsonObject {
-                        put("\$type", "app.offprint.block.heading")
-                        put("plaintext", plaintext)
-                        put("level", 3)
-                        if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
-                    })
-                    i++
-                }
-                line.startsWith("```") -> {
-                    val lang = line.drop(3).trim()
-                    val codeLines = mutableListOf<String>()
-                    i++
-                    while (i < lines.size && !lines[i].startsWith("```")) {
-                        codeLines.add(lines[i])
-                        i++
-                    }
-                    i++
-                    val blockType = if (lang == "math") "app.offprint.block.mathBlock" else "app.offprint.block.codeBlock"
-                    blocks.add(buildJsonObject {
-                        put("\$type", blockType)
-                        put("plaintext", codeLines.joinToString("\n"))
-                        if (lang.isNotBlank() && lang != "math") put("language", lang)
-                    })
-                }
-                line.startsWith("- ") || line.startsWith("* ") -> {
-                    val (items, nextI) = parseList(lines, i, ordered = false)
-                    blocks.add(buildJsonObject {
-                        put("\$type", "app.offprint.block.bulletList")
-                        put("children", buildJsonArray {
-                            items.forEach { item ->
-                                add(buildJsonObject {
-                                    put("\$type", "app.offprint.block.text")
-                                    val (plaintext, facets) = facetsFromMarkdown(item.text, "Offprint")
-                                    put("plaintext", plaintext)
-                                    if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
-                                    if (item.checked != null) put("checked", item.checked)
-                                })
-                            }
-                        })
-                    })
-                    i = nextI
-                }
-                line.startsWith("> ") -> {
-                    val quoteLines = mutableListOf<String>()
-                    while (i < lines.size && (lines[i].startsWith("> ") || lines[i].isEmpty())) {
-                        if (lines[i].startsWith("> ")) quoteLines.add(lines[i].drop(2).trim())
-                        i++
-                    }
-                    blocks.add(buildJsonObject {
-                        put("\$type", "app.offprint.block.blockquote")
-                        put("content", buildJsonArray {
-                            add(buildJsonObject {
-                                put("\$type", "app.offprint.block.text")
-                                put("plaintext", quoteLines.joinToString("\n"))
-                            })
-                        })
-                    })
-                }
-                line == "---" || line == "***" -> {
-                    blocks.add(buildJsonObject { put("\$type", "app.offprint.block.horizontalRule") })
-                    i++
-                }
-                line.startsWith("![") -> {
-                    val match = Regex("^!\\[([^\\]]*)\\]\\(([^)]+)\\)$").find(line)
-                    if (match != null) {
-                        val alt = match.groupValues[1]
-                        val url = match.groupValues[2]
-                        val blob = uploadedBlobs[url] ?: buildJsonObject { put("\$link", url) }
-                        blocks.add(buildJsonObject {
-                            put("\$type", "app.offprint.block.image")
-                            put("alt", alt)
-                            put("image", blob)
-                        })
-                    } else {
-                        val paraLines = mutableListOf<String>()
-                        while (i < lines.size && lines[i].isNotBlank() &&
-                            !lines[i].startsWith("#") && !lines[i].startsWith(">") &&
-                            !lines[i].startsWith("```") && !lines[i].startsWith("- ") &&
-                            !lines[i].startsWith("* ") && lines[i] != "---" && lines[i] != "***"
-                        ) {
-                            paraLines.add(lines[i])
-                            i++
-                        }
-                        val text = paraLines.joinToString(" ")
-                        val (plaintext, facets) = facetsFromMarkdown(text, "Offprint")
-                        blocks.add(buildJsonObject {
-                            put("\$type", "app.offprint.block.text")
-                            put("plaintext", plaintext)
-                            if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
-                        })
-                    }
-                    i++
-                }
-                line.isEmpty() -> i++
-                else -> {
-                    val paraLines = mutableListOf<String>()
-                    while (i < lines.size && lines[i].isNotBlank() &&
-                        !lines[i].startsWith("#") && !lines[i].startsWith(">") &&
-                        !lines[i].startsWith("```") && !lines[i].startsWith("- ") &&
-                        !lines[i].startsWith("* ") && lines[i] != "---" && lines[i] != "***"
-                    ) {
-                        paraLines.add(lines[i])
-                        i++
-                    }
-                    val text = paraLines.joinToString(" ")
-                    val (plaintext, facets) = facetsFromMarkdown(text, "Offprint")
-                    blocks.add(buildJsonObject {
+    private fun offprintBlockToJson(block: SharedMarkdownBlock, uploadedBlobs: Map<String, JsonObject>): JsonObject? = when (block) {
+        is SharedMarkdownBlock.Heading -> {
+            val (plaintext, facets) = facetsFromMarkdown(block.text, "Offprint")
+            buildJsonObject {
+                put("\$type", "app.offprint.block.heading")
+                put("plaintext", plaintext)
+                put("level", block.level)
+                if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
+            }
+        }
+        is SharedMarkdownBlock.Paragraph -> {
+            val (plaintext, facets) = facetsFromMarkdown(block.text, "Offprint")
+            buildJsonObject {
+                put("\$type", "app.offprint.block.text")
+                put("plaintext", plaintext)
+                if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
+            }
+        }
+        is SharedMarkdownBlock.Code -> buildJsonObject {
+            put("\$type", "app.offprint.block.codeBlock")
+            put("plaintext", block.content)
+            if (block.language != null) put("language", block.language)
+        }
+        is SharedMarkdownBlock.Math -> buildJsonObject {
+            put("\$type", "app.offprint.block.mathBlock")
+            put("plaintext", block.tex)
+        }
+        is SharedMarkdownBlock.Blockquote -> {
+            val (plaintext, facets) = facetsFromMarkdown(block.text, "Offprint")
+            buildJsonObject {
+                put("\$type", "app.offprint.block.blockquote")
+                put("content", buildJsonArray {
+                    add(buildJsonObject {
                         put("\$type", "app.offprint.block.text")
                         put("plaintext", plaintext)
                         if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
                     })
-                }
+                })
             }
         }
-        return blocks
-    }
-
-    private data class ListItem(val text: String, val checked: Boolean? = null)
-
-    private fun parseList(lines: List<String>, start: Int, ordered: Boolean): Pair<List<ListItem>, Int> {
-        val items = mutableListOf<ListItem>()
-        val baseIndent = lines[start].indexOfFirst { it != ' ' }.coerceAtLeast(0)
-        var i = start
-
-        while (i < lines.size) {
-            val line = lines[i]
-            if (line.isEmpty()) { i++; continue }
-            val indent = line.indexOfFirst { it != ' ' }.coerceAtLeast(0)
-            if (indent < baseIndent) break
-
-            val trimmed = line.trim()
-            val isUnordered = trimmed.startsWith("- ") || trimmed.startsWith("* ")
-            val isOrdered = ordered && trimmed.matches(Regex("^\\d+[\\)\\.]\\s.*"))
-
-            if (!isUnordered && !isOrdered) break
-
-            var itemText = when {
-                isUnordered -> trimmed.drop(2)
-                else -> {
-                    val endOfMarker = trimmed.indexOfFirst { !it.isDigit() && it != '.' && it != ')' }
-                    trimmed.drop(endOfMarker).trimStart().dropWhile { it == ' ' || it == '.' || it == ')' }
-                }
+        is SharedMarkdownBlock.Image -> {
+            val blob = uploadedBlobs[block.url] ?: buildJsonObject { put("\$link", block.url) }
+            buildJsonObject {
+                put("\$type", "app.offprint.block.image")
+                put("alt", block.alt)
+                put("image", blob)
             }
-
-            var checked: Boolean? = null
-            if (itemText.startsWith("[x] ") || itemText.startsWith("[X] ")) {
-                checked = true
-                itemText = itemText.drop(4)
-            } else if (itemText.startsWith("[ ] ")) {
-                checked = false
-                itemText = itemText.drop(4)
-            }
-
-            items.add(ListItem(text = itemText, checked = checked))
-            i++
         }
-        return items to i
+        SharedMarkdownBlock.HorizontalRule -> buildJsonObject {
+            put("\$type", "app.offprint.block.horizontalRule")
+        }
+        is SharedMarkdownBlock.UnorderedList -> buildJsonObject {
+            put("\$type", "app.offprint.block.bulletList")
+            put("children", buildJsonArray {
+                block.items.forEach { item ->
+                    add(offprintListItemToJson(item, ordered = false, uploadedBlobs))
+                }
+            })
+        }
+        is SharedMarkdownBlock.OrderedList -> buildJsonObject {
+            put("\$type", "app.offprint.block.bulletList")
+            put("children", buildJsonArray {
+                block.items.forEach { item ->
+                    add(offprintListItemToJson(item, ordered = true, uploadedBlobs))
+                }
+            })
+        }
+        is SharedMarkdownBlock.TaskList -> buildJsonObject {
+            put("\$type", "app.offprint.block.bulletList")
+            put("children", buildJsonArray {
+                block.items.forEach { item ->
+                    add(offprintListItemToJson(item, ordered = false, uploadedBlobs, task = true))
+                }
+            })
+        }
     }
+
+    private fun offprintListItemToJson(
+        item: SharedMarkdownListItem,
+        ordered: Boolean,
+        uploadedBlobs: Map<String, JsonObject>,
+        task: Boolean = false
+    ): JsonObject = buildJsonObject {
+        put("\$type", "app.offprint.block.text")
+        val (plaintext, facets) = facetsFromMarkdown(item.text, "Offprint")
+        put("plaintext", plaintext)
+        if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
+        if (task && item.checked != null) put("checked", item.checked)
+    }
+
+    // MARK: - Facet Conversion
 
     private fun facetsFromMarkdown(text: String, format: String): Pair<String, List<JsonObject>> {
         val boldRegex = Regex("\\*\\*(.+?)\\*\\*")
