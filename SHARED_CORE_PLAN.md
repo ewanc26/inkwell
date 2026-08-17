@@ -187,11 +187,11 @@ decoupled from both SDKs — a follow-on after the pure-logic modules are proven
 - iOS: `StandardSiteTypes.swift` `normalizedSite` delegates to `SharedKMP.normalizedSite`; `DocumentRecord.canonicalURL` delegates to `SharedKMP.canonicalUrl`
 - Android: available via `UrlUtils` for future use
 
-## Remaining Work
-
-### Neutral shared-model layer for DTOs
-- **Status**: Deferred
-- DTOs (`PublicationRecord`, `DocumentRecord`, etc.) are coupled to platform serialization frameworks. Requires a neutral shared-model layer decoupled from both SDKs.
+### Neutral shared-model layer for DTOs ✅
+- Shared: `shared/src/commonMain/kotlin/.../model/` with neutral types: `BlobRef`, `StrongRef`, `RgbColor`, `RgbaColor`, `ColorValue`, `BasicTheme`, `PublicationTheme`, `LegacyPalette`, `PublicationPreferences`, `DocumentPreferences`, `SharedPublicationRecord`, `SharedDocumentRecord`, `SharedGraphRecommend`, `SharedGraphSubscription`, `SharedLeafletComment`, `ByteSlice`, `LeafletFacetFeature`, `LeafletFacet`
+- Android: `SharedModelMappers.kt` provides `toShared()` / `toAndroid()` extensions for theme types, blob/strong refs, and preferences
+- iOS: `SharedModelMappers.swift` provides `toShared()` / `toiOS()` extensions for theme types, blob/strong refs
+- Complex AT Protocol records (`PublicationRecord`, `DocumentRecord` with `ATRecordProtocol`/`@Serializable`) remain platform-specific for network I/O, but simplified shared versions exist for future shared-logic use
 
 ## Risk Notes
 
