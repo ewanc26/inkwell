@@ -23,7 +23,12 @@ inkwell/
 │   │   │       │   └── FacetConverter.kt
 │   │   │       ├── verification/
 │   │   │       │   ├── VerificationUrls.kt
-│   │   │       │   └── DocumentLinkScanner.kt
+│   │   │       │   ├── DocumentLinkScanner.kt
+│   │   │       │   └── VerificationModels.kt
+│   │   │       ├── constellation/
+│   │   │       │   └── Pagination.kt
+│   │   │       ├── url/
+│   │   │       │   └── UrlUtils.kt
 │   │   │       ├── theme/
 │   │   │       │   ├── ReaderTheme.kt
 │   │   │       │   └── FontFamily.kt
@@ -166,20 +171,27 @@ decoupled from both SDKs — a follow-on after the pure-logic modules are proven
 - Android: `MarkdownConverter.kt` delegates `markdownToFacets` to shared, maps `RichTextFacet` → JSON facet objects
 - XCFramework rebuilt with `@ObjCName` exports for `FacetConverter`, `RichTextFacet`, `RichTextFeature`
 
+### 2a. Verification URL Builders + Link Scanner ✅
+- Shared: `shared/src/commonMain/kotlin/.../verification/VerificationUrls.kt`, `DocumentLinkScanner.kt`, `VerificationModels.kt`
+- iOS: `SiteStandardVerification.swift` delegates to `SharedKMP.swift` (`sharedPublicationVerificationURL`, `sharedDocumentCanonicalURL`, `sharedDiscoveryLinkTag`, `sharedContainsDocumentLink`)
+- Android: `StandardSiteVerifier.kt` delegates URL construction/link scanning to `VerificationUrls`/`DocumentLinkScanner`; networking and caching remain native
+- Tests: `StandardSiteVerifierTest.kt` updated to call `VerificationUrls` directly
+
+### 2c. Constellation Pagination + Deduplication ✅
+- Shared: `shared/src/commonMain/kotlin/.../constellation/Pagination.kt` (`ConstellationPagination.paginateBacklinks`, `recommendCount`, `deduplicate`)
+- iOS: `ConstellationClient.swift` delegates mention-backlink deduplication to `SharedKMP.deduplicateBacklinks`
+- Android: `ConstellationClient.kt` delegates pagination to `ConstellationPagination.paginateBacklinks` and deduplication to `ConstellationPagination.deduplicate`
+
+### 2d. URL Utilities ✅
+- Shared: `shared/src/commonMain/kotlin/.../url/UrlUtils.kt` (`normalizedSite`, `canonicalUrl`)
+- iOS: `StandardSiteTypes.swift` `normalizedSite` delegates to `SharedKMP.normalizedSite`; `DocumentRecord.canonicalURL` delegates to `SharedKMP.canonicalUrl`
+- Android: available via `UrlUtils` for future use
+
 ## Remaining Work
 
-### 2a. Verification URL Builders + Link Scanner
-- **Status**: Not started
-- **Source**: iOS `SiteStandardVerification.swift` + Android `StandardSiteVerifier.kt`
-- **Target**: `shared/src/commonMain/.../verification/`
-- **Share**: `.well-known` endpoint construction, document canonical URL, `<link>` tag regex
-- **Keep native**: HTTP fetch, caching
-
-### 2c. Constellation Pagination + Recommend-Count Optimization
-- **Status**: Not started
-- **Source**: iOS `ConstellationClient.swift` + Android `ConstellationClient.kt`
-- **Target**: `shared/src/commonMain/.../constellation/Pagination.kt`
-- **Share**: Pagination cursor logic, 50/page cap, recommend-count optimization
+### Neutral shared-model layer for DTOs
+- **Status**: Deferred
+- DTOs (`PublicationRecord`, `DocumentRecord`, etc.) are coupled to platform serialization frameworks. Requires a neutral shared-model layer decoupled from both SDKs.
 
 ## Risk Notes
 

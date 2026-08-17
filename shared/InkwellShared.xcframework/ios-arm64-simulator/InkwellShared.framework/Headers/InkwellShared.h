@@ -6,9 +6,9 @@
 #import <Foundation/NSString.h>
 #import <Foundation/NSValue.h>
 
-@class FacetConverter, InkwellSharedAtUri, InkwellSharedAtUriCompanion, InkwellSharedFacetDefinition, InkwellSharedFacetSchema, InkwellSharedKotlinArray<T>, InkwellSharedKotlinEnum<E>, InkwellSharedKotlinEnumCompanion, InkwellSharedKotlinNothing, InkwellSharedKotlinPair<__covariant A, __covariant B>, InkwellSharedKotlinx_serialization_coreSerialKind, InkwellSharedKotlinx_serialization_coreSerializersModule, InkwellSharedMarkdownBlock, InkwellSharedMarkdownBlockBlockquote, InkwellSharedMarkdownBlockCode, InkwellSharedMarkdownBlockHeading, InkwellSharedMarkdownBlockHorizontalRule, InkwellSharedMarkdownBlockImage, InkwellSharedMarkdownBlockMath, InkwellSharedMarkdownBlockOrderedList, InkwellSharedMarkdownBlockParagraph, InkwellSharedMarkdownBlockTaskList, InkwellSharedMarkdownBlockUnorderedList, InkwellSharedMarkdownListItem, InkwellSharedMarkdownParser, InkwellSharedMarkdownSerializer, InkwellSharedNotificationPolicy, InkwellSharedNotificationStyleNone, InkwellSharedNotificationStyleSingle, InkwellSharedNotificationStyleSummary, InkwellSharedSharedReaderTheme, InkwellSharedSharedReaderThemeCompanion, InkwellSharedSharedReaderThemeFontFamily, InkwellSharedTipPromptPolicy, RichTextFacet, RichTextFeature;
+@class FacetConverter, InkwellSharedAtUri, InkwellSharedAtUriCompanion, InkwellSharedConstellationBacklink, InkwellSharedConstellationPagination, InkwellSharedConstellationResponse, InkwellSharedDocumentLinkScanner, InkwellSharedFacetDefinition, InkwellSharedFacetSchema, InkwellSharedKotlinArray<T>, InkwellSharedKotlinEnum<E>, InkwellSharedKotlinEnumCompanion, InkwellSharedKotlinException, InkwellSharedKotlinIllegalStateException, InkwellSharedKotlinNothing, InkwellSharedKotlinPair<__covariant A, __covariant B>, InkwellSharedKotlinRuntimeException, InkwellSharedKotlinThrowable, InkwellSharedKotlinx_serialization_coreSerialKind, InkwellSharedKotlinx_serialization_coreSerializersModule, InkwellSharedMarkdownBlock, InkwellSharedMarkdownBlockBlockquote, InkwellSharedMarkdownBlockCode, InkwellSharedMarkdownBlockHeading, InkwellSharedMarkdownBlockHorizontalRule, InkwellSharedMarkdownBlockImage, InkwellSharedMarkdownBlockMath, InkwellSharedMarkdownBlockOrderedList, InkwellSharedMarkdownBlockParagraph, InkwellSharedMarkdownBlockTaskList, InkwellSharedMarkdownBlockUnorderedList, InkwellSharedMarkdownListItem, InkwellSharedMarkdownParser, InkwellSharedMarkdownSerializer, InkwellSharedNotificationPolicy, InkwellSharedNotificationStyleNone, InkwellSharedNotificationStyleSingle, InkwellSharedNotificationStyleSummary, InkwellSharedSharedReaderTheme, InkwellSharedSharedReaderThemeCompanion, InkwellSharedSharedReaderThemeFontFamily, InkwellSharedTipPromptPolicy, InkwellSharedUrlUtils, InkwellSharedVerificationFailure, InkwellSharedVerificationFailureDocumentLinkMissing, InkwellSharedVerificationFailureEndpointUnreachable, InkwellSharedVerificationFailureInvalidDocumentURL, InkwellSharedVerificationFailureInvalidPublicationURL, InkwellSharedVerificationFailureMalformedResponse, InkwellSharedVerificationFailureMismatchedURI, InkwellSharedVerificationFailureUnexpected, InkwellSharedVerificationResult, InkwellSharedVerificationResultFailed, InkwellSharedVerificationResultVerified, InkwellSharedVerificationUrls, RichTextFacet, RichTextFeature;
 
-@protocol InkwellSharedKotlinAnnotation, InkwellSharedKotlinComparable, InkwellSharedKotlinIterator, InkwellSharedKotlinKAnnotatedElement, InkwellSharedKotlinKClass, InkwellSharedKotlinKClassifier, InkwellSharedKotlinKDeclarationContainer, InkwellSharedKotlinx_serialization_coreCompositeDecoder, InkwellSharedKotlinx_serialization_coreCompositeEncoder, InkwellSharedKotlinx_serialization_coreDecoder, InkwellSharedKotlinx_serialization_coreDeserializationStrategy, InkwellSharedKotlinx_serialization_coreEncoder, InkwellSharedKotlinx_serialization_coreKSerializer, InkwellSharedKotlinx_serialization_coreSerialDescriptor, InkwellSharedKotlinx_serialization_coreSerializationStrategy, InkwellSharedKotlinx_serialization_coreSerializersModuleCollector, InkwellSharedNotificationStyle;
+@protocol InkwellSharedKotlinAnnotation, InkwellSharedKotlinComparable, InkwellSharedKotlinFunction, InkwellSharedKotlinIterator, InkwellSharedKotlinKAnnotatedElement, InkwellSharedKotlinKClass, InkwellSharedKotlinKClassifier, InkwellSharedKotlinKDeclarationContainer, InkwellSharedKotlinSuspendFunction2, InkwellSharedKotlinx_serialization_coreCompositeDecoder, InkwellSharedKotlinx_serialization_coreCompositeEncoder, InkwellSharedKotlinx_serialization_coreDecoder, InkwellSharedKotlinx_serialization_coreDeserializationStrategy, InkwellSharedKotlinx_serialization_coreEncoder, InkwellSharedKotlinx_serialization_coreKSerializer, InkwellSharedKotlinx_serialization_coreSerialDescriptor, InkwellSharedKotlinx_serialization_coreSerializationStrategy, InkwellSharedKotlinx_serialization_coreSerializersModuleCollector, InkwellSharedNotificationStyle;
 
 NS_ASSUME_NONNULL_BEGIN
 #pragma clang diagnostic push
@@ -207,6 +207,67 @@ __attribute__((swift_name("AtUri.Companion")))
 /** Parses at:// URIs. Returns null for malformed input. */
 - (InkwellSharedAtUri * _Nullable)parseUri:(NSString *)uri __attribute__((swift_name("parse(uri:)")));
 - (id<InkwellSharedKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("ConstellationBacklink")))
+@interface InkwellSharedConstellationBacklink : InkwellSharedBase
+- (instancetype)initWithDid:(NSString *)did collection:(NSString *)collection rkey:(NSString *)rkey __attribute__((swift_name("init(did:collection:rkey:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedConstellationBacklink *)doCopyDid:(NSString *)did collection:(NSString *)collection rkey:(NSString *)rkey __attribute__((swift_name("doCopy(did:collection:rkey:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString *collection __attribute__((swift_name("collection")));
+@property (readonly) NSString *did __attribute__((swift_name("did")));
+@property (readonly) NSString *recordURI __attribute__((swift_name("recordURI")));
+@property (readonly) NSString *rkey __attribute__((swift_name("rkey")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("ConstellationPagination")))
+@interface InkwellSharedConstellationPagination : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)constellationPagination __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedConstellationPagination *shared __attribute__((swift_name("shared")));
+
+/**
+ * Deduplicates backlinks by (did, rkey) since a single record could
+ * appear in multiple source paths.
+ */
+- (NSArray<InkwellSharedConstellationBacklink *> *)deduplicateBacklinks:(NSArray<InkwellSharedConstellationBacklink *> *)backlinks __attribute__((swift_name("deduplicate(backlinks:)")));
+
+/**
+ * Generic cursor-based pagination over a backlink source.
+ *
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)paginateBacklinksFetchPage:(id<InkwellSharedKotlinSuspendFunction2>)fetchPage maxCount:(int32_t)maxCount completionHandler:(void (^)(NSArray<InkwellSharedConstellationBacklink *> * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("paginateBacklinks(fetchPage:maxCount:completionHandler:)")));
+
+/**
+ * Total recommend count for a document, across the whole network.
+ *
+ * Requests a single record first: if there's no next cursor the whole
+ * result set fit in that page, so its size is the count. Otherwise
+ * falls back to full pagination.
+ *
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)recommendCountFetchPage:(id<InkwellSharedKotlinSuspendFunction2>)fetchPage completionHandler:(void (^)(InkwellSharedInt * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("recommendCount(fetchPage:completionHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("ConstellationResponse")))
+@interface InkwellSharedConstellationResponse : InkwellSharedBase
+- (instancetype)initWithRecords:(NSArray<InkwellSharedConstellationBacklink *> *)records cursor:(NSString * _Nullable)cursor __attribute__((swift_name("init(records:cursor:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedConstellationResponse *)doCopyRecords:(NSArray<InkwellSharedConstellationBacklink *> *)records cursor:(NSString * _Nullable)cursor __attribute__((swift_name("doCopy(records:cursor:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString * _Nullable cursor __attribute__((swift_name("cursor")));
+@property (readonly) NSArray<InkwellSharedConstellationBacklink *> *records __attribute__((swift_name("records")));
 @end
 
 __attribute__((objc_subclassing_restricted))
@@ -749,6 +810,185 @@ __attribute__((swift_name("SharedReaderTheme.FontFamily")))
 @property (class, readonly) NSArray<InkwellSharedSharedReaderThemeFontFamily *> *entries __attribute__((swift_name("entries")));
 @end
 
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("UrlUtils")))
+@interface InkwellSharedUrlUtils : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)urlUtils __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedUrlUtils *shared __attribute__((swift_name("shared")));
+
+/**
+ * Builds the canonical web URL described by Standard.site's `site` + `path`
+ * rules. Returns null if `site` is not a valid HTTPS URL and no publication
+ * URL is provided for AT-URI sites.
+ */
+- (NSString * _Nullable)canonicalUrlSite:(NSString *)site path:(NSString * _Nullable)path publicationUrl:(NSString * _Nullable)publicationUrl __attribute__((swift_name("canonicalUrl(site:path:publicationUrl:)")));
+
+/**
+ * Normalizes a URL: lowercases scheme and host, trims trailing slashes.
+ * Returns the original string if it can't be parsed as a URL.
+ */
+- (NSString *)normalizedSiteValue:(NSString *)value __attribute__((swift_name("normalizedSite(value:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("DocumentLinkScanner")))
+@interface InkwellSharedDocumentLinkScanner : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)documentLinkScanner __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedDocumentLinkScanner *shared __attribute__((swift_name("shared")));
+
+/**
+ * Regex-based `<link>` search, tolerant of either attribute order and quote style.
+ * Mirrors the iOS and Android implementations' approach rather than pulling in
+ * an HTML parser.
+ */
+- (BOOL)containsDocumentLinkHtml:(NSString *)html documentURI:(NSString *)documentURI __attribute__((swift_name("containsDocumentLink(html:documentURI:)")));
+@end
+
+
+/**
+ * Why a publication or document failed verification.
+ * Kept as distinct, diagnosable cases so the UI and logs can say
+ * why a record is untrusted.
+ */
+__attribute__((swift_name("VerificationFailure")))
+@interface InkwellSharedVerificationFailure : InkwellSharedBase
+@property (readonly) NSString *reason __attribute__((swift_name("reason")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("VerificationFailure.DocumentLinkMissing")))
+@interface InkwellSharedVerificationFailureDocumentLinkMissing : InkwellSharedVerificationFailure
+- (instancetype)initWithExpected:(NSString *)expected __attribute__((swift_name("init(expected:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedVerificationFailureDocumentLinkMissing *)doCopyExpected:(NSString *)expected __attribute__((swift_name("doCopy(expected:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString *expected __attribute__((swift_name("expected")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("VerificationFailure.EndpointUnreachable")))
+@interface InkwellSharedVerificationFailureEndpointUnreachable : InkwellSharedVerificationFailure
+- (instancetype)initWithStatusCode:(InkwellSharedInt * _Nullable)statusCode __attribute__((swift_name("init(statusCode:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedVerificationFailureEndpointUnreachable *)doCopyStatusCode:(InkwellSharedInt * _Nullable)statusCode __attribute__((swift_name("doCopy(statusCode:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) InkwellSharedInt * _Nullable statusCode __attribute__((swift_name("statusCode")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("VerificationFailure.InvalidDocumentURL")))
+@interface InkwellSharedVerificationFailureInvalidDocumentURL : InkwellSharedVerificationFailure
+- (instancetype)initWithUrl:(NSString *)url __attribute__((swift_name("init(url:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedVerificationFailureInvalidDocumentURL *)doCopyUrl:(NSString *)url __attribute__((swift_name("doCopy(url:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString *url __attribute__((swift_name("url")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("VerificationFailure.InvalidPublicationURL")))
+@interface InkwellSharedVerificationFailureInvalidPublicationURL : InkwellSharedVerificationFailure
+- (instancetype)initWithUrl:(NSString *)url __attribute__((swift_name("init(url:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedVerificationFailureInvalidPublicationURL *)doCopyUrl:(NSString *)url __attribute__((swift_name("doCopy(url:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString *url __attribute__((swift_name("url")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("VerificationFailure.MalformedResponse")))
+@interface InkwellSharedVerificationFailureMalformedResponse : InkwellSharedVerificationFailure
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)malformedResponse __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedVerificationFailureMalformedResponse *shared __attribute__((swift_name("shared")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("VerificationFailure.MismatchedURI")))
+@interface InkwellSharedVerificationFailureMismatchedURI : InkwellSharedVerificationFailure
+- (instancetype)initWithExpected:(NSString *)expected found:(NSString *)found __attribute__((swift_name("init(expected:found:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedVerificationFailureMismatchedURI *)doCopyExpected:(NSString *)expected found:(NSString *)found __attribute__((swift_name("doCopy(expected:found:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString *expected __attribute__((swift_name("expected")));
+@property (readonly) NSString *found __attribute__((swift_name("found")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("VerificationFailure.Unexpected")))
+@interface InkwellSharedVerificationFailureUnexpected : InkwellSharedVerificationFailure
+- (instancetype)initWithMessage:(NSString * _Nullable)message __attribute__((swift_name("init(message:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedVerificationFailureUnexpected *)doCopyMessage:(NSString * _Nullable)message __attribute__((swift_name("doCopy(message:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString * _Nullable message __attribute__((swift_name("message")));
+@end
+
+__attribute__((swift_name("VerificationResult")))
+@interface InkwellSharedVerificationResult : InkwellSharedBase
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("VerificationResult.Failed")))
+@interface InkwellSharedVerificationResultFailed : InkwellSharedVerificationResult
+- (instancetype)initWithFailure:(InkwellSharedVerificationFailure *)failure __attribute__((swift_name("init(failure:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedVerificationResultFailed *)doCopyFailure:(InkwellSharedVerificationFailure *)failure __attribute__((swift_name("doCopy(failure:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) InkwellSharedVerificationFailure *failure __attribute__((swift_name("failure")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("VerificationResult.Verified")))
+@interface InkwellSharedVerificationResultVerified : InkwellSharedVerificationResult
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)verified __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedVerificationResultVerified *shared __attribute__((swift_name("shared")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("VerificationUrls")))
+@interface InkwellSharedVerificationUrls : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)verificationUrls __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedVerificationUrls *shared __attribute__((swift_name("shared")));
+
+/**
+ * Builds the `<link>` discovery tag a document page must serve in its
+ * `<head>` to point back at its AT-URI record.
+ */
+- (NSString *)discoveryLinkTagRecordURI:(NSString *)recordURI relation:(NSString *)relation __attribute__((swift_name("discoveryLinkTag(recordURI:relation:)")));
+
+/**
+ * Builds the canonical web URL for a document per standard.site's `site` + `path`
+ * rules. A resolved publication URL is required when `documentSite` is an AT-URI
+ * (i.e. the document belongs to a publication) rather than a direct `https://` URL.
+ */
+- (NSString * _Nullable)documentCanonicalUrlDocumentSite:(NSString *)documentSite documentPath:(NSString * _Nullable)documentPath publicationUrl:(NSString * _Nullable)publicationUrl __attribute__((swift_name("documentCanonicalUrl(documentSite:documentPath:publicationUrl:)")));
+
+/**
+ * Builds the `.well-known` verification endpoint for a publication, including the
+ * publication's own path for non-root publications — e.g. a publication living at
+ * `https://example.com/writing` verifies at
+ * `https://example.com/.well-known/site.standard.publication/writing`.
+ */
+- (NSString * _Nullable)publicationVerificationUrlPublicationUrl:(NSString *)publicationUrl __attribute__((swift_name("publicationVerificationUrl(publicationUrl:)")));
+@end
+
 __attribute__((swift_name("Kotlinx_serialization_coreSerializationStrategy")))
 @protocol InkwellSharedKotlinx_serialization_coreSerializationStrategy
 @required
@@ -766,6 +1006,83 @@ __attribute__((swift_name("Kotlinx_serialization_coreDeserializationStrategy")))
 __attribute__((swift_name("Kotlinx_serialization_coreKSerializer")))
 @protocol InkwellSharedKotlinx_serialization_coreKSerializer <InkwellSharedKotlinx_serialization_coreSerializationStrategy, InkwellSharedKotlinx_serialization_coreDeserializationStrategy>
 @required
+@end
+
+__attribute__((swift_name("KotlinThrowable")))
+@interface InkwellSharedKotlinThrowable : InkwellSharedBase
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+- (instancetype)initWithMessage:(NSString * _Nullable)message __attribute__((swift_name("init(message:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithCause:(InkwellSharedKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(cause:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithMessage:(NSString * _Nullable)message cause:(InkwellSharedKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(message:cause:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note annotations
+ *   kotlin.experimental.ExperimentalNativeApi
+*/
+- (InkwellSharedKotlinArray<NSString *> *)getStackTrace __attribute__((swift_name("getStackTrace()")));
+- (void)printStackTrace __attribute__((swift_name("printStackTrace()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) InkwellSharedKotlinThrowable * _Nullable cause __attribute__((swift_name("cause")));
+@property (readonly) NSString * _Nullable message __attribute__((swift_name("message")));
+- (NSError *)asError __attribute__((swift_name("asError()")));
+@end
+
+__attribute__((swift_name("KotlinException")))
+@interface InkwellSharedKotlinException : InkwellSharedKotlinThrowable
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+- (instancetype)initWithMessage:(NSString * _Nullable)message __attribute__((swift_name("init(message:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithCause:(InkwellSharedKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(cause:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithMessage:(NSString * _Nullable)message cause:(InkwellSharedKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(message:cause:)"))) __attribute__((objc_designated_initializer));
+@end
+
+__attribute__((swift_name("KotlinRuntimeException")))
+@interface InkwellSharedKotlinRuntimeException : InkwellSharedKotlinException
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+- (instancetype)initWithMessage:(NSString * _Nullable)message __attribute__((swift_name("init(message:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithCause:(InkwellSharedKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(cause:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithMessage:(NSString * _Nullable)message cause:(InkwellSharedKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(message:cause:)"))) __attribute__((objc_designated_initializer));
+@end
+
+__attribute__((swift_name("KotlinIllegalStateException")))
+@interface InkwellSharedKotlinIllegalStateException : InkwellSharedKotlinRuntimeException
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+- (instancetype)initWithMessage:(NSString * _Nullable)message __attribute__((swift_name("init(message:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithCause:(InkwellSharedKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(cause:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithMessage:(NSString * _Nullable)message cause:(InkwellSharedKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(message:cause:)"))) __attribute__((objc_designated_initializer));
+@end
+
+
+/**
+ * @note annotations
+ *   kotlin.SinceKotlin(version="1.4")
+*/
+__attribute__((swift_name("KotlinCancellationException")))
+@interface InkwellSharedKotlinCancellationException : InkwellSharedKotlinIllegalStateException
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+- (instancetype)initWithMessage:(NSString * _Nullable)message __attribute__((swift_name("init(message:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithCause:(InkwellSharedKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(cause:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithMessage:(NSString * _Nullable)message cause:(InkwellSharedKotlinThrowable * _Nullable)cause __attribute__((swift_name("init(message:cause:)"))) __attribute__((objc_designated_initializer));
+@end
+
+__attribute__((swift_name("KotlinFunction")))
+@protocol InkwellSharedKotlinFunction
+@required
+@end
+
+__attribute__((swift_name("KotlinSuspendFunction2")))
+@protocol InkwellSharedKotlinSuspendFunction2 <InkwellSharedKotlinFunction>
+@required
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)invokeP1:(id _Nullable)p1 p2:(id _Nullable)p2 completionHandler:(void (^)(id _Nullable_result, NSError * _Nullable))completionHandler __attribute__((swift_name("invoke(p1:p2:completionHandler:)")));
 @end
 
 __attribute__((objc_subclassing_restricted))

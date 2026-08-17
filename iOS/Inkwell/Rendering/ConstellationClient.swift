@@ -163,15 +163,10 @@ enum ConstellationClient {
         )
 
         let (facets, embeds) = await (facetLinks, embedLinks)
-        var seen = Set<String>()
-        var merged: [Backlink] = []
-        for link in facets + embeds {
-            let key = "\(link.did):\(link.rkey)"
-            if seen.insert(key).inserted {
-                merged.append(link)
-            }
-        }
-        return merged
+        let sharedFacets = facets.map { SharedBacklink(did: $0.did, collection: $0.collection, rkey: $0.rkey) }
+        let sharedEmbeds = embeds.map { SharedBacklink(did: $0.did, collection: $0.collection, rkey: $0.rkey) }
+        let merged = deduplicateBacklinks(sharedFacets + sharedEmbeds)
+        return merged.map { Backlink(did: $0.did, collection: $0.collection, rkey: $0.rkey) }
     }
 
     // MARK: - Private
@@ -201,3 +196,5 @@ enum ConstellationClient {
         return Array(all.prefix(maximumCount))
     }
 }
+
+// MARK: - Shared Backlink Bridge

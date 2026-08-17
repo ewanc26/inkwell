@@ -23,6 +23,9 @@ import java.net.URLEncoder
 import java.util.concurrent.TimeUnit
 import uk.ewancroft.inkwell.data.model.bluesky.ConstellationBacklink
 import uk.ewancroft.inkwell.data.model.bluesky.ConstellationResponse
+import uk.ewancroft.inkwell.shared.constellation.ConstellationPagination
+import uk.ewancroft.inkwell.shared.constellation.ConstellationBacklink as SharedBacklink
+import uk.ewancroft.inkwell.shared.constellation.ConstellationResponse as SharedResponse
 
 object ConstellationClient {
     private const val BASE_URL = "https://constellation.microcosm.blue"
@@ -74,26 +77,12 @@ object ConstellationClient {
         source: String,
         maxCount: Int = 200
     ): List<ConstellationBacklink> {
-        val all = mutableListOf<ConstellationBacklink>()
-        var cursor: String? = null
-        while (all.size < maxCount) {
-            val result = getBacklinks(subject, source, cursor = cursor)
-            all.addAll(result.records.orEmpty())
-            cursor = result.cursor
-            if (cursor == null) break
-        }
-        return all.take(maxCount)
+        val shared = ConstellationPagination.paginateBacklinks(
+            fetchPage = { limit, cursor -> getBacklinks(subject, source, limit, cursor).toShared() },
+            maxCount = maxCount
+        )
+        return shared.map { it.toAndroid() }
     }
-
-    // ── Convenience Methods ──────────────────────────────────────────────
-
-    /** Comments (Leaflet pub.leaflet.comment records) pointing at this document. */
-    suspend fun getCommentBacklinks(documentUri: String): List<ConstellationBacklink> =
-        paginateBacklinks(documentUri, "pub.leaflet.comment:subject")
-
-    /** Recommends (standard.site graph edges) pointing at this document. */
-    suspend fun getRecommendBacklinks(documentUri: String): List<ConstellationBacklink> =
-        paginateBacklinks(documentUri, "site.standard.graph.recommend:document")
 
     /**
      * Total recommend count for a document, across the whole network.
@@ -117,6 +106,14 @@ object ConstellationClient {
         return getRecommendBacklinks(documentUri).size
     }
 
+    /** Recommends (standard.site graph edges) pointing at this document. */
+    suspend fun getRecommendBacklinks(documentUri: String): List<ConstellationBacklink> =
+        paginateBacklinks(documentUri, "site.standard.graph.recommend:document")
+
+    /** Comments (Leaflet pub.leaflet.comment records) pointing at this document. */
+    suspend fun getCommentBacklinks(documentUri: String): List<ConstellationBacklink> =
+        paginateBacklinks(documentUri, "pub.leaflet.comment:subject")
+
     /**
      * Mentions in Bluesky posts: searches both link facets and embed.external URIs.
      * Deduplicates by (did, rkey) since a single post could have both a facet
@@ -131,6 +128,25 @@ object ConstellationClient {
         ) }
         val f = facets.await()
         val e = embeds.await()
-        (f + e).distinctBy { "${it.did}:${it.rkey}" }
+        ConstellationPagination.deduplicate((f + e).map { it.toShared() }).map { it.toAndroid() }
     }
 }
+
+// ── Type Conversions ─────────────────────────────────────────────────────
+
+private fun ConstellationBacklink.toShared(): SharedBacklink = SharedBacklink(
+    did = did,
+    collection = collection,
+    rkey = rkey
+)
+
+private fun ConstellationResponse.toShared(): SharedResponse = SharedResponse(
+    records = records.orEmpty().map { it.toShared() },
+    cursor = cursor
+)
+
+private fun SharedBacklink.toAndroid(): ConstellationBacklink = ConstellationBacklink(
+    did = did,
+    collection = collection,
+    rkey = rkey
+)

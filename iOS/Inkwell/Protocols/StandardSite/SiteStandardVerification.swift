@@ -74,7 +74,8 @@ extension SiteStandardLexicon {
             publicationURI: String,
             publication: SiteStandardLexicon.PublicationRecord
         ) async throws {
-            guard let endpoint = publicationVerificationURL(for: publication.url) else {
+            guard let endpointString = sharedPublicationVerificationURL(for: publication.url),
+                  let endpoint = URL(string: endpointString) else {
                 throw Failure.invalidPublicationURL(publication.url)
             }
 
@@ -96,24 +97,8 @@ extension SiteStandardLexicon {
 
         /// Builds the verification endpoint, including the publication path for
         /// non-root publications as required by the Standard.site specification.
-        static func publicationVerificationURL(for publicationURL: String) -> URL? {
-            guard var components = URLComponents(string: publicationURL),
-                  components.scheme?.lowercased() == "https",
-                  components.host != nil else {
-                return nil
-            }
-
-            let publicationPath = components.path
-                .split(separator: "/")
-                .map(String.init)
-                .joined(separator: "/")
-            components.path = "/.well-known/site.standard.publication"
-            if !publicationPath.isEmpty {
-                components.path += "/\(publicationPath)"
-            }
-            components.query = nil
-            components.fragment = nil
-            return components.url
+        static func publicationVerificationURL(for publicationURL: String) -> String? {
+            sharedPublicationVerificationURL(for: publicationURL)
         }
 
         /// Verifies a document page by checking for its required
@@ -123,7 +108,12 @@ extension SiteStandardLexicon {
             document: SiteStandardLexicon.DocumentRecord,
             publication: SiteStandardLexicon.PublicationRecord? = nil
         ) async throws {
-            guard let url = document.canonicalURL(publication: publication) else {
+            guard let urlString = sharedDocumentCanonicalURL(
+                documentSite: document.site,
+                documentPath: document.path,
+                publicationURL: publication?.url
+            ),
+            let url = URL(string: urlString) else {
                 throw Failure.invalidPublicationURL(document.site)
             }
 
@@ -136,19 +126,7 @@ extension SiteStandardLexicon {
                 throw Failure.malformedResponse
             }
 
-            let escapedURI = NSRegularExpression.escapedPattern(for: documentURI)
-            let patterns = [
-                #"<link\b[^>]*\brel\s*=\s*[\"']site\.standard\.document[\"'][^>]*\bhref\s*=\s*[\"']"# + escapedURI + #"[\"'][^>]*>"#,
-                #"<link\b[^>]*\bhref\s*=\s*[\"']"# + escapedURI + #"[\"'][^>]*\brel\s*=\s*[\"']site\.standard\.document[\"'][^>]*>"#
-            ]
-            let range = NSRange(html.startIndex..<html.endIndex, in: html)
-            let found = patterns.contains { pattern in
-                guard let expression = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive]) else {
-                    return false
-                }
-                return expression.firstMatch(in: html, range: range) != nil
-            }
-            guard found else {
+            guard sharedContainsDocumentLink(html: html, documentURI: documentURI) else {
                 throw Failure.documentLinkMissing(expected: documentURI)
             }
         }
@@ -166,7 +144,7 @@ extension SiteStandardLexicon {
         ///   matching the kind of record `recordURI` points to.
         /// - Returns: A `<link>` tag suitable for a document's `<head>`.
         public static func discoveryLinkTag(forRecordURI recordURI: String, relation: String) -> String {
-            "<link rel=\"\(relation)\" href=\"\(recordURI)\" />"
+            sharedDiscoveryLinkTag(forRecordURI: recordURI, relation: relation)
         }
     }
 }
