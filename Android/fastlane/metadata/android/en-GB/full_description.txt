@@ -2,13 +2,13 @@ Inkwell is a native reader and writer for the Standard.site publishing ecosystem
 
 This is an experimental Android companion to Inkwell for iOS, the primary client. It is a work in progress toward feature parity, so expect rough edges.
 
-Read site.standard.publication and site.standard.document records directly from the author's PDS. Renders Leaflet block content, Markpub/plain text, and other formats generically so nothing is silently dropped. Resolves display themes from Leaflet's rich palette through basicTheme to Material 3 defaults. Comments and interactions aren't shown yet.
+Read site.standard.publication and site.standard.document records directly from the author's PDS. Renders Leaflet block content, Markpub markdown, pckt/Offprint (converted to markdown with facet-aware formatting), and other formats generically so nothing is silently dropped. Resolves display themes from Leaflet's rich palette through basicTheme to Material 3 defaults. Comments, likes, reposts, and replies are shown.
 
 Discover publications via the cross-platform public index, then fetches authoritative records from the author. Subscribe to publications and recommend documents, with live recommend counts from Constellation (microcosm.blue). Paginated feed with previous/next navigation.
 
-Write and publish site.standard.document records with portable metadata. Content format selection is presentation-only for now; every publish currently writes plain text content regardless of the selected format.
+Write and publish site.standard.document records with portable metadata. Content format selection is functional — choose between Leaflet, Markpub, pckt, and Offprint, each producing the correct content type. Image upload and blob handling are supported.
 
-Verifies publications and documents against their claimed domain via Standard.site's `.well-known` and link-tag checks, shown as a badge on the post detail screen.
+Verifies publications and documents against their claimed domain via Standard.site's `.well-known` and link-tag checks, shown as a badge on both feed cards and the post detail screen.
 
 Authentication is OAuth-based with your AT Protocol handle — no app password required. Silent session restoration on relaunch.
 

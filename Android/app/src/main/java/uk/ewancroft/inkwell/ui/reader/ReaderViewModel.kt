@@ -1,5 +1,6 @@
 package uk.ewancroft.inkwell.ui.reader
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -173,9 +174,13 @@ class ReaderViewModel @Inject constructor(
                                     authorDisplayName = profile?.displayName,
                                     authorAvatar = profile?.avatar,
                                 ))
-                            } catch (_: Exception) {}
+                            } catch (e: Exception) {
+                                Log.w("ReaderViewModel", "Failed to parse document in following feed", e)
+                            }
                         }
-                    } catch (_: Exception) {}
+                    } catch (e: Exception) {
+                        Log.w("ReaderViewModel", "Failed to fetch documents for DID $did", e)
+                    }
                 }
                 val merged = (state.followingPosts + posts)
                     .distinctBy { it.uri }
@@ -245,9 +250,13 @@ class ReaderViewModel @Inject constructor(
                                 authorDisplayName = profile?.displayName,
                                 authorAvatar = profile?.avatar,
                             ))
-                        } catch (_: Exception) {}
+                        } catch (e: Exception) {
+                            Log.w("ReaderViewModel", "Failed to parse following feed document", e)
+                        }
                     }
-                } catch (_: Exception) {}
+                } catch (e: Exception) {
+                    Log.w("ReaderViewModel", "Failed to fetch publication documents in following feed", e)
+                }
             }
 
             _uiState.value = _uiState.value.copy(
@@ -292,7 +301,10 @@ class ReaderViewModel @Inject constructor(
                         authorDisplayName = profile?.displayName,
                         authorAvatar = profile?.avatar,
                     )
-                } catch (_: Exception) { null }
+                } catch (e: Exception) {
+                    Log.w("ReaderViewModel", "Failed to parse document in yours feed", e)
+                    null
+                }
             }
 
             _uiState.value = _uiState.value.copy(
