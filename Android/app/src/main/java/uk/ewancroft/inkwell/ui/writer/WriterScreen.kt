@@ -10,6 +10,10 @@ import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import android.net.Uri
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -203,6 +207,31 @@ fun WriterScreen(
                 }
             }
 
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                val context = androidx.compose.ui.platform.LocalContext.current
+                var showImagePicker by remember { mutableStateOf(false) }
+                val imagePickerLauncher = rememberLauncherForActivityResult(
+                    ActivityResultContracts.GetContent()
+                ) { uri: Uri? ->
+                    uri ?: return@rememberLauncherForActivityResult
+                    val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg"
+                    val bytes = context.contentResolver.openInputStream(uri)?.readBytes()
+                    if (bytes != null) {
+                        viewModel.uploadImage(bytes, mimeType)
+                    }
+                }
+                OutlinedButton(
+                    onClick = { imagePickerLauncher.launch("image/*") },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Icon(Icons.Outlined.Image, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Add image")
+                }
+            }
+
             if (showDocumentPicker) {
                 DocumentPickerDialog(
                     publications = uiState.publications,
@@ -300,7 +329,7 @@ fun WriterScreen(
 
             Button(
                 onClick = { viewModel.publish() },
-                enabled = uiState.title.isNotBlank() && uiState.selectedPublication != null && !uiState.isPublishing && !uiState.isVerifyingPublication,
+                enabled = uiState.title.isNotBlank() && uiState.selectedPublication != null && uiState.verifiedPublicationUri != null && !uiState.isPublishing && !uiState.isVerifyingPublication,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 if (uiState.isPublishing) {

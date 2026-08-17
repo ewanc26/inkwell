@@ -5,19 +5,19 @@ import uk.ewancroft.inkwell.data.model.content.*
 
 object MarkdownConverter {
 
-    fun convert(markdown: String, format: String): JsonObject {
+    fun convert(markdown: String, format: String, uploadedBlobs: Map<String, JsonObject> = emptyMap()): JsonObject {
         return when (format) {
-            "Leaflet" -> buildLeafletContent(markdown)
+            "Leaflet" -> buildLeafletContent(markdown, uploadedBlobs)
             "Markpub" -> buildMarkpubContent(markdown)
-            "pckt" -> buildPcktContent(markdown)
-            "Offprint" -> buildOffprintContent(markdown)
-            else -> buildLeafletContent(markdown)
+            "pckt" -> buildPcktContent(markdown, uploadedBlobs)
+            "Offprint" -> buildOffprintContent(markdown, uploadedBlobs)
+            else -> buildLeafletContent(markdown, uploadedBlobs)
         }
     }
 
-    private fun buildLeafletContent(markdown: String): JsonObject = buildJsonObject {
+    private fun buildLeafletContent(markdown: String, uploadedBlobs: Map<String, JsonObject>): JsonObject = buildJsonObject {
         put("\$type", "pub.leaflet.content")
-        val blocks = parseMarkdownToLeafletBlocks(markdown)
+        val blocks = parseMarkdownToLeafletBlocks(markdown, uploadedBlobs)
         put("pages", buildJsonArray {
             add(buildJsonObject {
                 put("\$type", "pub.leaflet.pages.linearDocument")
@@ -37,17 +37,17 @@ object MarkdownConverter {
         })
     }
 
-    private fun buildPcktContent(markdown: String): JsonObject = buildJsonObject {
+    private fun buildPcktContent(markdown: String, uploadedBlobs: Map<String, JsonObject>): JsonObject = buildJsonObject {
         put("\$type", "blog.pckt.content")
-        val blocks = parseMarkdownToPcktBlocks(markdown)
+        val blocks = parseMarkdownToPcktBlocks(markdown, uploadedBlobs)
         put("items", buildJsonArray {
             blocks.forEach { add(it) }
         })
     }
 
-    private fun buildOffprintContent(markdown: String): JsonObject = buildJsonObject {
+    private fun buildOffprintContent(markdown: String, uploadedBlobs: Map<String, JsonObject>): JsonObject = buildJsonObject {
         put("\$type", "app.offprint.content")
-        val blocks = parseMarkdownToOffprintBlocks(markdown)
+        val blocks = parseMarkdownToOffprintBlocks(markdown, uploadedBlobs)
         put("items", buildJsonArray {
             blocks.forEach { add(it) }
         })
@@ -55,7 +55,7 @@ object MarkdownConverter {
 
     // MARK: - Markdown Parsing
 
-    private fun parseMarkdownToLeafletBlocks(markdown: String): List<JsonObject> {
+    private fun parseMarkdownToLeafletBlocks(markdown: String, uploadedBlobs: Map<String, JsonObject>): List<JsonObject> {
         val lines = markdown.lines()
         val blocks = mutableListOf<JsonObject>()
         var i = 0
@@ -65,7 +65,7 @@ object MarkdownConverter {
             when {
                 line.startsWith("# ") -> {
                     val text = line.drop(2).trim()
-                    val (plaintext, facets) = facetsFromMarkdown(text)
+                    val (plaintext, facets) = facetsFromMarkdown(text, "Leaflet")
                     blocks.add(buildJsonObject {
                         put("\$type", "pub.leaflet.blocks.header")
                         put("plaintext", plaintext)
@@ -76,7 +76,7 @@ object MarkdownConverter {
                 }
                 line.startsWith("## ") -> {
                     val text = line.drop(3).trim()
-                    val (plaintext, facets) = facetsFromMarkdown(text)
+                    val (plaintext, facets) = facetsFromMarkdown(text, "Leaflet")
                     blocks.add(buildJsonObject {
                         put("\$type", "pub.leaflet.blocks.header")
                         put("plaintext", plaintext)
@@ -87,7 +87,7 @@ object MarkdownConverter {
                 }
                 line.startsWith("### ") -> {
                     val text = line.drop(4).trim()
-                    val (plaintext, facets) = facetsFromMarkdown(text)
+                    val (plaintext, facets) = facetsFromMarkdown(text, "Leaflet")
                     blocks.add(buildJsonObject {
                         put("\$type", "pub.leaflet.blocks.header")
                         put("plaintext", plaintext)
@@ -119,7 +119,7 @@ object MarkdownConverter {
                             items.forEach { item ->
                                 add(buildJsonObject {
                                     put("\$type", "pub.leaflet.blocks.unorderedList#listItem")
-                                    val (plaintext, facets) = facetsFromMarkdown(item.text)
+                                    val (plaintext, facets) = facetsFromMarkdown(item.text, "Leaflet")
                                     put("content", buildJsonObject {
                                         put("\$type", "pub.leaflet.blocks.text")
                                         put("plaintext", plaintext)
@@ -149,6 +149,37 @@ object MarkdownConverter {
                     blocks.add(buildJsonObject { put("\$type", "pub.leaflet.blocks.horizontalRule") })
                     i++
                 }
+                line.startsWith("![") -> {
+                    val match = Regex("^!\\[([^\\]]*)\\]\\(([^)]+)\\)$").find(line)
+                    if (match != null) {
+                        val alt = match.groupValues[1]
+                        val url = match.groupValues[2]
+                        val blob = uploadedBlobs[url] ?: buildJsonObject { put("\$link", url) }
+                        blocks.add(buildJsonObject {
+                            put("\$type", "pub.leaflet.blocks.image")
+                            put("alt", alt)
+                            put("image", blob)
+                        })
+                    } else {
+                        val paraLines = mutableListOf<String>()
+                        while (i < lines.size && lines[i].isNotBlank() &&
+                            !lines[i].startsWith("#") && !lines[i].startsWith(">") &&
+                            !lines[i].startsWith("```") && !lines[i].startsWith("- ") &&
+                            !lines[i].startsWith("* ") && lines[i] != "---" && lines[i] != "***"
+                        ) {
+                            paraLines.add(lines[i])
+                            i++
+                        }
+                        val text = paraLines.joinToString(" ")
+                        val (plaintext, facets) = facetsFromMarkdown(text, "Leaflet")
+                        blocks.add(buildJsonObject {
+                            put("\$type", "pub.leaflet.blocks.text")
+                            put("plaintext", plaintext)
+                            if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
+                        })
+                    }
+                    i++
+                }
                 line.isEmpty() -> i++
                 else -> {
                     val paraLines = mutableListOf<String>()
@@ -161,7 +192,7 @@ object MarkdownConverter {
                         i++
                     }
                     val text = paraLines.joinToString(" ")
-                    val (plaintext, facets) = facetsFromMarkdown(text)
+                    val (plaintext, facets) = facetsFromMarkdown(text, "Leaflet")
                     blocks.add(buildJsonObject {
                         put("\$type", "pub.leaflet.blocks.text")
                         put("plaintext", plaintext)
@@ -173,7 +204,7 @@ object MarkdownConverter {
         return blocks
     }
 
-    private fun parseMarkdownToPcktBlocks(markdown: String): List<JsonObject> {
+    private fun parseMarkdownToPcktBlocks(markdown: String, uploadedBlobs: Map<String, JsonObject>): List<JsonObject> {
         val lines = markdown.lines()
         val blocks = mutableListOf<JsonObject>()
         var i = 0
@@ -183,7 +214,7 @@ object MarkdownConverter {
             when {
                 line.startsWith("# ") -> {
                     val text = line.drop(2).trim()
-                    val (plaintext, facets) = facetsFromMarkdown(text)
+                    val (plaintext, facets) = facetsFromMarkdown(text, "pckt")
                     blocks.add(buildJsonObject {
                         put("\$type", "blog.pckt.block.heading")
                         put("plaintext", plaintext)
@@ -194,7 +225,7 @@ object MarkdownConverter {
                 }
                 line.startsWith("## ") -> {
                     val text = line.drop(3).trim()
-                    val (plaintext, facets) = facetsFromMarkdown(text)
+                    val (plaintext, facets) = facetsFromMarkdown(text, "pckt")
                     blocks.add(buildJsonObject {
                         put("\$type", "blog.pckt.block.heading")
                         put("plaintext", plaintext)
@@ -205,7 +236,7 @@ object MarkdownConverter {
                 }
                 line.startsWith("### ") -> {
                     val text = line.drop(4).trim()
-                    val (plaintext, facets) = facetsFromMarkdown(text)
+                    val (plaintext, facets) = facetsFromMarkdown(text, "pckt")
                     blocks.add(buildJsonObject {
                         put("\$type", "blog.pckt.block.heading")
                         put("plaintext", plaintext)
@@ -237,7 +268,7 @@ object MarkdownConverter {
                             items.forEach { item ->
                                 add(buildJsonObject {
                                     put("\$type", "blog.pckt.block.listItem")
-                                    val (plaintext, facets) = facetsFromMarkdown(item.text)
+                                    val (plaintext, facets) = facetsFromMarkdown(item.text, "pckt")
                                     put("content", buildJsonArray {
                                         add(buildJsonObject {
                                             put("\$type", "blog.pckt.block.text")
@@ -272,6 +303,40 @@ object MarkdownConverter {
                     blocks.add(buildJsonObject { put("\$type", "blog.pckt.block.horizontalRule") })
                     i++
                 }
+                line.startsWith("![") -> {
+                    val match = Regex("^!\\[([^\\]]*)\\]\\(([^)]+)\\)$").find(line)
+                    if (match != null) {
+                        val alt = match.groupValues[1]
+                        val url = match.groupValues[2]
+                        val blob = uploadedBlobs[url] ?: buildJsonObject { put("\$link", url) }
+                        blocks.add(buildJsonObject {
+                            put("\$type", "blog.pckt.block.image")
+                            put("alt", alt)
+                            put("attrs", buildJsonObject {
+                                put("src", url)
+                                put("blob", blob)
+                            })
+                        })
+                    } else {
+                        val paraLines = mutableListOf<String>()
+                        while (i < lines.size && lines[i].isNotBlank() &&
+                            !lines[i].startsWith("#") && !lines[i].startsWith(">") &&
+                            !lines[i].startsWith("```") && !lines[i].startsWith("- ") &&
+                            !lines[i].startsWith("* ") && lines[i] != "---" && lines[i] != "***"
+                        ) {
+                            paraLines.add(lines[i])
+                            i++
+                        }
+                        val text = paraLines.joinToString(" ")
+                        val (plaintext, facets) = facetsFromMarkdown(text, "pckt")
+                        blocks.add(buildJsonObject {
+                            put("\$type", "blog.pckt.block.text")
+                            put("plaintext", plaintext)
+                            if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
+                        })
+                    }
+                    i++
+                }
                 line.isEmpty() -> i++
                 else -> {
                     val paraLines = mutableListOf<String>()
@@ -284,7 +349,7 @@ object MarkdownConverter {
                         i++
                     }
                     val text = paraLines.joinToString(" ")
-                    val (plaintext, facets) = facetsFromMarkdown(text)
+                    val (plaintext, facets) = facetsFromMarkdown(text, "pckt")
                     blocks.add(buildJsonObject {
                         put("\$type", "blog.pckt.block.text")
                         put("plaintext", plaintext)
@@ -296,7 +361,7 @@ object MarkdownConverter {
         return blocks
     }
 
-    private fun parseMarkdownToOffprintBlocks(markdown: String): List<JsonObject> {
+    private fun parseMarkdownToOffprintBlocks(markdown: String, uploadedBlobs: Map<String, JsonObject>): List<JsonObject> {
         val lines = markdown.lines()
         val blocks = mutableListOf<JsonObject>()
         var i = 0
@@ -306,7 +371,7 @@ object MarkdownConverter {
             when {
                 line.startsWith("# ") -> {
                     val text = line.drop(2).trim()
-                    val (plaintext, facets) = facetsFromMarkdown(text)
+                    val (plaintext, facets) = facetsFromMarkdown(text, "Offprint")
                     blocks.add(buildJsonObject {
                         put("\$type", "app.offprint.block.heading")
                         put("plaintext", plaintext)
@@ -317,7 +382,7 @@ object MarkdownConverter {
                 }
                 line.startsWith("## ") -> {
                     val text = line.drop(3).trim()
-                    val (plaintext, facets) = facetsFromMarkdown(text)
+                    val (plaintext, facets) = facetsFromMarkdown(text, "Offprint")
                     blocks.add(buildJsonObject {
                         put("\$type", "app.offprint.block.heading")
                         put("plaintext", plaintext)
@@ -328,7 +393,7 @@ object MarkdownConverter {
                 }
                 line.startsWith("### ") -> {
                     val text = line.drop(4).trim()
-                    val (plaintext, facets) = facetsFromMarkdown(text)
+                    val (plaintext, facets) = facetsFromMarkdown(text, "Offprint")
                     blocks.add(buildJsonObject {
                         put("\$type", "app.offprint.block.heading")
                         put("plaintext", plaintext)
@@ -361,7 +426,7 @@ object MarkdownConverter {
                             items.forEach { item ->
                                 add(buildJsonObject {
                                     put("\$type", "app.offprint.block.text")
-                                    val (plaintext, facets) = facetsFromMarkdown(item.text)
+                                    val (plaintext, facets) = facetsFromMarkdown(item.text, "Offprint")
                                     put("plaintext", plaintext)
                                     if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
                                     if (item.checked != null) put("checked", item.checked)
@@ -391,6 +456,37 @@ object MarkdownConverter {
                     blocks.add(buildJsonObject { put("\$type", "app.offprint.block.horizontalRule") })
                     i++
                 }
+                line.startsWith("![") -> {
+                    val match = Regex("^!\\[([^\\]]*)\\]\\(([^)]+)\\)$").find(line)
+                    if (match != null) {
+                        val alt = match.groupValues[1]
+                        val url = match.groupValues[2]
+                        val blob = uploadedBlobs[url] ?: buildJsonObject { put("\$link", url) }
+                        blocks.add(buildJsonObject {
+                            put("\$type", "app.offprint.block.image")
+                            put("alt", alt)
+                            put("image", blob)
+                        })
+                    } else {
+                        val paraLines = mutableListOf<String>()
+                        while (i < lines.size && lines[i].isNotBlank() &&
+                            !lines[i].startsWith("#") && !lines[i].startsWith(">") &&
+                            !lines[i].startsWith("```") && !lines[i].startsWith("- ") &&
+                            !lines[i].startsWith("* ") && lines[i] != "---" && lines[i] != "***"
+                        ) {
+                            paraLines.add(lines[i])
+                            i++
+                        }
+                        val text = paraLines.joinToString(" ")
+                        val (plaintext, facets) = facetsFromMarkdown(text, "Offprint")
+                        blocks.add(buildJsonObject {
+                            put("\$type", "app.offprint.block.text")
+                            put("plaintext", plaintext)
+                            if (facets.isNotEmpty()) put("facets", buildJsonArray { facets.forEach { add(it) } })
+                        })
+                    }
+                    i++
+                }
                 line.isEmpty() -> i++
                 else -> {
                     val paraLines = mutableListOf<String>()
@@ -403,7 +499,7 @@ object MarkdownConverter {
                         i++
                     }
                     val text = paraLines.joinToString(" ")
-                    val (plaintext, facets) = facetsFromMarkdown(text)
+                    val (plaintext, facets) = facetsFromMarkdown(text, "Offprint")
                     blocks.add(buildJsonObject {
                         put("\$type", "app.offprint.block.text")
                         put("plaintext", plaintext)
@@ -457,16 +553,19 @@ object MarkdownConverter {
         return items to i
     }
 
-    private fun facetsFromMarkdown(text: String): Pair<String, List<JsonObject>> {
+    private fun facetsFromMarkdown(text: String, format: String): Pair<String, List<JsonObject>> {
         val boldRegex = Regex("\\*\\*(.+?)\\*\\*")
         val italicRegex = Regex("\\*(.+?)\\*")
         val codeRegex = Regex("`(.+?)`")
         val linkRegex = Regex("\\[(.+?)\\]\\((.+?)\\)")
+        val strikeRegex = Regex("~~(.+?)~~")
 
-        // Every format span is resolved against the original text with its
-        // marker-strip ranges. Later matches skip any span already claimed so
-        // nested/overlapping formatting can't double-strip or emit conflicting
-        // facets (e.g. the italic pass inside `**bold**`).
+        val facetPrefix = when (format) {
+            "pckt" -> "blog.pckt.richtext.facet"
+            "Offprint" -> "app.offprint.richtext.facet"
+            else -> "pub.leaflet.richtext.facet"
+        }
+
         data class Span(
             val start: Int,
             val innerStart: Int,
@@ -487,6 +586,10 @@ object MarkdownConverter {
             val innerStart = match.range.first + 2
             claim(Span(match.range.first, innerStart, innerStart + match.groupValues[1].length, match.range.last + 1, "bold"))
         }
+        for (match in strikeRegex.findAll(text)) {
+            val innerStart = match.range.first + 2
+            claim(Span(match.range.first, innerStart, innerStart + match.groupValues[1].length, match.range.last + 1, "strikethrough"))
+        }
         for (match in italicRegex.findAll(text)) {
             if (match.value.startsWith("**")) continue
             val innerStart = match.range.first + 1
@@ -501,15 +604,12 @@ object MarkdownConverter {
             claim(Span(match.range.first, innerStart, innerStart + match.groupValues[1].length, match.range.last + 1, "link", match.groupValues[2]))
         }
 
-        // Mark every character that belongs to a formatting marker.
         val removed = BooleanArray(text.length)
         for (span in spans) {
             for (i in span.start until span.innerStart) removed[i] = true
             for (i in span.innerEnd until span.end) removed[i] = true
         }
 
-        // removedBefore[i] = markers stripped in text[0..i), mapping original
-        // character indices to their position in the stripped plaintext.
         val removedBefore = IntArray(text.length + 1)
         for (i in text.indices) {
             removedBefore[i + 1] = removedBefore[i] + (if (removed[i]) 1 else 0)
@@ -519,10 +619,6 @@ object MarkdownConverter {
             for (i in text.indices) if (!removed[i]) append(text[i])
         }
 
-        // Cumulative UTF-8 byte offset of each character index in the
-        // plaintext. Facet byte ranges are byte offsets, not character
-        // indices, and must index the *plaintext* — not the original text
-        // (markers were stripped from it).
         val bytePrefix = IntArray(plaintext.length + 1)
         var byteCount = 0
         var ci = 0
@@ -546,7 +642,7 @@ object MarkdownConverter {
             val pStart = span.innerStart - removedBefore[span.innerStart]
             val pEnd = span.innerEnd - removedBefore[span.innerEnd]
             buildJsonObject {
-                put("\$type", "pub.leaflet.richtext.facet")
+                put("\$type", facetPrefix)
                 put("index", buildJsonObject {
                     put("byteStart", bytePrefix[pStart])
                     put("byteEnd", bytePrefix[pEnd])
@@ -554,11 +650,12 @@ object MarkdownConverter {
                 put("features", buildJsonArray {
                     add(buildJsonObject {
                         when (span.type) {
-                            "bold" -> put("\$type", "pub.leaflet.richtext.facet#bold")
-                            "italic" -> put("\$type", "pub.leaflet.richtext.facet#italic")
-                            "code" -> put("\$type", "pub.leaflet.richtext.facet#code")
+                            "bold" -> put("\$type", "$facetPrefix#bold")
+                            "italic" -> put("\$type", "$facetPrefix#italic")
+                            "code" -> put("\$type", "$facetPrefix#code")
+                            "strikethrough" -> put("\$type", "$facetPrefix#strikethrough")
                             else -> {
-                                put("\$type", "pub.leaflet.richtext.facet#link")
+                                put("\$type", "$facetPrefix#link")
                                 put("uri", span.url)
                             }
                         }
