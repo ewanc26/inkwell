@@ -7,6 +7,11 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import uk.ewancroft.inkwell.shared.facets.FacetSchema
+import uk.ewancroft.inkwell.shared.facets.FacetDefinition
+import uk.ewancroft.inkwell.shared.facets.RichTextFacet
+import uk.ewancroft.inkwell.shared.facets.RichTextFeature
+import uk.ewancroft.inkwell.shared.facets.facetsToMarkdown
 
 data class ConvertResult(
     val markdown: String?,
@@ -23,26 +28,6 @@ data class ConvertResult(
  */
 object PcktOffprintConverter {
 
-    private val pcktLossLabels = mapOf(
-        "blog.pckt.block.table" to "tables",
-        "blog.pckt.block.mention" to "mention blocks",
-        "blog.pckt.block.gallery" to "galleries",
-        "blog.pckt.block.iframe" to "embeds",
-        "blog.pckt.block.website" to "website cards",
-        "blog.pckt.block.blueskyEmbed" to "Bluesky posts",
-    )
-
-    private val offprintLossLabels = mapOf(
-        "app.offprint.block.callout" to "callouts",
-        "app.offprint.block.button" to "buttons",
-        "app.offprint.block.webBookmark" to "bookmarks",
-        "app.offprint.block.webEmbed" to "embeds",
-        "app.offprint.block.blueskyPost" to "Bluesky posts",
-        "app.offprint.block.imageGrid" to "image grids",
-        "app.offprint.block.imageCarousel" to "image carousels",
-        "app.offprint.block.imageDiff" to "image comparisons",
-    )
-
     fun isSupported(formatType: String?): Boolean {
         return formatType == "blog.pckt.content" || formatType == "app.offprint.content"
     }
@@ -51,13 +36,13 @@ object PcktOffprintConverter {
         val items = contentObj["items"] as? JsonArray ?: return ConvertResult(null)
         val prefix = if (formatType == "blog.pckt.content") "blog.pckt.block." else "app.offprint.block."
         val isOffprint = formatType == "app.offprint.content"
-        val lossLabels = if (isOffprint) offprintLossLabels else pcktLossLabels
+        val schema = if (isOffprint) FacetSchema.offprint else FacetSchema.pckt
 
         val blocks = mutableListOf<String>()
         val lost = mutableSetOf<String>()
         for (item in items) {
             val obj = item as? JsonObject ?: continue
-            val md = blockToMarkdown(obj, prefix, isOffprint, authorDid, lossLabels, lost)
+            val md = blockToMarkdown(obj, prefix, isOffprint, authorDid, schema, lost)
             if (md != null) blocks.add(md)
         }
         return ConvertResult(blocks.joinToString("\n\n"), lost.toList())
@@ -68,7 +53,7 @@ object PcktOffprintConverter {
         prefix: String,
         isOffprint: Boolean,
         authorDid: String,
-        lossLabels: Map<String, String>,
+        schema: FacetDefinition,
         lost: MutableSet<String>,
     ): String? {
         val type = block["\$type"]?.jsonPrimitive?.contentOrNull ?: return null
@@ -78,7 +63,8 @@ object PcktOffprintConverter {
                 val text = facetsToMarkdown(
                     block["plaintext"]?.jsonPrimitive?.contentOrNull ?: "",
                     block["facets"] as? JsonArray,
-                    prefix,
+                    schema,
+                    lost,
                 )
                 text.ifEmpty { null }
             }
@@ -89,7 +75,8 @@ object PcktOffprintConverter {
                 val text = facetsToMarkdown(
                     block["plaintext"]?.jsonPrimitive?.contentOrNull ?: "",
                     block["facets"] as? JsonArray,
-                    prefix,
+                    schema,
+                    lost,
                 )
                 val hashes = "#".repeat(level)
                 "$hashes $text"
@@ -99,7 +86,7 @@ object PcktOffprintConverter {
                 val inner = block["content"] as? JsonArray ?: return null
                 val parts = inner.mapNotNull { el ->
                     val obj = el as? JsonObject ?: return@mapNotNull null
-                    blockContentToInlineMarkdown(obj, prefix, isOffprint, authorDid, lossLabels, lost)
+                    blockContentToInlineMarkdown(obj, prefix, isOffprint, authorDid, schema, lost)
                 }
                 val text = parts.joinToString("\n")
                 if (text.isNotEmpty()) "> ${text.replace("\n", "\n> ")}" else null
@@ -130,7 +117,7 @@ object PcktOffprintConverter {
                 val items = block["content"] as? JsonArray ?: return null
                 val rendered = items.mapNotNull { el ->
                     val obj = el as? JsonObject ?: return@mapNotNull null
-                    listItemToMarkdown(obj, prefix, isOffprint, authorDid, lossLabels, lost, ordered = false)
+                    listItemToMarkdown(obj, prefix, isOffprint, authorDid, schema, lost, ordered = false)
                 }
                 if (rendered.isNotEmpty()) rendered.joinToString("\n") else null
             }
@@ -140,7 +127,7 @@ object PcktOffprintConverter {
                 val items = block["content"] as? JsonArray ?: return null
                 val rendered = items.mapIndexedNotNull { index, el ->
                     val obj = el as? JsonObject ?: return@mapIndexedNotNull null
-                    listItemToMarkdown(obj, prefix, isOffprint, authorDid, lossLabels, lost, ordered = true, number = start + index)
+                    listItemToMarkdown(obj, prefix, isOffprint, authorDid, schema, lost, ordered = true, number = start + index)
                 }
                 if (rendered.isNotEmpty()) rendered.joinToString("\n") else null
             }
@@ -149,13 +136,13 @@ object PcktOffprintConverter {
                 val items = block["content"] as? JsonArray ?: return null
                 val rendered = items.mapNotNull { el ->
                     val obj = el as? JsonObject ?: return@mapNotNull null
-                    listItemToMarkdown(obj, prefix, isOffprint, authorDid, lossLabels, lost, ordered = false, isTask = true)
+                    listItemToMarkdown(obj, prefix, isOffprint, authorDid, schema, lost, ordered = false, isTask = true)
                 }
                 if (rendered.isNotEmpty()) rendered.joinToString("\n") else null
             }
 
             else -> {
-                val label = lossLabels[type]
+                val label = schema.lossy[type]
                 if (label != null) {
                     lost.add(label)
                 } else {
@@ -175,7 +162,7 @@ object PcktOffprintConverter {
         prefix: String,
         isOffprint: Boolean,
         authorDid: String,
-        lossLabels: Map<String, String>,
+        schema: FacetDefinition,
         lost: MutableSet<String>,
     ): String? {
         val type = obj["\$type"]?.jsonPrimitive?.contentOrNull ?: return null
@@ -184,7 +171,8 @@ object PcktOffprintConverter {
                 facetsToMarkdown(
                     obj["plaintext"]?.jsonPrimitive?.contentOrNull ?: "",
                     obj["facets"] as? JsonArray,
-                    prefix,
+                    schema,
+                    lost,
                 )
             }
             "${prefix}image" -> {
@@ -193,7 +181,7 @@ object PcktOffprintConverter {
                 if (url.isNotEmpty()) "![$alt]($url)" else null
             }
             else -> {
-                val label = lossLabels[type]
+                val label = schema.lossy[type]
                 if (label != null) lost.add(label) else lost.add("unsupported content")
                 null
             }
@@ -242,7 +230,7 @@ object PcktOffprintConverter {
         prefix: String,
         isOffprint: Boolean,
         authorDid: String,
-        lossLabels: Map<String, String>,
+        schema: FacetDefinition,
         lost: MutableSet<String>,
         ordered: Boolean,
         number: Int? = null,
@@ -264,7 +252,8 @@ object PcktOffprintConverter {
                             text += facetsToMarkdown(
                                 obj["plaintext"]?.jsonPrimitive?.contentOrNull ?: "",
                                 obj["facets"] as? JsonArray,
-                                prefix,
+                                schema,
+                                lost,
                             )
                         }
                         "${prefix}image" -> {
@@ -280,7 +269,7 @@ object PcktOffprintConverter {
                             for ((idx, subItem) in subItems.withIndex()) {
                                 val subObj = subItem as? JsonObject ?: continue
                                 val rendered = listItemToMarkdown(
-                                    subObj, prefix, isOffprint, authorDid, lossLabels, lost,
+                                    subObj, prefix, isOffprint, authorDid, schema, lost,
                                     ordered = isSubOrdered,
                                     number = if (isSubOrdered) subStart + idx else null,
                                     isTask = isSubTask,
@@ -289,7 +278,7 @@ object PcktOffprintConverter {
                             }
                         }
                         else -> {
-                            val label = lossLabels[blockType]
+                            val label = schema.lossy[blockType]
                             if (label != null) lost.add(label) else lost.add("unsupported content")
                         }
                     }
@@ -299,7 +288,8 @@ object PcktOffprintConverter {
                 text = facetsToMarkdown(
                     contentEl["plaintext"]?.jsonPrimitive?.contentOrNull ?: "",
                     contentEl["facets"] as? JsonArray,
-                    prefix,
+                    schema,
+                    lost,
                 )
             }
             else -> {}
@@ -318,7 +308,7 @@ object PcktOffprintConverter {
         val nestedFromChildren = if (children != null && children.isNotEmpty()) {
             children.mapNotNull { el ->
                 val obj = el as? JsonObject ?: return@mapNotNull null
-                listItemToMarkdown(obj, prefix, isOffprint, authorDid, lossLabels, lost, ordered = false)
+                listItemToMarkdown(obj, prefix, isOffprint, authorDid, schema, lost, ordered = false)
             }
         } else emptyList()
 
@@ -330,79 +320,38 @@ object PcktOffprintConverter {
 
     // ── Facet to Markdown ─────────────────────────────────────────────────
 
-    private fun facetsToMarkdown(plaintext: String, facets: JsonArray?, prefix: String): String {
+    private fun facetsToMarkdown(
+        plaintext: String,
+        facets: JsonArray?,
+        schema: FacetDefinition,
+        lost: MutableSet<String>,
+    ): String {
         if (facets == null || facets.isEmpty()) return plaintext
 
-        val utf8Bytes = plaintext.toByteArray(Charsets.UTF_8)
-        val totalBytes = utf8Bytes.size
+        val sharedFacets = facets.mapNotNull { facet ->
+            val obj = facet as? JsonObject ?: return@mapNotNull null
+            val index = obj["index"] as? JsonObject ?: return@mapNotNull null
+            val byteStart = index["byteStart"]?.jsonPrimitive?.contentOrNull?.toIntOrNull() ?: return@mapNotNull null
+            val byteEnd = index["byteEnd"]?.jsonPrimitive?.contentOrNull?.toIntOrNull() ?: return@mapNotNull null
+            val features = (obj["features"] as? JsonArray)?.mapNotNull { feature ->
+                val featureObj = feature as? JsonObject ?: return@mapNotNull null
+                val featureType = featureObj["\$type"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null
+                RichTextFeature(type = featureType, uri = featureObj["uri"]?.jsonPrimitive?.contentOrNull)
+            } ?: return@mapNotNull null
 
-        val boundaries = mutableSetOf(0, totalBytes)
-        for (facet in facets) {
-            val obj = facet as? JsonObject ?: continue
-            val index = obj["index"] as? JsonObject ?: continue
-            index["byteStart"]?.jsonPrimitive?.contentOrNull?.toIntOrNull()?.let { boundaries.add(it) }
-            index["byteEnd"]?.jsonPrimitive?.contentOrNull?.toIntOrNull()?.let { boundaries.add(it) }
-        }
-        val sortedBounds = boundaries.sorted()
-
-        data class Segment(val text: String, val bold: Boolean, val italic: Boolean, val code: Boolean, val strike: Boolean, val link: String?)
-
-        val segments = mutableListOf<Segment>()
-        for (idx in 0 until sortedBounds.size - 1) {
-            val start = sortedBounds[idx]
-            val end = sortedBounds[idx + 1]
-            if (start >= end || start >= totalBytes) continue
-            val clampedEnd = minOf(end, totalBytes)
-
-            val text = String(utf8Bytes, start, clampedEnd - start, Charsets.UTF_8)
-            if (text.isEmpty()) continue
-
-            var bold = false; var italic = false; var code = false; var strike = false; var link: String? = null
-            for (facet in facets) {
-                val obj = facet as? JsonObject ?: continue
-                val index = obj["index"] as? JsonObject ?: continue
-                val byteStart = index["byteStart"]?.jsonPrimitive?.contentOrNull?.toIntOrNull() ?: continue
-                val byteEnd = index["byteEnd"]?.jsonPrimitive?.contentOrNull?.toIntOrNull() ?: continue
-                if (start >= byteStart && start < byteEnd) {
-                    val features = obj["features"] as? JsonArray ?: continue
-                    for (feature in features) {
-                        val featureObj = feature as? JsonObject ?: continue
-                        val featureType = featureObj["\$type"]?.jsonPrimitive?.contentOrNull ?: continue
-                        when (featureType) {
-                            "${prefix}bold" -> bold = true
-                            "${prefix}italic" -> italic = true
-                            "${prefix}code" -> code = true
-                            "${prefix}strikethrough" -> strike = true
-                            "${prefix}link" -> link = featureObj["uri"]?.jsonPrimitive?.contentOrNull
-                        }
-                    }
-                }
-            }
-
-            val seg = Segment(text, bold, italic, code, strike, link)
-            val last = segments.lastOrNull()
-            if (last != null && last.bold == seg.bold && last.italic == seg.italic &&
-                last.code == seg.code && last.strike == seg.strike && last.link == seg.link
-            ) {
-                segments[segments.size - 1] = last.copy(text = last.text + seg.text)
-            } else {
-                segments.add(seg)
-            }
+            RichTextFacet(byteStart = byteStart, byteEnd = byteEnd, features = features)
         }
 
-        return segments.joinToString("") { seg ->
-            var wrapped = seg.text
-            if (seg.code) {
-                wrapped = "`$wrapped`"
-            } else {
-                if (seg.strike) wrapped = "~~$wrapped~~"
-                if (seg.italic) wrapped = "*$wrapped*"
-                if (seg.bold) wrapped = "**$wrapped**"
-            }
-            if (seg.link != null) {
-                wrapped = "[$wrapped](${seg.link})"
-            }
-            wrapped
-        }
+        return uk.ewancroft.inkwell.shared.facets.facetsToMarkdown(
+            plaintext = plaintext,
+            facets = sharedFacets,
+            boldType = schema.bold,
+            italicType = schema.italic,
+            codeType = schema.code,
+            strikeType = schema.strike,
+            linkType = schema.link,
+            lossy = schema.lossy,
+            lost = lost,
+        )
     }
 }
