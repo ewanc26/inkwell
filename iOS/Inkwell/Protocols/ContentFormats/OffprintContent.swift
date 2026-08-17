@@ -2,13 +2,14 @@
 //  OffprintContent.swift
 //  Inkwell
 //
-//  Created by Ewan Croft on 20/06/2026.
-//
 //  The `app.offprint.content` record format — offprint.app's block-array
 //  content shape. Converted to/from the editor's markdown by
 //  `OffprintProvider` in ContentProvider.swift; inline formatting uses
 //  ``LeafletFacet`` (see RichTextFacets.swift) under offprint's own
 //  `app.offprint.richtext.facet#*` `$type` strings.
+//
+//  Wire models match the authoritative offprint.app lexicons published at
+//  at://did:plc:pgjkomf37an4czloay5zeth6/com.atproto.lexicon.schema.
 //
 
 import Foundation
@@ -42,119 +43,223 @@ public struct OffprintContent: ATRecordProtocol {
     }
 }
 
+// MARK: - OffprintBlock
+
 public struct OffprintBlock: Codable, Equatable, Hashable, Sendable {
     public let type: String
+
+    // Text / heading / callout
     public let plaintext: String?
     public let level: Int?
-    public let language: String?
     public let facets: [LeafletFacet]?
+    public let textAlign: String?
+
+    // Code block
+    public let code: String?
+    public let language: String?
+    public let showLineNumbers: Bool?
+
+    // Blockquote
     public let content: [OffprintBlock]?
-    public let image: ComAtprotoLexicon.Repository.UploadBlobOutput?
-    public let alt: String?
 
     // Lists
     public let children: [OffprintListItem]?
-    public let ordered: Bool?
     public let start: Int?
+
+    // Image
+    public let image: ComAtprotoLexicon.Repository.UploadBlobOutput?
+    public let alt: String?
+    public let width: String?
+    public let caption: String?
+    public let alignment: String?
+    public let aspectRatio: OffprintAspectRatio?
+    public let captionFacets: [LeafletFacet]?
+
+    // Image grid / carousel / diff
+    public let images: [OffprintGridImage]?
+    public let gridRows: Int?
+
+    // Web / embed / button
+    public let href: String?
+    public let title: String?
+    public let preview: ComAtprotoLexicon.Repository.UploadBlobOutput?
+    public let siteName: String?
+    public let description: String?
+    public let embedUrl: String?
+    public let embedWidth: Int?
+    public let embedHeight: Int?
+
+    // Bluesky post
+    public let post: OffprintStrongRef?
 
     public init(
         type: String,
         plaintext: String? = nil,
         level: Int? = nil,
-        language: String? = nil,
         facets: [LeafletFacet]? = nil,
+        textAlign: String? = nil,
+        code: String? = nil,
+        language: String? = nil,
+        showLineNumbers: Bool? = nil,
         content: [OffprintBlock]? = nil,
+        children: [OffprintListItem]? = nil,
+        start: Int? = nil,
         image: ComAtprotoLexicon.Repository.UploadBlobOutput? = nil,
         alt: String? = nil,
-        children: [OffprintListItem]? = nil,
-        ordered: Bool? = nil,
-        start: Int? = nil
+        width: String? = nil,
+        caption: String? = nil,
+        alignment: String? = nil,
+        aspectRatio: OffprintAspectRatio? = nil,
+        captionFacets: [LeafletFacet]? = nil,
+        images: [OffprintGridImage]? = nil,
+        gridRows: Int? = nil,
+        href: String? = nil,
+        title: String? = nil,
+        preview: ComAtprotoLexicon.Repository.UploadBlobOutput? = nil,
+        siteName: String? = nil,
+        description: String? = nil,
+        embedUrl: String? = nil,
+        embedWidth: Int? = nil,
+        embedHeight: Int? = nil,
+        post: OffprintStrongRef? = nil
     ) {
         self.type = type
         self.plaintext = plaintext
         self.level = level
-        self.language = language
         self.facets = facets
+        self.textAlign = textAlign
+        self.code = code
+        self.language = language
+        self.showLineNumbers = showLineNumbers
         self.content = content
+        self.children = children
+        self.start = start
         self.image = image
         self.alt = alt
-        self.children = children
-        self.ordered = ordered
-        self.start = start
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.type = try container.decode(String.self, forKey: .type)
-        self.plaintext = try container.decodeIfPresent(String.self, forKey: .plaintext)
-        self.level = try container.decodeIfPresent(Int.self, forKey: .level)
-        self.language = try container.decodeIfPresent(String.self, forKey: .language)
-        self.facets = try container.decodeIfPresent([LeafletFacet].self, forKey: .facets)
-        self.content = try container.decodeIfPresent([OffprintBlock].self, forKey: .content)
-        self.alt = try container.decodeIfPresent(String.self, forKey: .alt)
-        self.image = try container.decodeIfPresent(ComAtprotoLexicon.Repository.UploadBlobOutput.self, forKey: .image)
-
-        self.children = try container.decodeIfPresent([OffprintListItem].self, forKey: .children)
-        self.ordered = try container.decodeIfPresent(Bool.self, forKey: .ordered)
-        self.start = try container.decodeIfPresent(Int.self, forKey: .start)
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(type, forKey: .type)
-        try container.encodeIfPresent(plaintext, forKey: .plaintext)
-        try container.encodeIfPresent(level, forKey: .level)
-        try container.encodeIfPresent(language, forKey: .language)
-        try container.encodeIfPresent(facets, forKey: .facets)
-        try container.encodeIfPresent(content, forKey: .content)
-        try container.encodeIfPresent(image, forKey: .image)
-        try container.encodeIfPresent(alt, forKey: .alt)
-        try container.encodeIfPresent(children, forKey: .children)
-        try container.encodeIfPresent(ordered, forKey: .ordered)
-        try container.encodeIfPresent(start, forKey: .start)
+        self.width = width
+        self.caption = caption
+        self.alignment = alignment
+        self.aspectRatio = aspectRatio
+        self.captionFacets = captionFacets
+        self.images = images
+        self.gridRows = gridRows
+        self.href = href
+        self.title = title
+        self.preview = preview
+        self.siteName = siteName
+        self.description = description
+        self.embedUrl = embedUrl
+        self.embedWidth = embedWidth
+        self.embedHeight = embedHeight
+        self.post = post
     }
 
     enum CodingKeys: String, CodingKey {
         case type = "$type"
         case plaintext
         case level
-        case language
         case facets
+        case textAlign
+        case code
+        case language
+        case showLineNumbers
         case content
+        case children
+        case start
         case image
         case alt
-        case children
-        case ordered
-        case start
+        case width
+        case caption
+        case alignment
+        case aspectRatio
+        case captionFacets
+        case images
+        case gridRows
+        case href
+        case title
+        case preview
+        case siteName
+        case description
+        case embedUrl
+        case embedWidth
+        case embedHeight
+        case post
     }
 }
 
+// MARK: - OffprintListItem
+
 public struct OffprintListItem: Codable, Equatable, Hashable, Sendable {
-    public let type: String
-    /// A single block (almost always `app.offprint.block.text`) — offprint's
-    /// real schema stores one item body here, not an array. See
-    /// standard.horse's `offprint.ts` `itemBlock`/`itemToMdast`.
     public let content: OffprintBlock?
     public let checked: Bool?
-    /// Nested sub-list items, for a sub-list directly under this item.
     public let children: [OffprintListItem]?
 
     public init(
-        type: String,
         content: OffprintBlock? = nil,
         checked: Bool? = nil,
         children: [OffprintListItem]? = nil
     ) {
-        self.type = type
         self.content = content
         self.checked = checked
         self.children = children
     }
 
     enum CodingKeys: String, CodingKey {
-        case type = "$type"
         case content
         case checked
         case children
+    }
+}
+
+// MARK: - OffprintAspectRatio
+
+public struct OffprintAspectRatio: Codable, Equatable, Hashable, Sendable {
+    public let width: Int
+    public let height: Int
+
+    public init(width: Int, height: Int) {
+        self.width = width
+        self.height = height
+    }
+}
+
+// MARK: - OffprintGridImage
+
+public struct OffprintGridImage: Codable, Equatable, Hashable, Sendable {
+    public let alt: String?
+    public let blob: ComAtprotoLexicon.Repository.UploadBlobOutput?
+    public let aspectRatio: OffprintAspectRatio?
+
+    public init(
+        alt: String? = nil,
+        blob: ComAtprotoLexicon.Repository.UploadBlobOutput? = nil,
+        aspectRatio: OffprintAspectRatio? = nil
+    ) {
+        self.alt = alt
+        self.blob = blob
+        self.aspectRatio = aspectRatio
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case alt
+        case blob
+        case aspectRatio
+    }
+}
+
+// MARK: - OffprintStrongRef
+
+public struct OffprintStrongRef: Codable, Equatable, Hashable, Sendable {
+    public let uri: String
+    public let cid: String
+
+    public init(uri: String, cid: String) {
+        self.uri = uri
+        self.cid = cid
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case uri
+        case cid
     }
 }
