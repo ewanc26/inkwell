@@ -120,28 +120,30 @@ final class NotificationManager {
 
             // Only send notifications if this isn't the first poll (first
             // poll just establishes the baseline of existing documents).
-            let isFirstPoll = defaults.object(forKey: lastPollKey) == nil
+            let lastPoll = defaults.object(forKey: lastPollKey) as? Date
+            let isFirstPoll = isFirstPoll(lastPollEpochMillis: Int64(lastPoll?.timeIntervalSince1970 ?? -1))
 
             if !isFirstPoll && !newDocs.isEmpty {
                 // Sort newest first.
                 newDocs.sort { $0.doc.record.publishedAt > $1.doc.record.publishedAt }
 
-                // Send a summary notification if there are multiple, or
-                // a single notification for the newest document.
-                if newDocs.count == 1 {
+                switch notificationStyle(newDocCount: Int32(newDocs.count)) {
+                case .single:
                     let doc = newDocs[0]
                     await sendNotification(
                         title: doc.pub?.record.name ?? "New Document",
                         body: doc.doc.record.title,
                         documentURI: doc.doc.uri
                     )
-                } else {
+                case .summary(let count):
                     let newest = newDocs[0]
                     await sendNotification(
-                        title: "\(newDocs.count) New Documents",
+                        title: "\(count) New Documents",
                         body: "Latest: \(newest.doc.record.title) from \(newest.pub?.record.name ?? "a publication")",
                         documentURI: newest.doc.uri
                     )
+                case .none:
+                    break
                 }
 
                 // Update in-app notification list.
@@ -156,10 +158,8 @@ final class NotificationManager {
                 }
                 notifications.insert(contentsOf: newNotifications, at: 0)
 
-                // Keep only the last 50 notifications.
-                if notifications.count > 50 {
-                    notifications = Array(notifications.prefix(50))
-                }
+                // Keep only the most recent notifications.
+                notifications = trimNotifications(notifications) as? [StandardSiteNotification] ?? notifications
 
                 unreadCount += newDocs.count
                 persistNotifications()
@@ -216,8 +216,7 @@ final class NotificationManager {
     }
 
     private func saveLastSeenURIs(_ uris: Set<String>) {
-        // Keep only the last 500 URIs to avoid unbounded growth.
-        let limited = Array(uris.suffix(500))
+        let limited = trimSeenUris(Array(uris))
         defaults.set(limited, forKey: lastSeenKey)
     }
 
