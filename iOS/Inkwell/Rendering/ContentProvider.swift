@@ -274,7 +274,7 @@ enum FacetConverter {
 // MARK: - Markdown Block Types
 
 /// Common block representation that all providers convert to/from.
-enum MarkdownBlock {
+enum MarkdownBlockNode {
     case heading(level: Int, text: String)
     case paragraph(text: String)
     case code(language: String?, content: String)
@@ -282,261 +282,36 @@ enum MarkdownBlock {
     case blockquote(text: String)
     case image(alt: String, url: String)
     case horizontalRule
-    case unorderedList(items: [MarkdownListItem])
-    case orderedList(start: Int, items: [MarkdownListItem])
-    case taskList(items: [MarkdownListItem])
+    case unorderedList(items: [MarkdownListItemNode])
+    case orderedList(start: Int, items: [MarkdownListItemNode])
+    case taskList(items: [MarkdownListItemNode])
 }
 
-struct MarkdownListItem {
+struct MarkdownListItemNode {
     let text: String
     let checked: Bool?  // nil = not a task item
-    let children: [MarkdownListItem]?
+    let children: [MarkdownListItemNode]?
 }
 
 // MARK: - Markdown Parser
 
-/// A simple line-by-line markdown parser that handles the block types
-/// common to all standard.site providers. Not a full CommonMark parser,
-/// but sufficient for the editor's round-trip needs.
-enum MarkdownParser {
-
-    static func parse(_ markdown: String) -> [MarkdownBlock] {
-        var blocks: [MarkdownBlock] = []
-        let lines = markdown.components(separatedBy: "\n")
-        var i = 0
-
-        while i < lines.count {
-            let trimmed = lines[i].trimmingCharacters(in: .whitespaces)
-
-            if trimmed.isEmpty {
-                i += 1
-                continue
-            }
-
-            if trimmed.hasPrefix("```") {
-                let lang = String(trimmed.dropFirst(3))
-                var codeLines: [String] = []
-                i += 1
-                while i < lines.count && !lines[i].trimmingCharacters(in: .whitespaces).hasPrefix("```") {
-                    codeLines.append(lines[i])
-                    i += 1
-                }
-                i += 1
-                let content = codeLines.joined(separator: "\n")
-                if lang == "math" {
-                    blocks.append(.math(tex: content))
-                } else {
-                    blocks.append(.code(language: lang.isEmpty ? nil : lang, content: content))
-                }
-                continue
-            }
-
-            if trimmed.hasPrefix("#") {
-                let level = trimmed.prefix(while: { $0 == "#" }).count
-                if level >= 1 && level <= 6 {
-                    let text = trimmed.dropFirst(level).trimmingCharacters(in: .whitespaces)
-                    blocks.append(.heading(level: level, text: text))
-                    i += 1
-                    continue
-                }
-            }
-
-            if trimmed == "---" || trimmed == "***" || trimmed == "___" {
-                blocks.append(.horizontalRule)
-                i += 1
-                continue
-            }
-
-            if trimmed.hasPrefix(">") {
-                var quoteLines: [String] = []
-                while i < lines.count {
-                    let l = lines[i].trimmingCharacters(in: .whitespaces)
-                    if l.hasPrefix(">") {
-                        quoteLines.append(l.dropFirst().trimmingCharacters(in: .whitespaces))
-                        i += 1
-                    } else if !l.isEmpty {
-                        break
-                    } else {
-                        i += 1
-                        break
-                    }
-                }
-                blocks.append(.blockquote(text: quoteLines.joined(separator: "\n")))
-                continue
-            }
-
-            if trimmed.hasPrefix("![") {
-                if let closeBracket = trimmed.firstIndex(of: "]"),
-                   trimmed.index(after: closeBracket) < trimmed.endIndex,
-                   trimmed[trimmed.index(after: closeBracket)] == "(",
-                   let closeParen = trimmed[trimmed.index(after: trimmed.index(after: closeBracket))...].firstIndex(of: ")") {
-                    let alt = String(trimmed[trimmed.index(after: trimmed.startIndex)..<closeBracket])
-                    let urlStart = trimmed.index(closeBracket, offsetBy: 2)
-                    let url = String(trimmed[urlStart..<closeParen])
-                    blocks.append(.image(alt: alt, url: url))
-                    i += 1
-                    continue
-                }
-            }
-
-            if trimmed.hasPrefix("- ") || trimmed.hasPrefix("* ") {
-                let (items, nextI) = parseList(lines, from: i, ordered: false)
-                if items.allSatisfy({ $0.checked != nil }) && !items.isEmpty {
-                    blocks.append(.taskList(items: items))
-                } else {
-                    blocks.append(.unorderedList(items: items))
-                }
-                i = nextI
-                continue
-            }
-
-            var numberStart = trimmed.startIndex
-            var numberStr = ""
-            while numberStart < trimmed.endIndex, trimmed[numberStart].isNumber {
-                numberStr.append(trimmed[numberStart])
-                numberStart = trimmed.index(after: numberStart)
-            }
-            if !numberStr.isEmpty, numberStart < trimmed.endIndex,
-               (trimmed[numberStart] == "." || trimmed[numberStart] == ")"),
-               trimmed.index(after: numberStart) < trimmed.endIndex,
-               trimmed[trimmed.index(after: numberStart)] == " ",
-               let number = Int(numberStr) {
-                let (items, nextI) = parseList(lines, from: i, ordered: true)
-                blocks.append(.orderedList(start: number, items: items))
-                i = nextI
-                continue
-            }
-
-            var paraLines: [String] = []
-            while i < lines.count {
-                let l = lines[i].trimmingCharacters(in: .whitespaces)
-                if l.isEmpty || l.hasPrefix("#") || l.hasPrefix(">") || l.hasPrefix("```") ||
-                   l.hasPrefix("- ") || l.hasPrefix("* ") || l == "---" || l == "***" ||
-                   l.hasPrefix("![") {
-                    break
-                }
-                paraLines.append(l)
-                i += 1
-            }
-            if !paraLines.isEmpty {
-                blocks.append(.paragraph(text: paraLines.joined(separator: " ")))
-            }
-        }
-
-        return blocks
-    }
-
-    private static func parseList(_ lines: [String], from start: Int, ordered: Bool) -> ([MarkdownListItem], Int) {
-        var items: [MarkdownListItem] = []
-        var i = start
-        let baseIndent = lines[start].prefix(while: { $0 == " " }).count
-
-        while i < lines.count {
-            let line = lines[i]
-            let trimmed = line.trimmingCharacters(in: .whitespaces)
-
-            if trimmed.isEmpty {
-                i += 1
-                continue
-            }
-
-            let indent = line.prefix(while: { $0 == " " }).count
-            if indent < baseIndent {
-                break
-            }
-
-            let isUnordered = trimmed.hasPrefix("- ") || trimmed.hasPrefix("* ")
-            let isOrdered = ordered && trimmed.range(of: #"^\d+[.)]\s"#, options: .regularExpression) != nil
-
-            if !isUnordered && !isOrdered {
-                break
-            }
-
-            var itemText: String
-            if isUnordered {
-                itemText = String(trimmed.dropFirst(2))
-            } else {
-                if let markerEnd = trimmed.firstIndex(of: " ") {
-                    itemText = String(trimmed[trimmed.index(after: markerEnd)...])
-                } else {
-                    itemText = ""
-                }
-            }
-
-            var checked: Bool? = nil
-            if itemText.hasPrefix("[x] ") || itemText.hasPrefix("[X] ") {
-                checked = true
-                itemText = String(itemText.dropFirst(4))
-            } else if itemText.hasPrefix("[ ] ") {
-                checked = false
-                itemText = String(itemText.dropFirst(4))
-            }
-
-            var children: [MarkdownListItem] = []
-            if i + 1 < lines.count {
-                let nextIndent = lines[i + 1].prefix(while: { $0 == " " }).count
-                if nextIndent > baseIndent {
-                    let (nested, nextI) = parseList(lines, from: i + 1, ordered: false)
-                    children = nested
-                    i = nextI - 1
-                }
-            }
-
-            items.append(MarkdownListItem(text: itemText, checked: checked, children: children.isEmpty ? nil : children))
-            i += 1
-        }
-
-        return (items, i)
+/// Editor-side markdown parser — delegates to shared KMP for the
+/// block-level parse. Round-trip correctness for the writer depends on
+/// this staying in sync with `MarkdownSerializer` below.
+enum MarkdownParserEngine {
+    static func parse(_ markdown: String) -> [MarkdownBlockNode] {
+        parseMarkdown(markdown)
     }
 }
 
 // MARK: - Markdown Serializer
 
-/// Converts MarkdownBlock array back to a markdown string.
-enum MarkdownSerializer {
+/// Converts MarkdownBlockNode array back to a markdown string — delegates
+/// to shared KMP for canonical serialization.
+enum MarkdownSerializerEngine {
 
-    static func serialize(_ blocks: [MarkdownBlock]) -> String {
-        blocks.map { blockToString($0) }.joined(separator: "\n\n")
-    }
-
-    private static func blockToString(_ block: MarkdownBlock) -> String {
-        switch block {
-        case .heading(let level, let text):
-            return String(repeating: "#", count: level) + " " + text
-        case .paragraph(let text):
-            return text
-        case .code(let language, let content):
-            let lang = language ?? ""
-            return "```\(lang)\n\(content)\n```"
-        case .math(let tex):
-            return "```math\n\(tex)\n```"
-        case .blockquote(let text):
-            return text.components(separatedBy: "\n").map { "> " + $0 }.joined(separator: "\n")
-        case .image(let alt, let url):
-            return "![\(alt)](\(url))"
-        case .horizontalRule:
-            return "---"
-        case .unorderedList(let items):
-            return items.map { listItemToString($0, prefix: "- ") }.joined(separator: "\n")
-        case .orderedList(let start, let items):
-            return items.enumerated().map { (idx, item) in
-                listItemToString(item, prefix: "\(start + idx). ")
-            }.joined(separator: "\n")
-        case .taskList(let items):
-            return items.map { item in
-                let checkbox = item.checked == true ? "[x] " : item.checked == false ? "[ ] " : ""
-                return "- " + checkbox + item.text
-            }.joined(separator: "\n")
-        }
-    }
-
-    private static func listItemToString(_ item: MarkdownListItem, prefix: String) -> String {
-        var result = prefix + item.text
-        if let children = item.children {
-            let childLines = children.map { listItemToString($0, prefix: "  - ") }
-            result += "\n" + childLines.joined(separator: "\n")
-        }
-        return result
+    static func serialize(_ blocks: [MarkdownBlockNode]) -> String {
+        serializeMarkdown(blocks)
     }
 }
 
@@ -585,7 +360,7 @@ struct LeafletProvider: ContentProvider {
         }
 
         var lost = Set<String>()
-        var blocks: [MarkdownBlock] = []
+        var blocks: [MarkdownBlockNode] = []
 
         // When blobPages are present, the inline pages array may be empty —
         // the caller is expected to have already fetched the blob and
@@ -603,10 +378,10 @@ struct LeafletProvider: ContentProvider {
             }
         }
 
-        return ConvertResult(markdown: MarkdownSerializer.serialize(blocks), lost: Array(lost))
+        return ConvertResult(markdown: MarkdownSerializerEngine.serialize(blocks), lost: Array(lost))
     }
 
-    private func leafletBlockToMarkdown(_ block: LeafletBlock, alignment: String?, lost: inout Set<String>) -> MarkdownBlock? {
+    private func leafletBlockToMarkdown(_ block: LeafletBlock, alignment: String?, lost: inout Set<String>) -> MarkdownBlockNode? {
         if let alignment = alignment, !alignment.hasSuffix("textAlignLeft") {
             lost.insert("text alignment")
         }
@@ -665,7 +440,7 @@ struct LeafletProvider: ContentProvider {
         }
     }
 
-    private func leafletListItemToMarkdown(_ item: LeafletListItem) -> MarkdownListItem {
+    private func leafletListItemToMarkdown(_ item: LeafletListItem) -> MarkdownListItemNode {
         var text = ""
         if let content = item.content {
             switch content.type {
@@ -685,12 +460,12 @@ struct LeafletProvider: ContentProvider {
         // `orderedListChildren` (ordered nested). Inkwell's LeafletListItem
         // only has `children`, but when a stored record has both we prefer
         // `orderedListChildren` for ordered nesting.
-        var mdChildren: [MarkdownListItem]? = nil
+        var mdChildren: [MarkdownListItemNode]? = nil
         if let kids = item.children, !kids.isEmpty {
             mdChildren = kids.map { leafletListItemToMarkdown($0) }
         }
 
-        return MarkdownListItem(text: text, checked: item.checked, children: mdChildren)
+        return MarkdownListItemNode(text: text, checked: item.checked, children: mdChildren)
     }
 
     func fromMarkdown(_ markdown: String, ctx: WriteContext) -> UnknownType? {
@@ -699,7 +474,7 @@ struct LeafletProvider: ContentProvider {
         // without re-uploading — matching standard.horse's round-trip pattern.
         let previousBlobs = harvestImageBlobs(from: ctx.previousContent)
 
-        let blocks = MarkdownParser.parse(markdown)
+        let blocks = MarkdownParserEngine.parse(markdown)
         var leafletBlocks: [LeafletBlockContainer] = []
 
         for block in blocks {
@@ -713,7 +488,7 @@ struct LeafletProvider: ContentProvider {
         return UnknownType.record(content)
     }
 
-    private func markdownToLeafletBlock(_ block: MarkdownBlock, previousBlobs: [String: ComAtprotoLexicon.Repository.UploadBlobOutput]) -> LeafletBlock? {
+    private func markdownToLeafletBlock(_ block: MarkdownBlockNode, previousBlobs: [String: ComAtprotoLexicon.Repository.UploadBlobOutput]) -> LeafletBlock? {
         switch block {
         case .heading(let level, let text):
             let (plaintext, facets) = FacetConverter.markdownToFacets(text, schema: schema)
@@ -780,7 +555,7 @@ struct LeafletProvider: ContentProvider {
     /// Nested ordered lists become `orderedListChildren`, unordered become
     /// `children`, and task items carry their `checked` flag. The item content
     /// defaults to an empty text block when no text is provided.
-    private func markdownToLeafletListItem(_ item: MarkdownListItem, ordered: Bool, previousBlobs: [String: ComAtprotoLexicon.Repository.UploadBlobOutput]) -> LeafletListItem {
+    private func markdownToLeafletListItem(_ item: MarkdownListItemNode, ordered: Bool, previousBlobs: [String: ComAtprotoLexicon.Repository.UploadBlobOutput]) -> LeafletListItem {
         let itemType = ordered
             ? "pub.leaflet.blocks.orderedList#listItem"
             : "pub.leaflet.blocks.unorderedList#listItem"
@@ -862,7 +637,7 @@ struct PcktProvider: ContentProvider {
         }
 
         var lost = Set<String>()
-        var blocks: [MarkdownBlock] = []
+        var blocks: [MarkdownBlockNode] = []
 
         for block in pckt.items ?? [] {
             if let mdBlock = pcktBlockToMarkdown(block, lost: &lost) {
@@ -870,10 +645,10 @@ struct PcktProvider: ContentProvider {
             }
         }
 
-        return ConvertResult(markdown: MarkdownSerializer.serialize(blocks), lost: Array(lost))
+        return ConvertResult(markdown: MarkdownSerializerEngine.serialize(blocks), lost: Array(lost))
     }
 
-    private func pcktBlockToMarkdown(_ block: PcktBlock, lost: inout Set<String>) -> MarkdownBlock? {
+    private func pcktBlockToMarkdown(_ block: PcktBlock, lost: inout Set<String>) -> MarkdownBlockNode? {
         switch block.type {
         case b("text"):
             let text = FacetConverter.facetsToMarkdown(
@@ -934,9 +709,9 @@ struct PcktProvider: ContentProvider {
         }
     }
 
-    private func pcktListItemToMarkdown(_ item: PcktListItem) -> MarkdownListItem {
+    private func pcktListItemToMarkdown(_ item: PcktListItem) -> MarkdownListItemNode {
         var text = ""
-        var children: [MarkdownListItem]? = nil
+        var children: [MarkdownListItemNode]? = nil
         for block in item.content ?? [] {
             switch block.type {
             case b("text"):
@@ -953,11 +728,11 @@ struct PcktProvider: ContentProvider {
             }
         }
 
-        return MarkdownListItem(text: text, checked: item.checked, children: children)
+        return MarkdownListItemNode(text: text, checked: item.checked, children: children)
     }
 
     func fromMarkdown(_ markdown: String, ctx: WriteContext) -> UnknownType? {
-        let blocks = MarkdownParser.parse(markdown)
+        let blocks = MarkdownParserEngine.parse(markdown)
         var items: [PcktBlock] = []
 
         for block in blocks {
@@ -970,7 +745,7 @@ struct PcktProvider: ContentProvider {
         return UnknownType.record(content)
     }
 
-    private func markdownToPcktBlock(_ block: MarkdownBlock) -> PcktBlock? {
+    private func markdownToPcktBlock(_ block: MarkdownBlockNode) -> PcktBlock? {
         switch block {
         case .heading(let level, let text):
             let (plaintext, facets) = FacetConverter.markdownToFacets(text, schema: schema)
@@ -1027,7 +802,7 @@ struct PcktProvider: ContentProvider {
         }
     }
 
-    private func markdownToPcktListItem(_ item: MarkdownListItem, isTaskItem: Bool) -> PcktListItem {
+    private func markdownToPcktListItem(_ item: MarkdownListItemNode, isTaskItem: Bool) -> PcktListItem {
         let (plaintext, facets) = FacetConverter.markdownToFacets(item.text, schema: schema)
         var content: [PcktBlock] = [
             PcktBlock(type: b("text"), plaintext: plaintext, facets: facets.isEmpty ? nil : facets)
@@ -1081,7 +856,7 @@ struct OffprintProvider: ContentProvider {
         }
 
         var lost = Set<String>()
-        var blocks: [MarkdownBlock] = []
+        var blocks: [MarkdownBlockNode] = []
 
         for block in offprint.items ?? [] {
             if let mdBlock = offprintBlockToMarkdown(block, lost: &lost) {
@@ -1089,10 +864,10 @@ struct OffprintProvider: ContentProvider {
             }
         }
 
-        return ConvertResult(markdown: MarkdownSerializer.serialize(blocks), lost: Array(lost))
+        return ConvertResult(markdown: MarkdownSerializerEngine.serialize(blocks), lost: Array(lost))
     }
 
-    private func offprintBlockToMarkdown(_ block: OffprintBlock, lost: inout Set<String>) -> MarkdownBlock? {
+    private func offprintBlockToMarkdown(_ block: OffprintBlock, lost: inout Set<String>) -> MarkdownBlockNode? {
         switch block.type {
         case b("text"):
             let text = FacetConverter.facetsToMarkdown(
@@ -1152,7 +927,7 @@ struct OffprintProvider: ContentProvider {
         }
     }
 
-    private func offprintListItemToMarkdown(_ item: OffprintListItem) -> MarkdownListItem {
+    private func offprintListItemToMarkdown(_ item: OffprintListItem) -> MarkdownListItemNode {
         var text = ""
         if let content = item.content, content.type == b("text") {
             text = FacetConverter.facetsToMarkdown(
@@ -1160,16 +935,16 @@ struct OffprintProvider: ContentProvider {
             )
         }
 
-        var children: [MarkdownListItem]? = nil
+        var children: [MarkdownListItemNode]? = nil
         if let kids = item.children, !kids.isEmpty {
             children = kids.map { offprintListItemToMarkdown($0) }
         }
 
-        return MarkdownListItem(text: text, checked: item.checked, children: children)
+        return MarkdownListItemNode(text: text, checked: item.checked, children: children)
     }
 
     func fromMarkdown(_ markdown: String, ctx: WriteContext) -> UnknownType? {
-        let blocks = MarkdownParser.parse(markdown)
+        let blocks = MarkdownParserEngine.parse(markdown)
         var items: [OffprintBlock] = []
 
         for block in blocks {
@@ -1182,7 +957,7 @@ struct OffprintProvider: ContentProvider {
         return UnknownType.record(content)
     }
 
-    private func markdownToOffprintBlock(_ block: MarkdownBlock) -> OffprintBlock? {
+    private func markdownToOffprintBlock(_ block: MarkdownBlockNode) -> OffprintBlock? {
         switch block {
         case .heading(let level, let text):
             let (plaintext, facets) = FacetConverter.markdownToFacets(text, schema: schema)
@@ -1236,7 +1011,7 @@ struct OffprintProvider: ContentProvider {
         }
     }
 
-    private func markdownToOffprintListItem(_ item: MarkdownListItem, ordered: Bool) -> OffprintListItem {
+    private func markdownToOffprintListItem(_ item: MarkdownListItemNode, ordered: Bool) -> OffprintListItem {
         let (plaintext, facets) = FacetConverter.markdownToFacets(item.text, schema: schema)
         let textBlock = OffprintBlock(
             type: b("text"), plaintext: plaintext,

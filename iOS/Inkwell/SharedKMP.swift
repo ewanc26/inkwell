@@ -117,6 +117,89 @@ func resolveReaderTheme(
     )
 }
 
+// MARK: - Markdown Parser / Serializer
+
+func parseMarkdown(_ markdown: String) -> [MarkdownBlockNode] {
+    let sharedBlocks = MarkdownParser.shared.parse(markdown: markdown)
+    return sharedBlocks.map { sharedBlockToLocal($0) }
+}
+
+func serializeMarkdown(_ blocks: [MarkdownBlockNode]) -> String {
+    let sharedBlocks = blocks.map { localBlockToShared($0) }
+    return MarkdownSerializer.shared.serialize(blocks: sharedBlocks)
+}
+
+// MARK: - Markdown Type Bridging
+
+private func sharedBlockToLocal(_ block: MarkdownBlock) -> MarkdownBlockNode {
+    switch block {
+    case let heading as MarkdownBlock.Heading:
+        return .heading(level: Int(heading.level), text: heading.text as String)
+    case let paragraph as MarkdownBlock.Paragraph:
+        return .paragraph(text: paragraph.text as String)
+    case let code as MarkdownBlock.Code:
+        return .code(language: code.language as String?, content: code.content as String)
+    case let math as MarkdownBlock.Math:
+        return .math(tex: math.tex as String)
+    case let blockquote as MarkdownBlock.Blockquote:
+        return .blockquote(text: blockquote.text as String)
+    case let image as MarkdownBlock.Image:
+        return .image(alt: image.alt as String, url: image.url as String)
+    case _ as MarkdownBlock.HorizontalRule:
+        return .horizontalRule
+    case let list as MarkdownBlock.UnorderedList:
+        return .unorderedList(items: list.items.map { sharedListItemToLocal($0) })
+    case let list as MarkdownBlock.OrderedList:
+        return .orderedList(start: Int(list.start), items: list.items.map { sharedListItemToLocal($0) })
+    case let list as MarkdownBlock.TaskList:
+        return .taskList(items: list.items.map { sharedListItemToLocal($0) })
+    default:
+        return .paragraph(text: "")
+    }
+}
+
+private func localBlockToShared(_ block: MarkdownBlockNode) -> MarkdownBlock {
+    switch block {
+    case .heading(let level, let text):
+        return MarkdownBlock.Heading(level: Int32(level), text: text)
+    case .paragraph(let text):
+        return MarkdownBlock.Paragraph(text: text)
+    case .code(let language, let content):
+        return MarkdownBlock.Code(language: language, content: content)
+    case .math(let tex):
+        return MarkdownBlock.Math(tex: tex)
+    case .blockquote(let text):
+        return MarkdownBlock.Blockquote(text: text)
+    case .image(let alt, let url):
+        return MarkdownBlock.Image(alt: alt, url: url)
+    case .horizontalRule:
+        return MarkdownBlock.HorizontalRule.shared
+    case .unorderedList(let items):
+        return MarkdownBlock.UnorderedList(items: items.map { localListItemToShared($0) })
+    case .orderedList(let start, let items):
+        return MarkdownBlock.OrderedList(start: Int32(start), items: items.map { localListItemToShared($0) })
+    case .taskList(let items):
+        return MarkdownBlock.TaskList(items: items.map { localListItemToShared($0) })
+    }
+}
+
+private func sharedListItemToLocal(_ item: MarkdownListItem) -> MarkdownListItemNode {
+    return MarkdownListItemNode(
+        text: item.text as String,
+        checked: item.checked?.boolValue,
+        children: item.children?.map { sharedListItemToLocal($0) }
+    )
+}
+
+private func localListItemToShared(_ item: MarkdownListItemNode) -> MarkdownListItem {
+    let sharedChecked: KotlinBoolean? = item.checked.map { KotlinBoolean(value: $0) }
+    return MarkdownListItem(
+        text: item.text as String,
+        checked: sharedChecked,
+        children: item.children?.map { localListItemToShared($0) }
+    )
+}
+
 // MARK: - Tip Prompt Policy
 
 func shouldShowTip(

@@ -26,8 +26,8 @@ struct MarkdownRendererView: View {
     private var foregroundColor: Color { theme.foreground }
     private var accentColor: Color { theme.accent }
 
-    private var blocks: [MarkdownBlock] {
-        MarkdownParser.parse(markdown)
+    private var blocks: [MarkdownBlockNode] {
+        MarkdownParserEngine.parse(markdown)
     }
 
     var body: some View {
@@ -39,7 +39,7 @@ struct MarkdownRendererView: View {
     }
 
     @ViewBuilder
-    private func renderBlock(_ block: MarkdownBlock) -> some View {
+    private func renderBlock(_ block: MarkdownBlockNode) -> some View {
         switch block {
         case .heading(let level, let text):
             let style: Font.TextStyle = switch level {
@@ -165,7 +165,7 @@ struct MarkdownRendererView: View {
         }
     }
 
-    private func renderListItems(_ items: [MarkdownListItem], ordered: Bool, startIndex: Int?) -> AnyView {
+    private func renderListItems(_ items: [MarkdownListItemNode], ordered: Bool, startIndex: Int?) -> AnyView {
         AnyView(VStack(alignment: .leading, spacing: 8) {
             ForEach(items.indices, id: \.self) { index in
                 let item = items[index]
@@ -199,7 +199,7 @@ struct MarkdownRendererView: View {
         .padding(.leading, 4))
     }
 
-    private func renderTaskList(_ items: [MarkdownListItem]) -> some View {
+    private func renderTaskList(_ items: [MarkdownListItemNode]) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             ForEach(items.indices, id: \.self) { index in
                 let item = items[index]
