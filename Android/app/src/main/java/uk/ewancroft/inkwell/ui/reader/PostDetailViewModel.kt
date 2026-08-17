@@ -16,8 +16,10 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import uk.ewancroft.inkwell.data.model.atproto.BasicTheme
 import uk.ewancroft.inkwell.data.model.atproto.DocumentRecord
 import uk.ewancroft.inkwell.data.model.atproto.PublicationRecord
+import uk.ewancroft.inkwell.data.model.atproto.PublicationTheme
 import uk.ewancroft.inkwell.data.model.common.AtUri
 import uk.ewancroft.inkwell.data.model.common.StrongRef
 import uk.ewancroft.inkwell.data.model.content.LeafletContent
@@ -52,6 +54,10 @@ data class PostDetailUiState(
     val content: DocumentContent = DocumentContent.Empty,
     val publicationUri: String? = null,
     val publicationUrl: String? = null,
+
+    val documentTheme: PublicationTheme? = null,
+    val publicationTheme: PublicationTheme? = null,
+    val basicTheme: BasicTheme? = null,
 
     val verification: VerificationResult? = null,
 
@@ -143,6 +149,11 @@ class PostDetailViewModel @Inject constructor(
                 val contentObj = value["content"]?.jsonObject
                 val docContent = parseContent(contentObj, textContent, parsed.did, uri)
 
+                // Extract document-level theme override
+                val docTheme = runCatching {
+                    value["theme"]?.jsonObject?.let { json.decodeFromJsonElement<PublicationTheme>(it) }
+                }.getOrNull()
+
                 if (_uiState.value.uri != uri) return@launch
                 val pubUri = if (site?.startsWith("at://") == true &&
                     AtUri.parse(site)?.collection == "site.standard.publication") {
@@ -160,11 +171,13 @@ class PostDetailViewModel @Inject constructor(
                     coverUrl = coverUrl,
                     content = docContent,
                     publicationUri = pubUri,
+                    documentTheme = docTheme,
                 )
 
                 if (pubUri != null) {
                     verify(documentURI = uri, site = site!!, title = title, path = path, publishedAt = publishedAt)
                     loadSubscriptionState(pubUri)
+                    loadPublicationTheme(pubUri)
                 }
             } catch (e: Exception) {
                 if (_uiState.value.uri != uri) return@launch
@@ -360,6 +373,26 @@ class PostDetailViewModel @Inject constructor(
 
     fun dismissSubscriptionError() {
         _uiState.value = _uiState.value.copy(subscriptionError = null)
+    }
+
+    private fun loadPublicationTheme(publicationUri: String) {
+        viewModelScope.launch {
+            try {
+                val record = pdsRepository.getRecord(publicationUri)
+                val value = record["value"]?.jsonObject ?: return@launch
+                val pubTheme = runCatching {
+                    value["theme"]?.jsonObject?.let { json.decodeFromJsonElement<PublicationTheme>(it) }
+                }.getOrNull()
+                val basic = runCatching {
+                    value["basicTheme"]?.jsonObject?.let { json.decodeFromJsonElement<BasicTheme>(it) }
+                }.getOrNull()
+                if (_uiState.value.publicationUri != publicationUri) return@launch
+                _uiState.value = _uiState.value.copy(
+                    publicationTheme = pubTheme,
+                    basicTheme = basic,
+                )
+            } catch (_: Exception) {}
+        }
     }
 
     private suspend fun parseContent(
