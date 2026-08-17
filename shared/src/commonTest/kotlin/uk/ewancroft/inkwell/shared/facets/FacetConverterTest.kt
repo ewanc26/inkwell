@@ -16,13 +16,13 @@ class FacetConverterTest {
 
     @Test
     fun plainTextWithNoFacets() {
-        val result = facetsToMarkdown("Hello world", null, leafletBold, leafletItalic, leafletCode, leafletStrike, leafletLink, leafletLossy)
+        val result = FacetConverter.facetsToMarkdown("Hello world", null, leafletBold, leafletItalic, leafletCode, leafletStrike, leafletLink, leafletLossy)
         assertEquals("Hello world", result)
     }
 
     @Test
     fun emptyFacetsList() {
-        val result = facetsToMarkdown("Hello", emptyList(), leafletBold, leafletItalic, leafletCode, leafletStrike, leafletLink, leafletLossy)
+        val result = FacetConverter.facetsToMarkdown("Hello", emptyList(), leafletBold, leafletItalic, leafletCode, leafletStrike, leafletLink, leafletLossy)
         assertEquals("Hello", result)
     }
 
@@ -33,7 +33,7 @@ class FacetConverterTest {
         val facets = listOf(
             RichTextFacet(byteStart = 0, byteEnd = 5, features = listOf(RichTextFeature(leafletBold)))
         )
-        val result = facetsToMarkdown("Hello", facets, leafletBold, leafletItalic, leafletCode, leafletStrike, leafletLink, leafletLossy)
+        val result = FacetConverter.facetsToMarkdown("Hello", facets, leafletBold, leafletItalic, leafletCode, leafletStrike, leafletLink, leafletLossy)
         assertEquals("**Hello**", result)
     }
 
@@ -44,7 +44,7 @@ class FacetConverterTest {
         val facets = listOf(
             RichTextFacet(byteStart = 0, byteEnd = 5, features = listOf(RichTextFeature(leafletItalic)))
         )
-        val result = facetsToMarkdown("Hello", facets, leafletBold, leafletItalic, leafletCode, leafletStrike, leafletLink, leafletLossy)
+        val result = FacetConverter.facetsToMarkdown("Hello", facets, leafletBold, leafletItalic, leafletCode, leafletStrike, leafletLink, leafletLossy)
         assertEquals("*Hello*", result)
     }
 
@@ -55,7 +55,7 @@ class FacetConverterTest {
         val facets = listOf(
             RichTextFacet(byteStart = 0, byteEnd = 5, features = listOf(RichTextFeature(leafletCode)))
         )
-        val result = facetsToMarkdown("Hello", facets, leafletBold, leafletItalic, leafletCode, leafletStrike, leafletLink, leafletLossy)
+        val result = FacetConverter.facetsToMarkdown("Hello", facets, leafletBold, leafletItalic, leafletCode, leafletStrike, leafletLink, leafletLossy)
         assertEquals("`Hello`", result)
     }
 
@@ -66,7 +66,7 @@ class FacetConverterTest {
         val facets = listOf(
             RichTextFacet(byteStart = 0, byteEnd = 5, features = listOf(RichTextFeature(leafletStrike)))
         )
-        val result = facetsToMarkdown("Hello", facets, leafletBold, leafletItalic, leafletCode, leafletStrike, leafletLink, leafletLossy)
+        val result = FacetConverter.facetsToMarkdown("Hello", facets, leafletBold, leafletItalic, leafletCode, leafletStrike, leafletLink, leafletLossy)
         assertEquals("~~Hello~~", result)
     }
 
@@ -77,7 +77,7 @@ class FacetConverterTest {
         val facets = listOf(
             RichTextFacet(byteStart = 0, byteEnd = 5, features = listOf(RichTextFeature(leafletLink, uri = "https://example.com")))
         )
-        val result = facetsToMarkdown("Hello", facets, leafletBold, leafletItalic, leafletCode, leafletStrike, leafletLink, leafletLossy)
+        val result = FacetConverter.facetsToMarkdown("Hello", facets, leafletBold, leafletItalic, leafletCode, leafletStrike, leafletLink, leafletLossy)
         assertEquals("[Hello](https://example.com)", result)
     }
 
@@ -91,7 +91,7 @@ class FacetConverterTest {
                 RichTextFeature(leafletItalic),
             ))
         )
-        val result = facetsToMarkdown("Hello", facets, leafletBold, leafletItalic, leafletCode, leafletStrike, leafletLink, leafletLossy)
+        val result = FacetConverter.facetsToMarkdown("Hello", facets, leafletBold, leafletItalic, leafletCode, leafletStrike, leafletLink, leafletLossy)
         assertEquals("***Hello***", result)
     }
 
@@ -101,7 +101,7 @@ class FacetConverterTest {
             RichTextFacet(byteStart = 0, byteEnd = 3, features = listOf(RichTextFeature(leafletBold))),
             RichTextFacet(byteStart = 7, byteEnd = 10, features = listOf(RichTextFeature(leafletItalic))),
         )
-        val result = facetsToMarkdown("abc defghi", facets, leafletBold, leafletItalic, leafletCode, leafletStrike, leafletLink, leafletLossy)
+        val result = FacetConverter.facetsToMarkdown("abc defghi", facets, leafletBold, leafletItalic, leafletCode, leafletStrike, leafletLink, leafletLossy)
         assertEquals("**abc** def*ghi*", result)
     }
 
@@ -113,7 +113,7 @@ class FacetConverterTest {
             RichTextFacet(byteStart = 0, byteEnd = 3, features = listOf(RichTextFeature(leafletBold))),
             RichTextFacet(byteStart = 3, byteEnd = 6, features = listOf(RichTextFeature(leafletBold))),
         )
-        val result = facetsToMarkdown("abcdef", facets, leafletBold, leafletItalic, leafletCode, leafletStrike, leafletLink, leafletLossy)
+        val result = FacetConverter.facetsToMarkdown("abcdef", facets, leafletBold, leafletItalic, leafletCode, leafletStrike, leafletLink, leafletLossy)
         assertEquals("**abcdef**", result)
     }
 
@@ -127,7 +127,7 @@ class FacetConverterTest {
                 RichTextFeature(leafletBold),
             ))
         )
-        val result = facetsToMarkdown("Hello", facets, leafletBold, leafletItalic, leafletCode, leafletStrike, leafletLink, leafletLossy)
+        val result = FacetConverter.facetsToMarkdown("Hello", facets, leafletBold, leafletItalic, leafletCode, leafletStrike, leafletLink, leafletLossy)
         assertEquals("`Hello`", result)
     }
 
@@ -139,7 +139,7 @@ class FacetConverterTest {
         val facets = listOf(
             RichTextFacet(byteStart = 6, byteEnd = 10, features = listOf(RichTextFeature(leafletBold)))
         )
-        val result = facetsToMarkdown(text, facets, leafletBold, leafletItalic, leafletCode, leafletStrike, leafletLink, leafletLossy)
+        val result = FacetConverter.facetsToMarkdown(text, facets, leafletBold, leafletItalic, leafletCode, leafletStrike, leafletLink, leafletLossy)
         assertEquals("Hello **🎉** World", result)
     }
 
@@ -153,7 +153,7 @@ class FacetConverterTest {
                 RichTextFeature("pub.leaflet.richtext.facet#highlight")
             ))
         )
-        facetsToMarkdown("Hello", facets, leafletBold, leafletItalic, leafletCode, leafletStrike, leafletLink, leafletLossy, lost)
+        FacetConverter.facetsToMarkdown("Hello", facets, leafletBold, leafletItalic, leafletCode, leafletStrike, leafletLink, leafletLossy, lost)
         assertEquals(setOf("highlight"), lost)
     }
 }

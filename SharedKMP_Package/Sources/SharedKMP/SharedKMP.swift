@@ -1,6 +1,6 @@
 //
 //  SharedKMP.swift
-//  Inkwell
+//  SharedKMP
 //
 //  Swift wrappers around the Kotlin Multiplatform shared core.
 //  The InkwellShared.xcframework is built from Android/shared/ and
@@ -41,6 +41,48 @@ struct FacetSchema {
     static let offprint = InkwellSharedKt.FacetSchema.offprint
 }
 
+// MARK: - Facet Converter
+
+/// Converts rich-text facets (plaintext + byte-range features) to
+/// markdown inline syntax.
+func facetsToMarkdown(
+    _ plaintext: String,
+    facets: [RichTextFacet]?,
+    schema: FacetDefinition,
+    lost: inout Set<String>
+) -> String {
+    let sharedFacets = facets?.map { facet in
+        let features = facet.features.map { feature in
+            return RichTextFeature(type: feature.type, uri: feature.uri)
+        }
+        return RichTextFacet(byteStart: Int32(facet.byteStart), byteEnd: Int32(facet.byteEnd), features: features)
+    } ?? []
+
+    return InkwellSharedKt.FacetsToMarkdown(
+        plaintext,
+        sharedFacets: sharedFacets,
+        boldType: schema.bold,
+        italicType: schema.italic,
+        codeType: schema.code,
+        strikeType: schema.strike,
+        linkType: schema.link,
+        lossy: schema.lossy,
+        lost: &lost
+    )
+}
+
+/// Minimal facet representation for the shared converter.
+struct RichTextFacet {
+    let byteStart: Int
+    let byteEnd: Int
+    let features: [RichTextFeature]
+}
+
+struct RichTextFeature {
+    let type: String
+    let uri: String?
+}
+
 // MARK: - Theme Resolution
 
 /// Resolves a publication/document's visual theme from the richest
@@ -66,28 +108,27 @@ func resolveReaderTheme(
     basicAccent: String? = nil,
     basicAccentForeground: String? = nil,
 ) -> SharedReaderTheme {
-    let theme = SharedReaderTheme.resolve(
-        richBackgroundColor: richBackgroundColor ?? nil,
-        richPageBackgroundColor: richPageBackgroundColor ?? nil,
-        richPrimaryColor: richPrimaryColor ?? nil,
-        richAccentBackgroundColor: richAccentBackgroundColor ?? nil,
-        richAccentTextColor: richAccentTextColor ?? nil,
-        richPageWidth: richPageWidth ?? nil,
-        richShowPageBackground: richShowPageBackground ?? nil,
-        richHeadingFont: richHeadingFont ?? nil,
-        richBodyFont: richBodyFont ?? nil,
-        richSharedFont: richSharedFont ?? nil,
-        paletteBackground: paletteBackground ?? nil,
-        paletteText: paletteText ?? nil,
-        paletteLink: paletteLink ?? nil,
-        paletteAccent: paletteAccent ?? nil,
-        paletteSurfaceHover: paletteSurfaceHover ?? nil,
-        basicBackground: basicBackground ?? nil,
-        basicForeground: basicForeground ?? nil,
-        basicAccent: basicAccent ?? nil,
-        basicAccentForeground: basicAccentForeground ?? nil
+    SharedReaderTheme.resolve(
+        richBackgroundColor: richBackgroundColor.map { Int32($0) },
+        richPageBackgroundColor: richPageBackgroundColor.map { Int32($0) },
+        richPrimaryColor: richPrimaryColor.map { Int32($0) },
+        richAccentBackgroundColor: richAccentBackgroundColor.map { Int32($0) },
+        richAccentTextColor: richAccentTextColor.map { Int32($0) },
+        richPageWidth: richPageWidth.map { Int32($0) },
+        richShowPageBackground: richShowPageBackground ?? false,
+        richHeadingFont: richHeadingFont,
+        richBodyFont: richBodyFont,
+        richSharedFont: richSharedFont,
+        paletteBackground: paletteBackground,
+        paletteText: paletteText,
+        paletteLink: paletteLink,
+        paletteAccent: paletteAccent,
+        paletteSurfaceHover: paletteSurfaceHover,
+        basicBackground: basicBackground,
+        basicForeground: basicForeground,
+        basicAccent: basicAccent,
+        basicAccentForeground: basicAccentForeground
     )
-    return theme
 }
 
 // MARK: - Tip Prompt Policy
@@ -99,9 +140,9 @@ func shouldShowTip(
     nowEpochMillis: Int64
 ) -> Bool {
     TipPromptPolicyKt.shouldShowTip(
-        launchCount = Int32(launchCount),
-        lastShownEpochMillis = lastShownEpochMillis,
-        nowEpochMillis = nowEpochMillis
+        launchCount: Int32(launchCount),
+        lastShownEpochMillis: lastShownEpochMillis,
+        nowEpochMillis: nowEpochMillis
     )
 }
 
@@ -118,7 +159,7 @@ func notificationStyle(newDocCount: Int32) -> NotificationStyle {
     switch style {
     case .none: return .none
     case .single: return .single
-    case .summary(let count): return .summary(count: count)
+    case .summary(let count): return .summary(count: Int32(clamping: count))
     }
 }
 

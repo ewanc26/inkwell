@@ -102,14 +102,14 @@ decoupled from both SDKs — a follow-on after the pure-logic modules are proven
 ## Build Integration
 
 ### Android
-- `Android/settings.gradle.kts`: include `:shared` as a composite build or
-  published AAR.
+- `Android/settings.gradle.kts`: `include(":shared").projectDir = rootDir.resolve("../shared")`
 - `Android/app/build.gradle.kts`: `implementation(project(":shared"))`
 
 ### iOS
-- Build `shared` as XCFramework via `./gradlew :shared:assembleXCFramework`.
-- Add XCFramework to `iOS/Inkwell.xcodeproj` as a linked framework.
-- Swift imports `shared` and calls KMP APIs as native Swift types.
+- Swift package at `SharedKMP_Package/` wraps the XCFramework with `SharedKMP.swift`
+- XCFramework built at `shared/InkwellShared.xcframework`
+- Add `SharedKMP_Package` as a local Swift package dependency in Xcode
+- Swift imports `SharedKMP` and calls KMP APIs as native Swift types
 
 ## Execution Order
 
