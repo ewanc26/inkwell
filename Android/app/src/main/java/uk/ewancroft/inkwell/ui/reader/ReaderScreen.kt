@@ -1,6 +1,8 @@
 package uk.ewancroft.inkwell.ui.reader
 
 import androidx.compose.foundation.clickable
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -9,9 +11,8 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
+import uk.ewancroft.inkwell.ui.components.InkwellMark
 import androidx.compose.material3.*
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,29 +27,70 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import uk.ewancroft.inkwell.ScreenshotConfig
+import uk.ewancroft.inkwell.ui.reader.InkwellNotificationViewModel
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import uk.ewancroft.inkwell.ui.components.CreditsView
 import uk.ewancroft.inkwell.ui.components.InkwellMark
+import uk.ewancroft.inkwell.util.TipPromptManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReaderScreen(
     viewModel: ReaderViewModel = hiltViewModel(),
+    notificationViewModel: InkwellNotificationViewModel = hiltViewModel(),
     onNavigateToPost: (String, String?, String?, String?, String?) -> Unit = { _, _, _, _, _ -> },
     onSignOut: () -> Unit = {},
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val tabs = listOf("Following", "Yours")
 
     var showCredits by remember { mutableStateOf(false) }
+    var showTipPrompt by remember { mutableStateOf(false) }
 
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val appContext = androidx.compose.ui.platform.LocalContext.current
     val appVersion = remember {
         try {
-            val pkg = context.packageManager.getPackageInfo(context.packageName, 0)
-            "Version ${pkg.versionName} (${pkg.longVersionCode})"
+            val pkg = appContext.packageManager.getPackageInfo(appContext.packageName, 0)
+            val versionCode = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                pkg.longVersionCode
+            } else {
+                @Suppress("DEPRECATION")
+                pkg.versionCode.toLong()
+            }
+            "Version ${pkg.versionName} ($versionCode)"
         } catch (_: Exception) { "Version 1.3.0 (5)" }
+    }
+
+    var hasRequestedNotificationPermission by rememberSaveable { mutableStateOf(false) }
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        hasRequestedNotificationPermission = true
+        if (isGranted) {
+            notificationViewModel.schedulePeriodicPoll()
+        }
+    }
+
+    if (!ScreenshotConfig.enabled && !hasRequestedNotificationPermission) {
+        LaunchedEffect(Unit) {
+            hasRequestedNotificationPermission = true
+            notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        if (uk.ewancroft.inkwell.util.TipPromptManager.shouldShowTip(appContext)) {
+            showTipPrompt = true
+        }
     }
 
     Scaffold(
@@ -153,6 +195,35 @@ fun ReaderScreen(
             appVersion = appVersion,
             onSignOut = onSignOut,
             onDismiss = { showCredits = false },
+        )
+    }
+
+    if (showTipPrompt) {
+        AlertDialog(
+            onDismissRequest = {
+                showTipPrompt = false
+                uk.ewancroft.inkwell.util.TipPromptManager.markShown(appContext)
+            },
+            title = { Text("Enjoying Inkwell?") },
+            text = { Text("If you find Inkwell useful, consider buying me a coffee to support ongoing development.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showTipPrompt = false
+                    uk.ewancroft.inkwell.util.TipPromptManager.markShown(appContext)
+                    val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, Uri.parse("https://ko-fi.com/ewancroft"))
+                    appContext.startActivity(intent)
+                }) {
+                    Text("Tip me")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showTipPrompt = false
+                    uk.ewancroft.inkwell.util.TipPromptManager.markShown(appContext)
+                }) {
+                    Text("Maybe later")
+                }
+            },
         )
     }
 }
