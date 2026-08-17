@@ -14,7 +14,7 @@ Guidance for agents working on Inkwell, a native reader and writer for the Stand
 ## Current state
 
 - **iOS** (`uk.ewancroft.Inkwell`): primary SwiftUI client, marketing version `1.0` build `50`. OAuth with DPoP complete. Reader, Discover, Writer tabs functional. Leaflet blocks, Markpub/Offprint/pckt rendering. Background notification polling. Comments, subscriptions, recommends, publication/document verification, and blob handling implemented. AltStore distribution with live screenshots.
-- **Android** (`uk.ewancroft.inkwell`): experimental Kotlin/Compose client, version `1.3.0` build `5`. OAuth complete. Reader, Discover, Writer functional. Comments, interactions (likes/reposts/replies), and WorkManager notifications are unimplemented. Verification is wired to post detail only with no caching. F-Droid self-hosted repo with fastlane screenshots.
+- **Android** (`uk.ewancroft.inkwell`): Kotlin/Compose client, version `1.3.1` build `6`. OAuth complete. Reader, Discover, Writer functional. Reader publication theming (Leaflet rich theme, legacy palette, basicTheme cascade). Bluesky post embeds with live fetching and author/image/link/quote rendering. Standard.site post embeds with document fetch and cover image. Comments, subscriptions, recommends, and interactions (likes/reposts/replies) implemented. WorkManager background notification polling. Verification wired to post detail with no caching. F-Droid self-hosted repo with fastlane screenshots.
 - **Website** (`inkwell.ewancroft.uk`): SvelteKit/Vercel marketing, legal, and OAuth-metadata site. Hosts live `/client-metadata.json`, AltStore `source.json`, F-Droid repo index, and web-optimized screenshots for both platforms.
 
 ## Commits
@@ -31,7 +31,6 @@ Never mix unrelated changes in a single commit. AI-assisted contributions are we
 
 ## Things that look wrong but are not
 
-- **Android has no Worker or notification manager** despite some README claims — background polling is not implemented.
 - **Android's `ContentUnion` is intentionally incomplete** — it would silently lose unmodelled formats if round-tripped, so the partial set is deliberate.
 - **iOS `UserDefaults` stores only non-secret hints** (handle/PDS hints, notification state, seen URIs) — credentials and proof material stay in Keychain.
 - **Website links to self-hosted AltStore and F-Droid** rather than App Store / Play Store listings — those stores do not have published listings yet.
@@ -50,9 +49,9 @@ Platform-specific guidance lives in:
   - `iOS/Inkwell/Features/` owns Read/Discover/Write and background subscription polling. `iOS/InkwellTests/StandardSiteTests.swift` is a focused unit suite, not end-to-end OAuth/editor/rendering coverage.
 - **Android:** `Android/` is the Android client. Key boundaries:
   - `Android/app/src/main/java/uk/ewancroft/inkwell/data/repository/PdsRepository.kt` performs public/authenticated XRPC, records, blobs, subscriptions, recommends, and comments.
-  - `Android/app/src/main/java/uk/ewancroft/inkwell/data/model` defines partial Standard.site/Leaflet shapes. `Android/app/src/main/java/uk/ewancroft/inkwell/data/remote/ConstellationClient.kt` queries backlinks.
-  - Hilt modules construct OAuth/network services. ViewModels own `StateFlow`; Compose screens and `NavGraph` own UI/navigation.
-  - `Android/app/src/main/java/uk/ewancroft/inkwell/data/remote/StandardSiteVerifier.kt` implements publication/document verification. There is no Worker or notification manager despite README claims.
+  - `Android/app/src/main/java/uk/ewancroft/inkwell/data/model` defines partial Standard.site/Leaflet shapes. `Android/app/src/main/java/uk/ewancroft/inkwell/data/remote/ConstellationClient.kt` queries backlinks. `Android/app/src/main/java/uk/ewancroft/inkwell/data/remote/BSkyPostFetcher.kt` fetches Bluesky posts for embed rendering.
+  - Hilt modules construct OAuth/network services. ViewModels own `StateFlow`; Compose screens and `NavGraph` own UI/navigation. `InkwellNotificationManager.kt` and `InkwellNotificationWorker.kt` implement WorkManager-based background notification polling.
+  - `Android/app/src/main/java/uk/ewancroft/inkwell/data/remote/StandardSiteVerifier.kt` implements publication/document verification.
 - **Website:** `website/` is the SvelteKit/Vercel marketing, legal, and OAuth-metadata site shared by both apps.
   - `website/src/routes/+page.svelte` is the landing page; `/privacy` and `/terms` are substantive legal promises; `/client-metadata.json` is a live OAuth client identity consumed by PDS servers.
   - `website/src/lib/config.ts` owns install-source URLs, site metadata, and nav links.
