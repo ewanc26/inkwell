@@ -2,6 +2,7 @@ package uk.ewancroft.inkwell.ui.writer
 
 import kotlinx.serialization.json.*
 import uk.ewancroft.inkwell.data.model.content.*
+import uk.ewancroft.inkwell.shared.facets.FacetSchema
 
 object MarkdownConverter {
 
@@ -561,9 +562,9 @@ object MarkdownConverter {
         val strikeRegex = Regex("~~(.+?)~~")
 
         val facetPrefix = when (format) {
-            "pckt" -> "blog.pckt.richtext.facet"
-            "Offprint" -> "app.offprint.richtext.facet"
-            else -> "pub.leaflet.richtext.facet"
+            "pckt" -> FacetSchema.pckt.facet
+            "Offprint" -> FacetSchema.offprint.facet
+            else -> FacetSchema.leaflet.facet
         }
 
         data class Span(

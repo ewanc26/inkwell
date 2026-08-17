@@ -24,7 +24,7 @@ import kotlinx.serialization.json.put
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import uk.ewancroft.inkwell.data.model.bluesky.BlueskyProfile
-import uk.ewancroft.inkwell.data.model.common.AtUri
+import uk.ewancroft.inkwell.shared.AtUri
 import uk.ewancroft.inkwell.data.model.content.LeafletPollDefinition
 import uk.ewancroft.inkwell.data.model.content.LeafletPollVote
 import java.net.URLEncoder
@@ -408,7 +408,7 @@ class PdsRepository @Inject constructor(
             val value = record.jsonObject["value"]?.jsonObject ?: return@mapNotNull null
             val vote = runCatching { json.decodeFromJsonElement(LeafletPollVote.serializer(), value) }.getOrNull()
                 ?: return@mapNotNull null
-            val rkey = uk.ewancroft.inkwell.data.model.common.AtUri.parse(uri)?.recordKey ?: return@mapNotNull null
+            val rkey = AtUri.parse(uri)?.recordKey ?: return@mapNotNull null
             if (rkey != pollRkey) return@mapNotNull null
             vote
         }

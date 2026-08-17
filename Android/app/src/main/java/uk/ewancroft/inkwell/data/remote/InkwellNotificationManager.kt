@@ -23,7 +23,9 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import uk.ewancroft.inkwell.MainActivity
-import uk.ewancroft.inkwell.data.model.common.AtUri
+import uk.ewancroft.inkwell.shared.AtUri
+import uk.ewancroft.inkwell.shared.policy.NotificationPolicy
+import uk.ewancroft.inkwell.shared.policy.NotificationStyle
 import uk.ewancroft.inkwell.data.repository.PdsRepository
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -108,24 +110,31 @@ class InkwellNotificationManager @Inject constructor(
             }
         }
 
-        val isFirstPoll = !prefs.contains(LAST_POLL_KEY)
+        val isFirstPoll = NotificationPolicy.isFirstPoll(
+            lastPollEpochMillis = prefs.getLong(LAST_POLL_KEY, -1L)
+        )
+
         if (!isFirstPoll && newDocs.isNotEmpty()) {
             newDocs.sortByDescending { it.publishedAt }
 
-            if (newDocs.size == 1) {
-                val doc = newDocs[0]
-                sendNotification(
-                    title = doc.publicationName ?: "New Document",
-                    body = doc.title,
-                    documentURI = doc.uri
-                )
-            } else {
-                val newest = newDocs[0]
-                sendNotification(
-                    title = "${newDocs.size} New Documents",
-                    body = "Latest: ${newest.title} from ${newest.publicationName ?: "a publication"}",
-                    documentURI = newest.uri
-                )
+            when (val style = NotificationPolicy.notificationStyle(newDocs.size)) {
+                is NotificationStyle.Single -> {
+                    val doc = newDocs[0]
+                    sendNotification(
+                        title = doc.publicationName ?: "New Document",
+                        body = doc.title,
+                        documentURI = doc.uri
+                    )
+                }
+                is NotificationStyle.Summary -> {
+                    val newest = newDocs[0]
+                    sendNotification(
+                        title = "${style.count} New Documents",
+                        body = "Latest: ${newest.title} from ${newest.publicationName ?: "a publication"}",
+                        documentURI = newest.uri
+                    )
+                }
+                NotificationStyle.None -> {}
             }
 
             val notificationEntries = newDocs.map {
@@ -194,7 +203,7 @@ class InkwellNotificationManager @Inject constructor(
     }
 
     private fun saveLastSeenURIs(uris: Set<String>) {
-        val limited: List<String> = uris.toList().takeLast(500)
+        val limited = NotificationPolicy.trimSeenUris(uris.toList())
         val jsonStr = json.encodeToString(limited)
         prefs.edit().putString(LAST_SEEN_KEY, jsonStr).apply()
     }
@@ -209,7 +218,7 @@ class InkwellNotificationManager @Inject constructor(
     private fun saveNotifications(notifications: List<InkwellNotification>) {
         val existing = loadNotifications().toMutableList()
         existing.addAll(0, notifications)
-        val limited = existing.take(50)
+        val limited = NotificationPolicy.trimNotifications(existing)
         val jsonStr = json.encodeToString(limited)
         prefs.edit().putString(NOTIFICATIONS_KEY, jsonStr).apply()
         prefs.edit().putInt(UNREAD_COUNT_KEY, limited.size).apply()

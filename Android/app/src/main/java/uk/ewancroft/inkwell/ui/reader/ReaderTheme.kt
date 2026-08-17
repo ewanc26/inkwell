@@ -1,20 +1,18 @@
 package uk.ewancroft.inkwell.ui.reader
 
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import uk.ewancroft.inkwell.data.model.atproto.BasicTheme
 import uk.ewancroft.inkwell.data.model.atproto.ColorValue
 import uk.ewancroft.inkwell.data.model.atproto.PublicationTheme
 import uk.ewancroft.inkwell.data.model.atproto.RgbColor
-import kotlin.math.min
-import kotlin.math.max
+import uk.ewancroft.inkwell.shared.theme.SharedReaderTheme
 
 /**
  * Resolved publication theme — cascading from Leaflet's rich theme through
- * the basicTheme fallback to system defaults. Mirrors iOS ReaderTheme.swift.
+ * the basicTheme fallback to system defaults. The cascade logic lives in
+ * the shared KMP core; this adapter converts Android theme models to/from
+ * the shared representation.
  */
-@Immutable
 data class ReaderTheme(
     val background: Color,
     val pageBackground: Color,
@@ -32,13 +30,6 @@ data class ReaderTheme(
 
     companion object {
 
-        /**
-         * Resolves a publication/document's visual identity from the richest
-         * available source down to system defaults.
-         *
-         * Resolution chain: Leaflet rich theme -> legacy palette -> basicTheme -> system.
-         */
-        @Stable
         fun resolve(
             documentTheme: PublicationTheme? = null,
             publicationTheme: PublicationTheme? = null,
@@ -48,79 +39,64 @@ data class ReaderTheme(
             val rich = documentTheme ?: publicationTheme
             val palette = if (isDarkTheme) rich?.dark else rich?.light
 
-            return ReaderTheme(
-                background = rich?.backgroundColor?.toColor()
-                    ?: palette?.background?.hexToColor()
-                    ?: basicTheme?.background?.toColor()
-                    ?: Color.Unspecified,
-                pageBackground = rich?.pageBackground?.toColor()
-                    ?: palette?.surfaceHover?.hexToColor()
-                    ?: rich?.backgroundColor?.toColor()
-                    ?: palette?.background?.hexToColor()
-                    ?: basicTheme?.background?.toColor()
-                    ?: Color.Unspecified,
-                foreground = rich?.primary?.toColor()
-                    ?: palette?.text?.hexToColor()
-                    ?: basicTheme?.foreground?.toColor()
-                    ?: Color.Unspecified,
-                accent = rich?.accentBackground?.toColor()
-                    ?: palette?.link?.hexToColor()
-                    ?: palette?.accent?.hexToColor()
-                    ?: basicTheme?.accent?.toColor()
-                    ?: Color.Unspecified,
-                accentForeground = rich?.accentText?.toColor()
-                    ?: basicTheme?.accentForeground?.toColor()
-                    ?: Color.Unspecified,
-                pageWidthDp = min(max(rich?.pageWidth ?: 680, 320), 1000),
-                showPageBackground = rich?.showPageBackground ?: false,
-                headingFontFamily = resolveFontFamily(rich?.headingFont ?: rich?.font),
-                bodyFontFamily = resolveFontFamily(rich?.bodyFont ?: rich?.font),
+            val shared = SharedReaderTheme.resolve(
+                richBackgroundColor = rich?.backgroundColor?.toRgbInt(),
+                richPageBackgroundColor = rich?.pageBackground?.toRgbInt(),
+                richPrimaryColor = rich?.primary?.toRgbInt(),
+                richAccentBackgroundColor = rich?.accentBackground?.toRgbInt(),
+                richAccentTextColor = rich?.accentText?.toRgbInt(),
+                richPageWidth = rich?.pageWidth,
+                richShowPageBackground = rich?.showPageBackground,
+                richHeadingFont = rich?.headingFont,
+                richBodyFont = rich?.bodyFont,
+                richSharedFont = rich?.font,
+                paletteBackground = palette?.background,
+                paletteText = palette?.text,
+                paletteLink = palette?.link,
+                paletteAccent = palette?.accent,
+                paletteSurfaceHover = palette?.surfaceHover,
+                basicBackground = basicTheme?.background?.toHexString(),
+                basicForeground = basicTheme?.foreground?.toHexString(),
+                basicAccent = basicTheme?.accent?.toHexString(),
+                basicAccentForeground = basicTheme?.accentForeground?.toHexString(),
             )
-        }
 
-        /**
-         * Maps a Leaflet font identifier to a [FontFamily]. Returns [FontFamily.Sans]
-         * when no font was specified — theming should be opt-in, driven entirely by
-         * what the publication actually set.
-         */
-        private fun resolveFontFamily(identifier: String?): FontFamily {
-            val value = identifier?.lowercase() ?: return FontFamily.Sans
-            return when {
-                value.contains("mono") || value.contains("quattro") || value.contains("code") -> FontFamily.Monospaced
-                value.contains("lora") || value.contains("newsreader") || value.contains("serif") || value.contains("georgia") -> FontFamily.Serif
-                value.contains("atkinson") || value.contains("rounded") -> FontFamily.Rounded
-                else -> FontFamily.Sans
-            }
+            return ReaderTheme(
+                background = shared.backgroundRgb.toColor(),
+                pageBackground = shared.pageBackgroundRgb.toColor(),
+                foreground = shared.foregroundRgb.toColor(),
+                accent = shared.accentRgb.toColor(),
+                accentForeground = shared.accentForegroundRgb.toColor(),
+                pageWidthDp = shared.pageWidthDp,
+                showPageBackground = shared.showPageBackground,
+                headingFontFamily = shared.headingFontFamily.toLocal(),
+                bodyFontFamily = shared.bodyFontFamily.toLocal(),
+            )
         }
     }
 }
 
 // ── Colour Conversion Helpers ─────────────────────────────────────────────
 
-/** Converts a Leaflet [ColorValue] (0-255 RGB, 0-100 alpha) to Compose [Color]. */
-fun ColorValue.toColor(): Color {
-    val alpha = (a ?: 100) / 100f
-    return Color(red = r / 255f, green = g / 255f, blue = b / 255f, alpha = alpha)
+private fun ColorValue.toRgbInt(): Int {
+    val r = (r * 255).coerceIn(0, 255)
+    val g = (g * 255).coerceIn(0, 255)
+    val b = (b * 255).coerceIn(0, 255)
+    return (r shl 16) or (g shl 8) or b
 }
 
-/** Converts a basic theme [RgbColor] (0-255 RGB) to Compose [Color]. */
-fun RgbColor.toColor(): Color {
-    return Color(red = r / 255f, green = g / 255f, blue = b / 255f)
+private fun RgbColor.toHexString(): String {
+    val r = r.coerceIn(0, 255)
+    val g = g.coerceIn(0, 255)
+    val b = b.coerceIn(0, 255)
+    return String.format("#%02X%02X%02X", r, g, b)
 }
 
-/** Parses a hex colour string (#RRGGBB or RRGGBB) to Compose [Color]. Returns null for invalid input. */
-fun String?.hexToColor(): Color? {
-    if (this.isNullOrBlank()) return null
-    val value = this.trim().removePrefix("#")
-    if (value.length != 6) return null
-    return try {
-        val rgb = value.toLong(16)
-        Color(
-            red = ((rgb shr 16) and 0xFF) / 255f,
-            green = ((rgb shr 8) and 0xFF) / 255f,
-            blue = (rgb and 0xFF) / 255f,
-        )
-    } catch (_: Exception) {
-        null
-    }
+private fun Int.toColor(): Color = Color(this)
+
+private fun SharedReaderTheme.FontFamily.toLocal(): ReaderTheme.FontFamily = when (this) {
+    SharedReaderTheme.FontFamily.Sans -> ReaderTheme.FontFamily.Sans
+    SharedReaderTheme.FontFamily.Serif -> ReaderTheme.FontFamily.Serif
+    SharedReaderTheme.FontFamily.Rounded -> ReaderTheme.FontFamily.Rounded
+    SharedReaderTheme.FontFamily.Monospaced -> ReaderTheme.FontFamily.Monospaced
 }
