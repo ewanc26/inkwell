@@ -427,6 +427,11 @@ class PostDetailViewModel @Inject constructor(
                 if (!markdown.isNullOrBlank()) return DocumentContent.Markdown(markdown)
             }
 
+            if (PcktOffprintConverter.isSupported(formatType)) {
+                val markdown = PcktOffprintConverter.toMarkdown(contentObj, formatType!!)
+                if (!markdown.isNullOrBlank()) return DocumentContent.Markdown(markdown)
+            }
+
             val extracted = StringBuilder()
             collectPlaintext(contentObj, extracted)
             if (extracted.isNotBlank()) return DocumentContent.PlainText(extracted.toString())

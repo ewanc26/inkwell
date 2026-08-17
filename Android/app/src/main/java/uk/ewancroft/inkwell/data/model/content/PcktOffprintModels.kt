@@ -63,9 +63,17 @@ data class OffprintBlock(
     val facets: List<LeafletFacet>? = null,
     val language: String? = null,
     val content: List<OffprintBlock>? = null,
-    val children: List<OffprintBlock>? = null,
+    val children: List<OffprintListItem>? = null,
     val start: Int? = null,
     val image: BlobRef? = null,
     val alt: String? = null,
     val checked: Boolean? = null,
+)
+
+@Serializable
+data class OffprintListItem(
+    @SerialName("\$type") val type: String,
+    val content: OffprintBlock? = null,
+    val checked: Boolean? = null,
+    val children: List<OffprintListItem>? = null,
 )
