@@ -37,6 +37,7 @@ import javax.inject.Inject
 
 sealed class DocumentContent {
     data class Leaflet(val pages: List<LeafletPage>, val authorDid: String) : DocumentContent()
+    data class Markdown(val text: String) : DocumentContent()
     data class PlainText(val text: String) : DocumentContent()
     data object Empty : DocumentContent()
     data class Unsupported(val formatType: String?) : DocumentContent()
@@ -423,7 +424,7 @@ class PostDetailViewModel @Inject constructor(
 
             if (formatType == "at.markpub.markdown") {
                 val markdown = contentObj["text"]?.jsonObject?.get("markdown")?.jsonPrimitive?.contentOrNull
-                if (!markdown.isNullOrBlank()) return DocumentContent.PlainText(markdown)
+                if (!markdown.isNullOrBlank()) return DocumentContent.Markdown(markdown)
             }
 
             val extracted = StringBuilder()
