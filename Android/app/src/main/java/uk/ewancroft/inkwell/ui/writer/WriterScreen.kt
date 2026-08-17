@@ -1,17 +1,27 @@
 package uk.ewancroft.inkwell.ui.writer
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import uk.ewancroft.inkwell.ui.components.CreditsView
 import androidx.hilt.navigation.compose.hiltViewModel
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import okhttp3.OkHttpClient
+import okhttp3.Request
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,6 +34,7 @@ fun WriterScreen(
     var pubExpanded by remember { mutableStateOf(false) }
     var formatExpanded by remember { mutableStateOf(false) }
     var showCredits by remember { mutableStateOf(false) }
+    var showDocumentPicker by remember { mutableStateOf(false) }
 
     val formats = listOf("Leaflet", "Markpub", "pckt", "Offprint")
 
@@ -149,6 +160,61 @@ fun WriterScreen(
                 )
             }
 
+            if (uiState.editingDocumentUri != null) {
+                Surface(
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                    shape = MaterialTheme.shapes.small,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Icon(
+                            Icons.Outlined.Edit,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                        Text(
+                            "Editing existing document",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.weight(1f),
+                        )
+                        TextButton(onClick = { viewModel.cancelEditing() }) {
+                            Text("Cancel", style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                }
+            }
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                OutlinedButton(
+                    onClick = { showDocumentPicker = true },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Icon(Icons.Outlined.List, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text(if (uiState.editingDocumentUri != null) "Change document" else "Edit existing document")
+                }
+            }
+
+            if (showDocumentPicker) {
+                DocumentPickerDialog(
+                    publications = uiState.publications,
+                    selectedPublication = uiState.selectedPublication,
+                    onSelectDocument = { uri ->
+                        viewModel.loadDocumentForEditing(uri)
+                        showDocumentPicker = false
+                    },
+                    onDismiss = { showDocumentPicker = false },
+                )
+            }
+
             // Format picker
             Box {
                 OutlinedButton(
@@ -244,7 +310,7 @@ fun WriterScreen(
                 }
                 Icon(Icons.AutoMirrored.Outlined.Send, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
-                Text("Publish")
+                Text(if (uiState.editingDocumentUri != null) "Update" else "Publish")
             }
         }
 
@@ -306,3 +372,80 @@ fun WriterScreen(
             }
         }
     }
+
+@Composable
+private fun DocumentPickerDialog(
+    publications: List<PublicationItem>,
+    selectedPublication: PublicationItem?,
+    onSelectDocument: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    data class DocumentItem(val uri: String, val title: String)
+
+    var selectedPub by remember { mutableStateOf<PublicationItem?>(selectedPublication) }
+    var documents by remember { mutableStateOf<List<DocumentItem>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(selectedPub) {
+        val pub = selectedPub ?: return@LaunchedEffect
+        isLoading = true
+        error = null
+        try {
+            val client = okhttp3.OkHttpClient()
+            val url = "https://public.api.bsky.app/xrpc/com.atproto.repo.listRecords?repo=${pub.did}&collection=site.standard.document&limit=25"
+            val request = okhttp3.Request.Builder().url(url).get().build()
+            val body = client.newCall(request).execute().body?.string() ?: return@LaunchedEffect
+            val response = kotlinx.serialization.json.Json.parseToJsonElement(body).jsonObject
+            val records = response["records"]?.jsonArray.orEmpty()
+            documents = records.mapNotNull { record ->
+                val uri = record.jsonObject["uri"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null
+                val value = record.jsonObject["value"]?.jsonObject ?: return@mapNotNull null
+                val title = value["title"]?.jsonPrimitive?.contentOrNull ?: "Untitled"
+                DocumentItem(uri, title)
+            }
+        } catch (e: Exception) {
+            error = e.message
+        } finally {
+            isLoading = false
+        }
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Select a document to edit") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (error != null) {
+                    Text(error!!, color = MaterialTheme.colorScheme.error)
+                }
+                if (isLoading) {
+                    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(Modifier.size(24.dp))
+                    }
+                } else if (documents.isEmpty()) {
+                    Text("No documents found.", style = MaterialTheme.typography.bodyMedium)
+                } else {
+                    androidx.compose.foundation.lazy.LazyColumn(
+                        modifier = Modifier.heightIn(max = 300.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        items(documents) { doc ->
+                            TextButton(
+                                onClick = { onSelectDocument(doc.uri) },
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                Text(doc.title)
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        },
+    )
+}
