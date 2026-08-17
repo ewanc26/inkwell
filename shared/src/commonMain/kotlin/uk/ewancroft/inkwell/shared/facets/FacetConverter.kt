@@ -1,8 +1,5 @@
 package uk.ewancroft.inkwell.shared.facets
 
-import kotlin.experimental.ExperimentalObjCName
-import kotlin.native.ObjCName
-
 data class RichTextFacet(
     val byteStart: Int,
     val byteEnd: Int,
@@ -14,8 +11,6 @@ data class RichTextFeature(
     val uri: String? = null,
 )
 
-@OptIn(ExperimentalObjCName::class)
-@ObjCName("FacetConverter", exact = true)
 object FacetConverter {
 
     fun facetsToMarkdown(
