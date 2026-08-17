@@ -6,7 +6,7 @@
 #import <Foundation/NSString.h>
 #import <Foundation/NSValue.h>
 
-@class FacetConverter, InkwellSharedAtUri, InkwellSharedAtUriCompanion, InkwellSharedConstellationBacklink, InkwellSharedConstellationPagination, InkwellSharedConstellationResponse, InkwellSharedDocumentLinkScanner, InkwellSharedFacetDefinition, InkwellSharedFacetSchema, InkwellSharedKotlinArray<T>, InkwellSharedKotlinEnum<E>, InkwellSharedKotlinEnumCompanion, InkwellSharedKotlinException, InkwellSharedKotlinIllegalStateException, InkwellSharedKotlinNothing, InkwellSharedKotlinPair<__covariant A, __covariant B>, InkwellSharedKotlinRuntimeException, InkwellSharedKotlinThrowable, InkwellSharedKotlinx_serialization_coreSerialKind, InkwellSharedKotlinx_serialization_coreSerializersModule, InkwellSharedMarkdownBlock, InkwellSharedMarkdownBlockBlockquote, InkwellSharedMarkdownBlockCode, InkwellSharedMarkdownBlockHeading, InkwellSharedMarkdownBlockHorizontalRule, InkwellSharedMarkdownBlockImage, InkwellSharedMarkdownBlockMath, InkwellSharedMarkdownBlockOrderedList, InkwellSharedMarkdownBlockParagraph, InkwellSharedMarkdownBlockTaskList, InkwellSharedMarkdownBlockUnorderedList, InkwellSharedMarkdownListItem, InkwellSharedMarkdownParser, InkwellSharedMarkdownSerializer, InkwellSharedNotificationPolicy, InkwellSharedNotificationStyleNone, InkwellSharedNotificationStyleSingle, InkwellSharedNotificationStyleSummary, InkwellSharedSharedReaderTheme, InkwellSharedSharedReaderThemeCompanion, InkwellSharedSharedReaderThemeFontFamily, InkwellSharedTipPromptPolicy, InkwellSharedUrlUtils, InkwellSharedVerificationFailure, InkwellSharedVerificationFailureDocumentLinkMissing, InkwellSharedVerificationFailureEndpointUnreachable, InkwellSharedVerificationFailureInvalidDocumentURL, InkwellSharedVerificationFailureInvalidPublicationURL, InkwellSharedVerificationFailureMalformedResponse, InkwellSharedVerificationFailureMismatchedURI, InkwellSharedVerificationFailureUnexpected, InkwellSharedVerificationResult, InkwellSharedVerificationResultFailed, InkwellSharedVerificationResultVerified, InkwellSharedVerificationUrls, RichTextFacet, RichTextFeature;
+@class FacetConverter, InkwellSharedAtUri, InkwellSharedAtUriCompanion, InkwellSharedBasicTheme, InkwellSharedBlobRef, InkwellSharedByteSlice, InkwellSharedColorValue, InkwellSharedConstellationBacklink, InkwellSharedConstellationPagination, InkwellSharedConstellationResponse, InkwellSharedDocumentLinkScanner, InkwellSharedDocumentPreferences, InkwellSharedFacetDefinition, InkwellSharedFacetSchema, InkwellSharedKotlinArray<T>, InkwellSharedKotlinEnum<E>, InkwellSharedKotlinEnumCompanion, InkwellSharedKotlinException, InkwellSharedKotlinIllegalStateException, InkwellSharedKotlinNothing, InkwellSharedKotlinPair<__covariant A, __covariant B>, InkwellSharedKotlinRuntimeException, InkwellSharedKotlinThrowable, InkwellSharedKotlinx_serialization_coreSerialKind, InkwellSharedKotlinx_serialization_coreSerializersModule, InkwellSharedLeafletFacet, InkwellSharedLeafletFacetFeature, InkwellSharedLegacyPalette, InkwellSharedMarkdownBlock, InkwellSharedMarkdownBlockBlockquote, InkwellSharedMarkdownBlockCode, InkwellSharedMarkdownBlockHeading, InkwellSharedMarkdownBlockHorizontalRule, InkwellSharedMarkdownBlockImage, InkwellSharedMarkdownBlockMath, InkwellSharedMarkdownBlockOrderedList, InkwellSharedMarkdownBlockParagraph, InkwellSharedMarkdownBlockTaskList, InkwellSharedMarkdownBlockUnorderedList, InkwellSharedMarkdownListItem, InkwellSharedMarkdownParser, InkwellSharedMarkdownSerializer, InkwellSharedNotificationPolicy, InkwellSharedNotificationStyleNone, InkwellSharedNotificationStyleSingle, InkwellSharedNotificationStyleSummary, InkwellSharedPublicationPreferences, InkwellSharedPublicationTheme, InkwellSharedRgbColor, InkwellSharedRgbaColor, InkwellSharedSharedDocumentRecord, InkwellSharedSharedGraphRecommend, InkwellSharedSharedGraphSubscription, InkwellSharedSharedLeafletComment, InkwellSharedSharedLeafletCommentReplyRef, InkwellSharedSharedPublicationRecord, InkwellSharedSharedReaderTheme, InkwellSharedSharedReaderThemeCompanion, InkwellSharedSharedReaderThemeFontFamily, InkwellSharedStrongRef, InkwellSharedTipPromptPolicy, InkwellSharedUrlUtils, InkwellSharedVerificationFailure, InkwellSharedVerificationFailureDocumentLinkMissing, InkwellSharedVerificationFailureEndpointUnreachable, InkwellSharedVerificationFailureInvalidDocumentURL, InkwellSharedVerificationFailureInvalidPublicationURL, InkwellSharedVerificationFailureMalformedResponse, InkwellSharedVerificationFailureMismatchedURI, InkwellSharedVerificationFailureUnexpected, InkwellSharedVerificationResult, InkwellSharedVerificationResultFailed, InkwellSharedVerificationResultVerified, InkwellSharedVerificationUrls, RichTextFacet, RichTextFeature;
 
 @protocol InkwellSharedKotlinAnnotation, InkwellSharedKotlinComparable, InkwellSharedKotlinFunction, InkwellSharedKotlinIterator, InkwellSharedKotlinKAnnotatedElement, InkwellSharedKotlinKClass, InkwellSharedKotlinKClassifier, InkwellSharedKotlinKDeclarationContainer, InkwellSharedKotlinSuspendFunction2, InkwellSharedKotlinx_serialization_coreCompositeDecoder, InkwellSharedKotlinx_serialization_coreCompositeEncoder, InkwellSharedKotlinx_serialization_coreDecoder, InkwellSharedKotlinx_serialization_coreDeserializationStrategy, InkwellSharedKotlinx_serialization_coreEncoder, InkwellSharedKotlinx_serialization_coreKSerializer, InkwellSharedKotlinx_serialization_coreSerialDescriptor, InkwellSharedKotlinx_serialization_coreSerializationStrategy, InkwellSharedKotlinx_serialization_coreSerializersModuleCollector, InkwellSharedNotificationStyle;
 
@@ -544,6 +544,752 @@ __attribute__((swift_name("MarkdownSerializer")))
 + (instancetype)markdownSerializer __attribute__((swift_name("init()")));
 @property (class, readonly, getter=shared) InkwellSharedMarkdownSerializer *shared __attribute__((swift_name("shared")));
 - (NSString *)serializeBlocks:(NSArray<InkwellSharedMarkdownBlock *> *)blocks __attribute__((swift_name("serialize(blocks:)")));
+@end
+
+
+/**
+ * Neutral shared model for a publication-level basic theme.
+ *
+ * Four-colour palette: background, foreground, accent, accentForeground.
+ * Maps to Android `BasicTheme` and iOS `BasicDefinition`.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("BasicTheme")))
+@interface InkwellSharedBasicTheme : InkwellSharedBase
+- (instancetype)initWithType:(NSString *)type background:(InkwellSharedRgbColor *)background foreground:(InkwellSharedRgbColor *)foreground accent:(InkwellSharedRgbColor *)accent accentForeground:(InkwellSharedRgbColor *)accentForeground __attribute__((swift_name("init(type:background:foreground:accent:accentForeground:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedBasicTheme *)doCopyType:(NSString *)type background:(InkwellSharedRgbColor *)background foreground:(InkwellSharedRgbColor *)foreground accent:(InkwellSharedRgbColor *)accent accentForeground:(InkwellSharedRgbColor *)accentForeground __attribute__((swift_name("doCopy(type:background:foreground:accent:accentForeground:)")));
+
+/**
+ * Neutral shared model for a publication-level basic theme.
+ *
+ * Four-colour palette: background, foreground, accent, accentForeground.
+ * Maps to Android `BasicTheme` and iOS `BasicDefinition`.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Neutral shared model for a publication-level basic theme.
+ *
+ * Four-colour palette: background, foreground, accent, accentForeground.
+ * Maps to Android `BasicTheme` and iOS `BasicDefinition`.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Neutral shared model for a publication-level basic theme.
+ *
+ * Four-colour palette: background, foreground, accent, accentForeground.
+ * Maps to Android `BasicTheme` and iOS `BasicDefinition`.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) InkwellSharedRgbColor *accent __attribute__((swift_name("accent")));
+@property (readonly) InkwellSharedRgbColor *accentForeground __attribute__((swift_name("accentForeground")));
+@property (readonly) InkwellSharedRgbColor *background __attribute__((swift_name("background")));
+@property (readonly) InkwellSharedRgbColor *foreground __attribute__((swift_name("foreground")));
+@property (readonly) NSString *type __attribute__((swift_name("type")));
+@end
+
+
+/**
+ * Neutral shared model for an AT Protocol blob reference.
+ *
+ * Mirrors Android `BlobRef` and iOS `ComAtprotoLexicon.Repository.UploadBlobOutput`.
+ * The `link` field corresponds to the `$link` key in AT Protocol JSON.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("BlobRef")))
+@interface InkwellSharedBlobRef : InkwellSharedBase
+- (instancetype)initWithLink:(NSString *)link size:(int32_t)size type:(NSString *)type mimeType:(NSString * _Nullable)mimeType __attribute__((swift_name("init(link:size:type:mimeType:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedBlobRef *)doCopyLink:(NSString *)link size:(int32_t)size type:(NSString *)type mimeType:(NSString * _Nullable)mimeType __attribute__((swift_name("doCopy(link:size:type:mimeType:)")));
+
+/**
+ * Neutral shared model for an AT Protocol blob reference.
+ *
+ * Mirrors Android `BlobRef` and iOS `ComAtprotoLexicon.Repository.UploadBlobOutput`.
+ * The `link` field corresponds to the `$link` key in AT Protocol JSON.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Neutral shared model for an AT Protocol blob reference.
+ *
+ * Mirrors Android `BlobRef` and iOS `ComAtprotoLexicon.Repository.UploadBlobOutput`.
+ * The `link` field corresponds to the `$link` key in AT Protocol JSON.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Neutral shared model for an AT Protocol blob reference.
+ *
+ * Mirrors Android `BlobRef` and iOS `ComAtprotoLexicon.Repository.UploadBlobOutput`.
+ * The `link` field corresponds to the `$link` key in AT Protocol JSON.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString *link __attribute__((swift_name("link")));
+@property (readonly) NSString * _Nullable mimeType __attribute__((swift_name("mimeType")));
+@property (readonly) int32_t size __attribute__((swift_name("size")));
+@property (readonly) NSString *type __attribute__((swift_name("type")));
+@end
+
+
+/**
+ * Neutral shared model for a Leaflet byte slice (UTF-8 offset range).
+ *
+ * Mirrors Android `ByteSlice` and iOS `LeafletByteSlice`.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("ByteSlice")))
+@interface InkwellSharedByteSlice : InkwellSharedBase
+- (instancetype)initWithByteStart:(int32_t)byteStart byteEnd:(int32_t)byteEnd __attribute__((swift_name("init(byteStart:byteEnd:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedByteSlice *)doCopyByteStart:(int32_t)byteStart byteEnd:(int32_t)byteEnd __attribute__((swift_name("doCopy(byteStart:byteEnd:)")));
+
+/**
+ * Neutral shared model for a Leaflet byte slice (UTF-8 offset range).
+ *
+ * Mirrors Android `ByteSlice` and iOS `LeafletByteSlice`.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Neutral shared model for a Leaflet byte slice (UTF-8 offset range).
+ *
+ * Mirrors Android `ByteSlice` and iOS `LeafletByteSlice`.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Neutral shared model for a Leaflet byte slice (UTF-8 offset range).
+ *
+ * Mirrors Android `ByteSlice` and iOS `LeafletByteSlice`.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) int32_t byteEnd __attribute__((swift_name("byteEnd")));
+@property (readonly) int32_t byteStart __attribute__((swift_name("byteStart")));
+@end
+
+
+/**
+ * Neutral shared model for a Leaflet rich theme colour value.
+ *
+ * Supports both RGB and RGBA via the optional alpha channel.
+ * Alpha is a percentage 0-100, defaulting to 100 (opaque).
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("ColorValue")))
+@interface InkwellSharedColorValue : InkwellSharedBase
+- (instancetype)initWithType:(NSString *)type r:(int32_t)r g:(int32_t)g b:(int32_t)b a:(InkwellSharedInt * _Nullable)a __attribute__((swift_name("init(type:r:g:b:a:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedColorValue *)doCopyType:(NSString *)type r:(int32_t)r g:(int32_t)g b:(int32_t)b a:(InkwellSharedInt * _Nullable)a __attribute__((swift_name("doCopy(type:r:g:b:a:)")));
+
+/**
+ * Neutral shared model for a Leaflet rich theme colour value.
+ *
+ * Supports both RGB and RGBA via the optional alpha channel.
+ * Alpha is a percentage 0-100, defaulting to 100 (opaque).
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Neutral shared model for a Leaflet rich theme colour value.
+ *
+ * Supports both RGB and RGBA via the optional alpha channel.
+ * Alpha is a percentage 0-100, defaulting to 100 (opaque).
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Neutral shared model for a Leaflet rich theme colour value.
+ *
+ * Supports both RGB and RGBA via the optional alpha channel.
+ * Alpha is a percentage 0-100, defaulting to 100 (opaque).
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) InkwellSharedInt * _Nullable a __attribute__((swift_name("a")));
+@property (readonly) int32_t b __attribute__((swift_name("b")));
+@property (readonly) int32_t g __attribute__((swift_name("g")));
+@property (readonly) int32_t r __attribute__((swift_name("r")));
+@property (readonly) NSString *type __attribute__((swift_name("type")));
+@end
+
+
+/**
+ * Neutral shared model for per-document display preferences.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("DocumentPreferences")))
+@interface InkwellSharedDocumentPreferences : InkwellSharedBase
+- (instancetype)initWithShowComments:(InkwellSharedBoolean * _Nullable)showComments showMentions:(InkwellSharedBoolean * _Nullable)showMentions showRecommends:(InkwellSharedBoolean * _Nullable)showRecommends showPrevNext:(InkwellSharedBoolean * _Nullable)showPrevNext showInDiscover:(InkwellSharedBoolean * _Nullable)showInDiscover __attribute__((swift_name("init(showComments:showMentions:showRecommends:showPrevNext:showInDiscover:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedDocumentPreferences *)doCopyShowComments:(InkwellSharedBoolean * _Nullable)showComments showMentions:(InkwellSharedBoolean * _Nullable)showMentions showRecommends:(InkwellSharedBoolean * _Nullable)showRecommends showPrevNext:(InkwellSharedBoolean * _Nullable)showPrevNext showInDiscover:(InkwellSharedBoolean * _Nullable)showInDiscover __attribute__((swift_name("doCopy(showComments:showMentions:showRecommends:showPrevNext:showInDiscover:)")));
+
+/**
+ * Neutral shared model for per-document display preferences.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Neutral shared model for per-document display preferences.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Neutral shared model for per-document display preferences.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) InkwellSharedBoolean * _Nullable showComments __attribute__((swift_name("showComments")));
+@property (readonly) InkwellSharedBoolean * _Nullable showInDiscover __attribute__((swift_name("showInDiscover")));
+@property (readonly) InkwellSharedBoolean * _Nullable showMentions __attribute__((swift_name("showMentions")));
+@property (readonly) InkwellSharedBoolean * _Nullable showPrevNext __attribute__((swift_name("showPrevNext")));
+@property (readonly) InkwellSharedBoolean * _Nullable showRecommends __attribute__((swift_name("showRecommends")));
+@end
+
+
+/**
+ * Neutral shared model for a Leaflet inline facet (byte-range formatting).
+ *
+ * Mirrors Android `LeafletFacet` and iOS `LeafletFacet`.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("LeafletFacet")))
+@interface InkwellSharedLeafletFacet : InkwellSharedBase
+- (instancetype)initWithType:(NSString * _Nullable)type index:(InkwellSharedByteSlice *)index features:(NSArray<InkwellSharedLeafletFacetFeature *> *)features __attribute__((swift_name("init(type:index:features:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedLeafletFacet *)doCopyType:(NSString * _Nullable)type index:(InkwellSharedByteSlice *)index features:(NSArray<InkwellSharedLeafletFacetFeature *> *)features __attribute__((swift_name("doCopy(type:index:features:)")));
+
+/**
+ * Neutral shared model for a Leaflet inline facet (byte-range formatting).
+ *
+ * Mirrors Android `LeafletFacet` and iOS `LeafletFacet`.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Neutral shared model for a Leaflet inline facet (byte-range formatting).
+ *
+ * Mirrors Android `LeafletFacet` and iOS `LeafletFacet`.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Neutral shared model for a Leaflet inline facet (byte-range formatting).
+ *
+ * Mirrors Android `LeafletFacet` and iOS `LeafletFacet`.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSArray<InkwellSharedLeafletFacetFeature *> *features __attribute__((swift_name("features")));
+@property (readonly) InkwellSharedByteSlice *index __attribute__((swift_name("index")));
+@property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
+@end
+
+
+/**
+ * Neutral shared model for a Leaflet facet feature.
+ *
+ * Mirrors Android `FacetFeature` and iOS `LeafletFacetFeature`.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("LeafletFacetFeature")))
+@interface InkwellSharedLeafletFacetFeature : InkwellSharedBase
+- (instancetype)initWithType:(NSString *)type uri:(NSString * _Nullable)uri tag:(NSString * _Nullable)tag did:(NSString * _Nullable)did __attribute__((swift_name("init(type:uri:tag:did:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedLeafletFacetFeature *)doCopyType:(NSString *)type uri:(NSString * _Nullable)uri tag:(NSString * _Nullable)tag did:(NSString * _Nullable)did __attribute__((swift_name("doCopy(type:uri:tag:did:)")));
+
+/**
+ * Neutral shared model for a Leaflet facet feature.
+ *
+ * Mirrors Android `FacetFeature` and iOS `LeafletFacetFeature`.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Neutral shared model for a Leaflet facet feature.
+ *
+ * Mirrors Android `FacetFeature` and iOS `LeafletFacetFeature`.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Neutral shared model for a Leaflet facet feature.
+ *
+ * Mirrors Android `FacetFeature` and iOS `LeafletFacetFeature`.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString * _Nullable did __attribute__((swift_name("did")));
+@property (readonly) NSString * _Nullable tag __attribute__((swift_name("tag")));
+@property (readonly) NSString *type __attribute__((swift_name("type")));
+@property (readonly) NSString * _Nullable uri __attribute__((swift_name("uri")));
+@end
+
+
+/**
+ * Neutral shared model for a legacy light/dark palette.
+ *
+ * Older standard.site applications emit this shape instead of the full
+ * Leaflet rich theme. Contains hex colour strings for five UI elements.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("LegacyPalette")))
+@interface InkwellSharedLegacyPalette : InkwellSharedBase
+- (instancetype)initWithBackground:(NSString * _Nullable)background text:(NSString * _Nullable)text accent:(NSString * _Nullable)accent link:(NSString * _Nullable)link surfaceHover:(NSString * _Nullable)surfaceHover __attribute__((swift_name("init(background:text:accent:link:surfaceHover:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedLegacyPalette *)doCopyBackground:(NSString * _Nullable)background text:(NSString * _Nullable)text accent:(NSString * _Nullable)accent link:(NSString * _Nullable)link surfaceHover:(NSString * _Nullable)surfaceHover __attribute__((swift_name("doCopy(background:text:accent:link:surfaceHover:)")));
+
+/**
+ * Neutral shared model for a legacy light/dark palette.
+ *
+ * Older standard.site applications emit this shape instead of the full
+ * Leaflet rich theme. Contains hex colour strings for five UI elements.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Neutral shared model for a legacy light/dark palette.
+ *
+ * Older standard.site applications emit this shape instead of the full
+ * Leaflet rich theme. Contains hex colour strings for five UI elements.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Neutral shared model for a legacy light/dark palette.
+ *
+ * Older standard.site applications emit this shape instead of the full
+ * Leaflet rich theme. Contains hex colour strings for five UI elements.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString * _Nullable accent __attribute__((swift_name("accent")));
+@property (readonly) NSString * _Nullable background __attribute__((swift_name("background")));
+@property (readonly) NSString * _Nullable link __attribute__((swift_name("link")));
+@property (readonly) NSString * _Nullable surfaceHover __attribute__((swift_name("surfaceHover")));
+@property (readonly) NSString * _Nullable text __attribute__((swift_name("text")));
+@end
+
+
+/**
+ * Neutral shared model for publication-level display preferences.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PublicationPreferences")))
+@interface InkwellSharedPublicationPreferences : InkwellSharedBase
+- (instancetype)initWithShowInDiscover:(InkwellSharedBoolean * _Nullable)showInDiscover __attribute__((swift_name("init(showInDiscover:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedPublicationPreferences *)doCopyShowInDiscover:(InkwellSharedBoolean * _Nullable)showInDiscover __attribute__((swift_name("doCopy(showInDiscover:)")));
+
+/**
+ * Neutral shared model for publication-level display preferences.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Neutral shared model for publication-level display preferences.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Neutral shared model for publication-level display preferences.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) InkwellSharedBoolean * _Nullable showInDiscover __attribute__((swift_name("showInDiscover")));
+@end
+
+
+/**
+ * Neutral shared model for a rich Leaflet publication theme.
+ *
+ * Mirrors the structure of Android `PublicationTheme` and iOS
+ * `SiteStandardLexicon.Theme.PublicationTheme`. Supports the older
+ * light/dark palette shape via [light] and [dark].
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PublicationTheme")))
+@interface InkwellSharedPublicationTheme : InkwellSharedBase
+- (instancetype)initWithType:(NSString *)type backgroundColor:(InkwellSharedColorValue * _Nullable)backgroundColor pageBackground:(InkwellSharedColorValue * _Nullable)pageBackground primary:(InkwellSharedColorValue * _Nullable)primary accentBackground:(InkwellSharedColorValue * _Nullable)accentBackground accentText:(InkwellSharedColorValue * _Nullable)accentText pageWidth:(InkwellSharedInt * _Nullable)pageWidth showPageBackground:(InkwellSharedBoolean * _Nullable)showPageBackground headingFont:(NSString * _Nullable)headingFont bodyFont:(NSString * _Nullable)bodyFont font:(NSString * _Nullable)font light:(InkwellSharedLegacyPalette * _Nullable)light dark:(InkwellSharedLegacyPalette * _Nullable)dark __attribute__((swift_name("init(type:backgroundColor:pageBackground:primary:accentBackground:accentText:pageWidth:showPageBackground:headingFont:bodyFont:font:light:dark:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedPublicationTheme *)doCopyType:(NSString *)type backgroundColor:(InkwellSharedColorValue * _Nullable)backgroundColor pageBackground:(InkwellSharedColorValue * _Nullable)pageBackground primary:(InkwellSharedColorValue * _Nullable)primary accentBackground:(InkwellSharedColorValue * _Nullable)accentBackground accentText:(InkwellSharedColorValue * _Nullable)accentText pageWidth:(InkwellSharedInt * _Nullable)pageWidth showPageBackground:(InkwellSharedBoolean * _Nullable)showPageBackground headingFont:(NSString * _Nullable)headingFont bodyFont:(NSString * _Nullable)bodyFont font:(NSString * _Nullable)font light:(InkwellSharedLegacyPalette * _Nullable)light dark:(InkwellSharedLegacyPalette * _Nullable)dark __attribute__((swift_name("doCopy(type:backgroundColor:pageBackground:primary:accentBackground:accentText:pageWidth:showPageBackground:headingFont:bodyFont:font:light:dark:)")));
+
+/**
+ * Neutral shared model for a rich Leaflet publication theme.
+ *
+ * Mirrors the structure of Android `PublicationTheme` and iOS
+ * `SiteStandardLexicon.Theme.PublicationTheme`. Supports the older
+ * light/dark palette shape via [light] and [dark].
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Neutral shared model for a rich Leaflet publication theme.
+ *
+ * Mirrors the structure of Android `PublicationTheme` and iOS
+ * `SiteStandardLexicon.Theme.PublicationTheme`. Supports the older
+ * light/dark palette shape via [light] and [dark].
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Neutral shared model for a rich Leaflet publication theme.
+ *
+ * Mirrors the structure of Android `PublicationTheme` and iOS
+ * `SiteStandardLexicon.Theme.PublicationTheme`. Supports the older
+ * light/dark palette shape via [light] and [dark].
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) InkwellSharedColorValue * _Nullable accentBackground __attribute__((swift_name("accentBackground")));
+@property (readonly) InkwellSharedColorValue * _Nullable accentText __attribute__((swift_name("accentText")));
+@property (readonly) InkwellSharedColorValue * _Nullable backgroundColor __attribute__((swift_name("backgroundColor")));
+@property (readonly) NSString * _Nullable bodyFont __attribute__((swift_name("bodyFont")));
+@property (readonly) InkwellSharedLegacyPalette * _Nullable dark __attribute__((swift_name("dark")));
+@property (readonly) NSString * _Nullable font __attribute__((swift_name("font")));
+@property (readonly) NSString * _Nullable headingFont __attribute__((swift_name("headingFont")));
+@property (readonly) InkwellSharedLegacyPalette * _Nullable light __attribute__((swift_name("light")));
+@property (readonly) InkwellSharedColorValue * _Nullable pageBackground __attribute__((swift_name("pageBackground")));
+@property (readonly) InkwellSharedInt * _Nullable pageWidth __attribute__((swift_name("pageWidth")));
+@property (readonly) InkwellSharedColorValue * _Nullable primary __attribute__((swift_name("primary")));
+@property (readonly) InkwellSharedBoolean * _Nullable showPageBackground __attribute__((swift_name("showPageBackground")));
+@property (readonly) NSString *type __attribute__((swift_name("type")));
+@end
+
+
+/**
+ * Neutral shared model for an opaque RGB colour.
+ *
+ * Used by theme resolution across both platforms. The native platform
+ * types map to/from this when crossing the KMP boundary.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("RgbColor")))
+@interface InkwellSharedRgbColor : InkwellSharedBase
+- (instancetype)initWithType:(NSString *)type r:(int32_t)r g:(int32_t)g b:(int32_t)b __attribute__((swift_name("init(type:r:g:b:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedRgbColor *)doCopyType:(NSString *)type r:(int32_t)r g:(int32_t)g b:(int32_t)b __attribute__((swift_name("doCopy(type:r:g:b:)")));
+
+/**
+ * Neutral shared model for an opaque RGB colour.
+ *
+ * Used by theme resolution across both platforms. The native platform
+ * types map to/from this when crossing the KMP boundary.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Neutral shared model for an opaque RGB colour.
+ *
+ * Used by theme resolution across both platforms. The native platform
+ * types map to/from this when crossing the KMP boundary.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Neutral shared model for an opaque RGB colour.
+ *
+ * Used by theme resolution across both platforms. The native platform
+ * types map to/from this when crossing the KMP boundary.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) int32_t b __attribute__((swift_name("b")));
+@property (readonly) int32_t g __attribute__((swift_name("g")));
+@property (readonly) int32_t r __attribute__((swift_name("r")));
+@property (readonly) NSString *type __attribute__((swift_name("type")));
+@end
+
+
+/**
+ * Neutral shared model for a translucent RGBA colour.
+ *
+ * Alpha is stored as a percentage 0-100 (100 = fully opaque), matching
+ * both the Android and iOS convention.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("RgbaColor")))
+@interface InkwellSharedRgbaColor : InkwellSharedBase
+- (instancetype)initWithType:(NSString *)type r:(int32_t)r g:(int32_t)g b:(int32_t)b a:(int32_t)a __attribute__((swift_name("init(type:r:g:b:a:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedRgbaColor *)doCopyType:(NSString *)type r:(int32_t)r g:(int32_t)g b:(int32_t)b a:(int32_t)a __attribute__((swift_name("doCopy(type:r:g:b:a:)")));
+
+/**
+ * Neutral shared model for a translucent RGBA colour.
+ *
+ * Alpha is stored as a percentage 0-100 (100 = fully opaque), matching
+ * both the Android and iOS convention.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Neutral shared model for a translucent RGBA colour.
+ *
+ * Alpha is stored as a percentage 0-100 (100 = fully opaque), matching
+ * both the Android and iOS convention.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Neutral shared model for a translucent RGBA colour.
+ *
+ * Alpha is stored as a percentage 0-100 (100 = fully opaque), matching
+ * both the Android and iOS convention.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) int32_t a __attribute__((swift_name("a")));
+@property (readonly) int32_t b __attribute__((swift_name("b")));
+@property (readonly) int32_t g __attribute__((swift_name("g")));
+@property (readonly) int32_t r __attribute__((swift_name("r")));
+@property (readonly) NSString *type __attribute__((swift_name("type")));
+@end
+
+
+/**
+ * Neutral shared model for a `site.standard.document` record.
+ *
+ * Mirrors Android `DocumentRecord` and iOS `DocumentRecord`.
+ * Only the fields needed by shared KMP logic and cross-platform mapping
+ * are included here.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SharedDocumentRecord")))
+@interface InkwellSharedSharedDocumentRecord : InkwellSharedBase
+- (instancetype)initWithType:(NSString *)type site:(NSString *)site title:(NSString *)title publishedAt:(NSString *)publishedAt path:(NSString * _Nullable)path description:(NSString * _Nullable)description tags:(NSArray<NSString *> * _Nullable)tags textContent:(NSString * _Nullable)textContent coverImage:(InkwellSharedBlobRef * _Nullable)coverImage theme:(InkwellSharedPublicationTheme * _Nullable)theme preferences:(InkwellSharedDocumentPreferences * _Nullable)preferences bskyPostRef:(InkwellSharedStrongRef * _Nullable)bskyPostRef __attribute__((swift_name("init(type:site:title:publishedAt:path:description:tags:textContent:coverImage:theme:preferences:bskyPostRef:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedSharedDocumentRecord *)doCopyType:(NSString *)type site:(NSString *)site title:(NSString *)title publishedAt:(NSString *)publishedAt path:(NSString * _Nullable)path description:(NSString * _Nullable)description tags:(NSArray<NSString *> * _Nullable)tags textContent:(NSString * _Nullable)textContent coverImage:(InkwellSharedBlobRef * _Nullable)coverImage theme:(InkwellSharedPublicationTheme * _Nullable)theme preferences:(InkwellSharedDocumentPreferences * _Nullable)preferences bskyPostRef:(InkwellSharedStrongRef * _Nullable)bskyPostRef __attribute__((swift_name("doCopy(type:site:title:publishedAt:path:description:tags:textContent:coverImage:theme:preferences:bskyPostRef:)")));
+
+/**
+ * Neutral shared model for a `site.standard.document` record.
+ *
+ * Mirrors Android `DocumentRecord` and iOS `DocumentRecord`.
+ * Only the fields needed by shared KMP logic and cross-platform mapping
+ * are included here.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Neutral shared model for a `site.standard.document` record.
+ *
+ * Mirrors Android `DocumentRecord` and iOS `DocumentRecord`.
+ * Only the fields needed by shared KMP logic and cross-platform mapping
+ * are included here.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Neutral shared model for a `site.standard.document` record.
+ *
+ * Mirrors Android `DocumentRecord` and iOS `DocumentRecord`.
+ * Only the fields needed by shared KMP logic and cross-platform mapping
+ * are included here.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) InkwellSharedStrongRef * _Nullable bskyPostRef __attribute__((swift_name("bskyPostRef")));
+@property (readonly) InkwellSharedBlobRef * _Nullable coverImage __attribute__((swift_name("coverImage")));
+@property (readonly) NSString * _Nullable description_ __attribute__((swift_name("description_")));
+@property (readonly) NSString * _Nullable path __attribute__((swift_name("path")));
+@property (readonly) InkwellSharedDocumentPreferences * _Nullable preferences __attribute__((swift_name("preferences")));
+@property (readonly) NSString *publishedAt __attribute__((swift_name("publishedAt")));
+@property (readonly) NSString *site __attribute__((swift_name("site")));
+@property (readonly) NSArray<NSString *> * _Nullable tags __attribute__((swift_name("tags")));
+@property (readonly) NSString * _Nullable textContent __attribute__((swift_name("textContent")));
+@property (readonly) InkwellSharedPublicationTheme * _Nullable theme __attribute__((swift_name("theme")));
+@property (readonly) NSString *title __attribute__((swift_name("title")));
+@property (readonly) NSString *type __attribute__((swift_name("type")));
+@end
+
+
+/**
+ * Neutral shared model for a `site.standard.graph.recommend` record.
+ *
+ * Mirrors Android `GraphRecommend` and iOS `Graph.RecommendRecord`.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SharedGraphRecommend")))
+@interface InkwellSharedSharedGraphRecommend : InkwellSharedBase
+- (instancetype)initWithType:(NSString *)type document:(NSString *)document createdAt:(NSString * _Nullable)createdAt __attribute__((swift_name("init(type:document:createdAt:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedSharedGraphRecommend *)doCopyType:(NSString *)type document:(NSString *)document createdAt:(NSString * _Nullable)createdAt __attribute__((swift_name("doCopy(type:document:createdAt:)")));
+
+/**
+ * Neutral shared model for a `site.standard.graph.recommend` record.
+ *
+ * Mirrors Android `GraphRecommend` and iOS `Graph.RecommendRecord`.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Neutral shared model for a `site.standard.graph.recommend` record.
+ *
+ * Mirrors Android `GraphRecommend` and iOS `Graph.RecommendRecord`.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Neutral shared model for a `site.standard.graph.recommend` record.
+ *
+ * Mirrors Android `GraphRecommend` and iOS `Graph.RecommendRecord`.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString * _Nullable createdAt __attribute__((swift_name("createdAt")));
+@property (readonly) NSString *document __attribute__((swift_name("document")));
+@property (readonly) NSString *type __attribute__((swift_name("type")));
+@end
+
+
+/**
+ * Neutral shared model for a `site.standard.graph.subscription` record.
+ *
+ * Mirrors Android `GraphSubscription` and iOS `Graph.SubscriptionRecord`.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SharedGraphSubscription")))
+@interface InkwellSharedSharedGraphSubscription : InkwellSharedBase
+- (instancetype)initWithType:(NSString *)type publication:(NSString *)publication createdAt:(NSString * _Nullable)createdAt __attribute__((swift_name("init(type:publication:createdAt:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedSharedGraphSubscription *)doCopyType:(NSString *)type publication:(NSString *)publication createdAt:(NSString * _Nullable)createdAt __attribute__((swift_name("doCopy(type:publication:createdAt:)")));
+
+/**
+ * Neutral shared model for a `site.standard.graph.subscription` record.
+ *
+ * Mirrors Android `GraphSubscription` and iOS `Graph.SubscriptionRecord`.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Neutral shared model for a `site.standard.graph.subscription` record.
+ *
+ * Mirrors Android `GraphSubscription` and iOS `Graph.SubscriptionRecord`.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Neutral shared model for a `site.standard.graph.subscription` record.
+ *
+ * Mirrors Android `GraphSubscription` and iOS `Graph.SubscriptionRecord`.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString * _Nullable createdAt __attribute__((swift_name("createdAt")));
+@property (readonly) NSString *publication __attribute__((swift_name("publication")));
+@property (readonly) NSString *type __attribute__((swift_name("type")));
+@end
+
+
+/**
+ * Neutral shared model for a `pub.leaflet.comment` record.
+ *
+ * Mirrors Android `LeafletComment` and iOS `PubLeafletComment`.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SharedLeafletComment")))
+@interface InkwellSharedSharedLeafletComment : InkwellSharedBase
+- (instancetype)initWithType:(NSString *)type subject:(NSString *)subject createdAt:(NSString * _Nullable)createdAt plaintext:(NSString *)plaintext facets:(NSArray<InkwellSharedLeafletFacet *> * _Nullable)facets reply:(InkwellSharedSharedLeafletCommentReplyRef * _Nullable)reply onPage:(NSString * _Nullable)onPage __attribute__((swift_name("init(type:subject:createdAt:plaintext:facets:reply:onPage:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedSharedLeafletComment *)doCopyType:(NSString *)type subject:(NSString *)subject createdAt:(NSString * _Nullable)createdAt plaintext:(NSString *)plaintext facets:(NSArray<InkwellSharedLeafletFacet *> * _Nullable)facets reply:(InkwellSharedSharedLeafletCommentReplyRef * _Nullable)reply onPage:(NSString * _Nullable)onPage __attribute__((swift_name("doCopy(type:subject:createdAt:plaintext:facets:reply:onPage:)")));
+
+/**
+ * Neutral shared model for a `pub.leaflet.comment` record.
+ *
+ * Mirrors Android `LeafletComment` and iOS `PubLeafletComment`.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Neutral shared model for a `pub.leaflet.comment` record.
+ *
+ * Mirrors Android `LeafletComment` and iOS `PubLeafletComment`.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Neutral shared model for a `pub.leaflet.comment` record.
+ *
+ * Mirrors Android `LeafletComment` and iOS `PubLeafletComment`.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString * _Nullable createdAt __attribute__((swift_name("createdAt")));
+@property (readonly) NSArray<InkwellSharedLeafletFacet *> * _Nullable facets __attribute__((swift_name("facets")));
+@property (readonly) NSString * _Nullable onPage __attribute__((swift_name("onPage")));
+@property (readonly) NSString *plaintext __attribute__((swift_name("plaintext")));
+@property (readonly) InkwellSharedSharedLeafletCommentReplyRef * _Nullable reply __attribute__((swift_name("reply")));
+@property (readonly) NSString *subject __attribute__((swift_name("subject")));
+@property (readonly) NSString *type __attribute__((swift_name("type")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SharedLeafletComment.ReplyRef")))
+@interface InkwellSharedSharedLeafletCommentReplyRef : InkwellSharedBase
+- (instancetype)initWithParent:(NSString *)parent __attribute__((swift_name("init(parent:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedSharedLeafletCommentReplyRef *)doCopyParent:(NSString *)parent __attribute__((swift_name("doCopy(parent:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString *parent __attribute__((swift_name("parent")));
+@end
+
+
+/**
+ * Neutral shared model for a `site.standard.publication` record.
+ *
+ * Mirrors Android `PublicationRecord` and iOS `PublicationRecord`.
+ * Only the fields needed by shared KMP logic and cross-platform mapping
+ * are included here.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SharedPublicationRecord")))
+@interface InkwellSharedSharedPublicationRecord : InkwellSharedBase
+- (instancetype)initWithType:(NSString *)type url:(NSString *)url name:(NSString *)name description:(NSString * _Nullable)description icon:(InkwellSharedBlobRef * _Nullable)icon theme:(InkwellSharedPublicationTheme * _Nullable)theme basicTheme:(InkwellSharedBasicTheme * _Nullable)basicTheme preferences:(InkwellSharedPublicationPreferences * _Nullable)preferences __attribute__((swift_name("init(type:url:name:description:icon:theme:basicTheme:preferences:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedSharedPublicationRecord *)doCopyType:(NSString *)type url:(NSString *)url name:(NSString *)name description:(NSString * _Nullable)description icon:(InkwellSharedBlobRef * _Nullable)icon theme:(InkwellSharedPublicationTheme * _Nullable)theme basicTheme:(InkwellSharedBasicTheme * _Nullable)basicTheme preferences:(InkwellSharedPublicationPreferences * _Nullable)preferences __attribute__((swift_name("doCopy(type:url:name:description:icon:theme:basicTheme:preferences:)")));
+
+/**
+ * Neutral shared model for a `site.standard.publication` record.
+ *
+ * Mirrors Android `PublicationRecord` and iOS `PublicationRecord`.
+ * Only the fields needed by shared KMP logic and cross-platform mapping
+ * are included here.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Neutral shared model for a `site.standard.publication` record.
+ *
+ * Mirrors Android `PublicationRecord` and iOS `PublicationRecord`.
+ * Only the fields needed by shared KMP logic and cross-platform mapping
+ * are included here.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Neutral shared model for a `site.standard.publication` record.
+ *
+ * Mirrors Android `PublicationRecord` and iOS `PublicationRecord`.
+ * Only the fields needed by shared KMP logic and cross-platform mapping
+ * are included here.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) InkwellSharedBasicTheme * _Nullable basicTheme __attribute__((swift_name("basicTheme")));
+@property (readonly) NSString * _Nullable description_ __attribute__((swift_name("description_")));
+@property (readonly) InkwellSharedBlobRef * _Nullable icon __attribute__((swift_name("icon")));
+@property (readonly) NSString *name __attribute__((swift_name("name")));
+@property (readonly) InkwellSharedPublicationPreferences * _Nullable preferences __attribute__((swift_name("preferences")));
+@property (readonly) InkwellSharedPublicationTheme * _Nullable theme __attribute__((swift_name("theme")));
+@property (readonly) NSString *type __attribute__((swift_name("type")));
+@property (readonly) NSString *url __attribute__((swift_name("url")));
+@end
+
+
+/**
+ * Neutral shared model for an AT Protocol strong reference (URI + CID).
+ *
+ * Mirrors Android `StrongRef` and iOS `ComAtprotoLexicon.Repository.StrongReference`.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("StrongRef")))
+@interface InkwellSharedStrongRef : InkwellSharedBase
+- (instancetype)initWithUri:(NSString *)uri cid:(NSString * _Nullable)cid __attribute__((swift_name("init(uri:cid:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedStrongRef *)doCopyUri:(NSString *)uri cid:(NSString * _Nullable)cid __attribute__((swift_name("doCopy(uri:cid:)")));
+
+/**
+ * Neutral shared model for an AT Protocol strong reference (URI + CID).
+ *
+ * Mirrors Android `StrongRef` and iOS `ComAtprotoLexicon.Repository.StrongReference`.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Neutral shared model for an AT Protocol strong reference (URI + CID).
+ *
+ * Mirrors Android `StrongRef` and iOS `ComAtprotoLexicon.Repository.StrongReference`.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Neutral shared model for an AT Protocol strong reference (URI + CID).
+ *
+ * Mirrors Android `StrongRef` and iOS `ComAtprotoLexicon.Repository.StrongReference`.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString * _Nullable cid __attribute__((swift_name("cid")));
+@property (readonly) NSString *uri __attribute__((swift_name("uri")));
 @end
 
 
