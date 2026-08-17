@@ -247,6 +247,7 @@ private fun PostDetailContent(
 ) {
     val titleColor = if (readerTheme.foreground != Color.Unspecified) readerTheme.foreground else MaterialTheme.colorScheme.onBackground
     val bodyColor = if (readerTheme.foreground != Color.Unspecified) readerTheme.foreground else MaterialTheme.colorScheme.onSurfaceVariant
+    val accentColor = if (readerTheme.accent != Color.Unspecified) readerTheme.accent else MaterialTheme.colorScheme.primary
 
     val pageBg = if (readerTheme.showPageBackground && readerTheme.pageBackground != Color.Unspecified) {
         readerTheme.pageBackground
@@ -315,6 +316,16 @@ private fun PostDetailContent(
                             )
                         }
                     }
+                }
+            }
+
+            is DocumentContent.Markdown -> {
+                item {
+                    MarkdownRendererView(
+                        markdown = content.text,
+                        foregroundColor = bodyColor,
+                        accentColor = accentColor,
+                    )
                 }
             }
 
