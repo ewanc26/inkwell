@@ -18,7 +18,7 @@ AI tools may be used when contributing, but do not add `Co-authored-by:` trailer
 
 ## Read First and Source Boundaries
 
-- Read `README.md`, Gradle/version catalog files, `AndroidManifest.xml`, `docs/oauth/client-metadata.json`, and all touched Kotlin. Compare shared wire behavior with the owned iOS `../iOS/` checkout, without copying Swift lifecycle or security assumptions.
+- Read `README.md`, Gradle/version catalog files, `AndroidManifest.xml`, `docs/oauth/client-metadata.json`, and all touched Kotlin. Compare shared wire behavior with the owned iOS `../iOS/` checkout, without copying Swift lifecycle or security assumptions. The `shared/` KMP module provides `MarkdownParser`, `FacetConverter`, `FacetSchema`, `ReaderTheme`, `TipPromptPolicy`, and `NotificationPolicy`; prefer shared logic over local copies.
 - `app/src/main/java/uk/ewancroft/inkwell/data/auth` stores the OAuth session, `app/src/main/java/uk/ewancroft/inkwell/data/repository/PdsRepository.kt` performs public/authenticated XRPC, `app/src/main/java/uk/ewancroft/inkwell/data/model` defines Standard.site/Leaflet/pckt/Offprint shapes, and `app/src/main/java/uk/ewancroft/inkwell/data/remote/ConstellationClient.kt` queries backlinks.
 - `app/src/main/java/uk/ewancroft/inkwell/data/remote/BSkyPostFetcher.kt` fetches Bluesky posts from the public API for embed rendering.
 - Hilt modules construct OAuth/network services. ViewModels own `StateFlow`; Compose screens and `NavGraph` own UI/navigation. `InkwellNotificationManager.kt` and `InkwellNotificationWorker.kt` implement WorkManager-based background notification polling. `app/src/main/java/uk/ewancroft/inkwell/data/remote/StandardSiteVerifier.kt` implements publication/document verification.
