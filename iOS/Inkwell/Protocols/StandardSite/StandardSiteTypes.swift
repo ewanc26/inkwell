@@ -29,20 +29,8 @@ struct ATURI: Equatable, Hashable {
 
     /// Parses an AT-URI string. Returns `nil` if the format is invalid.
     static func parse(_ uri: String) -> ATURI? {
-        // Strip the "at://" prefix
-        guard uri.hasPrefix("at://") else { return nil }
-        let stripped = String(uri.dropFirst(5))
-
-        // Split into segments: did/collection/rkey
-        let parts = stripped.split(separator: "/", maxSplits: 2, omittingEmptySubsequences: false)
-        guard parts.count == 3 else { return nil }
-
-        let did = String(parts[0])
-        let collection = String(parts[1])
-        let recordKey = String(parts[2])
-
-        guard !did.isEmpty, !collection.isEmpty, !recordKey.isEmpty else { return nil }
-        return ATURI(did: did, collection: collection, recordKey: recordKey)
+        guard let result = parseAtUri(uri) else { return nil }
+        return ATURI(did: result.did, collection: result.collection, recordKey: result.recordKey)
     }
 }
 
