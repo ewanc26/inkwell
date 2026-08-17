@@ -16,7 +16,7 @@ import uk.ewancroft.inkwell.data.model.bluesky.BlueskyProfile
 import uk.ewancroft.inkwell.shared.AtUri
 import uk.ewancroft.inkwell.data.model.atproto.DocumentRecord
 import uk.ewancroft.inkwell.data.remote.StandardSiteVerifier
-import uk.ewancroft.inkwell.data.remote.VerificationResult
+import uk.ewancroft.inkwell.shared.verification.VerificationResult
 import uk.ewancroft.inkwell.data.repository.PdsRepository
 import uk.ewancroft.inkwell.ScreenshotConfig
 import uk.ewancroft.inkwell.util.formatPublishedDate

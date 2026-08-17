@@ -17,8 +17,8 @@ import kotlinx.serialization.json.put
 import uk.ewancroft.inkwell.data.model.atproto.PublicationRecord
 import uk.ewancroft.inkwell.shared.AtUri
 import uk.ewancroft.inkwell.data.remote.StandardSiteVerifier
-import uk.ewancroft.inkwell.data.remote.VerificationResult
-import uk.ewancroft.inkwell.data.remote.VerificationFailure
+import uk.ewancroft.inkwell.shared.verification.VerificationFailure
+import uk.ewancroft.inkwell.shared.verification.VerificationResult
 import uk.ewancroft.inkwell.data.repository.PdsRepository
 import uk.ewancroft.inkwell.ScreenshotConfig
 import javax.inject.Inject

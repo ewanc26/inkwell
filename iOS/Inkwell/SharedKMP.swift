@@ -299,3 +299,46 @@ func trimSeenUris(_ uris: [String]) -> [String] {
 func trimNotifications(_ notifications: [Any]) -> [Any] {
     NotificationPolicy.shared.trimNotifications(notifications: notifications)
 }
+
+// MARK: - Verification URLs
+
+func sharedPublicationVerificationURL(for publicationURL: String) -> String? {
+    VerificationUrls.shared.publicationVerificationUrl(publicationUrl: publicationURL)
+}
+
+func sharedDocumentCanonicalURL(documentSite: String, documentPath: String?, publicationURL: String?) -> String? {
+    VerificationUrls.shared.documentCanonicalUrl(documentSite: documentSite, documentPath: documentPath, publicationUrl: publicationURL)
+}
+
+func sharedDiscoveryLinkTag(forRecordURI recordURI: String, relation: String) -> String {
+    VerificationUrls.shared.discoveryLinkTag(recordURI: recordURI, relation: relation)
+}
+
+func sharedContainsDocumentLink(html: String, documentURI: String) -> Bool {
+    DocumentLinkScanner.shared.containsDocumentLink(html: html, documentURI: documentURI)
+}
+
+// MARK: - Constellation Pagination
+
+struct SharedBacklink {
+    let did: String
+    let collection: String
+    let rkey: String
+    var recordURI: String { "at://\(did)/\(collection)/\(rkey)" }
+}
+
+func deduplicateBacklinks(_ backlinks: [SharedBacklink]) -> [SharedBacklink] {
+    let shared = backlinks.map { InkwellShared.ConstellationBacklink(did: $0.did, collection: $0.collection, rkey: $0.rkey) }
+    let deduped = ConstellationPagination.shared.deduplicate(backlinks: shared)
+    return deduped.map { SharedBacklink(did: $0.did, collection: $0.collection, rkey: $0.rkey) }
+}
+
+// MARK: - URL Utilities
+
+func normalizedSite(_ value: String) -> String {
+    UrlUtils.shared.normalizedSite(value: value)
+}
+
+func canonicalUrl(site: String, path: String?, publicationURL: String? = nil) -> String? {
+    UrlUtils.shared.canonicalUrl(site: site, path: path, publicationUrl: publicationURL)
+}

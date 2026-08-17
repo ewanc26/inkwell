@@ -31,8 +31,8 @@ import uk.ewancroft.inkwell.data.model.graph.LeafletComment
 import uk.ewancroft.inkwell.data.model.bluesky.ConstellationBacklink
 import uk.ewancroft.inkwell.data.remote.ConstellationClient
 import uk.ewancroft.inkwell.data.remote.StandardSiteVerifier
-import uk.ewancroft.inkwell.data.remote.VerificationFailure
-import uk.ewancroft.inkwell.data.remote.VerificationResult
+import uk.ewancroft.inkwell.shared.verification.VerificationFailure
+import uk.ewancroft.inkwell.shared.verification.VerificationResult
 import uk.ewancroft.inkwell.data.repository.PdsRepository
 import javax.inject.Inject
 

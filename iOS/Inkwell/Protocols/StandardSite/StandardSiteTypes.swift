@@ -72,43 +72,13 @@ extension SiteStandardLexicon.DocumentRecord {
     /// Builds the canonical web URL described by Standard.site's `site` + `path`
     /// rules. A publication is required when `site` is an AT-URI.
     func canonicalURL(publication: SiteStandardLexicon.PublicationRecord? = nil) -> URL? {
-        let baseString: String
-        if site.hasPrefix("at://") {
-            guard let publication else { return nil }
-            baseString = publication.url
-        } else {
-            baseString = site
-        }
-
-        guard var components = URLComponents(string: baseString),
-              components.scheme?.lowercased() == "https",
-              components.host != nil else {
-            return nil
-        }
-
-        if let path, !path.isEmpty {
-            let documentPath = path.hasPrefix("/") ? path : "/\(path)"
-            components.path = components.path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
-            components.path = "/" + [components.path, documentPath]
-                .map { $0.trimmingCharacters(in: CharacterSet(charactersIn: "/")) }
-                .filter { !$0.isEmpty }
-                .joined(separator: "/")
-        }
-
-        return components.url
+        guard let urlString = canonicalUrl(
+            site: site,
+            path: path,
+            publicationURL: publication?.url
+        ) else { return nil }
+        return URL(string: urlString)
     }
-}
-
-private nonisolated func normalizedSite(_ value: String) -> String {
-    guard var components = URLComponents(string: value), components.host != nil else {
-        return value.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
-    }
-    components.scheme = components.scheme?.lowercased()
-    components.host = components.host?.lowercased()
-    while components.path.count > 1 && components.path.hasSuffix("/") {
-        components.path.removeLast()
-    }
-    return components.string ?? value
 }
 
 /// A subscription record enriched with its AT-URI and record key.

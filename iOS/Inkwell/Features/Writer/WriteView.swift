@@ -314,7 +314,7 @@ struct WriteView: View {
             verifiedPublicationURI = nil
             let endpoint = SiteStandardLexicon.Verification.publicationVerificationURL(
                 for: publication.record.url
-            )?.absoluteString ?? publication.record.url
+            ) ?? publication.record.url
             verificationMessage = "Serve \(publication.uri) as plain text from \(endpoint), then verify again."
         }
     }

@@ -7,6 +7,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import uk.ewancroft.inkwell.data.model.atproto.DocumentRecord
 import uk.ewancroft.inkwell.data.model.atproto.PublicationRecord
+import uk.ewancroft.inkwell.shared.verification.VerificationUrls
 
 /**
  * Unit and (network-dependent) integration tests for [StandardSiteVerifier].
@@ -23,30 +24,30 @@ class StandardSiteVerifierTest {
 
     @Test
     fun `non-root publication verification endpoint appends publication path`() {
-        val url = StandardSiteVerifier.publicationVerificationUrl("https://example.com/writing/")
+        val url = VerificationUrls.publicationVerificationUrl("https://example.com/writing/")
         assertEquals(
             "https://example.com/.well-known/site.standard.publication/writing",
-            url?.toString(),
+            url,
         )
     }
 
     @Test
     fun `root publication verification endpoint has no trailing path`() {
-        val url = StandardSiteVerifier.publicationVerificationUrl("https://example.com")
+        val url = VerificationUrls.publicationVerificationUrl("https://example.com")
         assertEquals(
             "https://example.com/.well-known/site.standard.publication",
-            url?.toString(),
+            url,
         )
     }
 
     @Test
     fun `non-https publication url is rejected`() {
-        assertNull(StandardSiteVerifier.publicationVerificationUrl("http://example.com"))
+        assertNull(VerificationUrls.publicationVerificationUrl("http://example.com"))
     }
 
     @Test
     fun `unparseable publication url is rejected`() {
-        assertNull(StandardSiteVerifier.publicationVerificationUrl("not a url"))
+        assertNull(VerificationUrls.publicationVerificationUrl("not a url"))
     }
 
     // ── documentCanonicalUrl ────────────────────────────────────────────
@@ -71,7 +72,6 @@ class StandardSiteVerifierTest {
             site = "at://did:plc:alice/site.standard.publication/3pub",
             title = "Hello",
             publishedAt = "2026-01-01T00:00:00Z",
-            path = "/posts/hello",
         )
 
         assertNull(StandardSiteVerifier.documentCanonicalUrl(document, publication = null))
