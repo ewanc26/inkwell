@@ -6,7 +6,7 @@
 #import <Foundation/NSString.h>
 #import <Foundation/NSValue.h>
 
-@class InkwellSharedAtUri, InkwellSharedAtUriCompanion, InkwellSharedFacetDefinition, InkwellSharedFacetSchema, InkwellSharedKotlinArray<T>, InkwellSharedKotlinEnum<E>, InkwellSharedKotlinEnumCompanion, InkwellSharedKotlinNothing, InkwellSharedKotlinx_serialization_coreSerialKind, InkwellSharedKotlinx_serialization_coreSerializersModule, InkwellSharedMarkdownBlock, InkwellSharedMarkdownBlockBlockquote, InkwellSharedMarkdownBlockCode, InkwellSharedMarkdownBlockHeading, InkwellSharedMarkdownBlockHorizontalRule, InkwellSharedMarkdownBlockImage, InkwellSharedMarkdownBlockMath, InkwellSharedMarkdownBlockOrderedList, InkwellSharedMarkdownBlockParagraph, InkwellSharedMarkdownBlockTaskList, InkwellSharedMarkdownBlockUnorderedList, InkwellSharedMarkdownListItem, InkwellSharedMarkdownParser, InkwellSharedMarkdownSerializer, InkwellSharedNotificationPolicy, InkwellSharedNotificationStyleNone, InkwellSharedNotificationStyleSingle, InkwellSharedNotificationStyleSummary, InkwellSharedSharedReaderTheme, InkwellSharedSharedReaderThemeCompanion, InkwellSharedSharedReaderThemeFontFamily, InkwellSharedTipPromptPolicy;
+@class FacetConverter, InkwellSharedAtUri, InkwellSharedAtUriCompanion, InkwellSharedFacetDefinition, InkwellSharedFacetSchema, InkwellSharedKotlinArray<T>, InkwellSharedKotlinEnum<E>, InkwellSharedKotlinEnumCompanion, InkwellSharedKotlinNothing, InkwellSharedKotlinPair<__covariant A, __covariant B>, InkwellSharedKotlinx_serialization_coreSerialKind, InkwellSharedKotlinx_serialization_coreSerializersModule, InkwellSharedMarkdownBlock, InkwellSharedMarkdownBlockBlockquote, InkwellSharedMarkdownBlockCode, InkwellSharedMarkdownBlockHeading, InkwellSharedMarkdownBlockHorizontalRule, InkwellSharedMarkdownBlockImage, InkwellSharedMarkdownBlockMath, InkwellSharedMarkdownBlockOrderedList, InkwellSharedMarkdownBlockParagraph, InkwellSharedMarkdownBlockTaskList, InkwellSharedMarkdownBlockUnorderedList, InkwellSharedMarkdownListItem, InkwellSharedMarkdownParser, InkwellSharedMarkdownSerializer, InkwellSharedNotificationPolicy, InkwellSharedNotificationStyleNone, InkwellSharedNotificationStyleSingle, InkwellSharedNotificationStyleSummary, InkwellSharedSharedReaderTheme, InkwellSharedSharedReaderThemeCompanion, InkwellSharedSharedReaderThemeFontFamily, InkwellSharedTipPromptPolicy, RichTextFacet, RichTextFeature;
 
 @protocol InkwellSharedKotlinAnnotation, InkwellSharedKotlinComparable, InkwellSharedKotlinIterator, InkwellSharedKotlinKAnnotatedElement, InkwellSharedKotlinKClass, InkwellSharedKotlinKClassifier, InkwellSharedKotlinKDeclarationContainer, InkwellSharedKotlinx_serialization_coreCompositeDecoder, InkwellSharedKotlinx_serialization_coreCompositeEncoder, InkwellSharedKotlinx_serialization_coreDecoder, InkwellSharedKotlinx_serialization_coreDeserializationStrategy, InkwellSharedKotlinx_serialization_coreEncoder, InkwellSharedKotlinx_serialization_coreKSerializer, InkwellSharedKotlinx_serialization_coreSerialDescriptor, InkwellSharedKotlinx_serialization_coreSerializationStrategy, InkwellSharedKotlinx_serialization_coreSerializersModuleCollector, InkwellSharedNotificationStyle;
 
@@ -210,6 +210,16 @@ __attribute__((swift_name("AtUri.Companion")))
 @end
 
 __attribute__((objc_subclassing_restricted))
+@interface FacetConverter : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)facetConverter __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) FacetConverter *shared __attribute__((swift_name("shared")));
+- (NSString *)facetsToMarkdownPlaintext:(NSString *)plaintext facets:(NSArray<RichTextFacet *> * _Nullable)facets boldType:(NSString *)boldType italicType:(NSString *)italicType codeType:(NSString *)codeType strikeType:(NSString *)strikeType linkType:(NSString *)linkType lossy:(NSDictionary<NSString *, NSString *> *)lossy lost:(InkwellSharedMutableSet<NSString *> * _Nullable)lost __attribute__((swift_name("facetsToMarkdown(plaintext:facets:boldType:italicType:codeType:strikeType:linkType:lossy:lost:)")));
+- (InkwellSharedKotlinPair<NSString *, NSArray<RichTextFacet *> *> *)markdownToFacetsMarkdown:(NSString *)markdown boldType:(NSString *)boldType italicType:(NSString *)italicType codeType:(NSString *)codeType strikeType:(NSString *)strikeType linkType:(NSString *)linkType __attribute__((swift_name("markdownToFacets(markdown:boldType:italicType:codeType:strikeType:linkType:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("FacetDefinition")))
 @interface InkwellSharedFacetDefinition : InkwellSharedBase
 - (instancetype)initWithFacet:(NSString *)facet byteSlice:(NSString *)byteSlice bold:(NSString *)bold italic:(NSString *)italic code:(NSString *)code strike:(NSString *)strike link:(NSString *)link lossy:(NSDictionary<NSString *, NSString *> *)lossy __attribute__((swift_name("init(facet:byteSlice:bold:italic:code:strike:link:lossy:)"))) __attribute__((objc_designated_initializer));
@@ -257,6 +267,29 @@ __attribute__((swift_name("FacetSchema")))
 @property (readonly) InkwellSharedFacetDefinition *leaflet __attribute__((swift_name("leaflet")));
 @property (readonly) InkwellSharedFacetDefinition *offprint __attribute__((swift_name("offprint")));
 @property (readonly) InkwellSharedFacetDefinition *pckt __attribute__((swift_name("pckt")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+@interface RichTextFacet : InkwellSharedBase
+- (instancetype)initWithByteStart:(int32_t)byteStart byteEnd:(int32_t)byteEnd features:(NSArray<RichTextFeature *> *)features __attribute__((swift_name("init(byteStart:byteEnd:features:)"))) __attribute__((objc_designated_initializer));
+- (RichTextFacet *)doCopyByteStart:(int32_t)byteStart byteEnd:(int32_t)byteEnd features:(NSArray<RichTextFeature *> *)features __attribute__((swift_name("doCopy(byteStart:byteEnd:features:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) int32_t byteEnd __attribute__((swift_name("byteEnd")));
+@property (readonly) int32_t byteStart __attribute__((swift_name("byteStart")));
+@property (readonly) NSArray<RichTextFeature *> *features __attribute__((swift_name("features")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+@interface RichTextFeature : InkwellSharedBase
+- (instancetype)initWithType:(NSString *)type uri:(NSString * _Nullable)uri __attribute__((swift_name("init(type:uri:)"))) __attribute__((objc_designated_initializer));
+- (RichTextFeature *)doCopyType:(NSString *)type uri:(NSString * _Nullable)uri __attribute__((swift_name("doCopy(type:uri:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString *type __attribute__((swift_name("type")));
+@property (readonly) NSString * _Nullable uri __attribute__((swift_name("uri")));
 @end
 
 
@@ -733,6 +766,18 @@ __attribute__((swift_name("Kotlinx_serialization_coreDeserializationStrategy")))
 __attribute__((swift_name("Kotlinx_serialization_coreKSerializer")))
 @protocol InkwellSharedKotlinx_serialization_coreKSerializer <InkwellSharedKotlinx_serialization_coreSerializationStrategy, InkwellSharedKotlinx_serialization_coreDeserializationStrategy>
 @required
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("KotlinPair")))
+@interface InkwellSharedKotlinPair<__covariant A, __covariant B> : InkwellSharedBase
+- (instancetype)initWithFirst:(A _Nullable)first second:(B _Nullable)second __attribute__((swift_name("init(first:second:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedKotlinPair<A, B> *)doCopyFirst:(A _Nullable)first second:(B _Nullable)second __attribute__((swift_name("doCopy(first:second:)")));
+- (BOOL)equalsOther:(id _Nullable)other __attribute__((swift_name("equals(other:)")));
+- (int32_t)hashCode __attribute__((swift_name("hashCode()")));
+- (NSString *)toString __attribute__((swift_name("toString()")));
+@property (readonly) A _Nullable first __attribute__((swift_name("first")));
+@property (readonly) B _Nullable second __attribute__((swift_name("second")));
 @end
 
 __attribute__((objc_subclassing_restricted))

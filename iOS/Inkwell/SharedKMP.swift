@@ -71,6 +71,60 @@ struct FacetSchema {
     }()
 }
 
+// MARK: - Facet Converter
+
+func facetsToMarkdown(_ plaintext: String, facets: [LeafletFacet]?, schema: FacetSchema) -> String {
+    var lost = Set<String>()
+    return facetsToMarkdown(plaintext, facets: facets, schema: schema, lost: &lost)
+}
+
+func facetsToMarkdown(_ plaintext: String, facets: [LeafletFacet]?, schema: FacetSchema, lost: inout Set<String>) -> String {
+    let sharedFacets = facets?.map { facetToShared($0) }
+    let result = InkwellShared.FacetConverter.shared.facetsToMarkdown(
+        plaintext: plaintext,
+        facets: sharedFacets,
+        boldType: schema.bold,
+        italicType: schema.italic,
+        codeType: schema.code,
+        strikeType: schema.strike,
+        linkType: schema.link,
+        lossy: schema.lossy,
+        lost: nil
+    )
+    return result
+}
+
+func markdownToFacets(_ markdown: String, schema: FacetSchema) -> (plaintext: String, facets: [LeafletFacet]) {
+    let pair = InkwellShared.FacetConverter.shared.markdownToFacets(
+        markdown: markdown,
+        boldType: schema.bold,
+        italicType: schema.italic,
+        codeType: schema.code,
+        strikeType: schema.strike,
+        linkType: schema.link
+    )
+    let sharedFacets = pair.second as? [RichTextFacet] ?? []
+    let plaintext = pair.first! as String
+    return (plaintext: plaintext, facets: sharedFacets.map { sharedToFacet($0) })
+}
+
+// MARK: - Facet Type Bridging
+
+private func facetToShared(_ facet: LeafletFacet) -> RichTextFacet {
+    return RichTextFacet(
+        byteStart: Int32(facet.index.byteStart),
+        byteEnd: Int32(facet.index.byteEnd),
+        features: facet.features.map { RichTextFeature(type: $0.type, uri: $0.uri) }
+    )
+}
+
+private func sharedToFacet(_ facet: RichTextFacet) -> LeafletFacet {
+    return LeafletFacet(
+        index: LeafletByteSlice(byteStart: Int(facet.byteStart), byteEnd: Int(facet.byteEnd)),
+        features: facet.features.map { LeafletFacetFeature(type: $0.type, uri: $0.uri) }
+    )
+}
+
 // MARK: - Theme Resolution
 
 func resolveReaderTheme(
