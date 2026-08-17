@@ -47,8 +47,17 @@ data class PostDetailUiState(
     val path: String? = null,
     val coverUrl: String? = null,
     val content: DocumentContent = DocumentContent.Empty,
+    val publicationUri: String? = null,
+    val publicationUrl: String? = null,
 
     val verification: VerificationResult? = null,
+
+    val isSubscribed: Boolean = false,
+    val subscriptionRkey: String? = null,
+    val isLoadingSubscriptionState: Boolean = false,
+    val hasLoadedSubscriptionState: Boolean = false,
+    val isTogglingSubscription: Boolean = false,
+    val subscriptionError: String? = null,
 
     val isRecommended: Boolean = false,
     val recommendRkey: String? = null,
@@ -73,7 +82,7 @@ data class PostDetailUiState(
 
 @HiltViewModel
 class PostDetailViewModel @Inject constructor(
-    private val pdsRepository: PdsRepository,
+    internal val pdsRepository: PdsRepository,
     private val constellationClient: ConstellationClient,
 ) : ViewModel() {
 
@@ -129,9 +138,15 @@ class PostDetailViewModel @Inject constructor(
 
                 val textContent = value["textContent"]?.jsonPrimitive?.contentOrNull
                 val contentObj = value["content"]?.jsonObject
-                val docContent = parseContent(contentObj, textContent, parsed.did)
+                val docContent = parseContent(contentObj, textContent, parsed.did, uri)
 
                 if (_uiState.value.uri != uri) return@launch
+                val pubUri = if (site?.startsWith("at://") == true &&
+                    AtUri.parse(site)?.collection == "site.standard.publication") {
+                    site
+                } else {
+                    null
+                }
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     loadError = null,
@@ -141,10 +156,12 @@ class PostDetailViewModel @Inject constructor(
                     path = path,
                     coverUrl = coverUrl,
                     content = docContent,
+                    publicationUri = pubUri,
                 )
 
-                if (site != null) {
-                    verify(documentURI = uri, site = site, title = title, path = path, publishedAt = publishedAt)
+                if (pubUri != null) {
+                    verify(documentURI = uri, site = site!!, title = title, path = path, publishedAt = publishedAt)
+                    loadSubscriptionState(pubUri)
                 }
             } catch (e: Exception) {
                 if (_uiState.value.uri != uri) return@launch
@@ -189,6 +206,7 @@ class PostDetailViewModel @Inject constructor(
         val value = publicationJson["value"]?.jsonObject ?: return null
         val url = value["url"]?.jsonPrimitive?.contentOrNull ?: return null
         val name = value["name"]?.jsonPrimitive?.contentOrNull ?: ""
+        _uiState.value = _uiState.value.copy(publicationUrl = url)
         return PublicationRecord(url = url, name = name)
     }
 
@@ -270,17 +288,98 @@ class PostDetailViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(recommendError = null)
     }
 
-    private fun parseContent(
+    private fun loadSubscriptionState(publicationUri: String) {
+        val current = _uiState.value
+        if (current.uri.isBlank()) return
+        if (current.hasLoadedSubscriptionState) return
+        _uiState.value = _uiState.value.copy(isLoadingSubscriptionState = true)
+
+        viewModelScope.launch {
+            var isSubscribed = false
+            var subscriptionRkey: String? = null
+            val session = runCatching { pdsRepository.getSession() }.getOrNull()
+            if (session != null) {
+                runCatching { pdsRepository.fetchSubscriptions(session.did, session.pdsUrl) }
+                    .onSuccess { entries ->
+                        entries.firstOrNull { it.publicationUri == publicationUri }?.let {
+                            isSubscribed = true
+                            subscriptionRkey = it.rkey
+                        }
+                    }
+            }
+
+            if (_uiState.value.uri != current.uri) return@launch
+            _uiState.value = _uiState.value.copy(
+                isSubscribed = isSubscribed,
+                subscriptionRkey = subscriptionRkey,
+                isLoadingSubscriptionState = false,
+                hasLoadedSubscriptionState = true,
+            )
+        }
+    }
+
+    fun toggleSubscription() {
+        val state = _uiState.value
+        if (state.isTogglingSubscription || state.uri.isBlank()) return
+
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isTogglingSubscription = true, subscriptionError = null)
+            try {
+                if (state.isSubscribed) {
+                    val rkey = state.subscriptionRkey
+                        ?: throw IllegalStateException("Missing record key for existing subscription")
+                    pdsRepository.deleteSubscription(rkey)
+                    _uiState.value = _uiState.value.copy(
+                        isSubscribed = false,
+                        subscriptionRkey = null,
+                        isTogglingSubscription = false,
+                    )
+                } else {
+                    val publicationUri = state.publicationUri
+                        ?: throw IllegalStateException("Missing publication URI")
+                    val result = pdsRepository.createSubscription(publicationUri)
+                    val newUri = result["uri"]?.jsonPrimitive?.content
+                    val rkey = newUri?.let { AtUri.parse(it)?.recordKey }
+                    _uiState.value = _uiState.value.copy(
+                        isSubscribed = true,
+                        subscriptionRkey = rkey,
+                        isTogglingSubscription = false,
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isTogglingSubscription = false,
+                    subscriptionError = e.message ?: "Failed to update subscription",
+                )
+            }
+        }
+    }
+
+    fun dismissSubscriptionError() {
+        _uiState.value = _uiState.value.copy(subscriptionError = null)
+    }
+
+    private suspend fun parseContent(
         contentObj: JsonObject?,
         textContent: String?,
         authorDid: String,
+        documentUri: String,
     ): DocumentContent {
         if (contentObj != null) {
             val formatType = contentObj["\$type"]?.jsonPrimitive?.contentOrNull
 
             if (formatType == "pub.leaflet.content") {
                 val leaflet = runCatching { json.decodeFromJsonElement<LeafletContent>(contentObj) }.getOrNull()
-                val pages = leaflet?.pages
+                var pages = leaflet?.pages
+                if (pages.isNullOrEmpty() && leaflet?.blobPages != null) {
+                    pages = runCatching {
+                        val blobData = pdsRepository.downloadBlob(
+                            cid = leaflet.blobPages.link,
+                            fromDID = authorDid
+                        )
+                        json.decodeFromString<List<LeafletPage>>(blobData.decodeToString())
+                    }.getOrNull()
+                }
                 if (!pages.isNullOrEmpty()) {
                     return DocumentContent.Leaflet(pages, authorDid)
                 }

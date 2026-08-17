@@ -16,6 +16,12 @@ import androidx.compose.material.icons.automirrored.outlined.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,11 +36,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.AsyncImage
+import kotlinx.coroutines.launch
 import uk.ewancroft.inkwell.data.model.common.BlobRef
 import uk.ewancroft.inkwell.data.model.common.StrongRef
 import uk.ewancroft.inkwell.data.model.content.LeafletBlock
 import uk.ewancroft.inkwell.data.model.content.LeafletFacet
+import uk.ewancroft.inkwell.data.model.content.LeafletPollDefinition
+import uk.ewancroft.inkwell.data.model.content.LeafletPollVote
 import uk.ewancroft.inkwell.data.model.content.ListItem as ListItemModel
+import uk.ewancroft.inkwell.data.repository.PdsRepository
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,13 +72,14 @@ fun LeafletBlockContent(
         "pub.leaflet.blocks.page" -> PageBlock(block)
         "pub.leaflet.blocks.postsList" -> PostsListBlock(block)
         "pub.leaflet.blocks.signup" -> SignupBlock()
+        "pub.leaflet.blocks.poll" -> PollBlock(block, authorDid)
         else -> UnknownBlock(block)
     }
 }
 
 // MARK: - Facet Rendering
 
-private fun buildAnnotatedString(text: String, facets: List<LeafletFacet>?): AnnotatedString {
+fun buildAnnotatedString(text: String, facets: List<LeafletFacet>?): AnnotatedString {
     if (facets.isNullOrEmpty() || text.isEmpty()) return AnnotatedString(text)
 
     val builder = AnnotatedString.Builder(text)
@@ -585,4 +596,26 @@ private fun openUrl(context: android.content.Context, url: String) {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
         context.startActivity(intent)
     } catch (_: Exception) {}
+}
+
+@Composable
+private fun PollBlock(block: LeafletBlock, authorDid: String) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+        shape = MaterialTheme.shapes.medium,
+    ) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text(
+                "Poll",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Text(
+                "Interactive polls are not yet supported in Inkwell.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
 }

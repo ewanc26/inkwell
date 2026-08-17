@@ -10,7 +10,11 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
@@ -21,6 +25,8 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import uk.ewancroft.inkwell.data.model.bluesky.BlueskyProfile
 import uk.ewancroft.inkwell.data.model.common.AtUri
+import uk.ewancroft.inkwell.data.model.content.LeafletPollDefinition
+import uk.ewancroft.inkwell.data.model.content.LeafletPollVote
 import java.net.URLEncoder
 import java.time.Instant
 import java.util.concurrent.TimeUnit
@@ -268,9 +274,17 @@ class PdsRepository @Inject constructor(
     /** Deletes a comment record by its record key. */
     suspend fun deleteComment(rkey: String) = deleteRecord(COMMENT_COLLECTION, rkey)
 
+    suspend fun fetchDocuments(did: String, pdsUrl: String? = null): List<JsonObject> =
+        fetchDocumentEntries(did, pdsUrl).map { it.value }
+
+    data class DocumentRecordEntry(val uri: String, val value: JsonObject)
+
+    suspend fun fetchDocumentEntries(did: String, pdsUrl: String? = null): List<DocumentRecordEntry> =
+        listAllRecords(did, "site.standard.document", pdsUrl).map { DocumentRecordEntry(it.uri, it.value) }
+
     // ── Pagination helper ────────────────────────────────────────────────
 
-    private data class RawRecordEntry(val uri: String, val value: JsonObject)
+    internal data class RawRecordEntry(val uri: String, val value: JsonObject)
 
     /**
      * Paginates `com.atproto.repo.listRecords` to completion. Capped at
@@ -314,6 +328,65 @@ class PdsRepository @Inject constructor(
     suspend fun getProfile(did: String): BlueskyProfile {
         val urlStr = "https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=${enc(did)}"
         return json.decodeFromString(executeGet(urlStr))
+    }
+
+    suspend fun downloadBlob(cid: String, fromDID: String): ByteArray = withContext(Dispatchers.IO) {
+        val pdsUrl = resolvePdsUrl(fromDID) ?: "https://public.api.bsky.app"
+        val urlStr = "$pdsUrl/xrpc/com.atproto.sync.getBlob?cid=${enc(cid)}&did=${enc(fromDID)}"
+        val request = Request.Builder().url(urlStr).get().build()
+        publicHttpClient.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) {
+                throw java.io.IOException("Blob download failed: HTTP ${response.code}")
+            }
+            response.body?.bytes() ?: throw java.io.IOException("Blob response had no body")
+        }
+    }
+
+    suspend fun getPollDefinition(did: String, rkey: String): LeafletPollDefinition {
+        val urlStr = "https://public.api.bsky.app/xrpc/com.atproto.repo.getRecord?repo=${enc(did)}&collection=pub.leaflet.poll.definition&rkey=${enc(rkey)}"
+        val body = executeGet(urlStr)
+        val record = json.parseToJsonElement(body).jsonObject
+        val value = record["value"]?.jsonObject ?: throw IllegalStateException("Missing poll value")
+        return json.decodeFromJsonElement(LeafletPollDefinition.serializer(), value)
+    }
+
+    suspend fun listPollVotes(did: String, pollRkey: String): List<LeafletPollVote> {
+        val urlStr = "https://public.api.bsky.app/xrpc/com.atproto.repo.listRecords?repo=${enc(did)}&collection=pub.leaflet.poll.vote&limit=100"
+        val body = executeGet(urlStr)
+        val response = json.parseToJsonElement(body).jsonObject
+        val records = response["records"]?.jsonArray.orEmpty()
+        return records.mapNotNull { record ->
+            val uri = record.jsonObject["uri"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null
+            val value = record.jsonObject["value"]?.jsonObject ?: return@mapNotNull null
+            val vote = runCatching { json.decodeFromJsonElement(LeafletPollVote.serializer(), value) }.getOrNull()
+                ?: return@mapNotNull null
+            val rkey = uk.ewancroft.inkwell.data.model.common.AtUri.parse(uri)?.recordKey ?: return@mapNotNull null
+            if (rkey != pollRkey) return@mapNotNull null
+            vote
+        }
+    }
+
+    suspend fun createPollVote(did: String, pollUri: String, options: List<String>): JsonObject {
+        val session = sessionStore.load() ?: throw Exception("Not authenticated")
+        val authClient = atOAuth.createClient()
+        return authClient.procedure(
+            nsid = "com.atproto.repo.createRecord",
+            params = Unit,
+            paramsSerializer = Unit.serializer(),
+            input = buildJsonObject {
+                put("repo", session.did)
+                put("collection", "pub.leaflet.poll.vote")
+                put("record", buildJsonObject {
+                    put("\$type", "pub.leaflet.poll.vote")
+                    put("poll", buildJsonObject {
+                        put("uri", pollUri)
+                    })
+                    put("option", buildJsonArray { options.forEach { add(JsonPrimitive(it)) } })
+                })
+            },
+            inputSerializer = JsonObject.serializer(),
+            responseSerializer = JsonObject.serializer(),
+        )
     }
 
     private suspend fun resolvePdsUrl(did: String): String? {
