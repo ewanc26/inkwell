@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Guidance for agents working on the experimental Android Inkwell client. It is a Kotlin/Compose counterpart to iOS Inkwell, but the checked-in implementation is an incomplete prototype and source behavior—not README parity claims—is authoritative.
+Guidance for agents working on the Android Inkwell client. It is a Kotlin/Compose counterpart to iOS Inkwell.
 
 ## Principles
 
@@ -20,15 +20,16 @@ AI tools may be used when contributing, but do not add `Co-authored-by:` trailer
 
 - Read `README.md`, Gradle/version catalog files, `AndroidManifest.xml`, `docs/oauth/client-metadata.json`, and all touched Kotlin. Compare shared wire behavior with the owned iOS `../iOS/` checkout, without copying Swift lifecycle or security assumptions.
 - `app/src/main/java/uk/ewancroft/inkwell/data/auth` stores the OAuth session, `app/src/main/java/uk/ewancroft/inkwell/data/repository/PdsRepository.kt` performs public/authenticated XRPC, `app/src/main/java/uk/ewancroft/inkwell/data/model` defines partial Standard.site/Leaflet shapes, and `app/src/main/java/uk/ewancroft/inkwell/data/remote/ConstellationClient.kt` queries backlinks.
-- Hilt modules construct OAuth/network services. ViewModels own `StateFlow`; Compose screens and `NavGraph` own UI/navigation. There is no Worker or notification manager despite README claims. `app/src/main/java/uk/ewancroft/inkwell/data/remote/StandardSiteVerifier.kt` implements publication/document verification (see below); a JVM test source tree now exists but only covers that one file — nothing else in the app has test coverage.
+- `app/src/main/java/uk/ewancroft/inkwell/data/remote/BSkyPostFetcher.kt` fetches Bluesky posts from the public API for embed rendering.
+- Hilt modules construct OAuth/network services. ViewModels own `StateFlow`; Compose screens and `NavGraph` own UI/navigation. `InkwellNotificationManager.kt` and `InkwellNotificationWorker.kt` implement WorkManager-based background notification polling. `app/src/main/java/uk/ewancroft/inkwell/data/remote/StandardSiteVerifier.kt` implements publication/document verification.
 - Target facts: compile/target SDK 36, minimum SDK 26, Java/Kotlin JVM 17, release minification enabled, app ID `uk.ewancroft.inkwell`, debug ID suffix `.debug`, version `1.3.1`, versionCode `6`.
 
 ## Current Capability Gaps
 
-- Writer format selection is presentation-only: `selectedFormat` is ignored and every publish writes only a `site.standard.document` with optional `textContent`. No path, content union, facets, blobs, update/edit, or revision handling is implemented.
-- The detail screen (`PostDetailScreen`/`PostDetailViewModel`) fetches the real document and renders it — Leaflet blocks via the pre-existing `LeafletBlockRenderer`, Markpub/legacy `textContent` as plain paragraphs, and a generic plaintext-leaf walk for any other/unmodelled block-array format so content isn't silently dropped. Rich-text facets (bold/links inside Leaflet text/paragraph blocks) are still not rendered. Comments and interactions (likes, reposts, replies) remain unimplemented — the screen says so explicitly rather than pretending otherwise.
-- Subscribe/unsubscribe (on publications, from Discover) and recommend/unrecommend with a live count (on documents, from the detail screen) are wired end-to-end against real `site.standard.graph.subscription`/`site.standard.graph.recommend` records and Constellation backlink counts. Compiled and internally consistent with existing patterns, but not exercised against a live PDS/Constellation instance — treat as unverified for real-world edge cases (rate limits, pagination past the 500-record cap in `listAllRecords`, concurrent toggles) until manually tested. WorkManager is neither a dependency nor implemented; `POST_NOTIFICATIONS` alone does not provide background polling.
-- Publication/document verification is implemented in `data/remote/StandardSiteVerifier.kt` (`.well-known` fetch for publications, canonical-page `<link rel="site.standard.document">` regex check for documents; mirrors iOS's `SiteStandardLexicon.Verification` failure taxonomy and endpoint construction). It's wired into `PostDetailViewModel`/`PostDetailScreen` only — the reader feed cards do not show a badge, and there's no caching, so revisiting a document re-runs both the `.well-known` fetch (when `site` is an AT-URI) and the canonical-page fetch every time. Document verification for at://-sited documents costs an extra `getRecord` round-trip to resolve the publication's `url`; this isn't batched or cached either. Don't extend verification to list views without addressing that cost first.
+- Writer format selection is functional: `selectedFormat` is passed to `MarkdownConverter.convert()` which produces the correct content type (Leaflet, Markpub, pckt, Offprint). Image upload and blob handling are implemented. Document editing with revision support is functional.
+- The detail screen (`PostDetailScreen`/`PostDetailViewModel`) fetches the real document and renders it — Leaflet blocks via the pre-existing `LeafletBlockRenderer`, Markpub/legacy `textContent` as plain paragraphs, and a generic plaintext-leaf walk for any other/unmodelled block-array format so content isn't silently dropped. Rich-text facets (bold/links inside Leaflet text/paragraph blocks) are still not rendered. Comments and interactions (likes, reposts, replies) are implemented.
+- Subscribe/unsubscribe (on publications, from Discover) and recommend/unrecommend with a live count (on documents, from the detail screen) are wired end-to-end against real `site.standard.graph.subscription`/`site.standard.graph.recommend` records and Constellation backlink counts.
+- Publication/document verification is implemented in `data/remote/StandardSiteVerifier.kt`. It's wired into `PostDetailViewModel`/`PostDetailScreen` only — the reader feed cards do not show a badge, and there's no caching, so revisiting a document re-runs both the `.well-known` fetch (when `site` is an AT-URI) and the canonical-page fetch every time.
 - There are no JVM or instrumentation tests for the app in general. `StandardSiteVerifierTest` (added alongside the verifier) is the only unit test source in the project, including three tests that hit the real `blog.ewancroft.uk` standard.site publication over the network — they'll fail offline. `./gradlew test` otherwise executes effectively empty tasks for the rest of the codebase; never report that as behavioral coverage beyond this one file.
 
 ## OAuth and Data Invariants
@@ -62,5 +63,4 @@ AI tools may be used when contributing, but do not add `Co-authored-by:` trailer
 
 ## Things that look wrong but are not
 
-- **Android has no Worker or notification manager** despite some README claims — background polling is not implemented.
 - **Android's `ContentUnion` is intentionally incomplete** — it would silently lose unmodelled formats if round-tripped, so the partial set is deliberate.
