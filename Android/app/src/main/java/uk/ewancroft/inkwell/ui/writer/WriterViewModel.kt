@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -58,6 +59,7 @@ data class WriterUiState(
     val editingDocumentFormat: String? = null,
     val editingDocumentRevision: String? = null,
     val isEditing: Boolean = false,
+    val uploadedBlobs: Map<String, JsonObject> = emptyMap(),
 )
 
 @HiltViewModel
@@ -274,12 +276,26 @@ class WriterViewModel @Inject constructor(
             return
         }
 
+        if (state.verifiedPublicationUri == null) {
+            _uiState.value = state.copy(publishError = "Publication must be verified before publishing")
+            return
+        }
+
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isPublishing = true, publishError = null, publishSuccess = null)
             try {
                 val now = java.time.Instant.now().toString()
 
-                val content = MarkdownConverter.convert(state.markdown, state.selectedFormat)
+                val normalizedPath = state.path.trim().let { p ->
+                    when {
+                        p.isEmpty() -> ""
+                        p.startsWith("/") -> p
+                        else -> "/$p"
+                    }
+                }
+
+                val content = MarkdownConverter.convert(state.markdown, state.selectedFormat, state.uploadedBlobs)
+                val plaintext = markdownToPlaintext(state.markdown)
 
                 if (state.editingDocumentUri != null) {
                     val revision = state.editingDocumentRevision
@@ -299,12 +315,12 @@ class WriterViewModel @Inject constructor(
                         if (state.description.isNotBlank()) {
                             put("description", state.description.trim())
                         }
-                        if (state.path.isNotBlank()) {
-                            put("path", state.path.trim())
+                        if (normalizedPath.isNotBlank()) {
+                            put("path", normalizedPath)
                         }
                         put("content", content)
-                        if (state.markdown.isNotBlank()) {
-                            put("textContent", state.markdown)
+                        if (plaintext.isNotBlank()) {
+                            put("textContent", plaintext)
                         }
                     }
 
@@ -330,12 +346,12 @@ class WriterViewModel @Inject constructor(
                         if (state.description.isNotBlank()) {
                             put("description", state.description.trim())
                         }
-                        if (state.path.isNotBlank()) {
-                            put("path", state.path.trim())
+                        if (normalizedPath.isNotBlank()) {
+                            put("path", normalizedPath)
                         }
                         put("content", content)
-                        if (state.markdown.isNotBlank()) {
-                            put("textContent", state.markdown)
+                        if (plaintext.isNotBlank()) {
+                            put("textContent", plaintext)
                         }
                     }
 
@@ -353,6 +369,7 @@ class WriterViewModel @Inject constructor(
                         description = "",
                         path = "",
                         markdown = "",
+                        uploadedBlobs = emptyMap(),
                     )
                 }
             } catch (e: Exception) {
@@ -377,6 +394,17 @@ class WriterViewModel @Inject constructor(
                 val path = value["path"]?.jsonPrimitive?.contentOrNull ?: ""
                 val textContent = value["textContent"]?.jsonPrimitive?.contentOrNull ?: ""
 
+                val content = value["content"]?.jsonObject
+                val contentType = content?.get("\$type")?.jsonPrimitive?.contentOrNull
+                val format = when (contentType) {
+                    "at.markpub.markdown" -> "Markpub"
+                    "blog.pckt.content" -> "pckt"
+                    "app.offprint.content" -> "Offprint"
+                    else -> "Leaflet"
+                }
+
+                val existingBlobs = harvestBlobRefs(textContent)
+
                 _uiState.value = _uiState.value.copy(
                     editingDocumentUri = uri,
                     editingDocumentTitle = title,
@@ -388,6 +416,10 @@ class WriterViewModel @Inject constructor(
                     description = description,
                     path = path,
                     markdown = textContent,
+                    selectedFormat = format,
+                    uploadedBlobs = existingBlobs,
+                    verifiedPublicationUri = null,
+                    verificationMessage = null,
                     isEditing = false,
                 )
             } catch (e: Exception) {
@@ -399,6 +431,15 @@ class WriterViewModel @Inject constructor(
         }
     }
 
+    private fun harvestBlobRefs(markdown: String?): Map<String, JsonObject> {
+        if (markdown == null) return emptyMap()
+        val regex = Regex("^!\\[([^\\]]*)\\]\\(([^)]+)\\)$", RegexOption.MULTILINE)
+        return regex.findAll(markdown).associate {
+            val url = it.groupValues[2]
+            url to buildJsonObject { put("\$link", url) }
+        }
+    }
+
     fun cancelEditing() {
         _uiState.value = _uiState.value.copy(
             editingDocumentUri = null,
@@ -407,6 +448,47 @@ class WriterViewModel @Inject constructor(
             editingDocumentDescription = null,
             editingDocumentPath = null,
             editingDocumentMarkdown = null,
+            uploadedBlobs = emptyMap(),
         )
+    }
+
+    fun uploadImage(bytes: ByteArray, mimeType: String) {
+        viewModelScope.launch {
+            try {
+                val result = pdsRepository.uploadBlob(bytes, mimeType)
+                val blobRef = result["blob"]?.jsonObject ?: throw Exception("Missing blob in upload response")
+                val blobLink = blobRef["ref"]?.jsonObject?.get("\$link")?.jsonPrimitive?.content
+                    ?: blobRef["link"]?.jsonPrimitive?.content
+                    ?: throw Exception("Missing blob reference in upload response")
+
+                val markdown = "\n![Image]($blobLink)\n"
+                val newBlobs = _uiState.value.uploadedBlobs + (blobLink to blobRef)
+                _uiState.value = _uiState.value.copy(
+                    markdown = _uiState.value.markdown + markdown,
+                    uploadedBlobs = newBlobs,
+                    publishError = null,
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    publishError = "Failed to upload image: ${e.message}",
+                )
+            }
+        }
+    }
+
+    private fun markdownToPlaintext(markdown: String): String {
+        var text = markdown
+        text = text.replace(Regex("^#{1,6}\\s+", RegexOption.MULTILINE), "")
+        text = text.replace(Regex("^[-*]\\s+", RegexOption.MULTILINE), "")
+        text = text.replace(Regex("^>\\s*", RegexOption.MULTILINE), "")
+        text = text.replace(Regex("```[\\s\\S]*?```"), "")
+        text = text.replace(Regex("\\*\\*(.+?)\\*\\*"), "$1")
+        text = text.replace(Regex("\\*(.+?)\\*"), "$1")
+        text = text.replace(Regex("~~(.+?)~~"), "$1")
+        text = text.replace(Regex("`(.+?)`"), "$1")
+        text = text.replace(Regex("!\\[(.+?)\\]\\((.+?)\\)"), "$1")
+        text = text.replace(Regex("\\[(.+?)\\]\\((.+?)\\)"), "$1")
+        text = text.replace(Regex("^---$|^\\*\\*\\*$", RegexOption.MULTILINE), "")
+        return text.trim()
     }
 }
