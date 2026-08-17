@@ -287,6 +287,7 @@ private fun FeedContent(
                     coverUrl = post.coverUrl,
                     authorDisplayName = post.authorDisplayName,
                     authorAvatar = post.authorAvatar,
+                    isVerified = post.isVerified,
                     onClick = { onPostClick(index, post) },
                 )
             }
@@ -314,6 +315,7 @@ fun PostCard(
     coverUrl: String?,
     authorDisplayName: String? = null,
     authorAvatar: String? = null,
+    isVerified: Boolean? = null,
     onClick: () -> Unit = {},
 ) {
     val cardBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
@@ -411,6 +413,15 @@ fun PostCard(
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
+                        if (isVerified == true) {
+                            Spacer(Modifier.width(4.dp))
+                            Icon(
+                                Icons.Filled.Verified,
+                                contentDescription = "Verified source",
+                                modifier = Modifier.size(14.dp),
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                        }
                     }
                     Spacer(Modifier.weight(1f))
                     Icon(

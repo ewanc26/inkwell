@@ -13,6 +13,9 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import uk.ewancroft.inkwell.data.model.bluesky.BlueskyProfile
 import uk.ewancroft.inkwell.data.model.common.AtUri
+import uk.ewancroft.inkwell.data.model.atproto.DocumentRecord
+import uk.ewancroft.inkwell.data.remote.StandardSiteVerifier
+import uk.ewancroft.inkwell.data.remote.VerificationResult
 import uk.ewancroft.inkwell.data.repository.PdsRepository
 import uk.ewancroft.inkwell.ScreenshotConfig
 import uk.ewancroft.inkwell.util.formatPublishedDate
@@ -28,6 +31,7 @@ data class PostItem(
     val site: String,
     val authorDisplayName: String? = null,
     val authorAvatar: String? = null,
+    val isVerified: Boolean? = null,
 ) {
     val date: String get() = publishedAt.formatPublishedDate()
 }
@@ -41,6 +45,7 @@ data class ReaderUiState(
     val hasMoreFollowing: Boolean = false,
     val error: String? = null,
     val selectedTab: Int = 0,
+    val isVerifyingPosts: Boolean = false,
 )
 
 @HiltViewModel
@@ -89,6 +94,28 @@ class ReaderViewModel @Inject constructor(
 
     fun selectTab(index: Int) {
         _uiState.value = _uiState.value.copy(selectedTab = index)
+    }
+
+    private suspend fun verifyPosts(posts: List<PostItem>): List<PostItem> {
+        val session = pdsRepository.getSession() ?: return posts
+        val docsToVerify = posts.filter { it.site.startsWith("https://") && it.isVerified == null }
+        if (docsToVerify.isEmpty()) return posts
+
+        return posts.map { post ->
+            if (post.site.startsWith("https://") && post.isVerified == null) {
+                val result = StandardSiteVerifier.verifyDocument(
+                    documentURI = post.uri,
+                    document = uk.ewancroft.inkwell.data.model.atproto.DocumentRecord(
+                        site = post.site,
+                        title = post.title,
+                        publishedAt = post.publishedAt,
+                    ),
+                )
+                post.copy(isVerified = result is VerificationResult.Verified)
+            } else {
+                post
+            }
+        }
     }
 
     fun loadData() {
@@ -228,6 +255,8 @@ class ReaderViewModel @Inject constructor(
                 isLoadingFollowing = false,
                 hasMoreFollowing = followingCursors.isNotEmpty(),
             )
+            val verifiedFollowing = verifyPosts(_uiState.value.followingPosts)
+            _uiState.value = _uiState.value.copy(followingPosts = verifiedFollowing)
         } catch (e: Exception) {
             _uiState.value = _uiState.value.copy(
                 isLoadingFollowing = false,
@@ -270,6 +299,8 @@ class ReaderViewModel @Inject constructor(
                 yoursPosts = posts.sortedByDescending { it.publishedAt },
                 isLoadingYours = false
             )
+            val verifiedYours = verifyPosts(_uiState.value.yoursPosts)
+            _uiState.value = _uiState.value.copy(yoursPosts = verifiedYours)
         } catch (e: Exception) {
             _uiState.value = _uiState.value.copy(
                 isLoadingYours = false,
