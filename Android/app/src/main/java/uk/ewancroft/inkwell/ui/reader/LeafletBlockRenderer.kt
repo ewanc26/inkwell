@@ -52,6 +52,8 @@ import uk.ewancroft.inkwell.data.model.content.LeafletPollDefinition
 import uk.ewancroft.inkwell.data.model.content.LeafletPollVote
 import uk.ewancroft.inkwell.data.model.content.ListItem as ListItemModel
 import uk.ewancroft.inkwell.data.repository.PdsRepository
+import uk.ewancroft.inkwell.shared.AtUri
+import uk.ewancroft.inkwell.shared.facets.FacetSchema
 import uk.ewancroft.inkwell.util.formatPublishedDate
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -108,29 +110,29 @@ fun buildAnnotatedString(text: String, facets: List<LeafletFacet>?): AnnotatedSt
 
         for (feature in facet.features) {
             when (feature.type) {
-                "pub.leaflet.richtext.facet#bold",
-                "blog.pckt.richtext.facet#bold",
-                "app.offprint.richtext.facet#bold" -> {
+                FacetSchema.leaflet.bold,
+                FacetSchema.pckt.bold,
+                FacetSchema.offprint.bold -> {
                     builder.addStyle(SpanStyle(fontWeight = FontWeight.Bold), range.start, range.endInclusive + 1)
                 }
-                "pub.leaflet.richtext.facet#italic",
-                "blog.pckt.richtext.facet#italic",
-                "app.offprint.richtext.facet#italic" -> {
+                FacetSchema.leaflet.italic,
+                FacetSchema.pckt.italic,
+                FacetSchema.offprint.italic -> {
                     builder.addStyle(SpanStyle(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic), range.start, range.endInclusive + 1)
                 }
-                "pub.leaflet.richtext.facet#code",
-                "blog.pckt.richtext.facet#code",
-                "app.offprint.richtext.facet#code" -> {
+                FacetSchema.leaflet.code,
+                FacetSchema.pckt.code,
+                FacetSchema.offprint.code -> {
                     builder.addStyle(SpanStyle(fontFamily = FontFamily.Monospace), range.start, range.endInclusive + 1)
                 }
-                "pub.leaflet.richtext.facet#strikethrough",
-                "blog.pckt.richtext.facet#strikethrough",
-                "app.offprint.richtext.facet#strikethrough" -> {
+                FacetSchema.leaflet.strike,
+                FacetSchema.pckt.strike,
+                FacetSchema.offprint.strike -> {
                     builder.addStyle(SpanStyle(textDecoration = TextDecoration.LineThrough), range.start, range.endInclusive + 1)
                 }
-                "pub.leaflet.richtext.facet#link",
-                "blog.pckt.richtext.facet#link",
-                "app.offprint.richtext.facet#link" -> {
+                FacetSchema.leaflet.link,
+                FacetSchema.pckt.link,
+                FacetSchema.offprint.link -> {
                     feature.uri?.let { uri ->
                         builder.addStringAnnotation(tag = "URL", annotation = uri, start = range.start, end = range.endInclusive + 1)
                     }
@@ -685,7 +687,7 @@ private data class StandardSitePostData(
 
 private suspend fun fetchStandardSitePost(uri: String): StandardSitePostData? {
     return try {
-        val parsed = uk.ewancroft.inkwell.data.model.common.AtUri.parse(uri) ?: return null
+        val parsed = AtUri.parse(uri) ?: return null
         val client = okhttp3.OkHttpClient.Builder()
             .connectTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
             .readTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
@@ -710,7 +712,7 @@ private suspend fun fetchStandardSitePost(uri: String): StandardSitePostData? {
         var publicationName: String? = null
         val siteUri = value["site"]?.jsonPrimitive?.contentOrNull
         if (siteUri != null && siteUri.startsWith("at://")) {
-            val pubParsed = uk.ewancroft.inkwell.data.model.common.AtUri.parse(siteUri)
+            val pubParsed = AtUri.parse(siteUri)
             if (pubParsed != null) {
                 val pubUrl = "https://public.api.bsky.app/xrpc/com.atproto.repo.getRecord?repo=${pubParsed.did}&collection=${pubParsed.collection}&rkey=${pubParsed.recordKey}"
                 val pubRequest = okhttp3.Request.Builder().url(pubUrl).build()

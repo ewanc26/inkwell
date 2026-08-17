@@ -45,22 +45,10 @@ data class ContentUnion(
 // ── AT Protocol URI & Pagination Types ───────────────────────────────────
 
 /**
- * Parsed AT-URI: did + collection + recordKey extracted from the
- * standard `at://did/collection/rkey` format.
+ * Parsed AT-URI — re-exported from the shared KMP core so existing
+ * @Serializable usages in this module resolve to the same type.
  */
-@Serializable
-data class AtUri(val did: String, val collection: String, val recordKey: String) {
-    companion object {
-        /** Parses at:// URIs. Returns null for malformed input. */
-        fun parse(uri: String): AtUri? {
-            val regex = Regex("""^at://([^/]+)/([^/]+)/(.+)$""")
-            val match = regex.find(uri) ?: return null
-            return AtUri(match.groupValues[1], match.groupValues[2], match.groupValues[3])
-        }
-    }
-    /** Reassembles the canonical AT-URI string. */
-    val uri: String get() = "at://$did/$collection/$recordKey"
-}
+typealias AtUri = uk.ewancroft.inkwell.shared.AtUri
 
 /** Generic wrapper for a single record returned from the PDS. */
 @Serializable

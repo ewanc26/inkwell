@@ -15,7 +15,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import uk.ewancroft.inkwell.data.model.atproto.PublicationRecord
-import uk.ewancroft.inkwell.data.model.common.AtUri
+import uk.ewancroft.inkwell.shared.AtUri
 import uk.ewancroft.inkwell.data.remote.StandardSiteVerifier
 import uk.ewancroft.inkwell.data.remote.VerificationResult
 import uk.ewancroft.inkwell.data.remote.VerificationFailure

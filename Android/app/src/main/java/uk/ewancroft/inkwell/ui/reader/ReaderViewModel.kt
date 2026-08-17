@@ -13,7 +13,7 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import uk.ewancroft.inkwell.data.model.bluesky.BlueskyProfile
-import uk.ewancroft.inkwell.data.model.common.AtUri
+import uk.ewancroft.inkwell.shared.AtUri
 import uk.ewancroft.inkwell.data.model.atproto.DocumentRecord
 import uk.ewancroft.inkwell.data.remote.StandardSiteVerifier
 import uk.ewancroft.inkwell.data.remote.VerificationResult

@@ -17,6 +17,7 @@ import okhttp3.Request
 import uk.ewancroft.inkwell.data.model.common.SearchResponse
 import uk.ewancroft.inkwell.data.model.common.SearchResult
 import uk.ewancroft.inkwell.data.repository.PdsRepository
+import uk.ewancroft.inkwell.shared.AtUri
 import uk.ewancroft.inkwell.ScreenshotConfig
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -177,7 +178,7 @@ class DiscoverViewModel @Inject constructor(
                 } else {
                     val created = pdsRepository.createSubscription(publicationUri)
                     val newUri = created["uri"]?.jsonPrimitive?.content
-                    val rkey = newUri?.let { uk.ewancroft.inkwell.data.model.common.AtUri.parse(it)?.recordKey }
+                    val rkey = newUri?.let { AtUri.parse(it)?.recordKey }
                     if (rkey != null) {
                         _uiState.value = _uiState.value.copy(
                             subscriptions = _uiState.value.subscriptions + (publicationUri to rkey)

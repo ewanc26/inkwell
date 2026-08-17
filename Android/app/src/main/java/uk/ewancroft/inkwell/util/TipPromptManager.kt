@@ -2,14 +2,13 @@ package uk.ewancroft.inkwell.util
 
 import android.content.Context
 import android.content.SharedPreferences
+import uk.ewancroft.inkwell.shared.policy.TipPromptPolicy
 
 object TipPromptManager {
+
     private const val PREFS_NAME = "inkwell_tip_prompt"
     private const val KEY_LAUNCH_COUNT = "launch_count"
     private const val KEY_LAST_SHOWN = "last_shown_date"
-
-    private const val MIN_LAUNCHES = 5
-    private const val COOLDOWN_DAYS = 7L
 
     fun recordLaunch(context: Context) {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -20,14 +19,13 @@ object TipPromptManager {
     fun shouldShowTip(context: Context): Boolean {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val count = prefs.getInt(KEY_LAUNCH_COUNT, 0)
-        if (count < MIN_LAUNCHES) return false
-
         val lastShown = prefs.getLong(KEY_LAST_SHOWN, -1L)
-        if (lastShown == -1L) return true
 
-        val now = System.currentTimeMillis()
-        val diffDays = (now - lastShown) / (1000 * 60 * 60 * 24)
-        return diffDays >= COOLDOWN_DAYS
+        return TipPromptPolicy.shouldShowTip(
+            launchCount = count,
+            lastShownEpochMillis = lastShown,
+            nowEpochMillis = System.currentTimeMillis(),
+        )
     }
 
     fun markShown(context: Context) {
