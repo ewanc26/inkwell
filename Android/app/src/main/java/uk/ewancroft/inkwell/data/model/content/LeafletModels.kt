@@ -21,7 +21,8 @@ import uk.ewancroft.inkwell.data.model.common.StrongRef
 @Serializable
 data class LeafletContent(
     @SerialName("\$type") val type: String = "pub.leaflet.content",
-    val pages: List<LeafletPage>? = null
+    val pages: List<LeafletPage>? = null,
+    val blobPages: BlobRef? = null
 )
 
 // ── Pages ────────────────────────────────────────────────────────────────
@@ -90,7 +91,9 @@ data class LeafletBlock(
     val aspectRatio: String? = null,
     // page reference
     val pageIndex: Int? = null,
-    val pageDocument: String? = null
+    val pageDocument: String? = null,
+    // poll
+    val poll: StrongRef? = null
 )
 
 // ── List Items & Facets ──────────────────────────────────────────────────
@@ -127,4 +130,28 @@ data class FacetFeature(
     @SerialName("\$type") val type: String,
     val uri: String? = null,
     val did: String? = null
+)
+
+// ── Polls ────────────────────────────────────────────────────────────────
+
+/** A poll definition record (`pub.leaflet.poll.definition`). */
+@Serializable
+data class LeafletPollDefinition(
+    @SerialName("\$type") val type: String = "pub.leaflet.poll.definition",
+    val name: String? = null,
+    val options: List<LeafletPollOption>? = null,
+    val endDate: String? = null
+) {
+    @Serializable
+    data class LeafletPollOption(
+        val text: String
+    )
+}
+
+/** A poll vote record (`pub.leaflet.poll.vote`). */
+@Serializable
+data class LeafletPollVote(
+    @SerialName("\$type") val type: String = "pub.leaflet.poll.vote",
+    val poll: StrongRef,
+    val option: List<String>? = null
 )

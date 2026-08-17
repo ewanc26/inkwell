@@ -15,6 +15,7 @@ import uk.ewancroft.inkwell.data.model.bluesky.BlueskyProfile
 import uk.ewancroft.inkwell.data.model.common.AtUri
 import uk.ewancroft.inkwell.data.repository.PdsRepository
 import uk.ewancroft.inkwell.ScreenshotConfig
+import uk.ewancroft.inkwell.util.formatPublishedDate
 import javax.inject.Inject
 
 data class PostItem(
@@ -28,7 +29,7 @@ data class PostItem(
     val authorDisplayName: String? = null,
     val authorAvatar: String? = null,
 ) {
-    val date: String get() = publishedAt.take(10)
+    val date: String get() = publishedAt.formatPublishedDate()
 }
 
 data class ReaderUiState(

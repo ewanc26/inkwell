@@ -1,22 +1,31 @@
 package uk.ewancroft.inkwell.ui.reader
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.filled.Verified
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
+import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.outlined.ErrorOutline
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.HourglassEmpty
 import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material.icons.outlined.WarningAmber
+import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import uk.ewancroft.inkwell.data.remote.VerificationResult
+import uk.ewancroft.inkwell.util.formatPublishedDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,6 +74,34 @@ fun PostDetailScreen(
                         Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = "Back")
                     }
                 },
+                actions = {
+                    val context = androidx.compose.ui.platform.LocalContext.current
+                    val canonicalUrl = remember(uiState.publicationUrl, uiState.path, uiState.publicationUri) {
+                        buildCanonicalUrl(uiState.publicationUrl, uiState.path)
+                    }
+                    if (canonicalUrl != null) {
+                        IconButton(onClick = {
+                            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                type = "text/plain"
+                                putExtra(Intent.EXTRA_TEXT, canonicalUrl)
+                            }
+                            context.startActivity(Intent.createChooser(shareIntent, "Share post"))
+                        }) {
+                            Icon(
+                                Icons.Outlined.Share,
+                                contentDescription = "Share",
+                            )
+                        }
+                        IconButton(onClick = {
+                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(canonicalUrl)))
+                        }) {
+                            Icon(
+                                Icons.AutoMirrored.Outlined.OpenInNew,
+                                contentDescription = "Open in browser",
+                            )
+                        }
+                    }
+                },
             )
         }
     ) { padding ->
@@ -76,6 +114,7 @@ fun PostDetailScreen(
             )
             else -> PostDetailContent(
                 uiState = uiState,
+                onToggleSubscription = { viewModel.toggleSubscription() },
                 onToggleRecommend = { viewModel.toggleRecommend() },
                 previousUri = uiState.previousUri,
                 previousTitle = uiState.previousTitle,
@@ -87,6 +126,19 @@ fun PostDetailScreen(
                 onSetReplyTo = { viewModel.setReplyTo(it) },
                 modifier = Modifier.padding(padding),
             )
+        }
+    }
+
+    if (uiState.subscriptionError != null) {
+        Snackbar(
+            modifier = Modifier.padding(16.dp),
+            action = {
+                TextButton(onClick = { viewModel.dismissSubscriptionError() }) {
+                    Text("Dismiss")
+                }
+            }
+        ) {
+            Text(uiState.subscriptionError!!)
         }
     }
 
@@ -157,6 +209,7 @@ private fun ErrorState(message: String, onRetry: () -> Unit, modifier: Modifier 
 @Composable
 private fun PostDetailContent(
     uiState: PostDetailUiState,
+    onToggleSubscription: () -> Unit,
     onToggleRecommend: () -> Unit,
     previousUri: String?,
     previousTitle: String?,
@@ -203,7 +256,7 @@ private fun PostDetailContent(
                 }
                 if (!uiState.publishedAt.isNullOrBlank()) {
                     Text(
-                        uiState.publishedAt.take(10),
+                        uiState.publishedAt.formatPublishedDate(),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -245,6 +298,9 @@ private fun PostDetailContent(
 
         item {
             HorizontalDivider()
+            if (uiState.publicationUri != null) {
+                SubscribeRow(uiState = uiState, onToggleSubscription = onToggleSubscription)
+            }
             RecommendRow(uiState = uiState, onToggleRecommend = onToggleRecommend)
         }
 
@@ -380,13 +436,14 @@ private fun CommentsSection(
 @Composable
 private fun CommentRow(comment: CommentEntry, isReplyTo: Boolean, onReply: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        val annotated = buildAnnotatedString(comment.record.plaintext, comment.record.facets)
         Text(
-            comment.record.plaintext,
+            annotated,
             style = MaterialTheme.typography.bodyMedium,
         )
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                comment.record.createdAt?.take(16)?.replace("T", " ") ?: "",
+                comment.record.createdAt?.formatPublishedDate() ?: "",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -497,6 +554,49 @@ private fun RecommendRow(uiState: PostDetailUiState, onToggleRecommend: () -> Un
     }
 }
 
+@Composable
+private fun SubscribeRow(uiState: PostDetailUiState, onToggleSubscription: () -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        if (uiState.isTogglingSubscription) {
+            Box(
+                modifier = Modifier.size(48.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+            }
+        } else {
+            IconToggleButton(
+                checked = uiState.isSubscribed,
+                onCheckedChange = { onToggleSubscription() },
+            ) {
+                Icon(
+                    if (uiState.isSubscribed) Icons.Filled.Notifications else Icons.Outlined.Notifications,
+                    contentDescription = if (uiState.isSubscribed) "Unsubscribe" else "Subscribe",
+                    tint = if (uiState.isSubscribed) MaterialTheme.colorScheme.primary
+                           else MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+
+        if (uiState.isLoadingSubscriptionState) {
+            Text(
+                "Loading subscription…",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        } else {
+            Text(
+                if (uiState.isSubscribed) "Subscribed" else "Subscribe to publication",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
 private fun splitIntoParagraphs(text: String): List<String> =
     text.split(Regex("\n\\s*\n"))
         .map { it.trim() }
@@ -554,4 +654,11 @@ private fun EmptyContentNotice() {
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
+}
+
+private fun buildCanonicalUrl(baseUrl: String?, path: String?): String? {
+    if (baseUrl == null) return null
+    val trimmedBase = baseUrl.trimEnd('/')
+    val trimmedPath = path?.trimStart('/')?.trimEnd('/') ?: return trimmedBase
+    return if (trimmedPath.isEmpty()) trimmedBase else "$trimmedBase/$trimmedPath"
 }

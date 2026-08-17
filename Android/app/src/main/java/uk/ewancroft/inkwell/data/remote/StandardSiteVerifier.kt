@@ -27,8 +27,17 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.IOException
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import uk.ewancroft.inkwell.data.model.atproto.DocumentRecord
 import uk.ewancroft.inkwell.data.model.atproto.PublicationRecord
+
+private data class CachedVerification(
+    val result: VerificationResult,
+    val timestamp: Long,
+)
+
+private const val CACHE_TTL_MS = 5 * 60 * 1000
 
 /** Why a publication or document failed verification. Kept as distinct, diagnosable cases
  * (rather than a plain boolean) so the UI and logs can say *why* a record is untrusted. */
@@ -95,6 +104,13 @@ object StandardSiteVerifier {
         .readTimeout(10, TimeUnit.SECONDS)
         .build()
 
+    private val publicationCache = mutableMapOf<String, CachedVerification>()
+    private val documentCache = mutableMapOf<String, CachedVerification>()
+    private val mutex = Mutex()
+
+    private fun isCacheValid(timestamp: Long): Boolean =
+        (System.currentTimeMillis() - timestamp) < CACHE_TTL_MS
+
     /**
      * Builds the `.well-known` verification endpoint for a publication, including the
      * publication's own path for non-root publications — e.g. a publication living at
@@ -158,38 +174,51 @@ object StandardSiteVerifier {
         publicationURI: String,
         publication: PublicationRecord,
     ): VerificationResult = withContext(Dispatchers.IO) {
-        val endpoint = publicationVerificationUrl(publication.url)
-            ?: return@withContext VerificationResult.Failed(
-                VerificationFailure.InvalidPublicationURL(publication.url)
-            )
-
-        try {
-            val request = Request.Builder().url(endpoint).get().build()
-            client.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) {
-                    return@withContext VerificationResult.Failed(
-                        VerificationFailure.EndpointUnreachable(response.code)
-                    )
-                }
-
-                val body = response.body?.string()?.trim()
-                if (body.isNullOrEmpty() || !body.startsWith("at://")) {
-                    return@withContext VerificationResult.Failed(VerificationFailure.MalformedResponse)
-                }
-
-                if (body != publicationURI) {
-                    return@withContext VerificationResult.Failed(
-                        VerificationFailure.MismatchedURI(expected = publicationURI, found = body)
-                    )
-                }
-
-                VerificationResult.Verified
+        mutex.withLock {
+            publicationCache[publicationURI]?.let { cached ->
+                if (isCacheValid(cached.timestamp)) return@withContext cached.result
             }
-        } catch (e: IOException) {
-            VerificationResult.Failed(VerificationFailure.EndpointUnreachable(statusCode = null))
-        } catch (e: Exception) {
-            VerificationResult.Failed(VerificationFailure.Unexpected(e.message))
         }
+
+        val result = runCatching {
+            val endpoint = publicationVerificationUrl(publication.url)
+                ?: return@withContext VerificationResult.Failed(
+                    VerificationFailure.InvalidPublicationURL(publication.url)
+                )
+
+            try {
+                val request = Request.Builder().url(endpoint).get().build()
+                client.newCall(request).execute().use { response ->
+                    if (!response.isSuccessful) {
+                        return@withContext VerificationResult.Failed(
+                            VerificationFailure.EndpointUnreachable(response.code)
+                        )
+                    }
+
+                    val body = response.body?.string()?.trim()
+                    if (body.isNullOrEmpty() || !body.startsWith("at://")) {
+                        return@withContext VerificationResult.Failed(VerificationFailure.MalformedResponse)
+                    }
+
+                    if (body != publicationURI) {
+                        return@withContext VerificationResult.Failed(
+                            VerificationFailure.MismatchedURI(expected = publicationURI, found = body)
+                        )
+                    }
+
+                    VerificationResult.Verified
+                }
+            } catch (e: IOException) {
+                VerificationResult.Failed(VerificationFailure.EndpointUnreachable(statusCode = null))
+            } catch (e: Exception) {
+                VerificationResult.Failed(VerificationFailure.Unexpected(e.message))
+            }
+        }.getOrElse { VerificationResult.Failed(VerificationFailure.Unexpected(it.message)) }
+
+        mutex.withLock {
+            publicationCache[publicationURI] = CachedVerification(result, System.currentTimeMillis())
+        }
+        result
     }
 
     /**
@@ -209,38 +238,51 @@ object StandardSiteVerifier {
         document: DocumentRecord,
         publication: PublicationRecord? = null,
     ): VerificationResult = withContext(Dispatchers.IO) {
-        val url = documentCanonicalUrl(document, publication)
-            ?: return@withContext VerificationResult.Failed(
-                VerificationFailure.InvalidDocumentURL(document.site)
-            )
-
-        try {
-            val request = Request.Builder().url(url).get().build()
-            client.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) {
-                    return@withContext VerificationResult.Failed(
-                        VerificationFailure.EndpointUnreachable(response.code)
-                    )
-                }
-
-                val html = response.body?.string()
-                if (html.isNullOrEmpty()) {
-                    return@withContext VerificationResult.Failed(VerificationFailure.MalformedResponse)
-                }
-
-                if (containsDocumentLink(html, documentURI)) {
-                    VerificationResult.Verified
-                } else {
-                    VerificationResult.Failed(
-                        VerificationFailure.DocumentLinkMissing(expected = documentURI)
-                    )
-                }
+        mutex.withLock {
+            documentCache[documentURI]?.let { cached ->
+                if (isCacheValid(cached.timestamp)) return@withContext cached.result
             }
-        } catch (e: IOException) {
-            VerificationResult.Failed(VerificationFailure.EndpointUnreachable(statusCode = null))
-        } catch (e: Exception) {
-            VerificationResult.Failed(VerificationFailure.Unexpected(e.message))
         }
+
+        val result = runCatching {
+            val url = documentCanonicalUrl(document, publication)
+                ?: return@withContext VerificationResult.Failed(
+                    VerificationFailure.InvalidDocumentURL(document.site)
+                )
+
+            try {
+                val request = Request.Builder().url(url).get().build()
+                client.newCall(request).execute().use { response ->
+                    if (!response.isSuccessful) {
+                        return@withContext VerificationResult.Failed(
+                            VerificationFailure.EndpointUnreachable(response.code)
+                        )
+                    }
+
+                    val html = response.body?.string()
+                    if (html.isNullOrEmpty()) {
+                        return@withContext VerificationResult.Failed(VerificationFailure.MalformedResponse)
+                    }
+
+                    if (containsDocumentLink(html, documentURI)) {
+                        VerificationResult.Verified
+                    } else {
+                        VerificationResult.Failed(
+                            VerificationFailure.DocumentLinkMissing(expected = documentURI)
+                        )
+                    }
+                }
+            } catch (e: IOException) {
+                VerificationResult.Failed(VerificationFailure.EndpointUnreachable(statusCode = null))
+            } catch (e: Exception) {
+                VerificationResult.Failed(VerificationFailure.Unexpected(e.message))
+            }
+        }.getOrElse { VerificationResult.Failed(VerificationFailure.Unexpected(it.message)) }
+
+        mutex.withLock {
+            documentCache[documentURI] = CachedVerification(result, System.currentTimeMillis())
+        }
+        result
     }
 
     /** Builds the `<link>` discovery tag a document page must serve in its

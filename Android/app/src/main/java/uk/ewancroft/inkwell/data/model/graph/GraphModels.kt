@@ -10,6 +10,7 @@ package uk.ewancroft.inkwell.data.model.graph
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import uk.ewancroft.inkwell.data.model.content.LeafletFacet
 
 // ── standard.site: subscription (follow) ─────────────────────────────────
 
@@ -39,6 +40,7 @@ data class LeafletComment(
     @SerialName("\$type") val type: String = "pub.leaflet.comment",
     val subject: String,
     val plaintext: String,
+    val facets: List<LeafletFacet>? = null,
     val reply: ReplyRef? = null,
     val onPage: String? = null,
     val createdAt: String? = null
