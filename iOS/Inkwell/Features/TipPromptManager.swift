@@ -24,18 +24,14 @@ final class TipPromptManager {
 
     var shouldShowTip: Bool {
         let count = launchCount
-        let lastShown = lastShownDate
-        let now = Date()
+        let lastShown = lastShownDate?.timeIntervalSince1970 ?? -1
+        let now = Date().timeIntervalSince1970
 
-        // Show after at least 5 launches.
-        guard count >= 5 else { return false }
-
-        // If never shown, or last shown more than 7 days ago.
-        if let lastShown {
-            return now.timeIntervalSince(lastShown) >= 7 * 24 * 60 * 60
-        } else {
-            return true
-        }
+        return Inkwell.shouldShowTip(
+            launchCount: count,
+            lastShownEpochMillis: Int64(lastShown),
+            nowEpochMillis: Int64(now)
+        )
     }
 
     func recordLaunch() {
