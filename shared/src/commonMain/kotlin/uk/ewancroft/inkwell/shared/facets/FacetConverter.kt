@@ -1,16 +1,25 @@
 package uk.ewancroft.inkwell.shared.facets
 
+import kotlin.experimental.ExperimentalObjCName
+import kotlin.native.ObjCName
+
+@OptIn(ExperimentalObjCName::class)
+@ObjCName("RichTextFacet", exact = true)
 data class RichTextFacet(
     val byteStart: Int,
     val byteEnd: Int,
     val features: List<RichTextFeature>,
 )
 
+@OptIn(ExperimentalObjCName::class)
+@ObjCName("RichTextFeature", exact = true)
 data class RichTextFeature(
     val type: String,
     val uri: String? = null,
 )
 
+@OptIn(ExperimentalObjCName::class)
+@ObjCName("FacetConverter", exact = true)
 object FacetConverter {
 
     fun facetsToMarkdown(
@@ -110,5 +119,112 @@ object FacetConverter {
             }
             wrapped
         }
+    }
+
+    fun markdownToFacets(
+        markdown: String,
+        boldType: String,
+        italicType: String,
+        codeType: String,
+        strikeType: String,
+        linkType: String,
+    ): Pair<String, List<RichTextFacet>> {
+        val plaintext = StringBuilder()
+        val facets = mutableListOf<RichTextFacet>()
+        val chars = markdown.toCharArray()
+        var i = 0
+
+        val markStack = mutableListOf<Triple<Int, String, String?>>()
+
+        while (i < chars.size) {
+            // Bold: **text**
+            if (i + 1 < chars.size && chars[i] == '*' && chars[i + 1] == '*') {
+                val top = markStack.lastOrNull()
+                if (top != null && top.second == boldType) {
+                    val byteEnd = plaintext.toString().encodeToByteArray().size
+                    if (byteEnd > top.first) {
+                        facets.add(RichTextFacet(top.first, byteEnd, listOf(RichTextFeature(top.second))))
+                    }
+                    markStack.removeLast()
+                    i += 2
+                } else {
+                    markStack.add(Triple(plaintext.toString().encodeToByteArray().size, boldType, null))
+                    i += 2
+                }
+                continue
+            }
+
+            // Italic: *text*
+            if (chars[i] == '*') {
+                val top = markStack.lastOrNull()
+                if (top != null && top.second == italicType) {
+                    val byteEnd = plaintext.toString().encodeToByteArray().size
+                    if (byteEnd > top.first) {
+                        facets.add(RichTextFacet(top.first, byteEnd, listOf(RichTextFeature(top.second))))
+                    }
+                    markStack.removeLast()
+                    i += 1
+                } else {
+                    markStack.add(Triple(plaintext.toString().encodeToByteArray().size, italicType, null))
+                    i += 1
+                }
+                continue
+            }
+
+            // Strikethrough: ~~text~~
+            if (i + 1 < chars.size && chars[i] == '~' && chars[i + 1] == '~') {
+                val top = markStack.lastOrNull()
+                if (top != null && top.second == strikeType) {
+                    val byteEnd = plaintext.toString().encodeToByteArray().size
+                    if (byteEnd > top.first) {
+                        facets.add(RichTextFacet(top.first, byteEnd, listOf(RichTextFeature(top.second))))
+                    }
+                    markStack.removeLast()
+                    i += 2
+                } else {
+                    markStack.add(Triple(plaintext.toString().encodeToByteArray().size, strikeType, null))
+                    i += 2
+                }
+                continue
+            }
+
+            // Code: `text`
+            if (chars[i] == '`') {
+                val closeIdx = chars.drop(i + 1).indexOfFirst { it == '`' }.let { if (it >= 0) i + 1 + it else -1 }
+                if (closeIdx >= 0) {
+                    val content = chars.sliceArray(i + 1 until closeIdx).concatToString()
+                    val byteStart = plaintext.toString().encodeToByteArray().size
+                    plaintext.append(content)
+                    val byteEnd = plaintext.toString().encodeToByteArray().size
+                    facets.add(RichTextFacet(byteStart, byteEnd, listOf(RichTextFeature(codeType))))
+                    i = closeIdx + 1
+                    continue
+                }
+            }
+
+            // Link: [text](url)
+            if (chars[i] == '[') {
+                val closeBracket = chars.drop(i + 1).indexOfFirst { it == ']' }.let { if (it >= 0) i + 1 + it else -1 }
+                if (closeBracket >= 0 && closeBracket + 1 < chars.size && chars[closeBracket + 1] == '(') {
+                    val openParen = closeBracket + 1
+                    val closeParen = chars.drop(openParen + 1).indexOfFirst { it == ')' }.let { if (it >= 0) openParen + 1 + it else -1 }
+                    if (closeParen >= 0) {
+                        val text = chars.sliceArray(i + 1 until closeBracket).concatToString()
+                        val url = chars.sliceArray(openParen + 1 until closeParen).concatToString()
+                        val byteStart = plaintext.toString().encodeToByteArray().size
+                        plaintext.append(text)
+                        val byteEnd = plaintext.toString().encodeToByteArray().size
+                        facets.add(RichTextFacet(byteStart, byteEnd, listOf(RichTextFeature(linkType, url))))
+                        i = closeParen + 1
+                        continue
+                    }
+                }
+            }
+
+            plaintext.append(chars[i])
+            i += 1
+        }
+
+        return plaintext.toString() to facets
     }
 }

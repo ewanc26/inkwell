@@ -83,191 +83,19 @@ private func harvestImageBlobs(from value: Any, into out: inout [String: ComAtpr
 
 /// Converts between AT Protocol facets (plaintext + byte-range features) and
 /// markdown inline syntax (**bold**, *italic*, `code`, ~~strike~~, [text](url)).
+/// Delegates to shared KMP for canonical conversion.
 enum FacetConverter {
 
-    /// Convert facets to markdown inline text. Unknown features are tracked
-    /// in `lost` using schema.lossy labels.
     static func facetsToMarkdown(_ plaintext: String, facets: [LeafletFacet]?, schema: FacetSchema, lost: inout Set<String>) -> String {
-        guard let facets, !facets.isEmpty else { return plaintext }
-
-        var insertions: [(offset: Int, text: String)] = []
-
-        for facet in facets {
-            for feature in facet.features {
-                let type = feature.type
-                var markdown: String?
-
-                switch type {
-                case schema.bold:
-                    markdown = "**"
-                case schema.italic:
-                    markdown = "*"
-                case schema.code:
-                    markdown = "`"
-                case schema.strike:
-                    markdown = "~~"
-                case schema.link:
-                    if let uri = feature.uri, !uri.isEmpty {
-                        markdown = "["
-                    } else {
-                        markdown = nil
-                    }
-                default:
-                    if let label = schema.lossy[type] {
-                        lost.insert(label)
-                    } else {
-                        lost.insert("unsupported inline feature")
-                    }
-                    markdown = nil
-                }
-
-                if let open = markdown {
-                    let close = type == schema.link && feature.uri != nil ? "](\(feature.uri ?? ""))" : open
-                    let start = facet.index.byteStart
-                    let end = facet.index.byteEnd
-                    if start < end && start >= 0 && end <= plaintext.utf8.count {
-                        insertions.append((offset: start, text: open))
-                        insertions.append((offset: end, text: close))
-                    }
-                }
-            }
-        }
-
-        guard !insertions.isEmpty else { return plaintext }
-
-        insertions.sort { $0.offset > $1.offset }
-
-        var result = plaintext
-        for (offset, text) in insertions {
-            let idx = result.utf8.index(result.utf8.startIndex, offsetBy: offset, limitedBy: result.utf8.endIndex)
-            if let idx {
-                result.insert(contentsOf: text, at: idx)
-            }
-        }
-
-        return result
+        facetsToMarkdown(plaintext, facets: facets, schema: schema, lost: &lost)
     }
 
-    /// Convenience overload — converts facets to markdown without tracking
-    /// lossy inline features (e.g. list item text, image alts).
     static func facetsToMarkdown(_ plaintext: String, facets: [LeafletFacet]?, schema: FacetSchema) -> String {
-        var dummy = Set<String>()
-        return facetsToMarkdown(plaintext, facets: facets, schema: schema, lost: &dummy)
+        facetsToMarkdown(plaintext, facets: facets, schema: schema)
     }
 
-    /// Parse markdown inline syntax into plaintext + facets.
-    /// Handles **bold**, *italic*, `code`, ~~strike~~, and [text](url).
     static func markdownToFacets(_ markdown: String, schema: FacetSchema) -> (plaintext: String, facets: [LeafletFacet]) {
-        var plaintext = ""
-        var facets: [LeafletFacet] = []
-        let chars = Array(markdown)
-        var i = 0
-
-        // Stack of active marks: (byteStart, featureType, uri?)
-        var markStack: [(start: Int, type: String, uri: String?)] = []
-
-        while i < chars.count {
-            // Bold: **text**
-            if i + 1 < chars.count && chars[i] == "*" && chars[i + 1] == "*" {
-                if let mark = markStack.last, mark.type == schema.bold {
-                    let byteEnd = plaintext.utf8.count
-                    if byteEnd > mark.start {
-                        facets.append(LeafletFacet(
-                            index: LeafletByteSlice(byteStart: mark.start, byteEnd: byteEnd),
-                            features: [LeafletFacetFeature(type: schema.bold)]
-                        ))
-                    }
-                    markStack.removeLast()
-                    i += 2
-                } else {
-                    markStack.append((start: plaintext.utf8.count, type: schema.bold, uri: nil))
-                    i += 2
-                }
-                continue
-            }
-
-            // Italic: *text*
-            if chars[i] == "*" {
-                if let mark = markStack.last, mark.type == schema.italic {
-                    let byteEnd = plaintext.utf8.count
-                    if byteEnd > mark.start {
-                        facets.append(LeafletFacet(
-                            index: LeafletByteSlice(byteStart: mark.start, byteEnd: byteEnd),
-                            features: [LeafletFacetFeature(type: schema.italic)]
-                        ))
-                    }
-                    markStack.removeLast()
-                    i += 1
-                } else {
-                    markStack.append((start: plaintext.utf8.count, type: schema.italic, uri: nil))
-                    i += 1
-                }
-                continue
-            }
-
-            // Strikethrough: ~~text~~
-            if i + 1 < chars.count && chars[i] == "~" && chars[i + 1] == "~" {
-                if let mark = markStack.last, mark.type == schema.strike {
-                    let byteEnd = plaintext.utf8.count
-                    if byteEnd > mark.start {
-                        facets.append(LeafletFacet(
-                            index: LeafletByteSlice(byteStart: mark.start, byteEnd: byteEnd),
-                            features: [LeafletFacetFeature(type: schema.strike)]
-                        ))
-                    }
-                    markStack.removeLast()
-                    i += 2
-                } else {
-                    markStack.append((start: plaintext.utf8.count, type: schema.strike, uri: nil))
-                    i += 2
-                }
-                continue
-            }
-
-            // Code: `text`
-            if chars[i] == "`" {
-                // Find closing backtick
-                if let closeIdx = chars[(i + 1)...].firstIndex(of: "`") {
-                    let content = String(chars[(i + 1)..<closeIdx])
-                    let byteStart = plaintext.utf8.count
-                    plaintext += content
-                    let byteEnd = plaintext.utf8.count
-                    facets.append(LeafletFacet(
-                        index: LeafletByteSlice(byteStart: byteStart, byteEnd: byteEnd),
-                        features: [LeafletFacetFeature(type: schema.code)]
-                    ))
-                    i = closeIdx + 1
-                    continue
-                }
-            }
-
-            // Link: [text](url)
-            if chars[i] == "[" {
-                if let closeBracket = chars[(i + 1)...].firstIndex(of: "]"),
-                   closeBracket + 1 < chars.count, chars[closeBracket + 1] == "(" {
-                    let openParen = closeBracket + 1
-                    if let closeParen = chars[(openParen + 1)...].firstIndex(of: ")") {
-                        let text = String(chars[(i + 1)..<closeBracket])
-                        let url = String(chars[(openParen + 1)..<closeParen])
-                        let byteStart = plaintext.utf8.count
-                        plaintext += text
-                        let byteEnd = plaintext.utf8.count
-                        facets.append(LeafletFacet(
-                            index: LeafletByteSlice(byteStart: byteStart, byteEnd: byteEnd),
-                            features: [LeafletFacetFeature(type: schema.link, uri: url)]
-                        ))
-                        i = closeParen + 1
-                        continue
-                    }
-                }
-            }
-
-            // Regular character
-            plaintext.append(chars[i])
-            i += 1
-        }
-
-        return (plaintext, facets)
+        markdownToFacets(markdown, schema: schema)
     }
 }
 

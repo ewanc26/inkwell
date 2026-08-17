@@ -2,7 +2,10 @@ package uk.ewancroft.inkwell.ui.writer
 
 import kotlinx.serialization.json.*
 import uk.ewancroft.inkwell.data.model.content.*
+import uk.ewancroft.inkwell.shared.facets.FacetConverter
 import uk.ewancroft.inkwell.shared.facets.FacetSchema
+import uk.ewancroft.inkwell.shared.facets.RichTextFacet
+import uk.ewancroft.inkwell.shared.facets.RichTextFeature
 import uk.ewancroft.inkwell.shared.markdown.MarkdownBlock as SharedMarkdownBlock
 import uk.ewancroft.inkwell.shared.markdown.MarkdownParser as SharedMarkdownParser
 import uk.ewancroft.inkwell.shared.markdown.MarkdownListItem as SharedMarkdownListItem
@@ -340,116 +343,43 @@ object MarkdownConverter {
     // MARK: - Facet Conversion
 
     private fun facetsFromMarkdown(text: String, format: String): Pair<String, List<JsonObject>> {
-        val boldRegex = Regex("\\*\\*(.+?)\\*\\*")
-        val italicRegex = Regex("\\*(.+?)\\*")
-        val codeRegex = Regex("`(.+?)`")
-        val linkRegex = Regex("\\[(.+?)\\]\\((.+?)\\)")
-        val strikeRegex = Regex("~~(.+?)~~")
-
-        val facetPrefix = when (format) {
-            "pckt" -> FacetSchema.pckt.facet
-            "Offprint" -> FacetSchema.offprint.facet
-            else -> FacetSchema.leaflet.facet
+        val schema = when (format) {
+            "pckt" -> FacetSchema.pckt
+            "Offprint" -> FacetSchema.offprint
+            else -> FacetSchema.leaflet
         }
-
-        data class Span(
-            val start: Int,
-            val innerStart: Int,
-            val innerEnd: Int,
-            val end: Int,
-            val type: String,
-            val url: String? = null,
+        val (plaintext, sharedFacets) = FacetConverter.markdownToFacets(
+            text,
+            boldType = schema.bold,
+            italicType = schema.italic,
+            codeType = schema.code,
+            strikeType = schema.strike,
+            linkType = schema.link
         )
-
-        val spans = mutableListOf<Span>()
-
-        fun claim(span: Span) {
-            if (spans.any { span.innerStart < it.end && it.innerStart < span.end }) return
-            spans.add(span)
-        }
-
-        for (match in boldRegex.findAll(text)) {
-            val innerStart = match.range.first + 2
-            claim(Span(match.range.first, innerStart, innerStart + match.groupValues[1].length, match.range.last + 1, "bold"))
-        }
-        for (match in strikeRegex.findAll(text)) {
-            val innerStart = match.range.first + 2
-            claim(Span(match.range.first, innerStart, innerStart + match.groupValues[1].length, match.range.last + 1, "strikethrough"))
-        }
-        for (match in italicRegex.findAll(text)) {
-            if (match.value.startsWith("**")) continue
-            val innerStart = match.range.first + 1
-            claim(Span(match.range.first, innerStart, innerStart + match.groupValues[1].length, match.range.last + 1, "italic"))
-        }
-        for (match in codeRegex.findAll(text)) {
-            val innerStart = match.range.first + 1
-            claim(Span(match.range.first, innerStart, innerStart + match.groupValues[1].length, match.range.last + 1, "code"))
-        }
-        for (match in linkRegex.findAll(text)) {
-            val innerStart = match.range.first + 1
-            claim(Span(match.range.first, innerStart, innerStart + match.groupValues[1].length, match.range.last + 1, "link", match.groupValues[2]))
-        }
-
-        val removed = BooleanArray(text.length)
-        for (span in spans) {
-            for (i in span.start until span.innerStart) removed[i] = true
-            for (i in span.innerEnd until span.end) removed[i] = true
-        }
-
-        val removedBefore = IntArray(text.length + 1)
-        for (i in text.indices) {
-            removedBefore[i + 1] = removedBefore[i] + (if (removed[i]) 1 else 0)
-        }
-
-        val plaintext = buildString {
-            for (i in text.indices) if (!removed[i]) append(text[i])
-        }
-
-        val bytePrefix = IntArray(plaintext.length + 1)
-        var byteCount = 0
-        var ci = 0
-        while (ci < plaintext.length) {
-            val cp = plaintext.codePointAt(ci)
-            val charCount = Character.charCount(cp)
-            byteCount += when {
-                cp < 0x80 -> 1
-                cp < 0x800 -> 2
-                cp < 0x10000 -> 3
-                else -> 4
-            }
-            ci += charCount
-            bytePrefix[ci] = byteCount
-        }
-        for (i in 1 until bytePrefix.size) {
-            if (bytePrefix[i] == 0) bytePrefix[i] = bytePrefix[i - 1]
-        }
-
-        val facets = spans.map { span ->
-            val pStart = span.innerStart - removedBefore[span.innerStart]
-            val pEnd = span.innerEnd - removedBefore[span.innerEnd]
+        val facetPrefix = schema.facet
+        val jsonFacets = sharedFacets.map { facet ->
             buildJsonObject {
                 put("\$type", facetPrefix)
                 put("index", buildJsonObject {
-                    put("byteStart", bytePrefix[pStart])
-                    put("byteEnd", bytePrefix[pEnd])
+                    put("byteStart", facet.byteStart)
+                    put("byteEnd", facet.byteEnd)
                 })
                 put("features", buildJsonArray {
                     add(buildJsonObject {
-                        when (span.type) {
-                            "bold" -> put("\$type", "$facetPrefix#bold")
-                            "italic" -> put("\$type", "$facetPrefix#italic")
-                            "code" -> put("\$type", "$facetPrefix#code")
-                            "strikethrough" -> put("\$type", "$facetPrefix#strikethrough")
+                        when (facet.features.firstOrNull()?.type) {
+                            schema.bold -> put("\$type", "${schema.facet}#bold")
+                            schema.italic -> put("\$type", "${schema.facet}#italic")
+                            schema.code -> put("\$type", "${schema.facet}#code")
+                            schema.strike -> put("\$type", "${schema.facet}#strikethrough")
                             else -> {
-                                put("\$type", "$facetPrefix#link")
-                                put("uri", span.url)
+                                put("\$type", "${schema.facet}#link")
+                                put("uri", facet.features.firstOrNull()?.uri)
                             }
                         }
                     })
                 })
             }
         }
-
-        return plaintext to facets
+        return Pair(plaintext, jsonFacets)
     }
 }
