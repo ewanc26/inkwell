@@ -345,6 +345,12 @@ private fun PostDetailContent(
             }
         }
 
+        if (uiState.lostContent.isNotEmpty()) {
+            item {
+                LostContentBanner(uiState.lostContent)
+            }
+        }
+
         item {
             HorizontalDivider()
             if (uiState.publicationUri != null) {
@@ -705,6 +711,35 @@ private fun EmptyContentNotice() {
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
+}
+
+@Composable
+private fun LostContentBanner(lost: List<String>) {
+    val label = when {
+        lost.size == 1 -> "Some content couldn't be displayed (${lost[0]})."
+        lost.size == 2 -> "Some content couldn't be displayed (${lost[0]} and ${lost[1]})."
+        else -> {
+            val allButLast = lost.dropLast(1).joinToString(", ")
+            "Some content couldn't be displayed ($allButLast, and ${lost.last()})."
+        }
+    }
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+    ) {
+        Row(
+            Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Icon(Icons.Outlined.WarningAmber, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                label,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
 }
 
 private fun buildCanonicalUrl(baseUrl: String?, path: String?): String? {

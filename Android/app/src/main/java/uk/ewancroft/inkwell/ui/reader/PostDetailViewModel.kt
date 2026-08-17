@@ -1,5 +1,6 @@
 package uk.ewancroft.inkwell.ui.reader
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -53,6 +54,7 @@ data class PostDetailUiState(
     val path: String? = null,
     val coverUrl: String? = null,
     val content: DocumentContent = DocumentContent.Empty,
+    val lostContent: List<String> = emptyList(),
     val publicationUri: String? = null,
     val publicationUrl: String? = null,
 
@@ -148,7 +150,7 @@ class PostDetailViewModel @Inject constructor(
 
                 val textContent = value["textContent"]?.jsonPrimitive?.contentOrNull
                 val contentObj = value["content"]?.jsonObject
-                val docContent = parseContent(contentObj, textContent, parsed.did, uri)
+                val parseResult = parseContent(contentObj, textContent, parsed.did, uri)
 
                 // Extract document-level theme override
                 val docTheme = runCatching {
@@ -170,7 +172,8 @@ class PostDetailViewModel @Inject constructor(
                     publishedAt = publishedAt,
                     path = path,
                     coverUrl = coverUrl,
-                    content = docContent,
+                    content = parseResult.content,
+                    lostContent = parseResult.lost,
                     publicationUri = pubUri,
                     documentTheme = docTheme,
                 )
@@ -392,16 +395,20 @@ class PostDetailViewModel @Inject constructor(
                     publicationTheme = pubTheme,
                     basicTheme = basic,
                 )
-            } catch (_: Exception) {}
+            } catch (e: Exception) {
+                Log.w("PostDetailVM", "Failed to load theme", e)
+            }
         }
     }
+
+    private data class ParseResult(val content: DocumentContent, val lost: List<String> = emptyList())
 
     private suspend fun parseContent(
         contentObj: JsonObject?,
         textContent: String?,
         authorDid: String,
         documentUri: String,
-    ): DocumentContent {
+    ): ParseResult {
         if (contentObj != null) {
             val formatType = contentObj["\$type"]?.jsonPrimitive?.contentOrNull
 
@@ -418,32 +425,32 @@ class PostDetailViewModel @Inject constructor(
                     }.getOrNull()
                 }
                 if (!pages.isNullOrEmpty()) {
-                    return DocumentContent.Leaflet(pages, authorDid)
+                    return ParseResult(DocumentContent.Leaflet(pages, authorDid))
                 }
             }
 
             if (formatType == "at.markpub.markdown") {
                 val markdown = contentObj["text"]?.jsonObject?.get("markdown")?.jsonPrimitive?.contentOrNull
-                if (!markdown.isNullOrBlank()) return DocumentContent.Markdown(markdown)
+                if (!markdown.isNullOrBlank()) return ParseResult(DocumentContent.Markdown(markdown))
             }
 
             if (PcktOffprintConverter.isSupported(formatType)) {
-                val markdown = PcktOffprintConverter.toMarkdown(contentObj, formatType!!, authorDid)
-                if (!markdown.isNullOrBlank()) return DocumentContent.Markdown(markdown)
+                val result = PcktOffprintConverter.toMarkdown(contentObj, formatType!!, authorDid)
+                if (!result.markdown.isNullOrBlank()) return ParseResult(DocumentContent.Markdown(result.markdown), result.lost)
             }
 
             val extracted = StringBuilder()
             collectPlaintext(contentObj, extracted)
-            if (extracted.isNotBlank()) return DocumentContent.PlainText(extracted.toString())
+            if (extracted.isNotBlank()) return ParseResult(DocumentContent.PlainText(extracted.toString()))
 
-            if (!textContent.isNullOrBlank()) return DocumentContent.PlainText(textContent)
+            if (!textContent.isNullOrBlank()) return ParseResult(DocumentContent.PlainText(textContent))
 
-            return DocumentContent.Unsupported(formatType)
+            return ParseResult(DocumentContent.Unsupported(formatType))
         }
 
-        if (!textContent.isNullOrBlank()) return DocumentContent.PlainText(textContent)
+        if (!textContent.isNullOrBlank()) return ParseResult(DocumentContent.PlainText(textContent))
 
-        return DocumentContent.Empty
+        return ParseResult(DocumentContent.Empty)
     }
 
     private fun collectPlaintext(element: JsonElement, out: StringBuilder) {
@@ -497,7 +504,9 @@ class PostDetailViewModel @Inject constructor(
                                     comment = comment
                                 )
                             )
-                        } catch (_: Exception) {}
+                        } catch (e: Exception) {
+                            Log.w("PostDetailVM", "Failed to parse comment", e)
+                        }
                     }
                 }
 
@@ -611,7 +620,9 @@ class PostDetailViewModel @Inject constructor(
                 )
 
                 _pollData.value = _pollData.value + (pollUri to data)
-            } catch (_: Exception) {}
+            } catch (e: Exception) {
+                Log.w("PostDetailVM", "Failed to load poll data for $pollUri", e)
+            }
         }
     }
 
@@ -633,7 +644,9 @@ class PostDetailViewModel @Inject constructor(
                     totalVotes = currentData.totalVotes + options.size,
                 )
                 _pollData.value = _pollData.value + (pollUri to updated)
-            } catch (_: Exception) {}
+            } catch (e: Exception) {
+                Log.e("PostDetailVM", "Failed to cast vote on $pollUri", e)
+            }
         }
     }
 }

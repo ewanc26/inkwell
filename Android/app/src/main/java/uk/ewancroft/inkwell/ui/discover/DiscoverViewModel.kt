@@ -1,5 +1,6 @@
 package uk.ewancroft.inkwell.ui.discover
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -122,7 +123,9 @@ class DiscoverViewModel @Inject constructor(
                     val request = Request.Builder().url(url).get().build()
                     client.newCall(request).execute().use { it.body!!.string() }
                 }
-                val searchResponse = json.decodeFromString<SearchResponse>(body)
+                val searchResponse = withContext(Dispatchers.IO) {
+                    json.decodeFromString<SearchResponse>(body)
+                }
                 _uiState.value = _uiState.value.copy(
                     results = searchResponse.results,
                     isSearching = false
@@ -146,8 +149,9 @@ class DiscoverViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(
                     subscriptions = entries.associate { it.publicationUri to it.rkey }
                 )
-            } catch (_: Exception) {
+            } catch (e: Exception) {
                 // Non-fatal: rows just won't reflect subscribed state until retried.
+                Log.d("DiscoverVM", "Failed to load subscriptions", e)
             }
         }
     }

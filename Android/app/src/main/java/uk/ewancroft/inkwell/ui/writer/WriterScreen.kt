@@ -43,18 +43,7 @@ fun WriterScreen(
     val formats = listOf("Leaflet", "Markpub", "pckt", "Offprint")
 
     val context = androidx.compose.ui.platform.LocalContext.current
-    val appVersion = remember {
-        try {
-            val pkg = context.packageManager.getPackageInfo(context.packageName, 0)
-            val versionCode = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-                pkg.longVersionCode
-            } else {
-                @Suppress("DEPRECATION")
-                pkg.versionCode.toLong()
-            }
-            "Version ${pkg.versionName} ($versionCode)"
-        } catch (_: Exception) { "Version 1.3.0 (5)" }
-    }
+    val appVersion = remember { uk.ewancroft.inkwell.util.appVersionString(context) }
 
     LaunchedEffect(Unit) {
         viewModel.loadPublications()

@@ -8,6 +8,11 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
+data class ConvertResult(
+    val markdown: String?,
+    val lost: List<String> = emptyList(),
+)
+
 /**
  * Converts pckt (blog.pckt.content) and Offprint (app.offprint.content)
  * block-array records into markdown strings. Works from raw JSON to avoid
@@ -18,32 +23,54 @@ import kotlinx.serialization.json.jsonPrimitive
  */
 object PcktOffprintConverter {
 
-    /**
-     * Returns true if the content object is a pckt or Offprint record.
-     */
+    private val pcktLossLabels = mapOf(
+        "blog.pckt.block.table" to "tables",
+        "blog.pckt.block.mention" to "mention blocks",
+        "blog.pckt.block.gallery" to "galleries",
+        "blog.pckt.block.iframe" to "embeds",
+        "blog.pckt.block.website" to "website cards",
+        "blog.pckt.block.blueskyEmbed" to "Bluesky posts",
+    )
+
+    private val offprintLossLabels = mapOf(
+        "app.offprint.block.callout" to "callouts",
+        "app.offprint.block.button" to "buttons",
+        "app.offprint.block.webBookmark" to "bookmarks",
+        "app.offprint.block.webEmbed" to "embeds",
+        "app.offprint.block.blueskyPost" to "Bluesky posts",
+        "app.offprint.block.imageGrid" to "image grids",
+        "app.offprint.block.imageCarousel" to "image carousels",
+        "app.offprint.block.imageDiff" to "image comparisons",
+    )
+
     fun isSupported(formatType: String?): Boolean {
         return formatType == "blog.pckt.content" || formatType == "app.offprint.content"
     }
 
-    /**
-     * Converts a pckt or Offprint content JSON object to a markdown string.
-     * Returns null if conversion fails.
-     */
-    fun toMarkdown(contentObj: JsonObject, formatType: String, authorDid: String = ""): String? {
-        val items = contentObj["items"] as? JsonArray ?: return null
+    fun toMarkdown(contentObj: JsonObject, formatType: String, authorDid: String = ""): ConvertResult {
+        val items = contentObj["items"] as? JsonArray ?: return ConvertResult(null)
         val prefix = if (formatType == "blog.pckt.content") "blog.pckt.block." else "app.offprint.block."
         val isOffprint = formatType == "app.offprint.content"
+        val lossLabels = if (isOffprint) offprintLossLabels else pcktLossLabels
 
         val blocks = mutableListOf<String>()
+        val lost = mutableSetOf<String>()
         for (item in items) {
             val obj = item as? JsonObject ?: continue
-            val md = blockToMarkdown(obj, prefix, isOffprint, authorDid)
+            val md = blockToMarkdown(obj, prefix, isOffprint, authorDid, lossLabels, lost)
             if (md != null) blocks.add(md)
         }
-        return blocks.joinToString("\n\n")
+        return ConvertResult(blocks.joinToString("\n\n"), lost.toList())
     }
 
-    private fun blockToMarkdown(block: JsonObject, prefix: String, isOffprint: Boolean, authorDid: String): String? {
+    private fun blockToMarkdown(
+        block: JsonObject,
+        prefix: String,
+        isOffprint: Boolean,
+        authorDid: String,
+        lossLabels: Map<String, String>,
+        lost: MutableSet<String>,
+    ): String? {
         val type = block["\$type"]?.jsonPrimitive?.contentOrNull ?: return null
 
         return when (type) {
@@ -57,7 +84,8 @@ object PcktOffprintConverter {
             }
 
             "${prefix}heading" -> {
-                val level = (block["level"]?.jsonPrimitive?.contentOrNull?.toIntOrNull() ?: 1).coerceIn(1, 6)
+                val maxLevel = if (isOffprint) 3 else 6
+                val level = (block["level"]?.jsonPrimitive?.contentOrNull?.toIntOrNull() ?: 1).coerceIn(1, maxLevel)
                 val text = facetsToMarkdown(
                     block["plaintext"]?.jsonPrimitive?.contentOrNull ?: "",
                     block["facets"] as? JsonArray,
@@ -69,14 +97,11 @@ object PcktOffprintConverter {
 
             "${prefix}blockquote" -> {
                 val inner = block["content"] as? JsonArray ?: return null
-                val text = inner.mapNotNull { el ->
+                val parts = inner.mapNotNull { el ->
                     val obj = el as? JsonObject ?: return@mapNotNull null
-                    facetsToMarkdown(
-                        obj["plaintext"]?.jsonPrimitive?.contentOrNull ?: "",
-                        obj["facets"] as? JsonArray,
-                        prefix,
-                    )
-                }.joinToString("\n")
+                    blockContentToInlineMarkdown(obj, prefix, isOffprint, authorDid, lossLabels, lost)
+                }
+                val text = parts.joinToString("\n")
                 if (text.isNotEmpty()) "> ${text.replace("\n", "\n> ")}" else null
             }
 
@@ -88,7 +113,7 @@ object PcktOffprintConverter {
 
             "${prefix}mathBlock" -> {
                 val content = block["plaintext"]?.jsonPrimitive?.contentOrNull ?: ""
-                "```\nmath\n$content\n```"
+                "$$\n$content\n$$"
             }
 
             "${prefix}horizontalRule" -> "---"
@@ -105,7 +130,7 @@ object PcktOffprintConverter {
                 val items = block["content"] as? JsonArray ?: return null
                 val rendered = items.mapNotNull { el ->
                     val obj = el as? JsonObject ?: return@mapNotNull null
-                    listItemToMarkdown(obj, prefix, isOffprint, ordered = false)
+                    listItemToMarkdown(obj, prefix, isOffprint, authorDid, lossLabels, lost, ordered = false)
                 }
                 if (rendered.isNotEmpty()) rendered.joinToString("\n") else null
             }
@@ -115,7 +140,7 @@ object PcktOffprintConverter {
                 val items = block["content"] as? JsonArray ?: return null
                 val rendered = items.mapIndexedNotNull { index, el ->
                     val obj = el as? JsonObject ?: return@mapIndexedNotNull null
-                    listItemToMarkdown(obj, prefix, isOffprint, ordered = true, number = start + index)
+                    listItemToMarkdown(obj, prefix, isOffprint, authorDid, lossLabels, lost, ordered = true, number = start + index)
                 }
                 if (rendered.isNotEmpty()) rendered.joinToString("\n") else null
             }
@@ -124,12 +149,54 @@ object PcktOffprintConverter {
                 val items = block["content"] as? JsonArray ?: return null
                 val rendered = items.mapNotNull { el ->
                     val obj = el as? JsonObject ?: return@mapNotNull null
-                    listItemToMarkdown(obj, prefix, isOffprint, ordered = false, isTask = true)
+                    listItemToMarkdown(obj, prefix, isOffprint, authorDid, lossLabels, lost, ordered = false, isTask = true)
                 }
                 if (rendered.isNotEmpty()) rendered.joinToString("\n") else null
             }
 
-            else -> null
+            else -> {
+                val label = lossLabels[type]
+                if (label != null) {
+                    lost.add(label)
+                } else {
+                    lost.add("unsupported content")
+                }
+                null
+            }
+        }
+    }
+
+    /**
+     * Converts a block inside a blockquote/list to inline markdown.
+     * Handles text, images, and nested formatting blocks.
+     */
+    private fun blockContentToInlineMarkdown(
+        obj: JsonObject,
+        prefix: String,
+        isOffprint: Boolean,
+        authorDid: String,
+        lossLabels: Map<String, String>,
+        lost: MutableSet<String>,
+    ): String? {
+        val type = obj["\$type"]?.jsonPrimitive?.contentOrNull ?: return null
+        return when (type) {
+            "${prefix}text" -> {
+                facetsToMarkdown(
+                    obj["plaintext"]?.jsonPrimitive?.contentOrNull ?: "",
+                    obj["facets"] as? JsonArray,
+                    prefix,
+                )
+            }
+            "${prefix}image" -> {
+                val url = resolveImageUrl(obj, isOffprint, authorDid)
+                val alt = obj["alt"]?.jsonPrimitive?.contentOrNull ?: ""
+                if (url.isNotEmpty()) "![$alt]($url)" else null
+            }
+            else -> {
+                val label = lossLabels[type]
+                if (label != null) lost.add(label) else lost.add("unsupported content")
+                null
+            }
         }
     }
 
@@ -159,10 +226,8 @@ object PcktOffprintConverter {
 
         if (ref.isEmpty()) return ""
 
-        // Already a full URL
         if (ref.startsWith("http://") || ref.startsWith("https://")) return ref
 
-        // Bare CID — build CDN URL (matches Leaflet ImageBlock pattern)
         if (authorDid.isNotEmpty()) {
             return "https://cdn.bsky.app/img/feed_thumbnail/plain/$authorDid/$ref"
         }
@@ -176,6 +241,9 @@ object PcktOffprintConverter {
         item: JsonObject,
         prefix: String,
         isOffprint: Boolean,
+        authorDid: String,
+        lossLabels: Map<String, String>,
+        lost: MutableSet<String>,
         ordered: Boolean,
         number: Int? = null,
         isTask: Boolean = false,
@@ -188,7 +256,6 @@ object PcktOffprintConverter {
 
         when (contentEl) {
             is JsonArray -> {
-                // pckt: content is an array of blocks
                 for (el in contentEl) {
                     val obj = el as? JsonObject ?: continue
                     val blockType = obj["\$type"]?.jsonPrimitive?.contentOrNull ?: continue
@@ -200,8 +267,12 @@ object PcktOffprintConverter {
                                 prefix,
                             )
                         }
+                        "${prefix}image" -> {
+                            val url = resolveImageUrl(obj, isOffprint, authorDid)
+                            val alt = obj["alt"]?.jsonPrimitive?.contentOrNull ?: ""
+                            if (url.isNotEmpty()) text += "![$alt]($url)"
+                        }
                         "${prefix}bulletList", "${prefix}orderedList", "${prefix}taskList" -> {
-                            // Nested sub-list inside a pckt list item
                             val subItems = obj["content"] as? JsonArray ?: continue
                             val isSubOrdered = blockType == "${prefix}orderedList"
                             val isSubTask = blockType == "${prefix}taskList"
@@ -209,7 +280,7 @@ object PcktOffprintConverter {
                             for ((idx, subItem) in subItems.withIndex()) {
                                 val subObj = subItem as? JsonObject ?: continue
                                 val rendered = listItemToMarkdown(
-                                    subObj, prefix, isOffprint,
+                                    subObj, prefix, isOffprint, authorDid, lossLabels, lost,
                                     ordered = isSubOrdered,
                                     number = if (isSubOrdered) subStart + idx else null,
                                     isTask = isSubTask,
@@ -217,11 +288,14 @@ object PcktOffprintConverter {
                                 if (rendered != null) nestedFromContent.add(rendered)
                             }
                         }
+                        else -> {
+                            val label = lossLabels[blockType]
+                            if (label != null) lost.add(label) else lost.add("unsupported content")
+                        }
                     }
                 }
             }
             is JsonObject -> {
-                // Offprint: content is a single block
                 text = facetsToMarkdown(
                     contentEl["plaintext"]?.jsonPrimitive?.contentOrNull ?: "",
                     contentEl["facets"] as? JsonArray,
@@ -240,12 +314,11 @@ object PcktOffprintConverter {
             else -> "- "
         }
 
-        // Handle nested sub-lists (Offprint uses `children`, pckt uses content array above)
         val children = item["children"] as? JsonArray
         val nestedFromChildren = if (children != null && children.isNotEmpty()) {
             children.mapNotNull { el ->
                 val obj = el as? JsonObject ?: return@mapNotNull null
-                listItemToMarkdown(obj, prefix, isOffprint, ordered = false)
+                listItemToMarkdown(obj, prefix, isOffprint, authorDid, lossLabels, lost, ordered = false)
             }
         } else emptyList()
 
@@ -257,17 +330,12 @@ object PcktOffprintConverter {
 
     // ── Facet to Markdown ─────────────────────────────────────────────────
 
-    /**
-     * Converts facets (byte-range inline formatting) to markdown inline syntax.
-     * Mirrors iOS FacetConverter.facetsToMarkdown.
-     */
     private fun facetsToMarkdown(plaintext: String, facets: JsonArray?, prefix: String): String {
         if (facets == null || facets.isEmpty()) return plaintext
 
         val utf8Bytes = plaintext.toByteArray(Charsets.UTF_8)
         val totalBytes = utf8Bytes.size
 
-        // Collect all byte boundaries where active marks may change
         val boundaries = mutableSetOf(0, totalBytes)
         for (facet in facets) {
             val obj = facet as? JsonObject ?: continue
@@ -322,7 +390,6 @@ object PcktOffprintConverter {
             }
         }
 
-        // Build markdown from segments
         return segments.joinToString("") { seg ->
             var wrapped = seg.text
             if (seg.code) {

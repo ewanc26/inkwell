@@ -57,18 +57,7 @@ fun ReaderScreen(
     var showTipPrompt by remember { mutableStateOf(false) }
 
     val appContext = androidx.compose.ui.platform.LocalContext.current
-    val appVersion = remember {
-        try {
-            val pkg = appContext.packageManager.getPackageInfo(appContext.packageName, 0)
-            val versionCode = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-                pkg.longVersionCode
-            } else {
-                @Suppress("DEPRECATION")
-                pkg.versionCode.toLong()
-            }
-            "Version ${pkg.versionName} ($versionCode)"
-        } catch (_: Exception) { "Version 1.3.0 (5)" }
-    }
+    val appVersion = remember { uk.ewancroft.inkwell.util.appVersionString(appContext) }
 
     var hasRequestedNotificationPermission by rememberSaveable { mutableStateOf(false) }
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
