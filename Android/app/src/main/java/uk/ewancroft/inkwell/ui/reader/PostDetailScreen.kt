@@ -27,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import uk.ewancroft.inkwell.data.remote.VerificationResult
+import uk.ewancroft.inkwell.data.model.common.StrongRef
 import uk.ewancroft.inkwell.util.formatPublishedDate
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -124,6 +126,9 @@ fun PostDetailScreen(
                 onNewCommentTextChanged = { viewModel.onNewCommentTextChanged(it) },
                 onSubmitComment = { viewModel.submitComment() },
                 onSetReplyTo = { viewModel.setReplyTo(it) },
+                pollData = viewModel.pollData,
+                onLoadPoll = { pollRef -> viewModel.loadPoll(pollRef) },
+                onCastVote = { pollUri, options -> viewModel.castVote(pollUri, options) },
                 modifier = Modifier.padding(padding),
             )
         }
@@ -219,6 +224,9 @@ private fun PostDetailContent(
     onNewCommentTextChanged: (String) -> Unit,
     onSubmitComment: () -> Unit,
     onSetReplyTo: (CommentEntry?) -> Unit,
+    pollData: kotlinx.coroutines.flow.StateFlow<Map<String, PostDetailViewModel.PollData>>,
+    onLoadPoll: suspend (StrongRef) -> Unit,
+    onCastVote: suspend (String, List<String>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -275,6 +283,8 @@ private fun PostDetailContent(
                             LeafletBlockContent(
                                 block = container.block,
                                 authorDid = content.authorDid,
+                                onLoadPoll = onLoadPoll,
+                                onCastVote = onCastVote,
                             )
                         }
                     }
