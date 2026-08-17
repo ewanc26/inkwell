@@ -11,6 +11,7 @@ import SwiftUI
 struct InkwellApp: App {
     @UIApplicationDelegateAdaptor(InkwellAppDelegate.self) private var appDelegate
     @State private var loginStateManager = LoginStateManager()
+    @State private var tipPromptManager = TipPromptManager.shared
 
     /// Controls whether the splash screen is in the view hierarchy.
     /// Uses a boolean (not opacity comparison) to ensure the overlay
@@ -52,7 +53,9 @@ struct InkwellApp: App {
             }
             // MARK: - Launch Task
             .task {
-                    // Cheap, synchronous-in-effect, so do it before resuming the session.
+                TipPromptManager.shared.recordLaunch()
+
+                // Cheap, synchronous-in-effect, so do it before resuming the session.
                     // Order doesn't matter between these two — they register disjoint
                     // sets of `$type` keys — but both must finish before anything tries
                     // to decode a site.standard.document's `content` field, since that's

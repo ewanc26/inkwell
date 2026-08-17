@@ -11,8 +11,10 @@ struct ContentView: View {
     @Environment(LoginStateManager.self) private var loginStateManager
     @Environment(\.scenePhase) private var scenePhase
     @State private var notificationManager = NotificationManager.shared
+    @State private var tipPromptManager = TipPromptManager.shared
 
     @State private var selectedTab = 0
+    @State private var showingTip = false
 
     var body: some View {
         Group {
@@ -32,6 +34,24 @@ struct ContentView: View {
             } else if CommandLine.arguments.contains("-tab-reader") {
                 selectedTab = 0
             }
+        }
+        .task {
+            if !CommandLine.arguments.contains("-screenshot") {
+                if tipPromptManager.shouldShowTip {
+                    showingTip = true
+                }
+            }
+        }
+        .alert("Enjoying Inkwell?", isPresented: $showingTip) {
+            Button("Maybe later") { tipPromptManager.markShown() }
+            Button("Tip me") {
+                if let url = URL(string: "https://ko-fi.com/ewancroft") {
+                    UIApplication.shared.open(url)
+                }
+                tipPromptManager.markShown()
+            }
+        } message: {
+            Text("If you find Inkwell useful, consider buying me a coffee to support ongoing development.")
         }
         // Routes App Intent tab-switch notifications to the matching
         // TabView index. Posted by OpenReaderIntent, OpenWriterIntent,
