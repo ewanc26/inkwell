@@ -21,7 +21,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,6 +54,9 @@ fun LeafletBlockContent(
     block: LeafletBlock,
     authorDid: String,
     modifier: Modifier = Modifier,
+    pollData: kotlinx.coroutines.flow.StateFlow<Map<String, PostDetailViewModel.PollData>> = kotlinx.coroutines.flow.MutableStateFlow(emptyMap()),
+    onLoadPoll: suspend (StrongRef) -> Unit = {},
+    onCastVote: suspend (String, List<String>) -> Unit = { _, _ -> },
 ) {
     when (block.type) {
         "pub.leaflet.blocks.text" -> TextBlock(block, modifier)
@@ -60,9 +65,9 @@ fun LeafletBlockContent(
         "pub.leaflet.blocks.code" -> CodeBlock(block)
         "pub.leaflet.blocks.math" -> MathBlock(block)
         "pub.leaflet.blocks.image" -> ImageBlock(block, authorDid)
-        "pub.leaflet.blocks.unorderedList" -> UnorderedListBlock(block)
-        "pub.leaflet.blocks.orderedList" -> OrderedListBlock(block)
-        "pub.leaflet.blocks.checklist" -> ChecklistBlock(block)
+        "pub.leaflet.blocks.unorderedList" -> UnorderedListBlock(block, pollData, onLoadPoll, onCastVote)
+        "pub.leaflet.blocks.orderedList" -> OrderedListBlock(block, pollData, onLoadPoll, onCastVote)
+        "pub.leaflet.blocks.checklist" -> ChecklistBlock(block, pollData, onLoadPoll, onCastVote)
         "pub.leaflet.blocks.bskyPost" -> BskyPostBlock(block)
         "pub.leaflet.blocks.standardSitePost" -> StandardSitePostBlock(block)
         "pub.leaflet.blocks.website" -> WebsiteEmbedBlock(block)
@@ -72,7 +77,7 @@ fun LeafletBlockContent(
         "pub.leaflet.blocks.page" -> PageBlock(block)
         "pub.leaflet.blocks.postsList" -> PostsListBlock(block)
         "pub.leaflet.blocks.signup" -> SignupBlock()
-        "pub.leaflet.blocks.poll" -> PollBlock(block, authorDid)
+        "pub.leaflet.blocks.poll" -> PollBlock(block, authorDid, pollData, onLoadPoll, onCastVote)
         else -> UnknownBlock(block)
     }
 }
@@ -299,28 +304,49 @@ fun ImageBlock(block: LeafletBlock, authorDid: String) {
 }
 
 @Composable
-fun UnorderedListBlock(block: LeafletBlock) {
+fun UnorderedListBlock(
+    block: LeafletBlock,
+    pollData: kotlinx.coroutines.flow.StateFlow<Map<String, PostDetailViewModel.PollData>> = kotlinx.coroutines.flow.MutableStateFlow(emptyMap()),
+    onLoadPoll: suspend (StrongRef) -> Unit = {},
+    onCastVote: suspend (String, List<String>) -> Unit = { _, _ -> },
+) {
     Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        block.children?.forEach { item -> ListItem(item) }
+        block.children?.forEach { item -> ListItem(item, pollData = pollData, onLoadPoll = onLoadPoll, onCastVote = onCastVote) }
     }
 }
 
 @Composable
-fun OrderedListBlock(block: LeafletBlock) {
+fun OrderedListBlock(
+    block: LeafletBlock,
+    pollData: kotlinx.coroutines.flow.StateFlow<Map<String, PostDetailViewModel.PollData>> = kotlinx.coroutines.flow.MutableStateFlow(emptyMap()),
+    onLoadPoll: suspend (StrongRef) -> Unit = {},
+    onCastVote: suspend (String, List<String>) -> Unit = { _, _ -> },
+) {
     Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        block.children?.forEachIndexed { index, item -> ListItem(item, index + 1) }
+        block.children?.forEachIndexed { index, item -> ListItem(item, index + 1, pollData = pollData, onLoadPoll = onLoadPoll, onCastVote = onCastVote) }
     }
 }
 
 @Composable
-fun ChecklistBlock(block: LeafletBlock) {
+fun ChecklistBlock(
+    block: LeafletBlock,
+    pollData: kotlinx.coroutines.flow.StateFlow<Map<String, PostDetailViewModel.PollData>> = kotlinx.coroutines.flow.MutableStateFlow(emptyMap()),
+    onLoadPoll: suspend (StrongRef) -> Unit = {},
+    onCastVote: suspend (String, List<String>) -> Unit = { _, _ -> },
+) {
     Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        block.children?.forEach { item -> ChecklistItem(item) }
+        block.children?.forEach { item -> ChecklistItem(item, pollData = pollData, onLoadPoll = onLoadPoll, onCastVote = onCastVote) }
     }
 }
 
 @Composable
-fun ListItem(item: ListItemModel, number: Int? = null) {
+fun ListItem(
+    item: ListItemModel,
+    number: Int? = null,
+    pollData: kotlinx.coroutines.flow.StateFlow<Map<String, PostDetailViewModel.PollData>> = kotlinx.coroutines.flow.MutableStateFlow(emptyMap()),
+    onLoadPoll: suspend (StrongRef) -> Unit = {},
+    onCastVote: suspend (String, List<String>) -> Unit = { _, _ -> },
+) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         if (item.type == "pub.leaflet.blocks.checklist") {
             Box(
@@ -349,13 +375,18 @@ fun ListItem(item: ListItemModel, number: Int? = null) {
             Spacer(Modifier.width(12.dp))
         }
         if (item.content != null) {
-            LeafletBlockContent(item.content, "", Modifier.weight(1f))
+            LeafletBlockContent(item.content, "", Modifier.weight(1f), pollData, onLoadPoll, onCastVote)
         }
     }
 }
 
 @Composable
-fun ChecklistItem(item: ListItemModel) {
+fun ChecklistItem(
+    item: ListItemModel,
+    pollData: kotlinx.coroutines.flow.StateFlow<Map<String, PostDetailViewModel.PollData>> = kotlinx.coroutines.flow.MutableStateFlow(emptyMap()),
+    onLoadPoll: suspend (StrongRef) -> Unit = {},
+    onCastVote: suspend (String, List<String>) -> Unit = { _, _ -> },
+) {
     ListItem(item)
 }
 
@@ -599,23 +630,145 @@ private fun openUrl(context: android.content.Context, url: String) {
 }
 
 @Composable
-private fun PollBlock(block: LeafletBlock, authorDid: String) {
+private fun PollBlock(
+    block: LeafletBlock,
+    authorDid: String,
+    pollData: kotlinx.coroutines.flow.StateFlow<Map<String, PostDetailViewModel.PollData>>,
+    onLoadPoll: suspend (StrongRef) -> Unit,
+    onCastVote: suspend (String, List<String>) -> Unit,
+) {
+    var isLoading by remember { mutableStateOf(true) }
+    var selectedOptions by remember { mutableStateOf<Set<String>>(emptySet()) }
+    var hasVoted by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
+    val pollRef = block.poll
+    val pollUri = pollRef?.uri ?: ""
+
+    LaunchedEffect(pollUri, authorDid) {
+        if (pollUri.isBlank()) return@LaunchedEffect
+        isLoading = true
+        onLoadPoll(pollRef!!)
+        isLoading = false
+    }
+
+    val myPollData by pollData.collectAsStateWithLifecycle(initialValue = emptyMap())
+    val data: PostDetailViewModel.PollData? = myPollData[pollUri]
+    hasVoted = data?.myVote?.isNotEmpty() == true
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
         shape = MaterialTheme.shapes.medium,
     ) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(
-                "Poll",
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.SemiBold,
-            )
-            Text(
-                "Interactive polls are not yet supported in Inkwell.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            if (isLoading) {
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                }
+            } else if (data != null) {
+                Text(
+                    data.definition.name ?: "Poll",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                val options = data.definition.options.orEmpty()
+                val totalVotes = data.totalVotes
+                options.forEach { option ->
+                    val count = data.voteCounts[option.text] ?: 0
+                    val fraction = if (totalVotes > 0) count.toFloat() / totalVotes else 0f
+                    val isSelected = selectedOptions.contains(option.text)
+                    val isVoted = hasVoted
+
+                    OutlinedButton(
+                        onClick = {
+                            if (!isVoted) {
+                                val newSelection = if (isSelected) {
+                                    selectedOptions - option.text
+                                } else {
+                                    selectedOptions + option.text
+                                }
+                                selectedOptions = newSelection
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !isVoted,
+                    ) {
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            if (totalVotes > 0) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxHeight()
+                                        .fillMaxWidth(fraction)
+                                        .background(
+                                            MaterialTheme.colorScheme.primary.copy(alpha = if (isVoted) 0.15f else 0.08f),
+                                            MaterialTheme.shapes.small
+                                        )
+                                )
+                            }
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                            ) {
+                                Text(
+                                    option.text,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    maxLines = 3,
+                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                                )
+                                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                    if (totalVotes > 0) {
+                                        Text(
+                                            "$count",
+                                            style = MaterialTheme.typography.labelMedium,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        )
+                                    }
+                                    if (isVoted && isSelected) {
+                                        Icon(
+                                            Icons.Filled.CheckCircle,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(18.dp),
+                                            tint = MaterialTheme.colorScheme.primary,
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (!hasVoted && selectedOptions.isNotEmpty()) {
+                    TextButton(
+                        onClick = {
+                            val selected = selectedOptions.toList()
+                            hasVoted = true
+                            selectedOptions = emptySet()
+                            scope.launch {
+                                onCastVote(pollUri, selected)
+                            }
+                        },
+                        modifier = Modifier.align(Alignment.End),
+                    ) {
+                        Text("Vote")
+                    }
+                }
+                if (totalVotes > 0) {
+                    Text(
+                        "$totalVotes vote${if (totalVotes == 1) "" else "s"}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            } else {
+                Text(
+                    "Poll",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         }
     }
 }

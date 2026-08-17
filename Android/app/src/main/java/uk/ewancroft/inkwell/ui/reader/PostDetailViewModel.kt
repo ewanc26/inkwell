@@ -19,8 +19,11 @@ import kotlinx.serialization.json.jsonPrimitive
 import uk.ewancroft.inkwell.data.model.atproto.DocumentRecord
 import uk.ewancroft.inkwell.data.model.atproto.PublicationRecord
 import uk.ewancroft.inkwell.data.model.common.AtUri
+import uk.ewancroft.inkwell.data.model.common.StrongRef
 import uk.ewancroft.inkwell.data.model.content.LeafletContent
 import uk.ewancroft.inkwell.data.model.content.LeafletPage
+import uk.ewancroft.inkwell.data.model.content.LeafletPollDefinition
+import uk.ewancroft.inkwell.data.model.content.LeafletPollVote
 import uk.ewancroft.inkwell.data.model.graph.LeafletComment
 import uk.ewancroft.inkwell.data.model.bluesky.ConstellationBacklink
 import uk.ewancroft.inkwell.data.remote.ConstellationClient
@@ -519,6 +522,80 @@ class PostDetailViewModel @Inject constructor(
 
     fun dismissCommentError() {
         _uiState.value = _uiState.value.copy(commentError = null)
+    }
+
+    data class PollData(
+        val definition: LeafletPollDefinition,
+        val voteCounts: Map<String, Int>,
+        val myVote: List<String>?,
+        val totalVotes: Int,
+    )
+
+    private val _pollData = MutableStateFlow<Map<String, PollData>>(emptyMap())
+    val pollData: StateFlow<Map<String, PollData>> = _pollData.asStateFlow()
+
+    fun loadPoll(pollRef: StrongRef) {
+        val pollUri = pollRef.uri
+        val cached = _pollData.value[pollUri]
+        if (cached != null) return
+
+        viewModelScope.launch {
+            try {
+                val parsed = AtUri.parse(pollUri) ?: return@launch
+                val did = parsed.did
+                val rkey = parsed.recordKey ?: return@launch
+
+                val definition = runCatching {
+                    pdsRepository.getPollDefinition(did, rkey)
+                }.getOrNull() ?: return@launch
+
+                val votes = runCatching {
+                    pdsRepository.listPollVotes(did, rkey)
+                }.getOrNull() ?: emptyList()
+
+                val voteCounts = mutableMapOf<String, Int>()
+                votes.forEach { vote ->
+                    vote.option?.forEach { option ->
+                        voteCounts[option] = (voteCounts[option] ?: 0) + 1
+                    }
+                }
+
+                val session = runCatching { pdsRepository.getSession() }.getOrNull()
+                val myVote = votes.firstOrNull { it.poll.uri == pollUri }?.option
+
+                val totalVotes = voteCounts.values.sum()
+                val data = PollData(
+                    definition = definition,
+                    voteCounts = voteCounts,
+                    myVote = myVote,
+                    totalVotes = totalVotes,
+                )
+
+                _pollData.value = _pollData.value + (pollUri to data)
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun castVote(pollUri: String, options: List<String>) {
+        val currentData = _pollData.value[pollUri] ?: return
+        viewModelScope.launch {
+            try {
+                val parsed = AtUri.parse(pollUri) ?: return@launch
+                pdsRepository.createPollVote(parsed.did, pollUri, options)
+
+                val newVoteCounts = currentData.voteCounts.toMutableMap()
+                options.forEach { option ->
+                    newVoteCounts[option] = (newVoteCounts[option] ?: 0) + 1
+                }
+
+                val updated = currentData.copy(
+                    voteCounts = newVoteCounts,
+                    myVote = options,
+                    totalVotes = currentData.totalVotes + options.size,
+                )
+                _pollData.value = _pollData.value + (pollUri to updated)
+            } catch (_: Exception) {}
+        }
     }
 }
 
