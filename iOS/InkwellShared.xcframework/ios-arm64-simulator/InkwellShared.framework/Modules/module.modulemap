@@ -1,0 +1,8 @@
+framework module "InkwellShared" {
+    umbrella header "InkwellShared.h"
+
+    export *
+    module * { export * }
+
+    use Foundation
+}

@@ -48,6 +48,7 @@ Android/.idea/
 Android/captures/
 Android/build/
 Android/app/build/
+Android/shared/build/
 Android/gradle/gradle-daemon-jvm.properties
 Android/.externalNativeBuild/
 Android/.cxx/
