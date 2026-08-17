@@ -33,6 +33,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -58,14 +59,22 @@ fun LeafletBlockContent(
     block: LeafletBlock,
     authorDid: String,
     modifier: Modifier = Modifier,
+    alignment: String? = null,
     pollData: kotlinx.coroutines.flow.StateFlow<Map<String, PostDetailViewModel.PollData>> = kotlinx.coroutines.flow.MutableStateFlow(emptyMap()),
     onLoadPoll: suspend (StrongRef) -> Unit = {},
     onCastVote: suspend (String, List<String>) -> Unit = { _, _ -> },
 ) {
+    val alignModifier = modifier.fillMaxWidth()
+    val textAlign = when {
+        alignment?.endsWith("textAlignCenter") == true -> TextAlign.Center
+        alignment?.endsWith("textAlignRight") == true -> TextAlign.End
+        else -> TextAlign.Start
+    }
+
     when (block.type) {
-        "pub.leaflet.blocks.text" -> TextBlock(block, modifier)
-        "pub.leaflet.blocks.header" -> HeaderBlock(block, modifier)
-        "pub.leaflet.blocks.paragraph", "pub.leaflet.blocks.blockquote" -> ParagraphBlock(block, modifier)
+        "pub.leaflet.blocks.text" -> TextBlock(block, alignModifier, textAlign)
+        "pub.leaflet.blocks.header" -> HeaderBlock(block, alignModifier, textAlign)
+        "pub.leaflet.blocks.paragraph", "pub.leaflet.blocks.blockquote" -> ParagraphBlock(block, alignModifier, textAlign)
         "pub.leaflet.blocks.code" -> CodeBlock(block)
         "pub.leaflet.blocks.math" -> MathBlock(block)
         "pub.leaflet.blocks.image" -> ImageBlock(block, authorDid)
@@ -173,6 +182,7 @@ private fun FacetedText(
     facets: List<LeafletFacet>?,
     style: TextStyle = MaterialTheme.typography.bodyLarge,
     modifier: Modifier = Modifier,
+    textAlign: TextAlign = TextAlign.Start,
     onLinkClick: ((String, android.content.Context) -> Unit)? = null,
     maxLines: Int = Int.MAX_VALUE,
 ) {
@@ -183,7 +193,7 @@ private fun FacetedText(
     if (hasLinks && onLinkClick != null) {
         androidx.compose.foundation.text.ClickableText(
             text = annotated,
-            style = style,
+            style = style.copy(textAlign = textAlign),
             modifier = modifier,
             onClick = { offset ->
                 val links = annotated.getStringAnnotations("URL", 0, annotated.length)
@@ -194,7 +204,7 @@ private fun FacetedText(
     } else {
         Text(
             text = annotated,
-            style = style,
+            style = style.copy(textAlign = textAlign),
             modifier = modifier,
             maxLines = maxLines,
             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
@@ -205,18 +215,19 @@ private fun FacetedText(
 // MARK: - Block Renderers
 
 @Composable
-fun TextBlock(block: LeafletBlock, modifier: Modifier = Modifier) {
+fun TextBlock(block: LeafletBlock, modifier: Modifier = Modifier, textAlign: TextAlign = TextAlign.Start) {
     FacetedText(
         text = block.plaintext ?: "",
         facets = block.facets,
         style = MaterialTheme.typography.bodyLarge,
         modifier = modifier.fillMaxWidth(),
+        textAlign = textAlign,
         onLinkClick = { url, ctx -> openUrl(ctx, url) }
     )
 }
 
 @Composable
-fun HeaderBlock(block: LeafletBlock, modifier: Modifier = Modifier) {
+fun HeaderBlock(block: LeafletBlock, modifier: Modifier = Modifier, textAlign: TextAlign = TextAlign.Start) {
     val level = when (block.level) {
         1 -> MaterialTheme.typography.headlineSmall
         2 -> MaterialTheme.typography.headlineSmall
@@ -228,12 +239,13 @@ fun HeaderBlock(block: LeafletBlock, modifier: Modifier = Modifier) {
         facets = block.facets,
         style = level,
         modifier = modifier.fillMaxWidth(),
+        textAlign = textAlign,
         onLinkClick = { url, ctx -> openUrl(ctx, url) }
     )
 }
 
 @Composable
-fun ParagraphBlock(block: LeafletBlock, modifier: Modifier = Modifier) {
+fun ParagraphBlock(block: LeafletBlock, modifier: Modifier = Modifier, textAlign: TextAlign = TextAlign.Start) {
     if (block.type == "pub.leaflet.blocks.blockquote") {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
@@ -245,6 +257,7 @@ fun ParagraphBlock(block: LeafletBlock, modifier: Modifier = Modifier) {
                 facets = block.facets,
                 style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
                 modifier = Modifier.fillMaxWidth(),
+                textAlign = textAlign,
                 onLinkClick = { url, ctx -> openUrl(ctx, url) }
             )
         }
@@ -254,6 +267,7 @@ fun ParagraphBlock(block: LeafletBlock, modifier: Modifier = Modifier) {
             facets = block.facets,
             style = MaterialTheme.typography.bodyLarge,
             modifier = modifier.fillMaxWidth(),
+            textAlign = textAlign,
             onLinkClick = { url, ctx -> openUrl(ctx, url) }
         )
     }
@@ -379,7 +393,7 @@ fun ListItem(
             Spacer(Modifier.width(12.dp))
         }
         if (item.content != null) {
-            LeafletBlockContent(item.content, "", Modifier.weight(1f), pollData, onLoadPoll, onCastVote)
+            LeafletBlockContent(item.content, "", Modifier.weight(1f), pollData = pollData, onLoadPoll = onLoadPoll, onCastVote = onCastVote)
         }
     }
 }

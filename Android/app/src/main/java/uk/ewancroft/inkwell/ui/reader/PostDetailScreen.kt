@@ -311,6 +311,7 @@ private fun PostDetailContent(
                             LeafletBlockContent(
                                 block = container.block,
                                 authorDid = content.authorDid,
+                                alignment = container.alignment,
                                 onLoadPoll = onLoadPoll,
                                 onCastVote = onCastVote,
                             )
