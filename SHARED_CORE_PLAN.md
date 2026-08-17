@@ -113,13 +113,73 @@ decoupled from both SDKs — a follow-on after the pure-logic modules are proven
 
 ## Execution Order
 
-1. Create `shared/` module with Gradle KMP plugin + iOS targets + XCFramework export.
-2. Extract Module 1 (pure logic, no `expect/actual` needed).
-3. Write shared unit tests in `commonTest`.
-4. Wire Android to depend on `shared`; run `./gradlew assembleDebug`.
-5. Wire iOS to consume XCFramework; run `xcodebuild`.
-6. Extract Module 2 (verification URLs + facet converter + pagination) with `expect/actual` I/O.
-7. Plan neutral shared-model layer for DTOs.
+1. Create `shared/` module with Gradle KMP plugin + iOS targets + XCFramework export. ✅
+2. Extract Module 1 (pure logic, no `expect/actual` needed). ✅
+3. Write shared unit tests in `commonTest`. ✅
+4. Wire Android to depend on `shared`; run `./gradlew assembleDebug`. ✅
+5. Wire iOS to consume XCFramework; run `xcodebuild`. ✅
+6. Extract Module 2 (verification URLs + facet converter + pagination) with `expect/actual` I/O. 🔄 FacetConverter done; verification + pagination pending.
+7. Plan neutral shared-model layer for DTOs. 📋 Deferred.
+
+## Completed Modules
+
+### 1a. AT-URI Parser ✅
+- Commits: `d547751`, `a1049eb`
+- Shared: `shared/src/commonMain/kotlin/.../AtUri.kt`
+- iOS bridge: `iOS/Inkwell/SharedKMP.swift` `parseAtUri()`
+- Android: direct dependency on `shared`
+
+### 1b. Markdown Parser ✅
+- Commits: `eafd39d`, `d7e13d4`
+- Shared: `shared/src/commonMain/kotlin/.../markdown/MarkdownParser.kt`, `MarkdownBlock.kt`, `MarkdownSerializer.kt`
+- iOS bridge: `SharedKMP.swift` `parseMarkdown()`, `serializeMarkdown()`
+- Android bridge: `Android/.../reader/MarkdownParser.kt`
+- iOS `ContentProvider.swift` local types renamed to `MarkdownBlockNode`/`MarkdownListItemNode`, parser/serializer delegate to shared KMP
+
+### 1c. Facet Schema Constants ✅
+- Commits: `dad33b5`, `f075b9f`
+- Shared: `shared/src/commonMain/kotlin/.../facets/FacetSchema.kt`
+- Both platforms consume `FacetSchema.leaflet/pckt/offprint` + lossy maps
+
+### 1d. Reader Theme Resolution ✅
+- Commits: earlier shared core wiring
+- Shared: `shared/src/commonMain/kotlin/.../theme/ReaderTheme.kt`
+- iOS bridge: `SharedKMP.swift` `resolveReaderTheme()`
+- Android: direct dependency on `shared`
+
+### 1e. Tip-Prompt Gating ✅
+- Commits: earlier shared core wiring
+- Shared: `shared/src/commonMain/kotlin/.../TipPromptPolicy.kt`
+- iOS bridge: `SharedKMP.swift` `shouldShowTip()`
+- Android: direct dependency on `shared`
+
+### 1f. Notification Retention Policy ✅
+- Commits: earlier shared core wiring
+- Shared: `shared/src/commonMain/kotlin/.../notification/NotificationPolicy.kt`
+- iOS bridge: `SharedKMP.swift` `notificationStyle()`, `isFirstPoll()`, `trimSeenUris()`, `trimNotifications()`
+- Android: direct dependency on `shared`
+
+### 2b. Facet Byte-Range → Markdown Converter ✅
+- Commits: `e87e385`
+- Shared: `shared/src/commonMain/kotlin/.../facets/FacetConverter.kt` (`facetsToMarkdown` + `markdownToFacets`)
+- iOS bridge: `SharedKMP.swift` `facetsToMarkdown()`, `markdownToFacets()` with `LeafletFacet` ↔ `RichTextFacet` conversion
+- Android: `MarkdownConverter.kt` delegates `markdownToFacets` to shared, maps `RichTextFacet` → JSON facet objects
+- XCFramework rebuilt with `@ObjCName` exports for `FacetConverter`, `RichTextFacet`, `RichTextFeature`
+
+## Remaining Work
+
+### 2a. Verification URL Builders + Link Scanner
+- **Status**: Not started
+- **Source**: iOS `SiteStandardVerification.swift` + Android `StandardSiteVerifier.kt`
+- **Target**: `shared/src/commonMain/.../verification/`
+- **Share**: `.well-known` endpoint construction, document canonical URL, `<link>` tag regex
+- **Keep native**: HTTP fetch, caching
+
+### 2c. Constellation Pagination + Recommend-Count Optimization
+- **Status**: Not started
+- **Source**: iOS `ConstellationClient.swift` + Android `ConstellationClient.kt`
+- **Target**: `shared/src/commonMain/.../constellation/Pagination.kt`
+- **Share**: Pagination cursor logic, 50/page cap, recommend-count optimization
 
 ## Risk Notes
 
