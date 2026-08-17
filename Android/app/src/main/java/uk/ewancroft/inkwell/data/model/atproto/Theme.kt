@@ -15,6 +15,8 @@ import kotlinx.serialization.Serializable
 /**
  * Full publication/document theme from the Leaflet lexicon.
  * Supports per-section background, heading/body font selection, page width.
+ * Also accepts the older light/dark palette shape still emitted by some
+ * standard.site applications.
  */
 @Serializable
 data class PublicationTheme(
@@ -27,7 +29,26 @@ data class PublicationTheme(
     val pageWidth: Int? = null,
     val showPageBackground: Boolean? = null,
     val headingFont: String? = null,
-    val bodyFont: String? = null
+    val bodyFont: String? = null,
+    val font: String? = null,
+    val light: LegacyPalette? = null,
+    val dark: LegacyPalette? = null
+)
+
+// ── Legacy Palette (older light/dark shape) ──────────────────────────────
+
+/**
+ * Older palette format still emitted by some standard.site applications.
+ * Contains hex colour strings for background, text, accent, link, and
+ * surface hover colours.
+ */
+@Serializable
+data class LegacyPalette(
+    val background: String? = null,
+    val text: String? = null,
+    val accent: String? = null,
+    val link: String? = null,
+    val surfaceHover: String? = null
 )
 
 // ── Basic Theme (Four-Colour) ────────────────────────────────────────────

@@ -3,6 +3,7 @@ package uk.ewancroft.inkwell.ui.reader
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -31,7 +32,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
@@ -52,6 +56,15 @@ fun PostDetailScreen(
     viewModel: PostDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val isDarkTheme = androidx.compose.foundation.isSystemInDarkTheme()
+    val readerTheme = remember(uiState.documentTheme, uiState.publicationTheme, uiState.basicTheme, isDarkTheme) {
+        ReaderTheme.resolve(
+            documentTheme = uiState.documentTheme,
+            publicationTheme = uiState.publicationTheme,
+            basicTheme = uiState.basicTheme,
+            isDarkTheme = isDarkTheme,
+        )
+    }
 
     LaunchedEffect(uri) {
         viewModel.loadPost(uri)
@@ -105,7 +118,8 @@ fun PostDetailScreen(
                     }
                 },
             )
-        }
+        },
+        containerColor = if (readerTheme.background != Color.Unspecified) readerTheme.background else MaterialTheme.colorScheme.background,
     ) { padding ->
         when {
             uiState.isLoading -> LoadingState(Modifier.padding(padding))
@@ -116,6 +130,7 @@ fun PostDetailScreen(
             )
             else -> PostDetailContent(
                 uiState = uiState,
+                readerTheme = readerTheme,
                 onToggleSubscription = { viewModel.toggleSubscription() },
                 onToggleRecommend = { viewModel.toggleRecommend() },
                 previousUri = uiState.previousUri,
@@ -214,6 +229,7 @@ private fun ErrorState(message: String, onRetry: () -> Unit, modifier: Modifier 
 @Composable
 private fun PostDetailContent(
     uiState: PostDetailUiState,
+    readerTheme: ReaderTheme,
     onToggleSubscription: () -> Unit,
     onToggleRecommend: () -> Unit,
     previousUri: String?,
@@ -229,8 +245,19 @@ private fun PostDetailContent(
     onCastVote: suspend (String, List<String>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val titleColor = if (readerTheme.foreground != Color.Unspecified) readerTheme.foreground else MaterialTheme.colorScheme.onBackground
+    val bodyColor = if (readerTheme.foreground != Color.Unspecified) readerTheme.foreground else MaterialTheme.colorScheme.onSurfaceVariant
+
+    val pageBg = if (readerTheme.showPageBackground && readerTheme.pageBackground != Color.Unspecified) {
+        readerTheme.pageBackground
+    } else {
+        Color.Unspecified
+    }
+
     LazyColumn(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .then(if (pageBg != Color.Unspecified) Modifier.background(pageBg) else Modifier),
         contentPadding = PaddingValues(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
@@ -253,27 +280,27 @@ private fun PostDetailContent(
                 Text(
                     uiState.title ?: "Untitled",
                     style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
+                    color = titleColor,
                 )
                 if (!uiState.description.isNullOrBlank()) {
                     Text(
                         uiState.description,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = bodyColor,
                     )
                 }
                 if (!uiState.publishedAt.isNullOrBlank()) {
                     Text(
                         uiState.publishedAt.formatPublishedDate(),
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = bodyColor.copy(alpha = 0.7f),
                     )
                 }
                 VerificationBadge(uiState.verification)
             }
         }
 
-        item { HorizontalDivider() }
+        item { HorizontalDivider(color = if (readerTheme.foreground != Color.Unspecified) readerTheme.foreground.copy(alpha = 0.2f) else MaterialTheme.colorScheme.outlineVariant) }
 
         when (val content = uiState.content) {
             is DocumentContent.Leaflet -> {
@@ -293,7 +320,7 @@ private fun PostDetailContent(
 
             is DocumentContent.PlainText -> {
                 items(splitIntoParagraphs(content.text)) { paragraph ->
-                    PlainTextParagraph(paragraph)
+                    PlainTextParagraph(paragraph, foregroundColor = bodyColor)
                 }
             }
 
@@ -613,8 +640,9 @@ private fun splitIntoParagraphs(text: String): List<String> =
         .filter { it.isNotEmpty() }
 
 @Composable
-private fun PlainTextParagraph(paragraph: String) {
+private fun PlainTextParagraph(paragraph: String, foregroundColor: Color = Color.Unspecified) {
     val headingLevel = paragraph.takeWhile { it == '#' }.length.coerceAtMost(6)
+    val color = if (foregroundColor != Color.Unspecified) foregroundColor else MaterialTheme.colorScheme.onBackground
     if (headingLevel in 1..6 && paragraph.getOrNull(headingLevel) == ' ') {
         val text = paragraph.drop(headingLevel + 1).trim()
         val style = when (headingLevel) {
@@ -622,11 +650,12 @@ private fun PlainTextParagraph(paragraph: String) {
             2 -> MaterialTheme.typography.titleLarge
             else -> MaterialTheme.typography.titleMedium
         }
-        Text(text, style = style, modifier = Modifier.fillMaxWidth())
+        Text(text, style = style, color = color, modifier = Modifier.fillMaxWidth())
     } else {
         Text(
             paragraph,
             style = MaterialTheme.typography.bodyLarge,
+            color = color,
             modifier = Modifier.fillMaxWidth(),
         )
     }
