@@ -35,6 +35,14 @@ class InlineMarkdownScannerTest {
     }
 
     @Test
+    fun codeFollowedByPlainText() {
+        val segments = InlineMarkdownScanner.scan("`inline code` and a fenced block:")
+        assertEquals(2, segments.size)
+        assertEquals("inline code", (segments[0] as InlineSegment.Code).text)
+        assertEquals(" and a fenced block:", (segments[1] as InlineSegment.Plain).text)
+    }
+
+    @Test
     fun strike() {
         val segments = InlineMarkdownScanner.scan("~~strike~~")
         assertEquals(1, segments.size)
