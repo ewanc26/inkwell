@@ -148,17 +148,9 @@ fun WriterScreen(
                                     pubExpanded = false
                                 },
                             )
-        }
-    }
-
-    if (showCredits) {
-        CreditsView(
-            appVersion = appVersion,
-            onSignOut = onSignOut,
-            onDismiss = { showCredits = false },
-        )
-    }
-}
+                        }
+                    }
+                }
                 TextButton(onClick = { viewModel.showCreateDialog() }) {
                     Icon(Icons.Outlined.Add, contentDescription = null, Modifier.size(18.dp))
                     Spacer(Modifier.width(4.dp))
@@ -419,6 +411,14 @@ fun WriterScreen(
                 Text(if (uiState.editingDocumentUri != null) "Update" else "Publish")
             }
         }
+
+            if (showCredits) {
+                CreditsView(
+                    appVersion = appVersion,
+                    onSignOut = onSignOut,
+                    onDismiss = { showCredits = false },
+                )
+            }
 
             if (uiState.showCreateDialog) {
                 AlertDialog(
