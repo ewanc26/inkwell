@@ -147,7 +147,10 @@ struct InkwellButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.body.weight(.semibold))
-            .foregroundStyle(.white)
+            // `.white` would sit unreadably on a light tint and ignore
+            // Increase Contrast; the automatic style resolves against
+            // whatever the capsule is actually filled with.
+            .foregroundStyle(tint.adaptedForegroundStyle)
             .padding(.horizontal, 24)
             .padding(.vertical, 12)
             .background(tint)
@@ -157,5 +160,35 @@ struct InkwellButtonStyle: ButtonStyle {
             .onChange(of: configuration.isPressed) { _, pressed in
                 if pressed { InkwellHaptics.light() }
             }
+    }
+}
+
+/// The press treatment for the article cards in the Reader feed.
+///
+/// `.buttonStyle(.plain)` leaves a tappable card completely inert under
+/// the finger — no highlight, no lift, nothing to confirm the tap landed.
+/// A list row would dim; this does the card equivalent.
+struct ReaderCardButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.98 : 1)
+            .opacity(configuration.isPressed ? 0.85 : 1)
+            .animation(InkwellMotion.micro, value: configuration.isPressed)
+    }
+}
+
+extension ButtonStyle where Self == ReaderCardButtonStyle {
+    static var readerCard: ReaderCardButtonStyle { ReaderCardButtonStyle() }
+}
+
+extension Color {
+    /// Black or white, whichever reads better on top of this color.
+    /// Uses the same relative-luminance split as the system's own
+    /// prominent controls rather than assuming a dark tint.
+    var adaptedForegroundStyle: Color {
+        let components = UIColor(self).cgColor.components ?? []
+        guard components.count >= 3 else { return .white }
+        let luminance = 0.299 * components[0] + 0.587 * components[1] + 0.114 * components[2]
+        return luminance > 0.6 ? .black : .white
     }
 }

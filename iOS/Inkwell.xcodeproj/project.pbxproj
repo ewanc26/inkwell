@@ -10,7 +10,7 @@
 		40FA13452FE4DB4B0016CC0D /* ATProtoKit in Frameworks */ = {isa = PBXBuildFile; productRef = 40FA13442FE4DB4B0016CC0D /* ATProtoKit */; };
 		40FA134D2FE500000016CC0D /* OAuthenticator in Frameworks */ = {isa = PBXBuildFile; productRef = 40FA134C2FE500000016CC0D /* OAuthenticator */; };
 		40FA13502FE500000016CC0D /* ATResolve in Frameworks */ = {isa = PBXBuildFile; productRef = 40FA134F2FE500000016CC0D /* ATResolve */; };
-		40FA13522FE500000016CC0D /* InkwellShared.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 40FA13512FE4DB4B0016CC0D /* InkwellShared.xcframework */; };
+		40FA13522FE500000016CC0D /* ../shared/InkwellShared.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 40FA13512FE4DB4B0016CC0D /* ../shared/InkwellShared.xcframework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -31,10 +31,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		40FA13512FE4DB4B0016CC0D /* ../shared/InkwellShared.xcframework */ = {isa = PBXFileReference; explicitFileType = wrapper.xcframework; path = ../shared/InkwellShared.xcframework; sourceTree = SOURCE_ROOT; };
 		40FF21B62FE4CA3100B4A027 /* Inkwell.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Inkwell.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		40FF21C72FE4CA3300B4A027 /* InkwellTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = InkwellTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		40FF21D12FE4CA3300B4A027 /* InkwellUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = InkwellUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		40FA13512FE4DB4B0016CC0D /* InkwellShared.xcframework */ = {isa = PBXFileReference; explicitFileType = wrapper.xcframework; path = "../shared/InkwellShared.xcframework"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -76,7 +76,7 @@
 				40FA13452FE4DB4B0016CC0D /* ATProtoKit in Frameworks */,
 				40FA134D2FE500000016CC0D /* OAuthenticator in Frameworks */,
 				40FA13502FE500000016CC0D /* ATResolve in Frameworks */,
-				40FA13522FE500000016CC0D /* InkwellShared.xcframework in Frameworks */,
+				40FA13522FE500000016CC0D /* ../shared/InkwellShared.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -97,6 +97,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		408CDFD23034224900DB7469 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				40FA13512FE4DB4B0016CC0D /* ../shared/InkwellShared.xcframework */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 		40FF21AD2FE4CA3100B4A027 = {
 			isa = PBXGroup;
 			children = (
@@ -104,6 +112,7 @@
 				40FF21CA2FE4CA3300B4A027 /* InkwellTests */,
 				40FF21D42FE4CA3300B4A027 /* InkwellUITests */,
 				40FF21B72FE4CA3100B4A027 /* Products */,
+				408CDFD23034224900DB7469 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};

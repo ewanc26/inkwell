@@ -283,77 +283,66 @@ struct BrowseDocumentsView: View {
     @State private var notificationManager = NotificationManager.shared
     @State private var store = ReaderFeedStore.shared
 
-    @State private var showCredits = false
+    @State private var showAbout = false
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                Picker("Reader feed", selection: $store.selectedFeed) {
-                    ForEach(ReaderFeed.allCases) { feed in
-                        Text(feed.rawValue).tag(feed)
+            content
+                // As a safe-area bar rather than a plain VStack row, the
+                // feed switcher picks up the scroll-edge effect: content
+                // slides under it and it stays legible over whatever's
+                // passing behind, instead of sitting on an opaque band.
+                .safeAreaBar(edge: .top) {
+                    Picker("Reader feed", selection: $store.selectedFeed) {
+                        ForEach(ReaderFeed.allCases) { feed in
+                            Text(feed.rawValue).tag(feed)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                }
+                .navigationTitle("Reader")
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Refresh", systemImage: "arrow.clockwise") {
+                            Task { await store.loadData(loginStateManager: loginStateManager, force: true) }
+                        }
+                        .disabled(store.followingState.isLoading || store.isLoadingYours)
                     }
                 }
-                .pickerStyle(.segmented)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-
-                content
-            }
-            .navigationTitle("Reader")
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button(role: .destructive, action: loginStateManager.signOut) {
-                        Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
+                .accountToolbar(showAbout: $showAbout)
+                .task {
+                    if CommandLine.arguments.contains("-screenshot") {
+                        let mockDoc = SiteStandardLexicon.DocumentRecord(
+                            site: "https://ewancroft.uk",
+                            title: "Publishing on the Open Web with Standard.site",
+                            publishedAt: Date(),
+                            path: "/publishing-on-open-web",
+                            description: "The Standard.site publishing spec brings structured, portable records to AT Protocol."
+                        )
+                        let mockPub = SiteStandardLexicon.PublicationRecord(
+                            url: "https://ewancroft.uk",
+                            name: "Ewan's Corner",
+                            description: "Essays on open protocols, software, and digital garden notes."
+                        )
+                        let mockItem = ReaderFeedItem(
+                            document: DocumentEntry(uri: "at://did:plc:ewan/site.standard.document/1", authorDID: "did:plc:ewan", record: mockDoc),
+                            publication: PublicationEntry(uri: "at://did:plc:ewan/site.standard.publication/1", authorDID: "did:plc:ewan", record: mockPub),
+                            authorProfile: nil
+                        )
+                        store.followingState.items = [mockItem]
+                        store.followingState.isLoading = false
+                        store.followingState.hasLoaded = true
+                    } else {
+                        // Usually already loading (or loaded) by now — kicked
+                        // off proactively from ContentView as soon as the user
+                        // authenticated, not lazily on this view's first
+                        // appearance. This is a no-op in that case.
+                        await store.loadData(loginStateManager: loginStateManager)
+                        notificationManager.markAllAsRead()
                     }
                 }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button { showCredits = true } label: {
-                        Image(systemName: "info.circle")
-                    }
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        Task { await store.loadData(loginStateManager: loginStateManager, force: true) }
-                    } label: {
-                        Image(systemName: "arrow.clockwise")
-                    }
-                    .disabled(store.followingState.isLoading || store.isLoadingYours)
-                }
-            }
-            .sheet(isPresented: $showCredits) {
-                CreditsView()
-            }
-            .task {
-                if CommandLine.arguments.contains("-screenshot") {
-                    let mockDoc = SiteStandardLexicon.DocumentRecord(
-                        site: "https://ewancroft.uk",
-                        title: "Publishing on the Open Web with Standard.site",
-                        publishedAt: Date(),
-                        path: "/publishing-on-open-web",
-                        description: "The Standard.site publishing spec brings structured, portable records to AT Protocol."
-                    )
-                    let mockPub = SiteStandardLexicon.PublicationRecord(
-                        url: "https://ewancroft.uk",
-                        name: "Ewan's Corner",
-                        description: "Essays on open protocols, software, and digital garden notes."
-                    )
-                    let mockItem = ReaderFeedItem(
-                        document: DocumentEntry(uri: "at://did:plc:ewan/site.standard.document/1", authorDID: "did:plc:ewan", record: mockDoc),
-                        publication: PublicationEntry(uri: "at://did:plc:ewan/site.standard.publication/1", authorDID: "did:plc:ewan", record: mockPub),
-                        authorProfile: nil
-                    )
-                    store.followingState.items = [mockItem]
-                    store.followingState.isLoading = false
-                    store.followingState.hasLoaded = true
-                } else {
-                    // Usually already loading (or loaded) by now — kicked
-                    // off proactively from ContentView as soon as the user
-                    // authenticated, not lazily on this view's first
-                    // appearance. This is a no-op in that case.
-                    await store.loadData(loginStateManager: loginStateManager)
-                    notificationManager.markAllAsRead()
-                }
-            }
         }
     }
 
@@ -371,19 +360,37 @@ struct BrowseDocumentsView: View {
     @ViewBuilder
     private var followingContent: some View {
         if store.followingState.isLoading && store.followingState.items.isEmpty {
-            ProgressView("Loading your reader...")
+            ProgressView("Loading your reader…")
+                .controlSize(.large)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if let error = store.followingState.error, store.followingState.items.isEmpty {
-            ContentUnavailableView(
-                "Reader Unavailable",
-                systemImage: "exclamationmark.triangle",
-                description: Text(error)
-            )
+            ContentUnavailableView {
+                Label("Reader Unavailable", systemImage: "exclamationmark.triangle")
+            } description: {
+                Text(error)
+            } actions: {
+                Button("Try Again") {
+                    Task { await store.loadData(loginStateManager: loginStateManager, force: true) }
+                }
+                .buttonStyle(.borderedProminent)
+            }
         } else if store.followingState.items.isEmpty && store.followingState.hasLoaded {
             ContentUnavailableView {
-                Label("Nothing to read yet", systemImage: "books.vertical")
+                Label("Nothing to Read Yet", systemImage: "books.vertical")
             } description: {
                 Text("Subscribe to publications in Discover and their latest posts will appear here.")
+            } actions: {
+                // An empty state that just describes the fix is a dead end;
+                // this takes you to it. Routed through the same notification
+                // the App Intents post, so tab switching stays in one place.
+                Button("Browse Discover") {
+                    NotificationCenter.default.post(
+                        name: .inkwellOpenTab,
+                        object: nil,
+                        userInfo: [InkwellTabKey.tab: InkwellTab.discover.rawValue]
+                    )
+                }
+                .buttonStyle(.borderedProminent)
             }
         } else {
             ScrollView {
@@ -401,7 +408,7 @@ struct BrowseDocumentsView: View {
                         } label: {
                             ReaderPostCard(item: item)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.readerCard)
                     }
 
                     // Infinite-scroll sentinel
@@ -419,7 +426,7 @@ struct BrowseDocumentsView: View {
         if store.followingState.isLoadingNextPage {
             HStack(spacing: 10) {
                 ProgressView()
-                Text("Loading more...")
+                Text("Loading more…")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -461,19 +468,34 @@ struct BrowseDocumentsView: View {
     @ViewBuilder
     private var yoursContent: some View {
         if store.isLoadingYours && store.yours.isEmpty {
-            ProgressView("Loading your posts...")
+            ProgressView("Loading your posts…")
+                .controlSize(.large)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if let error = store.yoursError, store.yours.isEmpty {
-            ContentUnavailableView(
-                "Reader Unavailable",
-                systemImage: "exclamationmark.triangle",
-                description: Text(error)
-            )
+            ContentUnavailableView {
+                Label("Posts Unavailable", systemImage: "exclamationmark.triangle")
+            } description: {
+                Text(error)
+            } actions: {
+                Button("Try Again") {
+                    Task { await store.loadData(loginStateManager: loginStateManager, force: true) }
+                }
+                .buttonStyle(.borderedProminent)
+            }
         } else if store.yours.isEmpty {
             ContentUnavailableView {
-                Label("No published posts", systemImage: "doc.text")
+                Label("No Published Posts", systemImage: "doc.text")
             } description: {
                 Text("Posts you publish from Inkwell or another standard.site app will appear here.")
+            } actions: {
+                Button("Start Writing") {
+                    NotificationCenter.default.post(
+                        name: .inkwellOpenTab,
+                        object: nil,
+                        userInfo: [InkwellTabKey.tab: InkwellTab.writer.rawValue]
+                    )
+                }
+                .buttonStyle(.borderedProminent)
             }
         } else {
             ScrollView {
@@ -491,7 +513,7 @@ struct BrowseDocumentsView: View {
                         } label: {
                             ReaderPostCard(item: item)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.readerCard)
                     }
                 }
                 .padding(.horizontal, 14)
