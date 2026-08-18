@@ -28,6 +28,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
+import uk.ewancroft.inkwell.ui.reader.MarkdownRendererView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,6 +47,17 @@ fun WriterScreen(
 
     val context = androidx.compose.ui.platform.LocalContext.current
     val appVersion = remember { uk.ewancroft.inkwell.util.appVersionString(context) }
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri ?: return@rememberLauncherForActivityResult
+        val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg"
+        val bytes = context.contentResolver.openInputStream(uri)?.readBytes()
+        if (bytes != null) {
+            viewModel.uploadImage(bytes, mimeType)
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.loadPublications()
@@ -198,31 +210,6 @@ fun WriterScreen(
                 }
             }
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                val context = androidx.compose.ui.platform.LocalContext.current
-                var showImagePicker by remember { mutableStateOf(false) }
-                val imagePickerLauncher = rememberLauncherForActivityResult(
-                    ActivityResultContracts.GetContent()
-                ) { uri: Uri? ->
-                    uri ?: return@rememberLauncherForActivityResult
-                    val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg"
-                    val bytes = context.contentResolver.openInputStream(uri)?.readBytes()
-                    if (bytes != null) {
-                        viewModel.uploadImage(bytes, mimeType)
-                    }
-                }
-                OutlinedButton(
-                    onClick = { imagePickerLauncher.launch("image/*") },
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Icon(Icons.Outlined.Image, contentDescription = null)
-                    Spacer(Modifier.width(8.dp))
-                    Text("Add image")
-                }
-            }
-
             if (showDocumentPicker) {
                 DocumentPickerDialog(
                     publications = uiState.publications,
@@ -236,10 +223,13 @@ fun WriterScreen(
             }
 
             // Format picker
+            // Format picker (disabled when editing existing document)
+            val isFormatLocked = uiState.editingDocumentUri != null
             Box {
                 OutlinedButton(
-                    onClick = { formatExpanded = true },
+                    onClick = { if (!isFormatLocked) formatExpanded = true },
                     modifier = Modifier.fillMaxWidth(),
+                    enabled = !isFormatLocked,
                 ) {
                     Text(uiState.selectedFormat, modifier = Modifier.weight(1f))
                     Icon(Icons.Outlined.ArrowDropDown, contentDescription = null)
@@ -277,12 +267,83 @@ fun WriterScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            // Loss reporting
+            if (uiState.lostFeatures.isNotEmpty()) {
+                Surface(
+                    color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f),
+                    shape = MaterialTheme.shapes.small,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Icon(
+                            Icons.Outlined.Warning,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                            tint = MaterialTheme.colorScheme.error,
+                        )
+                        Text(
+                            "This post contains ${uiState.lostFeatures.joinToString(", ")} that markdown can't represent. Saving will drop those.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    }
+                }
+            }
+
+            // Formatting toolbar
+            FormattingToolbar(
+                canUploadImages = when (uiState.selectedFormat) {
+                    "Markpub" -> false
+                    else -> true
+                },
+                onImagePicker = { imagePickerLauncher.launch("image/*") },
+            )
+
+            // Preview toggle
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    "Preview",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Switch(
+                    checked = uiState.showPreview,
+                    onCheckedChange = { viewModel.togglePreview() },
+                )
+            }
+
+            // Content editor
             OutlinedTextField(
                 value = uiState.markdown, onValueChange = { viewModel.onMarkdownChanged(it) },
                 label = { Text("Content (Markdown)") },
                 modifier = Modifier.fillMaxWidth().weight(1f),
                 minLines = 10
             )
+
+            // Live preview
+            if (uiState.showPreview && uiState.markdown.isNotBlank()) {
+                Surface(
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                    shape = MaterialTheme.shapes.small,
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 100.dp, max = 400.dp),
+                ) {
+                    androidx.compose.foundation.lazy.LazyColumn(
+                        modifier = Modifier.padding(8.dp),
+                    ) {
+                        item {
+                            MarkdownRendererView(markdown = uiState.markdown)
+                        }
+                    }
+                }
+            }
 
             if (uiState.publishError != null) {
                 Text(

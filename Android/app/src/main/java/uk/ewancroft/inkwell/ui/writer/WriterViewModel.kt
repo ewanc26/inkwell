@@ -18,6 +18,9 @@ import uk.ewancroft.inkwell.data.model.atproto.PublicationRecord
 import uk.ewancroft.inkwell.shared.AtUri
 import uk.ewancroft.inkwell.data.remote.StandardSiteVerifier
 import uk.ewancroft.inkwell.shared.content.ContentFormatDetector
+import uk.ewancroft.inkwell.shared.content.ContentFormatDispatcher
+import uk.ewancroft.inkwell.shared.content.JsonMapBridge
+import uk.ewancroft.inkwell.shared.markdown.MarkdownSerializer
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 import uk.ewancroft.inkwell.shared.text.StringUtils
 import uk.ewancroft.inkwell.shared.verification.VerificationFailure
@@ -63,6 +66,8 @@ data class WriterUiState(
     val editingDocumentRevision: String? = null,
     val isEditing: Boolean = false,
     val uploadedBlobs: Map<String, JsonObject> = emptyMap(),
+    val lostFeatures: List<String> = emptyList(),
+    val showPreview: Boolean = true,
 )
 
 @HiltViewModel
@@ -395,7 +400,6 @@ class WriterViewModel @Inject constructor(
                 val title = value["title"]?.jsonPrimitive?.content ?: ""
                 val description = value["description"]?.jsonPrimitive?.contentOrNull ?: ""
                 val path = value["path"]?.jsonPrimitive?.contentOrNull ?: ""
-                val textContent = value["textContent"]?.jsonPrimitive?.contentOrNull ?: ""
 
                 val content = value["content"]?.jsonObject
                 val contentType = content?.get("\$type")?.jsonPrimitive?.contentOrNull
@@ -406,21 +410,34 @@ class WriterViewModel @Inject constructor(
                     else -> "Leaflet"
                 }
 
-                val existingBlobs = harvestBlobRefs(textContent)
+                // Convert content to markdown via shared KMP for loss reporting
+                val markdownResult = if (content != null) {
+                    val contentMap = JsonMapBridge.jsonToMap(content)
+                    ContentFormatDispatcher.toMarkdown(contentMap)
+                } else null
+
+                val markdownText = markdownResult?.let {
+                    MarkdownSerializer.serialize(it.blocks)
+                } ?: value["textContent"]?.jsonPrimitive?.contentOrNull ?: ""
+
+                val lostFeatures = markdownResult?.lost?.toList() ?: emptyList()
+
+                val existingBlobs = harvestBlobRefs(markdownText)
 
                 _uiState.value = _uiState.value.copy(
                     editingDocumentUri = uri,
                     editingDocumentTitle = title,
                     editingDocumentDescription = description,
                     editingDocumentPath = path,
-                    editingDocumentMarkdown = textContent,
+                    editingDocumentMarkdown = markdownText,
                     editingDocumentRevision = cid,
                     title = title,
                     description = description,
                     path = path,
-                    markdown = textContent,
+                    markdown = markdownText,
                     selectedFormat = format,
                     uploadedBlobs = existingBlobs,
+                    lostFeatures = lostFeatures,
                     verifiedPublicationUri = null,
                     verificationMessage = null,
                     isEditing = false,
@@ -452,7 +469,12 @@ class WriterViewModel @Inject constructor(
             editingDocumentPath = null,
             editingDocumentMarkdown = null,
             uploadedBlobs = emptyMap(),
+            lostFeatures = emptyList(),
         )
+    }
+
+    fun togglePreview() {
+        _uiState.value = _uiState.value.copy(showPreview = !_uiState.value.showPreview)
     }
 
     fun uploadImage(bytes: ByteArray, mimeType: String) {
