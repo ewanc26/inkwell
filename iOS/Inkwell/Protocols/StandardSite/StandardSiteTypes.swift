@@ -14,26 +14,6 @@
 
 import Foundation
 
-// MARK: - AT-URI Parser
-
-/// Parses AT-URIs (`at://did:plc:abc123/collection/rkey`) into their
-/// components. Used for extracting the author DID and record key from
-/// subscription and publication AT-URIs.
-struct ATURI: Equatable, Hashable {
-    let did: String
-    let collection: String
-    let recordKey: String
-
-    /// The full AT-URI string.
-    var uri: String { "at://\(did)/\(collection)/\(recordKey)" }
-
-    /// Parses an AT-URI string. Returns `nil` if the format is invalid.
-    static func parse(_ uri: String) -> ATURI? {
-        guard let result = parseAtUri(uri) else { return nil }
-        return ATURI(did: result.did, collection: result.collection, recordKey: result.recordKey)
-    }
-}
-
 // MARK: - Entry Wrappers
 
 /// A publication record enriched with its AT-URI and author DID.
@@ -85,7 +65,7 @@ struct SubscriptionEntry: Identifiable, Equatable, Hashable {
     var id: String { uri }
 
     /// The parsed AT-URI of the publication being subscribed to.
-    var publicationURI: ATURI? { ATURI.parse(record.publication) }
+    var publicationURI: (did: String, collection: String, recordKey: String)? { parseAtUri(record.publication) }
 }
 
 /// A comment record enriched with its AT-URI and record key.
@@ -109,5 +89,5 @@ struct RecommendEntry: Identifiable, Equatable, Hashable {
     var id: String { uri }
 
     /// The parsed AT-URI of the document being recommended.
-    var documentURI: ATURI? { ATURI.parse(record.document) }
+    var documentURI: (did: String, collection: String, recordKey: String)? { parseAtUri(record.document) }
 }

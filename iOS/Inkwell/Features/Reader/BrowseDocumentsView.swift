@@ -291,7 +291,7 @@ struct BrowseDocumentsView: View {
 
             // Collect unique DIDs for profile resolution.
             let uniqueDIDs = Set(subscriptions.compactMap { sub in
-                ATURI.parse(sub.record.publication)?.did
+                parseAtUri(sub.record.publication)?.did
             })
             let profiles = await resolveProfiles(dids: uniqueDIDs)
 
@@ -299,7 +299,7 @@ struct BrowseDocumentsView: View {
             await withTaskGroup(of: (did: String, items: [ReaderFeedItem], cursor: String?).self) { group in
                 for subscription in subscriptions {
                     let pubURI = subscription.record.publication
-                    guard let pubDID = ATURI.parse(pubURI)?.did else { continue }
+                    guard let pubDID = parseAtUri(pubURI)?.did else { continue }
                     group.addTask { [pubURI, pubDID] in
                         let pubEntry = try? await loginStateManager.fetchPublication(uri: pubURI)
                         let (records, cursor) = (try? await loginStateManager.listRecordsPage(
