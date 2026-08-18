@@ -77,6 +77,37 @@
       View source
     </a>
   </div>
+
+  <p class="mt-6 flex flex-wrap items-center gap-2" aria-label="Project badges">
+    <a href="https://github.com/ewanc26/inkwell/releases/latest?q=ios-v">
+      <img
+        src="https://img.shields.io/github/v/release/ewanc26/inkwell?filter=ios-v*&label=iOS&logo=apple&logoColor=white"
+        alt="Latest iOS release"
+        height="20"
+      />
+    </a>
+    <a href="https://github.com/ewanc26/inkwell/releases/latest?q=android-v">
+      <img
+        src="https://img.shields.io/github/v/release/ewanc26/inkwell?filter=android-v*&label=Android&logo=android&logoColor=white"
+        alt="Latest Android release"
+        height="20"
+      />
+    </a>
+    <a href="https://github.com/ewanc26/inkwell/blob/main/LICENSE">
+      <img
+        src="https://img.shields.io/github/license/ewanc26/inkwell"
+        alt="AGPL-3.0"
+        height="20"
+      />
+    </a>
+    <a href="https://github.com/sponsors/ewanc26">
+      <img
+        src="https://img.shields.io/github/sponsors/ewanc26?logo=githubsponsors&logoColor=white&label=sponsors"
+        alt="Sponsor"
+        height="20"
+      />
+    </a>
+  </p>
 </section>
 
 <!-- Download -->
