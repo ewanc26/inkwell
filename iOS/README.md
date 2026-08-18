@@ -18,7 +18,15 @@ Open `Inkwell.xcodeproj` in Xcode and run the `Inkwell` scheme on an iOS 26.0+ s
 
 ## Tests
 
-Run `xcodebuild -project Inkwell.xcodeproj -scheme Inkwell -destination 'platform=iOS Simulator,name=<available iOS 26.5 device>' build test`.
+```bash
+xcodebuild -project Inkwell.xcodeproj -scheme Inkwell \
+  -destination 'platform=iOS Simulator,name=<available iOS 18+ device>' \
+  -skip-testing:InkwellUITests build test
+```
+
+`InkwellTests/StandardSiteTests.swift` is the only unit test source — nine tests over NSID namespacing, AT-URI rejection, publication/document association and canonical URLs, verification endpoints, wire keys, search v2 decoding, notification JSON, and malformed-record tolerance. `InkwellUITests` has no source files and fails to load its bundle if run, hence the skip.
+
+This target does not cover the shared KMP core. Those 135 tests live in `../shared/src/commonTest/` and run through Gradle from `../Android`: `./gradlew :shared:jvmTest`.
 
 ## Distribution
 
