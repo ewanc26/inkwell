@@ -41,16 +41,28 @@ Read the platform-specific `AGENTS.md` files before touching code. They are auth
 
 ## Building and testing
 
+### Shared core
+
+Most of the repo's automated coverage is here — 135 tests in `shared/src/commonTest/`, spanning AT-URI parsing, markdown parsing and inline scanning, facet schema and conversion, content-format conversion, URL utilities, reader themes, and the tip-prompt/notification policies. Run them from `Android/`, the only Gradle root:
+
+```bash
+cd Android
+./gradlew :shared:jvmTest      # JVM target
+./gradlew :shared:allTests     # adds Kotlin/Native iOS targets; much slower
+```
+
+`./gradlew test` does **not** run them — the KMP `jvm()` target exposes `jvmTest`, not `test`, so the aggregate task skips `:shared`. If you change anything under `shared/`, run `:shared:jvmTest` explicitly.
+
 ### iOS
 
 ```bash
 cd iOS
 xcodebuild -project Inkwell.xcodeproj -scheme Inkwell \
-  -destination 'platform=iOS Simulator,name=<available iOS 26.5 device>' \
-  build test
+  -destination 'platform=iOS Simulator,name=<available iOS 18+ device>' \
+  -skip-testing:InkwellUITests build test
 ```
 
-Unit tests cover AT-URI parsing, association/canonical URLs, verification endpoint paths, wire keys, search decoding, notification JSON, and tolerant record pages.
+`InkwellTests/StandardSiteTests.swift` is the only unit test source — nine tests covering the Inkwell NSID namespace, AT-URI rejection of malformed values, association/canonical URLs, verification endpoint paths, wire keys, search v2 decoding, notification JSON, and tolerant record pages. `InkwellUITests` has no source files and fails to load its bundle if run, hence the skip. This target does not exercise the shared core.
 
 ### Android
 
@@ -65,7 +77,9 @@ For release work:
 ./gradlew assembleRelease
 ```
 
-Inspect R8 output and ensure the signed APK is produced. There are no JVM or instrumentation tests for the app in general; `StandardSiteVerifierTest` is the only unit test source.
+Inspect R8 output and ensure the signed APK is produced.
+
+App-level coverage is thin: `StandardSiteVerifierTest` (13 tests) and `SearchModelsTest` (2) are the only unit test sources, and there are no instrumentation tests. Three verifier tests hit the real `blog.ewancroft.uk` standard.site publication over the network and fail offline. Don't treat a green `./gradlew test` as behavioural coverage of the app beyond those two files — and note it skips `:shared` entirely (see above).
 
 ### Website
 

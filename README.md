@@ -84,13 +84,38 @@ The app icon and in-app wordmark share one set of vector coordinates, so they al
 
 ## Testing
 
+### Shared core
+
+Most of the automated coverage lives in the KMP module: `shared/src/commonTest/` holds 135 tests across ten files, covering AT-URI parsing, markdown parsing and inline scanning, facet schema and conversion, content-format conversion, URL utilities, reader themes, and the tip-prompt/notification policies.
+
+Run them from the `Android/` directory (the only Gradle root in the repo):
+
+```bash
+./gradlew :shared:jvmTest      # JVM target — fast, what CI-style checks should use
+./gradlew :shared:allTests     # adds the Kotlin/Native iOS targets; much slower
+```
+
+Note that `./gradlew test` does **not** include these. The KMP `jvm()` target exposes `jvmTest`, not `test`, so the aggregate `test` task skips the shared module entirely.
+
 ### iOS
 
-`iOS/InkwellTests/StandardSiteTests.swift` covers AT-URI parsing, record encoding/decoding, publication/document association rules, theme and verification-endpoint resolution, and tolerant decoding of malformed records.
+`iOS/InkwellTests/StandardSiteTests.swift` holds nine tests covering the Inkwell NSID namespace, AT-URI rejection of malformed values, publication/document association and canonical URLs, verification endpoint paths, standard.site wire keys, search v2 decoding, notification JSON round-tripping, and tolerant decoding of malformed records.
+
+```bash
+xcodebuild -project iOS/Inkwell.xcodeproj -scheme Inkwell \
+  -destination 'platform=iOS Simulator,name=<available iOS 18+ device>' \
+  -skip-testing:InkwellUITests build test
+```
+
+`InkwellUITests` has no source files and fails to load its bundle if run, hence the skip. The shared-core tests are not part of this target — run them through Gradle as above.
 
 ### Android
 
-Run `./gradlew test` from the `Android/` directory.
+```bash
+./gradlew test
+```
+
+This runs the app's two unit test sources only: `StandardSiteVerifierTest` (13 tests) and `SearchModelsTest` (2). Three of the verifier tests hit the real `blog.ewancroft.uk` standard.site publication over the network and fail offline. There are no instrumentation tests.
 
 ## Dependencies
 
