@@ -25,20 +25,13 @@ struct BrowseDocumentsView: View {
     var body: some View {
         NavigationStack {
             content
-                // As a safe-area bar rather than a plain VStack row, the
-                // feed switcher picks up the scroll-edge effect: content
-                // slides under it and it stays legible over whatever's
-                // passing behind, instead of sitting on an opaque band.
-                .safeAreaBar(edge: .top) {
-                    Picker("Reader feed", selection: $store.selectedFeed) {
-                        ForEach(ReaderFeed.allCases) { feed in
-                            Text(feed.rawValue).tag(feed)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
-                }
+                // As a safe-area bar rather than a plain VStack row (on iOS
+                // 26+), the feed switcher picks up the scroll-edge effect:
+                // content slides under it and it stays legible over
+                // whatever's passing behind, instead of sitting on an
+                // opaque band. Older OS versions fall back to a plain
+                // safe-area inset without that effect.
+                .modifier(FeedSwitcherBar(selection: $store.selectedFeed))
                 .navigationTitle("Reader")
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
@@ -290,5 +283,28 @@ struct BrowseDocumentsView: View {
             }
             .refreshable { await store.loadData(loginStateManager: loginStateManager, force: true) }
         }
+    }
+}
+
+private struct FeedSwitcherBar: ViewModifier {
+    @Binding var selection: ReaderFeed
+
+    func body(content: Content) -> some View {
+        if #available(iOS 26.0, *) {
+            content.safeAreaBar(edge: .top) { picker }
+        } else {
+            content.safeAreaInset(edge: .top) { picker }
+        }
+    }
+
+    private var picker: some View {
+        Picker("Reader feed", selection: $selection) {
+            ForEach(ReaderFeed.allCases) { feed in
+                Text(feed.rawValue).tag(feed)
+            }
+        }
+        .pickerStyle(.segmented)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
     }
 }

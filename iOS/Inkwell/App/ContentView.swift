@@ -109,7 +109,9 @@ struct ContentView: View {
         }
         // Reading is the point of the app: give the feed and the article
         // back the tab bar's worth of screen as soon as you scroll into them.
-        .tabBarMinimizeBehavior(.onScrollDown)
+        // tabBarMinimizeBehavior is iOS 26+; the app's floor is much lower,
+        // so this only applies on devices new enough to have it.
+        .modifier(MinimizeTabBarOnScrollDown())
         .task {
             if !CommandLine.arguments.contains("-screenshot") {
                 await NotificationManager.shared.requestPermission()
@@ -128,4 +130,14 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .environment(LoginStateManager())
+}
+
+private struct MinimizeTabBarOnScrollDown: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 26.0, *) {
+            content.tabBarMinimizeBehavior(.onScrollDown)
+        } else {
+            content
+        }
+    }
 }
