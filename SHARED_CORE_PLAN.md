@@ -210,6 +210,12 @@ decoupled from both SDKs — a follow-on after the pure-logic modules are proven
 - iOS: `ContentProvider.swift` loss labels annotated as shared copies; providers retained for `UnknownType` integration
 - Tests: `ContentConverterTest.kt` — 30+ tests covering round-trip for all four formats, edge cases, dispatcher routing, and loss labels
 
+### Record List Pagination Policy ✅
+- Shared: `shared/src/commonMain/kotlin/.../policy/RecordListPolicy.kt` (`MAX_RECORDS`, `PAGE_LIMIT`)
+- Found iOS and Android had drifted to different pagination safety-caps (1,000 vs 500 records) for the same `listAllRecords`-style call; unified to 500
+- iOS: `SharedKMP.swift` `sharedMaxRecordsPerList`
+- Android: `PdsRepository.kt` uses `RecordListPolicy.MAX_RECORDS` directly
+
 ## Risk Notes
 
 - KMP adds ~2-4 MB to iOS binary (Kotlin/Native runtime).

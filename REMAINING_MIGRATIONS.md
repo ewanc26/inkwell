@@ -1,6 +1,6 @@
 # Inkwell Shared Core — Remaining Migration Opportunities
 
-_Last updated: 2026-08-18_
+_Last updated: 2026-08-18 (revised after closing out remaining Tier 1/2 items)_
 
 This document captures platform-specific backend logic that could still be migrated to the shared KMP module, ranked by impact and feasibility.
 
@@ -42,19 +42,11 @@ This document captures platform-specific backend logic that could still be migra
 
 ---
 
-### 2. Inline Markdown Rendering (Byte-Range → Attributed String)
+### 2. Inline Markdown Rendering (Byte-Range → Attributed String) ✅ COMPLETED
 
-**iOS:** `iOS/Inkwell/Rendering/MarkdownRendererView.swift` (`applyInlineFormatting()`, `byteRangeToAttrRange()`)  
-**Android:** `Android/app/src/main/java/uk/ewancroft/inkwell/ui/reader/MarkdownRendererView.kt` (`renderInline()`, `findClosing()`) + `Android/app/src/main/java/uk/ewancroft/inkwell/ui/reader/LeafletBlockRenderer.kt` (`buildAnnotatedString()`, `byteOffsetsToCharRange()`)
-
-**What's duplicated:**
-- UTF-8 byte-offset to character-range conversion (identical algorithm)
-- Delimiter pair scanning for `**bold**`, `*italic*`, `` `code` ``, `~~strike~~`, `[link](url)`
-- Opening/closing delimiter matching with escape handling
-
-**Effort:** Medium (~200 lines of pure string processing)  
-**Risk:** Low — pure text processing, no platform dependencies  
-**Benefit:** Ensures both platforms render inline formatting identically; fixes diverge less often
+**Shared:** `shared/src/commonMain/kotlin/.../markdown/InlineMarkdownScanner.kt` (delimiter scanning), `shared/src/commonMain/kotlin/.../text/Utf8Offsets.kt` (byte-range ↔ char-range conversion)
+**Android:** `MarkdownRendererView.kt` `renderInline()` delegates to `InlineMarkdownScanner`; `LeafletBlockRenderer.kt` `buildAnnotatedString()` delegates to `Utf8Offsets.byteRangeToCharRange`
+**iOS:** never needed the scanner — facets are converted to markdown text first (`FacetConverter.facetsToMarkdown`, already shared) and rendered via native `AttributedString(markdown:)` parsing. `sharedByteRangeToCharRange()`/`sharedCharIndexToByteOffset()`/`sharedByteLength()` wrappers exist in `SharedKMP.swift` for any future direct byte-range use.
 
 ---
 
@@ -132,80 +124,39 @@ This document captures platform-specific backend logic that could still be migra
 **iOS:** `iOS/Inkwell/Rendering/StandardSitePostEmbed.swift` (`loadDocument()`)  
 **Android:** `Android/app/src/main/java/uk/ewancroft/inkwell/ui/reader/LeafletBlockRenderer.kt` (`fetchStandardSitePost()`)
 
-**What's duplicated:**
-- AT-URI parsing to extract DID/collection/rkey
-- Document record fetching from PDS
-- Publication matching logic: `doc.record.site == pub.uri || pub.record.url == doc.record.site`
-- Cover image extraction and CDN URL building
-
-**Effort:** Medium (~150 lines of business logic, but embedded in platform-specific view code)  
-**Risk:** Medium — requires extracting pure logic from view-layer code  
-**Benefit:** Ensures both platforms resolve embedded Standard.site posts identically
+**Status:** Publication-matching logic is shared (`PublicationMatcher`, see 3d above). AT-URI parsing is shared. Remaining duplication is document record fetching + cover-image/CDN URL building, which is networking I/O — left platform-specific per the module boundary (pure logic vs. I/O) this plan draws everywhere else.
 
 ---
 
-### 5. AT-URI Type Consolidation (iOS)
+### 5. AT-URI Type Consolidation (iOS) — reviewed, not pursuing
 
-**iOS:** `iOS/Inkwell/Protocols/StandardSite/StandardSiteTypes.swift` (native `ATURI` struct)  
-**Android:** `Android/app/src/main/java/uk/ewancroft/inkwell/data/model/common/Models.kt` (`typealias AtUri = uk.ewancroft.inkwell.shared.AtUri`)
+**iOS:** `iOS/Inkwell/Protocols/StandardSite/StandardSiteTypes.swift` (native `ATURI` struct)
 
-**What's duplicated:**
-- iOS has its own `ATURI` struct with `parse()` method, used in 21+ call sites
-- Android already uses the shared `AtUri` type directly
-- iOS `ATURI` and shared `AtUri` have identical semantics
-
-**Effort:** Medium (21 call sites to update, bridging code needed)  
-**Risk:** Medium — pervasive type used throughout iOS codebase  
-**Benefit:** Single AT-URI implementation; bug fixes apply to both platforms automatically
+**Finding:** `ATURI.parse()` already delegates 100% to the shared `parseAtUri()` (see 1a) — there is no remaining *logic* duplication, only a thin Swift struct wrapper for idiomatic `Equatable`/`Hashable` use in SwiftUI. Replacing the struct with the KMP class directly across 21+ call sites would be a pure type swap with no behavioral change — real refactor risk for no reduction in duplicated logic. Not pursuing.
 
 ---
 
-### 6. Notification Polling Document-Matching Logic
+### 6. Notification Polling Document-Matching Logic ✅ COMPLETED
 
-**iOS:** `iOS/Inkwell/Features/Subscriptions/NotificationManager.swift` (`pollForNewDocuments()`)  
-**Android:** `Android/app/src/main/java/uk/ewancroft/inkwell/data/remote/InkwellNotificationManager.kt` (`pollForNewDocuments()`)
-
-**What's duplicated:**
-- Publication-matching condition: `site == sub.publicationUri || pubUrl != null && (site == pubUrl || site.startsWith("$pubUrl/"))`
-- New-document detection via `allSeenURIs.contains(uri)`
-- Sorting newest-first by `publishedAt`
-- Document-to-publication association rules
-
-**Effort:** Medium (~100 lines of pure logic embedded in platform-specific polling)  
-**Risk:** Medium — notification polling is sensitive; requires careful testing  
-**Benefit:** Both platforms notify about the same documents in the same way
+**Shared:** `shared/src/commonMain/kotlin/.../content/PublicationMatcher.kt` (document-belongs-to-publication matching, see 3d), `shared/src/commonMain/kotlin/.../policy/NotificationPolicy.kt` (seen-URI cap, notification cap, first-poll baseline, single-vs-summary threshold)
+**iOS/Android:** both `pollForNewDocuments()` implementations use the same publication-matching call and the same retention/threshold constants; sort-newest-first and seen-set dedup are trivial one-liners left inline on each platform (not worth extracting further).
 
 ---
 
-### 7. Content Type Detection / Provider Selection
+### 7. Content Type Detection / Provider Selection ✅ COMPLETED
 
-**iOS:** `iOS/Inkwell/Rendering/ContentProvider.swift` (`ProviderRegistry.detectProvider()`)  
-**Android:** `Android/app/src/main/java/uk/ewancroft/inkwell/ui/reader/PostDetailViewModel.kt` (`parseContent()`)
-
-**What's duplicated:**
-- Format-type string dispatch: `"pub.leaflet.content"` → Leaflet, `"at.markpub.markdown"` → Markpub, `"blog.pckt.content"` → Pckt, `"app.offprint.content"` → Offprint
-- Fallback to `textContent` plaintext
-- Blob-pages detection and handling
-
-**Effort:** Low-Medium (~50 lines of dispatch logic)  
-**Risk:** Low — pure string-matching dispatch  
-**Benefit:** Both platforms detect document content format identically
+**Shared:** `shared/src/commonMain/kotlin/.../content/ContentFormatDetector.kt`
+**Android:** `PostDetailViewModel.kt`, `WriterViewModel.kt`, `PdsRepository.kt` all use `ContentFormatDetector`
+**iOS:** `SharedKMP.swift` `sharedContentFormat(type:)` wrapper used by `ContentProvider.swift`
 
 ---
 
-### 8. Record Entry Parsing (rkey Extraction)
+### 8. Record Entry Parsing (rkey Extraction) — substantially complete
 
 **iOS:** `iOS/Inkwell/Authentication/LoginStateManager.swift` (`fetchSubscriptions`, `fetchRecommends`, `fetchComments`)  
 **Android:** `Android/app/src/main/java/uk/ewancroft/inkwell/data/repository/PdsRepository.kt` (same methods)
 
-**What's duplicated:**
-- AT-URI parsing to extract rkey: `AtUri.parse(entry.uri)?.recordKey`
-- Record entry construction from raw XRPC response
-- Pagination with max-records cap and cursor-stuck detection
-
-**Effort:** Medium (~200 lines across multiple methods)  
-**Risk:** Medium — tightly coupled to networking I/O in both platforms  
-**Benefit:** Reduces duplication in repository/record-fetching layer
+**Status:** rkey extraction already delegates to the shared AT-URI parser on both platforms. While auditing this item, found the two platforms' pagination safety-caps had drifted (iOS 1,000 records vs. Android 500 for the equivalent `listAllRecords` call) — unified via new `shared/src/commonMain/kotlin/.../policy/RecordListPolicy.kt` (`MAX_RECORDS = 500`), wired into both. The remaining duplication (raw XRPC response → record-entry construction, cursor loop) is networking I/O boilerplate, left platform-specific per the same pure-logic-vs-I/O boundary as everywhere else in this plan.
 
 ---
 
@@ -224,45 +175,27 @@ This document captures platform-specific backend logic that could still be migra
 
 ---
 
-### 10. Search/Discovery Computed Properties
+### 10. Search/Discovery Computed Properties ✅ COMPLETED
 
-**iOS:** `iOS/Inkwell/Features/Discover/StandardReaderAPI.swift` (`ReaderSearchResult.isPublication`, `isStandardSiteDocument`, `webURL`)  
-**Android:** `Android/app/src/main/java/uk/ewancroft/inkwell/data/model/common/SearchModels.kt` (`SearchResult.isPublication`, `isStandardSiteDocument`)
-
-**What's duplicated:**
-- `isPublication`: checks `type == "site.standard.publication"`
-- `isStandardSiteDocument`: checks `type == "site.standard.document"`
-- `webURL`: constructs URL from `basePath` + `path` + `rkey`
-
-**Effort:** Low (~30 lines)  
-**Risk:** Low  
-**Benefit:** Shared search result classification
+Duplicate of item 3c above — see there. Shared `SearchResultClassifier` covers `isPublication`, `isStandardSiteDocument`, and `webURL` construction for both platforms.
 
 ---
 
-### 11. Bluesky Post Fetching & Caching Pattern
+### 11. Bluesky Post Fetching & Caching Pattern — reviewed, not pursuing
 
 **iOS:** `iOS/Inkwell/Rendering/BSkyPostEmbed.swift` (`BSkyPostFetcher`, `BSkyPostCache`)  
 **Android:** `Android/app/src/main/java/uk/ewancroft/inkwell/data/remote/BSkyPostFetcher.kt`
 
-**Status:** Partially duplicated, but heavily coupled to platform networking. The cache-deduplication pattern is similar but not identical.
-
-**Effort:** High (requires abstracting networking layer)  
-**Risk:** High — networking I/O, caching semantics differ  
-**Benefit:** Moderate — reduces duplication but requires careful cache design
+**Finding:** Checked for extractable pure logic (cache TTLs, dedup-key formats) similar to what turned up in item 8 — found none; iOS's cache is a plain in-memory dedup dict with no shared constants to unify. Genuine duplication here is the fetch/cache orchestration itself, which is coupled to each platform's networking stack (URLSession vs OkHttp) and would need a real abstraction layer to share. Matches the plan's original high-effort/high-risk assessment — not pursuing without a specific need driving it.
 
 ---
 
-### 12. Bluesky Profile Fetching & Caching Pattern
+### 12. Bluesky Profile Fetching & Caching Pattern — handle normalization done, rest not pursued
 
 **iOS:** `iOS/Inkwell/Rendering/BSkyProfileFetcher.swift` (`BSkyProfileFetcher`, `BSkyProfileCache`)  
 **Android:** `Android/app/src/main/java/uk/ewancroft/inkwell/data/repository/PdsRepository.kt` (`getProfile()`, `resolveHandle()`)
 
-**Status:** Similar patterns but different architectures. Handle normalization (`lowercased`, removing `@`) is pure logic.
-
-**Effort:** Medium  
-**Risk:** Medium  
-**Benefit:** Moderate — handle normalization could be shared
+**Status:** Handle normalization (lowercasing, stripping `@`) is now shared via `shared/src/commonMain/kotlin/.../util/HandleUtils.kt` (`sharedNormalizeHandle()` on iOS, direct use on Android). The remaining fetch/cache orchestration has the same networking-coupling issue as item 11 — not pursuing.
 
 ---
 
@@ -289,8 +222,13 @@ This document captures platform-specific backend logic that could still be migra
 5. **Collection NSIDs** ✅ COMPLETED — poll definition/vote and comment collection strings migrated to shared `CollectionNsids`
 6. **Dead code removal** ✅ COMPLETED — removed unused iOS `applyInlineFormatting()` scanner and `byteRangeToAttrRange()`
 7. **Content format types** ✅ COMPLETED — shared converters for Leaflet/pckt/Offprint/Markpub with `ContentFormatDispatcher`, `BlockLossLabels`, and `JsonMapBridge`; Android `MarkdownConverter` and `PcktOffprintConverter` reduced to thin adapters
-8. **Standard.site post embed fetching** — publication matching shared; document fetching remains platform-specific due to different networking stacks
-9. **AT-URI type consolidation** — medium effort, pervasive but straightforward
-10. **Content type detection** — low effort, low risk
-11. **Record entry parsing** — higher effort, tightly coupled to I/O
-12. **Bluesky post/profile fetching patterns** — high effort, networking-coupled
+8. **Standard.site post embed fetching** ✅ publication matching shared; document fetching remains platform-specific due to different networking stacks
+9. **AT-URI type consolidation** — reviewed and **not pursued**: `ATURI` already delegates 100% to shared logic, so this would be a 21-site type swap with no reduction in duplicated logic
+10. **Content type detection** ✅ COMPLETED — shared `ContentFormatDetector`
+11. **Notification polling** ✅ COMPLETED — shared `PublicationMatcher` + `NotificationPolicy`
+12. **Record entry parsing** ✅ substantially complete — rkey extraction already shared; found and fixed a real iOS/Android pagination-cap mismatch (1,000 vs 500) via new shared `RecordListPolicy`
+13. **Bluesky post/profile fetching patterns** — reviewed: handle normalization now shared (`HandleUtils`); the fetch/cache orchestration itself stays platform-specific (networking-coupled, no extractable pure logic found)
+
+### Status
+
+All Tier 1 items and the feasible Tier 2/3 items are done. What's left (full AT-URI type consolidation, Bluesky fetch/cache abstraction) was evaluated and intentionally not pursued — either no logic duplication remains to extract, or the remaining duplication is networking orchestration that would need a real abstraction layer to share safely, which the risk didn't justify without a concrete driver.
