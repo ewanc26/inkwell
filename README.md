@@ -1,4 +1,4 @@
-# Inkwell
+<h1 align="center">Inkwell</h1>
 
 <p align="center">
   <picture>
