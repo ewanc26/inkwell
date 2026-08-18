@@ -45,6 +45,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Select an Xcode version that supports Icon Composer (.icon) assets
+        run: |
+          # Inkwell/Inkwell.icon is the Xcode 26 Icon Composer format. Older
+          # Xcodes (e.g. the runner's default 16.4) don't recognize it as an
+          # asset-catalog input at all and silently compile Assets.xcassets
+          # alone, which has no icon set named "Inkwell" — a hard build
+          # error, not a warning. This is independent of the app's iOS 18.0
+          # deployment target; it's purely an Xcode-version requirement.
+          best=""
+          for app in /Applications/Xcode*.app; do
+            version=$("$app/Contents/Developer/usr/bin/xcodebuild" -version 2>/dev/null | awk '/^Xcode/ {print $2}')
+            major=${version%%.*}
+            if [ -n "$major" ] && [ "$major" -ge 26 ] 2>/dev/null; then
+              best="$app"
+            fi
+          done
+          if [ -z "$best" ]; then
+            echo "No installed Xcode >= 26 found (needed for Inkwell.icon). Available:" >&2
+            ls /Applications | grep -i xcode >&2
+            exit 1
+          fi
+          echo "Selecting $best"
+          sudo xcode-select -s "$best/Contents/Developer"
+          xcodebuild -version
+
       - name: Resolve an available iOS Simulator destination
         id: destination
         working-directory: iOS
