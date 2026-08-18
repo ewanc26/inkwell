@@ -10,8 +10,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.Feedback
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -19,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import uk.ewancroft.inkwell.shared.content.SearchBackendUrl
+import uk.ewancroft.inkwell.ui.feedback.FeedbackDialog
 
 @Composable
 fun CreditsView(
@@ -27,6 +33,11 @@ fun CreditsView(
     onDismiss: () -> Unit,
 ) {
     val context = LocalContext.current
+    var showFeedback by remember { mutableStateOf(false) }
+
+    if (showFeedback) {
+        FeedbackDialog(onDismiss = { showFeedback = false })
+    }
 
     fun openUrl(url: String) {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
@@ -95,6 +106,26 @@ fun CreditsView(
 
                 // Support
                 SectionHeader("Support")
+                Row(
+                    modifier = Modifier.fillMaxWidth().clickable { showFeedback = true }.padding(vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        Icons.Outlined.Feedback,
+                        contentDescription = null,
+                        Modifier.size(18.dp),
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("Send Feedback", style = MaterialTheme.typography.bodyMedium)
+                        Text(
+                            "Bugs, questions, anything",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
                 SupportRow(url = "https://ewancroft.uk", openUrl = ::openUrl)
                 CreditRow(title = "Ko-fi", detail = "Buy me a tea", url = "https://ko-fi.com/ewancroft", openUrl = ::openUrl)
                 CreditRow(title = "GitHub Sponsors", detail = "Sponsor development work", url = "https://github.com/sponsors/ewanc26", openUrl = ::openUrl)

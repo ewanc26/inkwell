@@ -6,7 +6,7 @@
 #import <Foundation/NSString.h>
 #import <Foundation/NSValue.h>
 
-@class FacetConverter, InkwellSharedAtUri, InkwellSharedAtUriCompanion, InkwellSharedBasicTheme, InkwellSharedBlobRef, InkwellSharedBlockLossLabels, InkwellSharedBlueskyEmbedTypes, InkwellSharedByteSlice, InkwellSharedCdnUrls, InkwellSharedCollectionNsids, InkwellSharedColorValue, InkwellSharedConstellationBacklink, InkwellSharedConstellationPagination, InkwellSharedConstellationResponse, InkwellSharedConstellationSourcePaths, InkwellSharedContentFormatDetector, InkwellSharedContentFormatDispatcher, InkwellSharedDocumentLinkScanner, InkwellSharedDocumentPreferences, InkwellSharedFacetDefinition, InkwellSharedFacetSchema, InkwellSharedHandleUtils, InkwellSharedInlineMarkdownScanner, InkwellSharedInlineSegment, InkwellSharedInlineSegmentBold, InkwellSharedInlineSegmentCode, InkwellSharedInlineSegmentItalic, InkwellSharedInlineSegmentLink, InkwellSharedInlineSegmentPlain, InkwellSharedInlineSegmentStrike, InkwellSharedJsonMapBridge, InkwellSharedKotlinArray<T>, InkwellSharedKotlinEnum<E>, InkwellSharedKotlinEnumCompanion, InkwellSharedKotlinException, InkwellSharedKotlinIllegalStateException, InkwellSharedKotlinIntIterator, InkwellSharedKotlinIntProgression, InkwellSharedKotlinIntProgressionCompanion, InkwellSharedKotlinIntRange, InkwellSharedKotlinIntRangeCompanion, InkwellSharedKotlinNothing, InkwellSharedKotlinPair<__covariant A, __covariant B>, InkwellSharedKotlinRuntimeException, InkwellSharedKotlinThrowable, InkwellSharedKotlinx_serialization_coreSerialKind, InkwellSharedKotlinx_serialization_coreSerializersModule, InkwellSharedKotlinx_serialization_jsonJsonElement, InkwellSharedKotlinx_serialization_jsonJsonElementCompanion, InkwellSharedLeafletContentConverter, InkwellSharedLeafletFacet, InkwellSharedLeafletFacetFeature, InkwellSharedLeafletTypes, InkwellSharedLegacyPalette, InkwellSharedMarkdownBlock, InkwellSharedMarkdownBlockBlockquote, InkwellSharedMarkdownBlockCode, InkwellSharedMarkdownBlockHeading, InkwellSharedMarkdownBlockHorizontalRule, InkwellSharedMarkdownBlockImage, InkwellSharedMarkdownBlockMath, InkwellSharedMarkdownBlockOrderedList, InkwellSharedMarkdownBlockParagraph, InkwellSharedMarkdownBlockTaskList, InkwellSharedMarkdownBlockUnorderedList, InkwellSharedMarkdownListItem, InkwellSharedMarkdownParser, InkwellSharedMarkdownSerializer, InkwellSharedMarkpubContentConverter, InkwellSharedMarkpubTypes, InkwellSharedNotificationPolicy, InkwellSharedNotificationStyleNone, InkwellSharedNotificationStyleSingle, InkwellSharedNotificationStyleSummary, InkwellSharedNumberFormat, InkwellSharedOAuthScopes, InkwellSharedOffprintContentConverter, InkwellSharedOffprintTypes, InkwellSharedPcktContentConverter, InkwellSharedPcktTypes, InkwellSharedPublicationMatcher, InkwellSharedPublicationPreferences, InkwellSharedPublicationTheme, InkwellSharedRecordListPolicy, InkwellSharedRgbColor, InkwellSharedRgbaColor, InkwellSharedSearchBackendUrl, InkwellSharedSearchResultClassifier, InkwellSharedSharedConvertResult, InkwellSharedSharedDocumentRecord, InkwellSharedSharedGraphRecommend, InkwellSharedSharedGraphSubscription, InkwellSharedSharedLeafletComment, InkwellSharedSharedLeafletCommentReplyRef, InkwellSharedSharedPublicationRecord, InkwellSharedSharedReaderTheme, InkwellSharedSharedReaderThemeCompanion, InkwellSharedSharedReaderThemeFontFamily, InkwellSharedSharedWriteResult, InkwellSharedStringUtils, InkwellSharedStrongRef, InkwellSharedTipPromptPolicy, InkwellSharedUrlUtils, InkwellSharedUtf8Offsets, InkwellSharedVerificationFailure, InkwellSharedVerificationFailureDocumentLinkMissing, InkwellSharedVerificationFailureEndpointUnreachable, InkwellSharedVerificationFailureInvalidDocumentURL, InkwellSharedVerificationFailureInvalidPublicationURL, InkwellSharedVerificationFailureMalformedResponse, InkwellSharedVerificationFailureMismatchedURI, InkwellSharedVerificationFailureUnexpected, InkwellSharedVerificationResult, InkwellSharedVerificationResultFailed, InkwellSharedVerificationResultVerified, InkwellSharedVerificationUrls, InkwellSharedXrpcEndpoints, RichTextFacet, RichTextFeature;
+@class FacetConverter, InkwellSharedAtUri, InkwellSharedAtUriCompanion, InkwellSharedBasicTheme, InkwellSharedBlobRef, InkwellSharedBlockLossLabels, InkwellSharedBlueskyEmbedTypes, InkwellSharedByteSlice, InkwellSharedCdnUrls, InkwellSharedCollectionNsids, InkwellSharedColorValue, InkwellSharedConstellationBacklink, InkwellSharedConstellationPagination, InkwellSharedConstellationResponse, InkwellSharedConstellationSourcePaths, InkwellSharedContentFormatDetector, InkwellSharedContentFormatDispatcher, InkwellSharedDocumentLinkScanner, InkwellSharedDocumentPreferences, InkwellSharedFacetDefinition, InkwellSharedFacetSchema, InkwellSharedHandleUtils, InkwellSharedInlineMarkdownScanner, InkwellSharedInlineSegment, InkwellSharedInlineSegmentBold, InkwellSharedInlineSegmentCode, InkwellSharedInlineSegmentItalic, InkwellSharedInlineSegmentLink, InkwellSharedInlineSegmentPlain, InkwellSharedInlineSegmentStrike, InkwellSharedJsonMapBridge, InkwellSharedKotlinArray<T>, InkwellSharedKotlinEnum<E>, InkwellSharedKotlinEnumCompanion, InkwellSharedKotlinException, InkwellSharedKotlinIllegalStateException, InkwellSharedKotlinIntIterator, InkwellSharedKotlinIntProgression, InkwellSharedKotlinIntProgressionCompanion, InkwellSharedKotlinIntRange, InkwellSharedKotlinIntRangeCompanion, InkwellSharedKotlinNothing, InkwellSharedKotlinPair<__covariant A, __covariant B>, InkwellSharedKotlinRuntimeException, InkwellSharedKotlinThrowable, InkwellSharedKotlinx_serialization_coreSerialKind, InkwellSharedKotlinx_serialization_coreSerializersModule, InkwellSharedKotlinx_serialization_jsonJsonElement, InkwellSharedKotlinx_serialization_jsonJsonElementCompanion, InkwellSharedLeafletContentConverter, InkwellSharedLeafletFacet, InkwellSharedLeafletFacetFeature, InkwellSharedLeafletTypes, InkwellSharedLegacyPalette, InkwellSharedMarkdownBlock, InkwellSharedMarkdownBlockBlockquote, InkwellSharedMarkdownBlockCode, InkwellSharedMarkdownBlockHeading, InkwellSharedMarkdownBlockHorizontalRule, InkwellSharedMarkdownBlockImage, InkwellSharedMarkdownBlockMath, InkwellSharedMarkdownBlockOrderedList, InkwellSharedMarkdownBlockParagraph, InkwellSharedMarkdownBlockTaskList, InkwellSharedMarkdownBlockUnorderedList, InkwellSharedMarkdownListItem, InkwellSharedMarkdownParser, InkwellSharedMarkdownSerializer, InkwellSharedMarkpubContentConverter, InkwellSharedMarkpubTypes, InkwellSharedNotificationPolicy, InkwellSharedNotificationStyleNone, InkwellSharedNotificationStyleSingle, InkwellSharedNotificationStyleSummary, InkwellSharedNumberFormat, InkwellSharedOAuthScopes, InkwellSharedOffprintContentConverter, InkwellSharedOffprintTypes, InkwellSharedPcktContentConverter, InkwellSharedPcktTypes, InkwellSharedPublicationMatcher, InkwellSharedPublicationPreferences, InkwellSharedPublicationTheme, InkwellSharedRecordListPolicy, InkwellSharedRgbColor, InkwellSharedRgbaColor, InkwellSharedSearchBackendUrl, InkwellSharedSearchResultClassifier, InkwellSharedSharedConvertResult, InkwellSharedSharedDocumentRecord, InkwellSharedSharedGraphRecommend, InkwellSharedSharedGraphSubscription, InkwellSharedSharedLeafletComment, InkwellSharedSharedLeafletCommentReplyRef, InkwellSharedSharedPublicationRecord, InkwellSharedSharedReaderTheme, InkwellSharedSharedReaderThemeCompanion, InkwellSharedSharedReaderThemeFontFamily, InkwellSharedSharedWriteResult, InkwellSharedStringUtils, InkwellSharedStrongRef, InkwellSharedTipPromptPolicy, InkwellSharedUrlUtils, InkwellSharedUserInputLexicon, InkwellSharedUtf8Offsets, InkwellSharedVerificationFailure, InkwellSharedVerificationFailureDocumentLinkMissing, InkwellSharedVerificationFailureEndpointUnreachable, InkwellSharedVerificationFailureInvalidDocumentURL, InkwellSharedVerificationFailureInvalidPublicationURL, InkwellSharedVerificationFailureMalformedResponse, InkwellSharedVerificationFailureMismatchedURI, InkwellSharedVerificationFailureUnexpected, InkwellSharedVerificationResult, InkwellSharedVerificationResultFailed, InkwellSharedVerificationResultVerified, InkwellSharedVerificationUrls, InkwellSharedXrpcEndpoints, RichTextFacet, RichTextFeature;
 
 @protocol InkwellSharedKotlinAnnotation, InkwellSharedKotlinClosedRange, InkwellSharedKotlinComparable, InkwellSharedKotlinFunction, InkwellSharedKotlinIterable, InkwellSharedKotlinIterator, InkwellSharedKotlinKAnnotatedElement, InkwellSharedKotlinKClass, InkwellSharedKotlinKClassifier, InkwellSharedKotlinKDeclarationContainer, InkwellSharedKotlinOpenEndRange, InkwellSharedKotlinSuspendFunction2, InkwellSharedKotlinx_serialization_coreCompositeDecoder, InkwellSharedKotlinx_serialization_coreCompositeEncoder, InkwellSharedKotlinx_serialization_coreDecoder, InkwellSharedKotlinx_serialization_coreDeserializationStrategy, InkwellSharedKotlinx_serialization_coreEncoder, InkwellSharedKotlinx_serialization_coreKSerializer, InkwellSharedKotlinx_serialization_coreSerialDescriptor, InkwellSharedKotlinx_serialization_coreSerializationStrategy, InkwellSharedKotlinx_serialization_coreSerializersModuleCollector, InkwellSharedNotificationStyle;
 
@@ -1042,6 +1042,64 @@ __attribute__((objc_subclassing_restricted))
 - (NSString *)description __attribute__((swift_name("description()")));
 @property (readonly) NSString *type __attribute__((swift_name("type")));
 @property (readonly) NSString * _Nullable uri __attribute__((swift_name("uri")));
+@end
+
+
+/**
+ * Constants for submitting in-app feedback to userinput.app
+ * (https://userinput.app), a federated feedback board built on AT Protocol.
+ *
+ * Inkwell only ever *creates* `app.userinput.discussion` records in the
+ * signed-in user's own repo, pointing at Inkwell's own feedback space
+ * (owned by ewancroft.uk) via a strong reference — it doesn't implement
+ * the rest of userinput.app's lexicon surface (voting, moderation,
+ * replies, etc.), which isn't needed for a "send feedback" flow.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("UserInputLexicon")))
+@interface InkwellSharedUserInputLexicon : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Constants for submitting in-app feedback to userinput.app
+ * (https://userinput.app), a federated feedback board built on AT Protocol.
+ *
+ * Inkwell only ever *creates* `app.userinput.discussion` records in the
+ * signed-in user's own repo, pointing at Inkwell's own feedback space
+ * (owned by ewancroft.uk) via a strong reference — it doesn't implement
+ * the rest of userinput.app's lexicon surface (voting, moderation,
+ * replies, etc.), which isn't needed for a "send feedback" flow.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)userInputLexicon __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedUserInputLexicon *shared __attribute__((swift_name("shared")));
+
+/** `app.userinput.discussion.body` — maximum length in Unicode grapheme clusters. */
+@property (readonly) int32_t BODY_MAX_GRAPHEMES __attribute__((swift_name("BODY_MAX_GRAPHEMES")));
+
+/** `app.userinput.discussion.body` — maximum length in UTF-16 code units. */
+@property (readonly) int32_t BODY_MAX_LENGTH __attribute__((swift_name("BODY_MAX_LENGTH")));
+
+/** A feedback post, created in the submitting user's own repo. */
+@property (readonly) NSString *DISCUSSION __attribute__((swift_name("DISCUSSION")));
+
+/** Inkwell's own feedback space, owned by ewancroft.uk. */
+@property (readonly) NSString *INKWELL_SPACE_URI __attribute__((swift_name("INKWELL_SPACE_URI")));
+
+/** Maximum number of tags a discussion may carry. */
+@property (readonly) int32_t MAX_TAGS __attribute__((swift_name("MAX_TAGS")));
+
+/** A feedback board/space. Inkwell only reads its own (see [INKWELL_SPACE_URI]). */
+@property (readonly) NSString *SPACE __attribute__((swift_name("SPACE")));
+
+/** Tag values defined on Inkwell's feedback space, in display order. */
+@property (readonly) NSArray<NSString *> *TAGS __attribute__((swift_name("TAGS")));
+
+/** `app.userinput.discussion.title` — maximum length in Unicode grapheme clusters. */
+@property (readonly) int32_t TITLE_MAX_GRAPHEMES __attribute__((swift_name("TITLE_MAX_GRAPHEMES")));
+
+/** `app.userinput.discussion.title` — maximum length in UTF-16 code units. */
+@property (readonly) int32_t TITLE_MAX_LENGTH __attribute__((swift_name("TITLE_MAX_LENGTH")));
 @end
 
 __attribute__((objc_subclassing_restricted))
@@ -2178,6 +2236,9 @@ __attribute__((swift_name("OAuthScopes")))
 @property (readonly) NSString *REPO_PUBLICATION __attribute__((swift_name("REPO_PUBLICATION")));
 @property (readonly) NSString *REPO_RECOMMEND __attribute__((swift_name("REPO_RECOMMEND")));
 @property (readonly) NSString *REPO_SUBSCRIPTION __attribute__((swift_name("REPO_SUBSCRIPTION")));
+
+/** Needed to post feedback to Inkwell's userinput.app board. */
+@property (readonly) NSString *REPO_USERINPUT_DISCUSSION __attribute__((swift_name("REPO_USERINPUT_DISCUSSION")));
 @end
 
 

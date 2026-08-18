@@ -23,7 +23,8 @@ object OAuthModule {
 
     private const val SCOPE =
         "atproto blob:*/* repo:site.standard.publication repo:site.standard.document " +
-            "repo:site.standard.graph.subscription repo:site.standard.graph.recommend"
+            "repo:site.standard.graph.subscription repo:site.standard.graph.recommend " +
+            "repo:app.userinput.discussion"
 
     @Provides
     @Singleton
