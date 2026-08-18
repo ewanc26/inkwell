@@ -29,7 +29,7 @@ docs(website): update OAuth contract for comment scope
 chore(fdroid): regenerate signed index with screenshots
 ```
 
-Never mix unrelated changes in a single commit. AI-assisted contributions are welcome, but do not add `Co-authored-by:` trailers crediting AI agents. Attribution is reserved for human contributors only.
+Never mix unrelated changes in a single commit. AI-assisted contributions are welcome; add `Co-authored-by:` trailers crediting AI agents when they materially contributed, so attribution stays honest.
 
 ## Things that look wrong but are not
 
