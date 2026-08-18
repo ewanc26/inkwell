@@ -80,7 +80,7 @@ struct DiscoverView: View {
                             PublicationSearchRow(
                                 publication: publication,
                                 isSubscribed: subscriptions.contains(publication.uri),
-                                canSubscribe: ATURI.parse(publication.uri)?.collection == SiteStandardLexicon.PublicationRecord.type,
+                                canSubscribe: parseAtUri(publication.uri)?.collection == SiteStandardLexicon.PublicationRecord.type,
                                 onSubscribe: { Task { await toggleSubscription(publication) } }
                             )
                         }
@@ -239,7 +239,7 @@ struct RemoteDocumentView: View {
         do {
             let document = try await loginStateManager.fetchDocument(uri: documentURI)
             self.document = document
-            if ATURI.parse(document.record.site)?.collection == SiteStandardLexicon.PublicationRecord.type {
+            if parseAtUri(document.record.site)?.collection == SiteStandardLexicon.PublicationRecord.type {
                 publication = try? await loginStateManager.fetchPublication(uri: document.record.site)
             }
         } catch {

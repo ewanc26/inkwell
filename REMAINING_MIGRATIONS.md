@@ -128,11 +128,11 @@ This document captures platform-specific backend logic that could still be migra
 
 ---
 
-### 5. AT-URI Type Consolidation (iOS) — reviewed, not pursuing
+### 5. AT-URI Type Consolidation (iOS) ✅ COMPLETED
 
-**iOS:** `iOS/Inkwell/Protocols/StandardSite/StandardSiteTypes.swift` (native `ATURI` struct)
+**iOS:** `iOS/Inkwell/Protocols/StandardSite/StandardSiteTypes.swift`
 
-**Finding:** `ATURI.parse()` already delegates 100% to the shared `parseAtUri()` (see 1a) — there is no remaining *logic* duplication, only a thin Swift struct wrapper for idiomatic `Equatable`/`Hashable` use in SwiftUI. Replacing the struct with the KMP class directly across 21+ call sites would be a pure type swap with no behavioral change — real refactor risk for no reduction in duplicated logic. Not pursuing.
+Audited actual usage first: only 6 files / 22 call sites (smaller than the original 21+ estimate suggested), and every one just chains `.did`/`.collection`/`.recordKey` off the optional result — no `Set<ATURI>`/dictionary-key/direct-comparison usage anywhere, so the struct's `Equatable`/`Hashable` conformance was never actually exercised. Removed the `ATURI` struct entirely; all call sites now call the existing `parseAtUri()` bridge (already used elsewhere, returns the same `(did:collection:recordKey:)` tuple) directly. `PublicationEntry.publicationURI`/`RecommendEntry.documentURI` computed properties updated to the tuple type. Zero behavior change — confirmed via the full iOS unit test suite passing, including the AT-URI parsing test.
 
 ---
 
@@ -223,7 +223,7 @@ Duplicate of item 3c above — see there. Shared `SearchResultClassifier` covers
 6. **Dead code removal** ✅ COMPLETED — removed unused iOS `applyInlineFormatting()` scanner and `byteRangeToAttrRange()`
 7. **Content format types** ✅ COMPLETED — shared converters for Leaflet/pckt/Offprint/Markpub with `ContentFormatDispatcher`, `BlockLossLabels`, and `JsonMapBridge`; Android `MarkdownConverter` and `PcktOffprintConverter` reduced to thin adapters
 8. **Standard.site post embed fetching** ✅ publication matching shared; document fetching remains platform-specific due to different networking stacks
-9. **AT-URI type consolidation** — reviewed and **not pursued**: `ATURI` already delegates 100% to shared logic, so this would be a 21-site type swap with no reduction in duplicated logic
+9. **AT-URI type consolidation** ✅ COMPLETED — removed the iOS `ATURI` struct, all 22 call sites now use the shared `parseAtUri()` bridge directly
 10. **Content type detection** ✅ COMPLETED — shared `ContentFormatDetector`
 11. **Notification polling** ✅ COMPLETED — shared `PublicationMatcher` + `NotificationPolicy`
 12. **Record entry parsing** ✅ substantially complete — rkey extraction already shared; found and fixed a real iOS/Android pagination-cap mismatch (1,000 vs 500) via new shared `RecordListPolicy`
@@ -231,4 +231,4 @@ Duplicate of item 3c above — see there. Shared `SearchResultClassifier` covers
 
 ### Status
 
-All Tier 1 items and the feasible Tier 2/3 items are done. What's left (full AT-URI type consolidation, Bluesky fetch/cache abstraction) was evaluated and intentionally not pursued — either no logic duplication remains to extract, or the remaining duplication is networking orchestration that would need a real abstraction layer to share safely, which the risk didn't justify without a concrete driver.
+All Tier 1 and Tier 2 items are done, including AT-URI type consolidation. The only item left unpursued is Bluesky fetch/cache abstraction (11): evaluated and found to have no extractable pure logic (handle normalization, the one piece that was pure logic, is already shared) — the remaining duplication is networking orchestration that would need a real abstraction layer to share safely, which the risk didn't justify without a concrete driver.

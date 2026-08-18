@@ -962,7 +962,7 @@ final class LoginStateManager {
 
     /// Fetches one publication by AT-URI.
     func fetchPublication(uri: String) async throws -> PublicationEntry {
-        guard let parsed = ATURI.parse(uri),
+        guard let parsed = parseAtUri(uri),
               parsed.collection == SiteStandardLexicon.PublicationRecord.type else {
             throw LoginError.invalidURI
         }
@@ -1028,7 +1028,7 @@ final class LoginStateManager {
 
     /// Fetches one document by AT-URI.
     func fetchDocument(uri: String) async throws -> DocumentEntry {
-        guard let parsed = ATURI.parse(uri),
+        guard let parsed = parseAtUri(uri),
               parsed.collection == SiteStandardLexicon.DocumentRecord.type else {
             throw LoginError.invalidURI
         }
@@ -1059,7 +1059,7 @@ final class LoginStateManager {
             throw LoginError.contentConversionFailed
         }
 
-        guard (ATURI.parse(site)?.collection == SiteStandardLexicon.PublicationRecord.type) ||
+        guard (parseAtUri(site)?.collection == SiteStandardLexicon.PublicationRecord.type) ||
                 (URL(string: site)?.scheme?.lowercased() == "https") else {
             throw LoginError.invalidURI
         }
@@ -1100,7 +1100,7 @@ final class LoginStateManager {
     /// Creates a `site.standard.graph.subscription` record.
     @discardableResult
     func createSubscription(publicationURI: String) async throws -> ComAtprotoLexicon.Repository.StrongReference {
-        guard ATURI.parse(publicationURI)?.collection == SiteStandardLexicon.PublicationRecord.type else {
+        guard parseAtUri(publicationURI)?.collection == SiteStandardLexicon.PublicationRecord.type else {
             throw LoginError.invalidURI
         }
         _cachedSubscriptions = nil  // invalidate cache
@@ -1130,7 +1130,7 @@ final class LoginStateManager {
             record.value
                 .flatMap { $0.getRecord(ofType: SiteStandardLexicon.Graph.SubscriptionRecord.self) }
                 .map {
-                    let rkey = ATURI.parse(record.uri)?.recordKey ?? ""
+                    let rkey = parseAtUri(record.uri)?.recordKey ?? ""
                     return SubscriptionEntry(uri: record.uri, recordKey: rkey, record: $0)
                 }
         }
@@ -1156,7 +1156,7 @@ final class LoginStateManager {
     /// Creates a `site.standard.graph.recommend` record.
     @discardableResult
     func createRecommend(documentURI: String) async throws -> ComAtprotoLexicon.Repository.StrongReference {
-        guard ATURI.parse(documentURI)?.collection == SiteStandardLexicon.DocumentRecord.type else {
+        guard parseAtUri(documentURI)?.collection == SiteStandardLexicon.DocumentRecord.type else {
             throw LoginError.invalidURI
         }
         let recommend = SiteStandardLexicon.Graph.RecommendRecord(
@@ -1182,7 +1182,7 @@ final class LoginStateManager {
             record.value
                 .flatMap { $0.getRecord(ofType: SiteStandardLexicon.Graph.RecommendRecord.self) }
                 .map {
-                    let rkey = ATURI.parse(record.uri)?.recordKey ?? ""
+                    let rkey = parseAtUri(record.uri)?.recordKey ?? ""
                     return RecommendEntry(uri: record.uri, recordKey: rkey, record: $0)
                 }
         }
@@ -1329,7 +1329,7 @@ final class LoginStateManager {
             seen.insert(record.uri)
             comments.append(CommentEntry(
                 uri: record.uri,
-                recordKey: ATURI.parse(record.uri)?.recordKey ?? "",
+                recordKey: parseAtUri(record.uri)?.recordKey ?? "",
                 record: comment
             ))
         }

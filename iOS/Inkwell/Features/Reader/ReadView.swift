@@ -63,7 +63,7 @@ struct ReadView: View {
     /// requires. Standalone documents published straight to a URL have
     /// nothing to subscribe to, so the action simply doesn't appear for them.
     private var publicationURI: String? {
-        guard ATURI.parse(document.site)?.collection == SiteStandardLexicon.PublicationRecord.type else {
+        guard parseAtUri(document.site)?.collection == SiteStandardLexicon.PublicationRecord.type else {
             return nil
         }
         return document.site
@@ -517,7 +517,7 @@ struct ReadView: View {
                 }
                 let reference = try await loginStateManager.createSubscription(publicationURI: publicationURI)
                 isSubscribed = true
-                subscriptionRecordKey = ATURI.parse(reference.recordURI)?.recordKey
+                subscriptionRecordKey = parseAtUri(reference.recordURI)?.recordKey
                 await NotificationManager.shared.requestPermission()
             }
         } catch {
@@ -539,7 +539,7 @@ struct ReadView: View {
             } else {
                 let reference = try await loginStateManager.createRecommend(documentURI: documentURI)
                 isRecommended = true
-                recommendRecordKey = ATURI.parse(reference.recordURI)?.recordKey
+                recommendRecordKey = parseAtUri(reference.recordURI)?.recordKey
             }
         } catch {
             actionMessage = "Couldn't update recommendation: \(error.localizedDescription)"

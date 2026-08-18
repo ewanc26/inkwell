@@ -108,7 +108,7 @@ struct StandardSitePostEmbedView: View {
     // MARK: - Loading
 
     private func loadDocument() async {
-        guard let parsed = ATURI.parse(subjectURI) else {
+        guard let parsed = parseAtUri(subjectURI) else {
             logger.error("[StandardSitePostEmbed] invalid AT-URI: \(subjectURI)")
             loadError = true
             return

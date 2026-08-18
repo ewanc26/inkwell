@@ -24,11 +24,11 @@ final class StandardSiteTests: XCTestCase {
 
     func testATURIParsingRejectsMalformedValues() {
         XCTAssertEqual(
-            ATURI.parse("at://did:plc:alice/site.standard.document/3abc")?.recordKey,
+            parseAtUri("at://did:plc:alice/site.standard.document/3abc")?.recordKey,
             "3abc"
         )
-        XCTAssertNil(ATURI.parse("https://example.com/post"))
-        XCTAssertNil(ATURI.parse("at://did:plc:alice/site.standard.document"))
+        XCTAssertNil(parseAtUri("https://example.com/post"))
+        XCTAssertNil(parseAtUri("at://did:plc:alice/site.standard.document"))
     }
 
     func testPublicationAssociationPrefersATURIAndAcceptsNormalizedURL() {
