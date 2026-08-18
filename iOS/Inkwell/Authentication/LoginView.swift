@@ -26,22 +26,24 @@ struct LoginView: View {
     }
 
     var body: some View {
-        GeometryReader { proxy in
-            ScrollView {
-                VStack(spacing: 32) {
-                    Spacer(minLength: 24)
-                    header
-                    onboardingSection
-                    formSection
-                    oauthNote
-                    Spacer(minLength: 24)
-                }
-                .padding(.horizontal, 24)
-                .frame(minHeight: proxy.size.height)
-                .frame(maxWidth: .infinity)
+        ScrollView {
+            VStack(spacing: 32) {
+                Spacer(minLength: 24)
+                header
+                onboardingSection
+                formSection
+                oauthNote
+                Spacer(minLength: 24)
             }
-            .scrollDismissesKeyboard(.interactively)
+            .padding(.horizontal, 24)
+            .frame(maxWidth: .infinity)
+            // Fills the scroll view's own height so the content centres on
+            // a tall screen — the modern equivalent of measuring the
+            // container with a GeometryReader and pinning a minHeight.
+            .containerRelativeFrame(.vertical)
         }
+        .scrollBounceBehavior(.basedOnSize)
+        .scrollDismissesKeyboard(.interactively)
         .background(Color(uiColor: .systemBackground))
     }
 
@@ -102,8 +104,13 @@ struct LoginView: View {
             }
         }
         .padding(16)
-        .background(.quaternary.opacity(0.3))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        // A semantic grouped-content fill rather than a translucent
+        // quaternary shape style, so the panel keeps its contrast in dark
+        // mode and with Increase Contrast turned on.
+        .background(
+            Color(uiColor: .secondarySystemGroupedBackground),
+            in: .rect(cornerRadius: 12, style: .continuous)
+        )
     }
 
     private var formSection: some View {
@@ -142,20 +149,19 @@ struct LoginView: View {
             .fill(Color(uiColor: .secondarySystemBackground))
     }
 
+    /// Validation feedback under the field, the way a form states it: a
+    /// red footnote with a symbol, not a tinted alert-shaped box that
+    /// competes with the primary button right below it.
     private func errorBanner(_ message: String) -> some View {
-        HStack(alignment: .top, spacing: 8) {
-            Image(systemName: "exclamationmark.triangle.fill")
-                .foregroundStyle(.red)
+        Label {
             Text(message)
-                .font(.footnote)
-                .foregroundStyle(.red)
-            Spacer(minLength: 0)
+        } icon: {
+            Image(systemName: "exclamationmark.triangle.fill")
         }
-        .padding(12)
-        .background(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(Color.red.opacity(0.1))
-        )
+        .font(.footnote)
+        .foregroundStyle(.red)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityLabel("Sign-in error: \(message)")
     }
 
     private var signInButton: some View {
@@ -165,13 +171,14 @@ struct LoginView: View {
                     .opacity(isSigningIn ? 0 : 1)
                 if isSigningIn {
                     ProgressView()
-                        .tint(.white)
                 }
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
         }
         .buttonStyle(.borderedProminent)
+        // The system's own large control metrics, rather than padding the
+        // label out to guess at them.
+        .controlSize(.large)
         .disabled(!canSubmit)
     }
 

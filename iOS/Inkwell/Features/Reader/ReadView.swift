@@ -330,7 +330,7 @@ struct ReadView: View {
 
                     // New comment composer
                     HStack(spacing: 8) {
-                        TextField("Add a comment...", text: $newCommentText, axis: .vertical)
+                        TextField("Add a comment…", text: $newCommentText, axis: .vertical)
                             .textFieldStyle(.plain)
                             .font(theme.bodyFont(.subheadline))
                             .foregroundStyle(foregroundColor)
@@ -375,7 +375,20 @@ struct ReadView: View {
         // screen edge — the Liquid Glass back button adapts to whatever's
         // behind it on its own, no light patch needed.
         .background(backgroundColor.ignoresSafeArea(edges: .top))
+        // The bar used to be titleless. Naming the publication there is what
+        // a reader is expected to do — the article's own title is already
+        // set in type below, so repeating it would just be noise.
+        .navigationTitle(publication?.name ?? document.title)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            if let url = document.canonicalURL(publication: publication) {
+                ToolbarItem(placement: .topBarTrailing) {
+                    ShareLink(item: url, subject: Text(document.title)) {
+                        Label("Share", systemImage: "square.and.arrow.up")
+                    }
+                }
+            }
+        }
         .task {
             await loadContent()
         }

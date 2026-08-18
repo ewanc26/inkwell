@@ -13,11 +13,15 @@ struct DiscoverView: View {
     @Environment(LoginStateManager.self) private var loginStateManager
 
     @State private var query = ""
+    /// The query the currently-displayed results came back for, so the
+    /// empty state can quote what was actually searched rather than
+    /// whatever's been typed since.
+    @State private var searchedQuery = ""
     @State private var results: [ReaderSearchResult] = []
     @State private var subscriptions: Set<String> = []
     @State private var isSearching = false
     @State private var errorMessage: String?
-    @State private var showCredits = false
+    @State private var showAbout = false
 
     private var publications: [ReaderSearchResult] { results.filter(\.isPublication) }
     private var documents: [ReaderSearchResult] { results.filter { !$0.isPublication } }
@@ -25,37 +29,6 @@ struct DiscoverView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section {
-                    HStack {
-                        Image(systemName: "magnifyingglass")
-                            .foregroundStyle(.secondary)
-                        TextField("Search publications and articles", text: $query)
-                            .textInputAutocapitalization(.never)
-                            .autocorrectionDisabled()
-                            .submitLabel(.search)
-                            .onSubmit { Task { await search() } }
-                    }
-                }
-
-                if isSearching {
-                    Section {
-                        HStack {
-                            ProgressView()
-                            Text("Searching the Standard.site network...")
-                                .foregroundStyle(.secondary)
-                                .lineLimit(2)
-                        }
-                    }
-                } else if results.isEmpty && errorMessage == nil {
-                    Section {
-                        ContentUnavailableView(
-                            "Search the Open Web",
-                            systemImage: "text.magnifyingglass",
-                            description: Text("Find Standard.site writing from Leaflet, pckt, Offprint, and independent publishers.")
-                        )
-                    }
-                }
-
                 if !documents.isEmpty {
                     Section("Documents") {
                         ForEach(documents) { result in
@@ -86,31 +59,45 @@ struct DiscoverView: View {
                         }
                     }
                 }
-
-                if let errorMessage {
-                    Section {
-                        Text(errorMessage)
-                            .font(.caption)
-                            .foregroundStyle(.red)
-                            .lineLimit(3)
-                    }
-                }
             }
             .listStyle(.insetGrouped)
-            .navigationTitle("Discover")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button { showCredits = true } label: {
-                        Image(systemName: "info.circle")
-                    }
-                }
+            // Placeholder states belong over the list, not stuffed into a
+            // row of it — a ContentUnavailableView inside a Section gets
+            // the list's row insets and separators, which is not what it's
+            // designed to sit in.
+            .overlay {
+                placeholder
             }
-            .sheet(isPresented: $showCredits) {
-                CreditsView()
+            .navigationTitle("Discover")
+            // The system search field, rather than a TextField dressed up
+            // with a magnifying glass in the first row of the list: it gets
+            // the cancel button, scroll-to-reveal, dictation, and the
+            // search-tab integration for free.
+            .searchable(
+                text: $query,
+                prompt: "Publications and articles"
+            )
+            .textInputAutocapitalization(.never)
+            .autocorrectionDisabled()
+            .onSubmit(of: .search) {
+                Task { await search() }
+            }
+            .accountToolbar(showAbout: $showAbout)
+            .alert(
+                "Something Went Wrong",
+                isPresented: Binding(
+                    get: { errorMessage != nil },
+                    set: { if !$0 { errorMessage = nil } }
+                )
+            ) {
+                Button("OK", role: .cancel) { errorMessage = nil }
+            } message: {
+                Text(errorMessage ?? "")
             }
             .task {
                 if CommandLine.arguments.contains("-screenshot") {
                     query = "Standard.site"
+                    searchedQuery = query
                     results = [
                         ReaderSearchResult(
                             type: "publication",
@@ -162,6 +149,26 @@ struct DiscoverView: View {
         }
     }
 
+    /// The prompt, spinner, or "no results" state shown in place of the
+    /// list. Nothing is drawn once there are results to show.
+    @ViewBuilder
+    private var placeholder: some View {
+        if isSearching && results.isEmpty {
+            ProgressView("Searching the Standard.site network…")
+                .controlSize(.large)
+        } else if results.isEmpty {
+            if searchedQuery.isEmpty {
+                ContentUnavailableView(
+                    "Search the Open Web",
+                    systemImage: "text.magnifyingglass",
+                    description: Text("Find Standard.site writing from Leaflet, pckt, Offprint, and independent publishers.")
+                )
+            } else {
+                ContentUnavailableView.search(text: searchedQuery)
+            }
+        }
+    }
+
     private func search() async {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
@@ -171,6 +178,7 @@ struct DiscoverView: View {
 
         do {
             results = try await StandardReaderAPI.shared.search(query: trimmed).results
+            searchedQuery = trimmed
         } catch {
             errorMessage = "Search is unavailable: \(error.localizedDescription)"
         }
@@ -229,7 +237,9 @@ struct RemoteDocumentView: View {
                     description: Text(errorMessage)
                 )
             } else {
-                ProgressView("Fetching from the author's PDS...")
+                ProgressView("Fetching from the author's PDS…")
+                    .controlSize(.large)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
         .task { await load() }
@@ -268,8 +278,7 @@ private struct SearchResultThumbnail: View {
                     case .failure:
                         placeholder
                     default:
-                        Color.primary.opacity(0.05)
-                            .overlay { ProgressView().scaleEffect(0.6) }
+                        ProgressView().controlSize(.small)
                     }
                 }
             } else {
@@ -277,8 +286,11 @@ private struct SearchResultThumbnail: View {
             }
         }
         .frame(width: size, height: size)
-        .background(Color.primary.opacity(0.05))
-        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+        // The system's grouped-content fill, so the thumbnail well tracks
+        // light/dark and increased-contrast the way every other inset
+        // grouped row does — an opaque 5% black never did.
+        .background(Color(uiColor: .tertiarySystemFill))
+        .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
     }
 
     private var placeholder: some View {
@@ -361,19 +373,37 @@ private struct PublicationSearchRow: View {
         .padding(.vertical, 4)
     }
 
+    /// A real system button rather than a symbol on a hand-drawn tinted
+    /// circle: `.borderedProminent` when subscribed and `.bordered` when
+    /// not gives the same filled/outlined read, but with the system's own
+    /// contrast handling, disabled appearance, and press feedback.
     private var subscribeButton: some View {
         Button(action: onSubscribe) {
             Image(systemName: isSubscribed ? "bell.fill" : "bell")
-                .font(.subheadline)
                 .symbolEffect(.bounce, value: isSubscribed)
-                .foregroundStyle(isSubscribed ? Color.white : Color.accentColor)
-                .frame(width: 32, height: 32)
-                .background(
-                    Circle().fill(isSubscribed ? Color.accentColor : Color.accentColor.opacity(0.12))
-                )
+                .accessibilityHidden(true)
         }
-        .buttonStyle(.borderless)
+        .modifier(ProminentBorderedWhen(isProminent: isSubscribed))
+        .buttonBorderShape(.circle)
         .disabled(!canSubscribe)
-        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSubscribed)
+        .accessibilityLabel(isSubscribed ? "Unsubscribe" : "Subscribe")
+        .accessibilityAddTraits(isSubscribed ? [.isSelected] : [])
+        .animation(InkwellMotion.micro, value: isSubscribed)
+    }
+}
+
+/// Switches a button between the bordered and prominent-bordered system
+/// styles. The two are distinct types, so the choice can't be made with a
+/// ternary inside `.buttonStyle(_:)` — it has to branch at the view level.
+private struct ProminentBorderedWhen: ViewModifier {
+    let isProminent: Bool
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if isProminent {
+            content.buttonStyle(.borderedProminent)
+        } else {
+            content.buttonStyle(.bordered)
+        }
     }
 }

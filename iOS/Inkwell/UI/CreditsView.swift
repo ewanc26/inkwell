@@ -13,6 +13,9 @@ import SwiftUI
 
 struct CreditsView: View {
     @Environment(LoginStateManager.self) private var loginStateManager
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var isConfirmingSignOut = false
 
     private var versionString: String {
         let shortVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
@@ -116,7 +119,9 @@ struct CreditsView: View {
                 }
 
                 Section {
-                    Button(role: .destructive, action: loginStateManager.signOut) {
+                    Button(role: .destructive) {
+                        isConfirmingSignOut = true
+                    } label: {
                         Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
                     }
                 }
@@ -129,6 +134,26 @@ struct CreditsView: View {
             }
             .navigationTitle("About")
             .navigationBarTitleDisplayMode(.inline)
+            // This is only ever presented as a sheet, and a sheet with no
+            // visible way out relies on people knowing to swipe it down.
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }
+                }
+            }
+            .confirmationDialog(
+                "Sign out of Inkwell?",
+                isPresented: $isConfirmingSignOut,
+                titleVisibility: .visible
+            ) {
+                Button("Sign Out", role: .destructive) {
+                    loginStateManager.signOut()
+                    dismiss()
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("Your publications and subscriptions stay in your PDS. You can sign back in at any time.")
+            }
         }
     }
 

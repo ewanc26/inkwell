@@ -13,7 +13,10 @@ struct ContentView: View {
     @State private var notificationManager = NotificationManager.shared
     @State private var tipPromptManager = TipPromptManager.shared
 
-    @State private var selectedTab = 0
+    /// Selection is the same `InkwellTab` the App Intents post, so a
+    /// Shortcuts-driven tab switch is just an assignment — no mapping
+    /// between intent cases and anonymous integer tags.
+    @State private var selectedTab: InkwellTab = .reader
     @State private var showingTip = false
 
     var body: some View {
@@ -28,11 +31,11 @@ struct ContentView: View {
         }
         .onAppear {
             if CommandLine.arguments.contains("-tab-discover") {
-                selectedTab = 1
+                selectedTab = .discover
             } else if CommandLine.arguments.contains("-tab-writer") {
-                selectedTab = 2
+                selectedTab = .writer
             } else if CommandLine.arguments.contains("-tab-reader") {
-                selectedTab = 0
+                selectedTab = .reader
             }
         }
         .task {
@@ -51,8 +54,8 @@ struct ContentView: View {
             await ReaderFeedStore.shared.loadData(loginStateManager: loginStateManager)
         }
         .alert("Enjoying Inkwell?", isPresented: $showingTip) {
-            Button("Maybe later") { tipPromptManager.markShown() }
-            Button("Tip me") {
+            Button("Maybe Later", role: .cancel) { tipPromptManager.markShown() }
+            Button("Tip Me") {
                 if let url = URL(string: "https://ko-fi.com/ewancroft") {
                     UIApplication.shared.open(url)
                 }
@@ -61,18 +64,14 @@ struct ContentView: View {
         } message: {
             Text("If you find Inkwell useful, consider buying me a coffee to support ongoing development.")
         }
-        // Routes App Intent tab-switch notifications to the matching
-        // TabView index. Posted by OpenReaderIntent, OpenWriterIntent,
-        // and OpenDiscoverIntent when run via Siri or Shortcuts.
+        // Routes App Intent tab-switch notifications to the matching tab.
+        // Posted by OpenReaderIntent, OpenWriterIntent, and
+        // OpenDiscoverIntent when run via Siri or Shortcuts.
         .onReceive(NotificationCenter.default.publisher(for: .inkwellOpenTab)) { notification in
             guard let raw = notification.userInfo?[InkwellTabKey.tab] as? String,
                   let tab = InkwellTab(rawValue: raw) else { return }
             withAnimation {
-                switch tab {
-                case .reader: selectedTab = 0
-                case .discover: selectedTab = 1
-                case .writer: selectedTab = 2
-                }
+                selectedTab = tab
             }
         }
     }
@@ -87,29 +86,33 @@ struct ContentView: View {
                 .foregroundStyle(.primary)
             ProgressView()
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(uiColor: .systemBackground))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Restoring your session")
     }
 
     private var authenticatedView: some View {
         TabView(selection: $selectedTab) {
-            BrowseDocumentsView()
-                .tabItem {
-                    Label("Read", systemImage: "book")
-                }
-                .tag(0)
-                .badge(notificationManager.unreadCount)
+            Tab("Read", systemImage: "book", value: InkwellTab.reader) {
+                BrowseDocumentsView()
+            }
+            .badge(notificationManager.unreadCount)
 
-            DiscoverView()
-                .tabItem {
-                    Label("Discover", systemImage: "safari")
-                }
-                .tag(1)
+            // Discover is search, and nothing else — the search role gives
+            // it the system's dedicated search tab treatment rather than a
+            // generic tab that happens to contain a search field.
+            Tab("Discover", systemImage: "magnifyingglass", value: InkwellTab.discover, role: .search) {
+                DiscoverView()
+            }
 
-            WriteView()
-                .tabItem {
-                    Label("Write", systemImage: "square.and.pencil")
-                }
-                .tag(2)
+            Tab("Write", systemImage: "square.and.pencil", value: InkwellTab.writer) {
+                WriteView()
+            }
         }
+        // Reading is the point of the app: give the feed and the article
+        // back the tab bar's worth of screen as soon as you scroll into them.
+        .tabBarMinimizeBehavior(.onScrollDown)
         .task {
             if !CommandLine.arguments.contains("-screenshot") {
                 await NotificationManager.shared.requestPermission()
@@ -121,79 +124,6 @@ struct ContentView: View {
             Task {
                 await notificationManager.pollForNewDocuments(loginStateManager: loginStateManager)
             }
-        }
-    }
-
-    /// A tab's content while its real feature hasn't been built yet — shares
-    /// the same sign-out button and greeting header across every tab so that
-    /// chrome stays consistent as tabs gain real content over time.
-    private func placeholderTab(title: String, systemImage: String, description: String) -> some View {
-        NavigationStack {
-            ContentUnavailableView(
-                title,
-                systemImage: systemImage,
-                description: Text(description)
-            )
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(role: .destructive, action: loginStateManager.signOut) {
-                        Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
-                    }
-                }
-                ToolbarItem(placement: .principal) {
-                    HStack(spacing: 8) {
-                        avatarView
-                        Text(timeZoneAwareGreeting)
-                            .font(.headline)
-                    }
-                }
-            }
-        }
-    }
-
-    /// The account's Bluesky avatar, shown small next to the greeting. Falls
-    /// back to a generic person icon while loading or if no avatar is set.
-    /// Purely decorative — not a button, so it shouldn't read as tappable.
-    private var avatarView: some View {
-        AsyncImage(url: loginStateManager.avatarURL) { phase in
-            if let image = phase.image {
-                image
-                    .resizable()
-                    .scaledToFill()
-            } else {
-                Image(systemName: "person.crop.circle.fill")
-                    .resizable()
-                    .foregroundStyle(.secondary)
-            }
-        }
-        .frame(width: 24, height: 24)
-        .clipShape(Circle())
-    }
-
-    /// A greeting whose period of day (morning/afternoon/evening/night) is
-    /// derived from the device's current local time, with the account's
-    /// Bluesky display name appended when one is set. If no display name is
-    /// available, the name is dropped entirely rather than falling back to
-    /// the handle.
-    private var timeZoneAwareGreeting: String {
-        let hour = Calendar.current.component(.hour, from: Date())
-        let period: String
-        switch hour {
-        case 5..<12:
-            period = "morning"
-        case 12..<17:
-            period = "afternoon"
-        case 17..<22:
-            period = "evening"
-        default:
-            period = "night"
-        }
-
-        if let name = loginStateManager.displayName {
-            return "Good \(period), \(name)"
-        } else {
-            return "Good \(period)"
         }
     }
 }
