@@ -17,6 +17,8 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import uk.ewancroft.inkwell.TestingConfig
+import uk.ewancroft.inkwell.TestingModeException
 import uk.ewancroft.inkwell.shared.AtUri
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
@@ -107,6 +109,10 @@ class PdsRepository @Inject constructor(
         collection: String,
         record: JsonObject,
     ): JsonObject {
+        if (TestingConfig.enabled) {
+            TestingConfig.report("Create $collection record")
+            throw TestingModeException("Create $collection record")
+        }
         val session = sessionStore.load() ?: throw Exception("Not authenticated")
         val authClient = atOAuth.createClient()
         return authClient.procedure(
@@ -128,6 +134,10 @@ class PdsRepository @Inject constructor(
         record: JsonObject,
         revision: String,
     ): JsonObject {
+        if (TestingConfig.enabled) {
+            TestingConfig.report("Update record")
+            throw TestingModeException("Update record")
+        }
         val session = sessionStore.load() ?: throw Exception("Not authenticated")
         val parsed = AtUri.parse(uri) ?: throw IllegalArgumentException("Invalid AT-URI: $uri")
         val authClient = atOAuth.createClient()
@@ -149,6 +159,10 @@ class PdsRepository @Inject constructor(
     }
 
     suspend fun uploadBlob(bytes: ByteArray, mimeType: String): JsonObject {
+        if (TestingConfig.enabled) {
+            TestingConfig.report("Upload image")
+            throw TestingModeException("Upload image")
+        }
         val session = sessionStore.load() ?: throw Exception("Not authenticated")
         val authClient = atOAuth.createClient()
 
@@ -172,6 +186,10 @@ class PdsRepository @Inject constructor(
     }
 
     suspend fun deleteRecord(collection: String, rkey: String) {
+        if (TestingConfig.enabled) {
+            TestingConfig.report("Delete $collection record")
+            throw TestingModeException("Delete $collection record")
+        }
         val session = sessionStore.load() ?: throw Exception("Not authenticated")
         val authClient = atOAuth.createClient()
         authClient.procedure(

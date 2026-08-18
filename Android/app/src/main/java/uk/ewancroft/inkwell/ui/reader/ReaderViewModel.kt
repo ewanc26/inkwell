@@ -21,7 +21,6 @@ import uk.ewancroft.inkwell.data.remote.StandardSiteVerifier
 import uk.ewancroft.inkwell.shared.verification.VerificationResult
 import uk.ewancroft.inkwell.data.repository.PdsRepository
 import uk.ewancroft.inkwell.data.repository.getProfile
-import uk.ewancroft.inkwell.ScreenshotConfig
 import uk.ewancroft.inkwell.util.formatPublishedDate
 import javax.inject.Inject
 
@@ -64,37 +63,9 @@ class ReaderViewModel @Inject constructor(
     private val followingCursors = mutableMapOf<String, String>()
 
     init {
-        if (ScreenshotConfig.enabled) {
-            loadMockData()
-        } else {
-            loadData()
-        }
+        loadData()
     }
 
-    private fun loadMockData() {
-        _uiState.value = _uiState.value.copy(
-            followingPosts = listOf(
-                PostItem(
-                    uri = "at://did:plc:ewan/site.standard.document/1",
-                    title = "Publishing on the Open Web with Standard.site",
-                    description = "The Standard.site publishing spec brings structured, portable records to AT Protocol.",
-                    publicationName = "Ewan's Corner",
-                    publishedAt = "2026-06-20T12:00:00Z",
-                    coverUrl = null,
-                    site = "https://ewancroft.uk",
-                    authorDisplayName = "Ewan Croft",
-                    authorAvatar = null,
-                )
-            ),
-            yoursPosts = emptyList(),
-            isLoadingFollowing = false,
-            isLoadingYours = false,
-            isLoadingMoreFollowing = false,
-            hasMoreFollowing = false,
-            error = null,
-            selectedTab = 0,
-        )
-    }
 
     fun selectTab(index: Int) {
         _uiState.value = _uiState.value.copy(selectedTab = index)
@@ -123,10 +94,6 @@ class ReaderViewModel @Inject constructor(
     }
 
     fun loadData() {
-        if (ScreenshotConfig.enabled) {
-            loadMockData()
-            return
-        }
         viewModelScope.launch {
             val session = pdsRepository.getSession()
             if (session != null) {
