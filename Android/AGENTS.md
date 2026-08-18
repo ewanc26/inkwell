@@ -10,7 +10,7 @@ Guidance for agents working on the Android Inkwell client. It is a Kotlin/Compos
 4. **Honest stubs** — unimplemented features show explicit UI banners or return errors. Never silent no-ops or fabricated successes.
 5. **Security stays in EncryptedSharedPreferences** — OAuth tokens, refresh state, PKCE/DPoP material, and authorization URLs never enter logs or ordinary preferences.
 6. **No duplication** — never reimplement logic that already exists in shared KMP. The Android `app/` module consumes shared logic directly; iOS gets it via XCFramework. Two independent implementations of the same rule silently drift apart.
-7. **Modular file structure** — every file owns one clear responsibility. Each feature lives in its own folder under `app/src/main/java/.../ui/` with ViewModel, Screen, and helpers as separate files (see `ui/writer/` as the exemplar). Reusable UI components (toolbars, pickers, rendering views) get their own files. Keep files under ~400 lines; split before exceeding. `PdsRepository.kt` (459 lines) and `PostDetailScreen.kt` (751 lines) are acknowledged legacy debt — do not add new responsibilities to them; extract new XRPC methods or rendering helpers into focused extensions instead.
+7. **Modular file structure** — every file owns one clear responsibility. Each feature lives in its own folder under `app/src/main/java/.../ui/` with ViewModel, Screen, and helpers as separate files (see `ui/writer/` as the exemplar). Reusable UI components (toolbars, pickers, rendering views) get their own files. Keep files under ~400 lines; split before exceeding. `PdsRepository.kt` and `PostDetailScreen.kt` were split in 2.0 into `PdsRepository{Documents,Graph,Comments,Polls,Feedback}.kt` and `PostDetail{Body,Comments,Models,ContentParsing,PollExtensions}.kt` — add new XRPC methods and rendering helpers to the matching file.
 
 For monorepo-wide rules, see [`../AGENTS.md`](../AGENTS.md). For iOS-specific boundaries, see [`../iOS/AGENTS.md`](../iOS/AGENTS.md). For website/legal accuracy, see [`../website/AGENTS.md`](../website/AGENTS.md).
 
@@ -26,7 +26,7 @@ AI tools may be used when contributing, but do not add `Co-authored-by:` trailer
 - `app/src/main/java/uk/ewancroft/inkwell/data/auth` stores the OAuth session, `app/src/main/java/uk/ewancroft/inkwell/data/repository/PdsRepository.kt` performs public/authenticated XRPC, `app/src/main/java/uk/ewancroft/inkwell/data/model` defines Standard.site/Leaflet/pckt/Offprint shapes, and `app/src/main/java/uk/ewancroft/inkwell/data/remote/ConstellationClient.kt` delegates pagination/deduplication to shared KMP.
 - `app/src/main/java/uk/ewancroft/inkwell/data/remote/BSkyPostFetcher.kt` fetches Bluesky posts from the public API for embed rendering.
 - Hilt modules construct OAuth/network services. ViewModels own `StateFlow`; Compose screens and `NavGraph` own UI/navigation. `InkwellNotificationManager.kt` and `InkwellNotificationWorker.kt` implement WorkManager-based background notification polling. `app/src/main/java/uk/ewancroft/inkwell/data/remote/StandardSiteVerifier.kt` delegates URL construction and link scanning to shared KMP; networking and caching remain native.
-- Target facts: compile/target SDK 36, minimum SDK 26, Java/Kotlin JVM 17, release minification enabled, app ID `uk.ewancroft.inkwell`, debug ID suffix `.debug`, version `1.3.1`, versionCode `6`.
+- Target facts: compile/target SDK 36, minimum SDK 26, Java/Kotlin JVM 17, release minification enabled, app ID `uk.ewancroft.inkwell`, debug ID suffix `.debug`, version `2.0.0`, versionCode `7`.
 
 ## Current Capability Gaps
 
@@ -61,6 +61,7 @@ AI tools may be used when contributing, but do not add `Co-authored-by:` trailer
 
 ## Build, Tests, and Distribution
 
+- **Testing mode:** launch with `--ez testing true` (optionally `--es tab reader|discover|writer`) to keep the real session and real reads while intercepting every write, which raises a "Testing mode" dialog above the nav host. Enforced in `TestingConfig.kt` and the four `PdsRepository` write choke points, which throw `TestingModeException`; `submitFeedback` routes through `createRecord` so it's covered. No mock data and no fake auth — `isAuthenticated` is the real auth state only, so capture requires signing in.
 - Run `./gradlew clean assembleDebug lint test` with a valid local Android SDK/JDK, then add targeted unit/instrumentation tests for changed behavior. For release-sensitive work also run `./gradlew assembleRelease` and inspect R8 output.
 - There are no JVM or instrumentation tests for the app in general. `StandardSiteVerifierTest` is the only unit test source, including three tests that hit the real `blog.ewancroft.uk` standard.site publication over the network — they'll fail offline. `./gradlew test` otherwise executes effectively empty tasks for the rest of the codebase; never report that as behavioral coverage beyond this one file.
 - Never commit `local.properties`, `.idea/`, `.gradle/`, `app/build/`, signing material, OAuth sessions, or local `.letta/` data.
