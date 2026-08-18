@@ -31,6 +31,7 @@ import uk.ewancroft.inkwell.shared.util.HandleUtils
 import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
 import uk.ewancroft.inkwell.data.model.content.LeafletPollDefinition
 import uk.ewancroft.inkwell.data.model.content.LeafletPollVote
+import uk.ewancroft.inkwell.shared.policy.RecordListPolicy
 import java.net.URLEncoder
 import java.time.Instant
 import java.util.concurrent.TimeUnit
@@ -347,7 +348,7 @@ class PdsRepository @Inject constructor(
         did: String,
         collection: String,
         pdsUrl: String? = null,
-        maxRecords: Int = 500,
+        maxRecords: Int = RecordListPolicy.MAX_RECORDS,
     ): List<RawRecordEntry> {
         val all = mutableListOf<RawRecordEntry>()
         var cursor: String? = null
