@@ -14,6 +14,7 @@ Inkwell is a **native app** available on iOS and Android. This monorepo also con
 
 | Directory | Purpose |
 |-----------|---------|
+| `shared/` | Kotlin Multiplatform shared core — format conversion, markdown parsing, facet handling, content models, verification URLs, and constellation deduplication. Consumed by iOS via `InkwellShared.xcframework`; consumed by Android directly. |
 | `iOS/` | iOS app (SwiftUI) |
 | `Android/` | Android app (Kotlin/Compose) |
 | `website/` | Marketing/legal site and OAuth metadata (`inkwell.ewancroft.uk`) |
@@ -24,6 +25,9 @@ Inkwell is a **native app** available on iOS and Android. This monorepo also con
 - Renders Markpub Markdown plus Leaflet, pckt, and Offprint content. Uses `textContent` as a fallback. Native block rendering for Leaflet (including blob-stored pages), Markdown for everything else.
 - Real device screenshots are checked in under `iOS/screenshots/`, `Android/fastlane/metadata/.../images/phoneScreenshots/`, and `website/static/screenshots/`, captured via each app's `-screenshot` (iOS) / intent-extra (Android) mock-data mode.
 - Theme resolution: Leaflet's light/dark palette → `basicTheme` → system defaults. Publication-level by default, overridable per document.
+- Split-pane editor with live markdown preview, formatting toolbar, and selectable content formats.
+- Image upload directly into the editor.
+- Loss reporting when converting between formats that don't round-trip perfectly.
 - Publishes Standard.site documents with portable metadata and selectable content formats.
 - Creates and removes `site.standard.graph.subscription` records and recommends.
 - Searches the cross-platform Standard.site public index, fetches records directly from the author.
@@ -61,6 +65,8 @@ Run on API 26+ device or emulator. Sign in with your AT Protocol handle via OAut
 
 Standard.site standardises publishing metadata rather than one body format. Inkwell always publishes `textContent` and defaults to `at.markpub.markdown`, while retaining readers for `pub.leaflet.content`, `blog.pckt.content`, and `app.offprint.content`.
 
+Shared logic — format conversion, markdown parsing, facet handling, content models, and verification URL construction — lives in the `shared/` Kotlin Multiplatform module. Both apps consume it through platform-appropriate wrappers, ensuring a single source of truth for wire-format rules.
+
 Inkwell-owned lexicons use the `uk.ewancroft.inkwell.*` namespace. Shared records use their canonical `site.standard.*` NSIDs.
 
 ## Design
@@ -79,6 +85,7 @@ Run `./gradlew test` from the `Android/` directory.
 
 ## Dependencies
 
+- **shared/**: **Kotlin Multiplatform** — kotlinx.serialization, kotlinx.coroutines. Compiled to an XCFramework for iOS and consumed as a Gradle module by Android.
 - **iOS:** **ATProtoKit** — via Swift Package Manager (`https://github.com/MasterJ93/ATProtoKit.git`)
 - **Android:** **atproto-kotlin** — via Gradle version catalog
 
