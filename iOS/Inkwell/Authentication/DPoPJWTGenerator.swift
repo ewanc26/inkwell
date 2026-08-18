@@ -30,7 +30,18 @@ private extension Data {
 enum DPoPJWTGenerator {
 
     /// Build a JWT generator that signs DPoP proofs with the given P-256 private key.
-    static func generator(key: P256.Signing.PrivateKey) -> DPoPSigner.JWTGenerator {
+    ///
+    /// - Parameter nonceOverride: Consulted when `params.nonce` is `nil` (a
+    ///   brand-new `DPoPSigner` hasn't learned one yet). Lets a caller carry
+    ///   a nonce it already knows is good — e.g. one learned by a prior
+    ///   `Authenticator` attempt against the same PDS — into a fresh
+    ///   `Authenticator`/`DPoPSigner` pair, so that instance's very first
+    ///   request doesn't need its own nonce-challenge round trip (which some
+    ///   PDSes treat as spending whatever grant that request carried).
+    static func generator(
+        key: P256.Signing.PrivateKey,
+        nonceOverride: (@Sendable () -> String?)? = nil
+    ) -> DPoPSigner.JWTGenerator {
         let publicKey = key.publicKey
         let jwk = publicKeyJWK(from: publicKey)
 
@@ -49,7 +60,7 @@ enum DPoPJWTGenerator {
                 "htu": params.requestEndpoint,
                 "iat": Int(Date().timeIntervalSince1970),
             ]
-            if let nonce = params.nonce {
+            if let nonce = params.nonce ?? nonceOverride?() {
                 payload["nonce"] = nonce
             }
             if let ath = params.tokenHash {

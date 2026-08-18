@@ -72,17 +72,6 @@ struct ReadView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
-                // Give Liquid Glass a system-colored surface to sample
-                // instead of the publication's dark theme background.
-                // Gradient from system background to theme colour so the
-                // Liquid Glass nav bar samples light pixels for its tint,
-                // keeping the back button visible on dark publications.
-                LinearGradient(
-                    colors: [Color(.systemBackground), backgroundColor],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .frame(height: 60)
                 // Wrapper to scope the theme background to content only
                 VStack(alignment: .leading, spacing: 24) {
                 // Header section
@@ -379,6 +368,13 @@ struct ReadView: View {
             .background(backgroundColor)
         }
         .scrollContentBackground(.hidden)
+        // The ScrollView's own content background only covers its content
+        // area, leaving the system's default (light) background showing
+        // through the status bar / nav bar safe area above it on dark
+        // themes. Extend the theme color there too, so it reaches the
+        // screen edge — the Liquid Glass back button adapts to whatever's
+        // behind it on its own, no light patch needed.
+        .background(backgroundColor.ignoresSafeArea(edges: .top))
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await loadContent()

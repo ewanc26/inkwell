@@ -42,6 +42,14 @@ struct ContentView: View {
                 }
             }
         }
+        // Start loading the Reader feed as soon as the user's
+        // authenticated, not lazily once the Reader tab is first shown —
+        // so it's often already loaded (or well underway) by the time they
+        // actually tap over to it.
+        .task(id: loginStateManager.isAuthenticated) {
+            guard loginStateManager.isAuthenticated, !CommandLine.arguments.contains("-screenshot") else { return }
+            await ReaderFeedStore.shared.loadData(loginStateManager: loginStateManager)
+        }
         .alert("Enjoying Inkwell?", isPresented: $showingTip) {
             Button("Maybe later") { tipPromptManager.markShown() }
             Button("Tip me") {

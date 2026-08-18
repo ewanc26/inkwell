@@ -10,6 +10,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct ReaderTheme {
     enum FontFamily: String, Equatable {
@@ -44,8 +45,20 @@ struct ReaderTheme {
         colorScheme: ColorScheme
     ) {
         let rich = document?.theme ?? publication?.theme
-        let palette = colorScheme == .dark ? rich?.dark : rich?.light
         let basic = publication?.basicTheme
+
+        // Which of the theme's dark/light palettes actually matches what
+        // `background` will resolve to below — not just the device's
+        // appearance. A publication can set a fixed `backgroundColor`
+        // independent of its dark/light palettes; picking foreground/accent
+        // from the palette keyed to the device's colorScheme in that case
+        // can pick the wrong one entirely (e.g. a fixed dark background
+        // paired with the `.light` palette's near-black text, or the
+        // `.label` fallback resolving black because the device itself is in
+        // light mode) — illegible text baked onto a background it was never
+        // designed to sit on.
+        let isDark = rich?.backgroundColor?.color.isPerceptuallyDark ?? (colorScheme == .dark)
+        let palette = isDark ? rich?.dark : rich?.light
 
         background = rich?.backgroundColor?.color
             ?? Color(hex: palette?.background)
@@ -57,7 +70,7 @@ struct ReaderTheme {
         foreground = rich?.primary?.color
             ?? Color(hex: palette?.text)
             ?? basic?.foreground.color
-            ?? Color(uiColor: .label)
+            ?? (isDark ? .white : .black)
         accent = rich?.accentBackground?.color
             ?? Color(hex: palette?.link ?? palette?.accent)
             ?? basic?.accent.color
@@ -106,6 +119,14 @@ struct ReaderTheme {
 }
 
 private extension Color {
+    /// Standard perceived-luminance formula (Rec. 601): true below the
+    /// midpoint, i.e. a color dark enough to need light text on top of it.
+    var isPerceptuallyDark: Bool {
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        UIColor(self).getRed(&r, green: &g, blue: &b, alpha: &a)
+        return (0.299 * r + 0.587 * g + 0.114 * b) < 0.5
+    }
+
     init?(hex: String?) {
         guard var value = hex?.trimmingCharacters(in: .whitespacesAndNewlines), !value.isEmpty else {
             return nil

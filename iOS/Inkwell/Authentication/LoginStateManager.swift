@@ -204,152 +204,89 @@ final class LoginStateManager {
                 try? dpopKeyStore.write(key.rawRepresentation)
             }
 
-            // 4. Build token handling for Bluesky AT Protocol OAuth
-            let tokenHandling = Bluesky.tokenHandling(
-                account: trimmed,
-                server: serverMetadata,
-                jwtGenerator: DPoPJWTGenerator.generator(key: key),
-                validator: { [weak self] tokenResponse, issuer in
-                    // Verify that the token's subject (DID) resolves to a PDS
-                    // whose issuer matches the token's issuer. This is a
-                    // critical security check per AT Protocol OAuth spec.
-                    guard let self else { return false }
-                    guard let resolved = try? await self.resolver.resolveHandle(tokenResponse.sub),
-                          let subPDSURL = resolved.serviceEndpoint.flatMap({ URL(string: $0) }),
-                          subPDSURL.absoluteString.caseInsensitiveCompare(issuer) == .orderedSame
-                            || issuer.contains(subPDSURL.host ?? "") else {
-                        return false
-                    }
-                    return true
+            // 4. Build token handling for Bluesky AT Protocol OAuth.
+            //
+            // Some PDSes (e.g. pds.croft.click) require a DPoP nonce on the
+            // token endpoint and burn the authorization code the instant a
+            // request arrives without one — even though that's exactly the
+            // request whose *rejection* is supposed to teach the client
+            // what the nonce is. `nonceCache` records every `DPoP-Nonce`
+            // response header this sign-in attempt sees (via `loader`
+            // below); `DPoPJWTGenerator`'s `nonceOverride` falls back to it
+            // whenever a signer doesn't have one of its own yet. That lets
+            // a *retry* — which needs a brand-new `Authenticator` (and so a
+            // brand-new, never-yet-presented PKCE challenge, since
+            // `Bluesky.tokenHandling` mints one internally on every call —
+            // reusing the same `Authenticator` reuses the same challenge,
+            // which this class of PDS treats as one-time-use too) still
+            // carry the nonce learned from the first attempt's real server
+            // response, so the retry's first token request already has a
+            // valid nonce instead of needing (and losing) its own
+            // burn-then-learn round trip.
+            let nonceCache = LockedBox<String?>(nil)
+            let validator: Bluesky.TokenSubscriberValidator = { [weak self] tokenResponse, issuer in
+                // Verify that the token's subject (DID) resolves to a PDS
+                // whose issuer matches the token's issuer. This is a
+                // critical security check per AT Protocol OAuth spec.
+                guard let self else { return false }
+                guard let resolved = try? await self.resolver.resolveHandle(tokenResponse.sub),
+                      let subPDSURL = resolved.serviceEndpoint.flatMap({ URL(string: $0) }),
+                      subPDSURL.absoluteString.caseInsensitiveCompare(issuer) == .orderedSame
+                        || issuer.contains(subPDSURL.host ?? "") else {
+                    return false
                 }
-            )
+                return true
+            }
+            func makeTokenHandling() -> TokenHandling {
+                Bluesky.tokenHandling(
+                    account: trimmed,
+                    server: serverMetadata,
+                    jwtGenerator: DPoPJWTGenerator.generator(key: key, nonceOverride: { nonceCache.value }),
+                    validator: validator
+                )
+            }
 
             // 5. Create Authenticator in manual mode to trigger auth.
-            //    The debugLoader intercepts the first token request because
-            //    eurosky.social burns auth codes on DPoP nonce mismatch.
-            //    It holds the request, pre-flights the real nonce, returns
-            //    a fake use_dpop_nonce to the library (which then retries
-            //    with the correct nonce), and only sends the real request
-            //    on the retry — so the code never reaches the server without
-            //    the proper DPoP nonce.
-            let tokenEndpoint = serverMetadata.tokenEndpoint
-            let debugLoader: URLResponseProvider = { [logger] request in
+            let loader: URLResponseProvider = { [logger] request in
                 let (data, response) = try await URLSession.defaultProvider(request)
-                if let http = response as? HTTPURLResponse, http.statusCode >= 400 {
-                    let body = String(decoding: data, as: UTF8.self)
-                    logger.error("[SignIn] token endpoint returned HTTP \(http.statusCode): \(body)")
+                if let http = response as? HTTPURLResponse {
+                    if let nonce = http.value(forHTTPHeaderField: "DPoP-Nonce") {
+                        nonceCache.value = nonce
+                    }
+                    if http.statusCode >= 400 {
+                        let body = String(decoding: data, as: UTF8.self)
+                        logger.error("[SignIn] token endpoint returned HTTP \(http.statusCode): \(body)")
+                    }
                 }
                 return (data, response)
             }
-
-            // Wrapping loader: intercept the first POST to the token
-            // endpoint for nonce pre-warming.
-            struct TokenRequestBody: Codable {
-                let code: String
-                let code_verifier: String
-                let redirect_uri: String
-                let grant_type: String
-                let client_id: String
+            func makeAuth() -> (Authenticator, TokenHandling) {
+                let handling = makeTokenHandling()
+                let config = Authenticator.Configuration(
+                    appCredentials: appCredentials,
+                    loginStorage: makeLoginStorage(),
+                    tokenHandling: handling,
+                    mode: .manualOnly
+                )
+                return (Authenticator(config: config, urlLoader: loader), handling)
             }
-
-            var didPreflight = false
-            let loader: URLResponseProvider = { [logger] request in
-                guard request.url?.absoluteString == tokenEndpoint,
-                      request.httpMethod == "POST" else {
-                    return try await debugLoader(request)
-                }
-
-                // Does the request's DPoP proof already carry a nonce? The
-                // library primes it from other AS responses (e.g. the PAR
-                // flow), so the first token request may already be signed
-                // with a valid nonce. Intercepting such a request and
-                // answering with a use_dpop_nonce whose nonce matches the one
-                // the signer already holds would suppress the retry and fail
-                // decoding — so pass it straight through.
-                func dpopCarriesNonce(_ request: URLRequest) -> Bool {
-                    guard let header = request.value(forHTTPHeaderField: "DPoP") else { return false }
-                    let segments = header.split(separator: ".")
-                    guard segments.count >= 2 else { return false }
-                    var b64 = String(segments[1])
-                        .replacingOccurrences(of: "-", with: "+")
-                        .replacingOccurrences(of: "_", with: "/")
-                    while b64.count % 4 != 0 { b64.append("=") }
-                    guard let data = Data(base64Encoded: b64),
-                          let json = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
-                          let nonce = json["nonce"] as? String,
-                          !nonce.isEmpty else { return false }
-                    return true
-                }
-
-                // Only the first nonce-less POST needs pre-warming; anything
-                // already signed with a nonce (and the library's retry) must
-                // pass through.
-                if didPreflight || dpopCarriesNonce(request) {
-                    return try await debugLoader(request)
-                }
-                didPreflight = true
-
-                // Build a fake use_dpop_nonce response so the library's
-                // DPoP layer caches the correct nonce and retries.
-                func fakeNonceResponse(_ nonce: String) -> (Data, HTTPURLResponse) {
-                    let errorBody = Data("{\"error\":\"use_dpop_nonce\"}".utf8)
-                    let fakeResponse = HTTPURLResponse(
-                        url: request.url!,
-                        statusCode: 401,
-                        httpVersion: nil,
-                        headerFields: ["DPoP-Nonce": nonce]
-                    )!
-                    return (errorBody, fakeResponse)
-                }
-
-                // Pre-flight to get the token endpoint's own DPoP nonce.
-                var preflight = URLRequest(url: URL(string: tokenEndpoint)!)
-                preflight.httpMethod = "GET"
-                let (_, preResp) = try await URLSession.defaultProvider(preflight)
-                if let dpopNonce = (preResp as? HTTPURLResponse)?.value(forHTTPHeaderField: "DPoP-Nonce") {
-                    logger.info("[SignIn] token endpoint nonce pre-flighted via GET, retrying with correct nonce")
-                    return fakeNonceResponse(dpopNonce)
-                }
-
-                // Some PDSes (e.g. pds.croft.click) don't expose the nonce
-                // on a GET. Re-run the pre-flight as a POST whose JSON body
-                // swaps the real auth code for a dummy, so the code is never
-                // presented without a valid nonce — otherwise the PDS consumes
-                // the code on the use_dpop_nonce response and the retry fails
-                // with invalid_grant.
-                if let body = request.httpBody,
-                   let tokenRequest = try? JSONDecoder().decode(TokenRequestBody.self, from: body) {
-                    let sanitized = TokenRequestBody(
-                        code: "preflight-invalid-code",
-                        code_verifier: tokenRequest.code_verifier,
-                        redirect_uri: tokenRequest.redirect_uri,
-                        grant_type: tokenRequest.grant_type,
-                        client_id: tokenRequest.client_id
-                    )
-                    var post = URLRequest(url: request.url!)
-                    post.httpMethod = request.httpMethod
-                    post.allHTTPHeaderFields = request.allHTTPHeaderFields
-                    post.httpBody = try? JSONEncoder().encode(sanitized)
-                    let (_, postResp) = try await debugLoader(post)
-                    if let dpopNonce = (postResp as? HTTPURLResponse)?.value(forHTTPHeaderField: "DPoP-Nonce") {
-                        logger.info("[SignIn] token endpoint nonce pre-flighted via POST, retrying with correct nonce")
-                        return fakeNonceResponse(dpopNonce)
-                    }
-                }
-
-                return try await debugLoader(request)
-            }
-
-            let config = Authenticator.Configuration(
-                appCredentials: appCredentials,
-                loginStorage: makeLoginStorage(),
-                tokenHandling: tokenHandling,
-                mode: .manualOnly
-            )
-            let auth = Authenticator(config: config, urlLoader: loader)
 
             logger.info("[SignIn] starting ASWebAuthenticationSession…")
-            try await auth.authenticate()
+            var (auth, tokenHandling) = makeAuth()
+            do {
+                try await auth.authenticate()
+            } catch is DecodingError {
+                logger.warning("[SignIn] first token exchange failed to decode (likely an auth code burned by a DPoP nonce challenge) — retrying with a fresh authorization code and the now-cached nonce")
+                // The first ASWebAuthenticationSession's view controller is
+                // still mid-dismissal when this catch runs; presenting a
+                // second one immediately fails silently (SFAuthenticationSession
+                // logs "Attempted to present ... from a view controller that
+                // is being dismissed" and the retry never shows). Give the
+                // dismissal animation time to finish first.
+                try await Task.sleep(nanoseconds: 600_000_000)
+                (auth, tokenHandling) = makeAuth()
+                try await auth.authenticate()
+            }
             logger.info("[SignIn] OAuth flow completed")
 
             // 6. Rebuild Authenticator in automatic mode for subsequent requests
@@ -1541,5 +1478,23 @@ extension URLError {
         default:
             return false
         }
+    }
+}
+
+/// A lock-protected box for sharing mutable state between `@Sendable`
+/// closures — e.g. the `URLResponseProvider` and `DPoPSigner.JWTGenerator`
+/// closures passed to `Authenticator`, which run concurrently and can't
+/// otherwise share a plain `var`.
+final class LockedBox<Value>: @unchecked Sendable {
+    private let lock = NSLock()
+    private var _value: Value
+
+    init(_ value: Value) {
+        self._value = value
+    }
+
+    var value: Value {
+        get { lock.lock(); defer { lock.unlock() }; return _value }
+        set { lock.lock(); defer { lock.unlock() }; _value = newValue }
     }
 }

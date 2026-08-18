@@ -24,8 +24,13 @@ final class TipPromptManager {
 
     var shouldShowTip: Bool {
         let count = launchCount
-        let lastShown = lastShownDate?.timeIntervalSince1970 ?? -1
-        let now = Date().timeIntervalSince1970
+        // TipPromptPolicy.shouldShowTip expects millisecond epoch values (it
+        // divides the difference by 1000*60*60*24 to get days) — passing
+        // timeIntervalSince1970 (seconds) directly here made the computed
+        // day-diff 1000x too small, so the 7-day cooldown effectively never
+        // re-triggered once it had fired once.
+        let lastShown = lastShownDate.map { $0.timeIntervalSince1970 * 1000 } ?? -1
+        let now = Date().timeIntervalSince1970 * 1000
 
         return Inkwell.shouldShowTip(
             launchCount: count,
