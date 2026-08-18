@@ -18,6 +18,11 @@ struct ContentView: View {
     /// between intent cases and anonymous integer tags.
     @State private var selectedTab: InkwellTab = .reader
     @State private var showingTip = false
+    /// Bound to Discover's search field. Owned here rather than in
+    /// DiscoverView because `.searchable` for a `Tab(role: .search)` must
+    /// be attached to the TabView itself to actually appear — see the note
+    /// on `DiscoverView.query`.
+    @State private var discoverQuery = ""
 
     var body: some View {
         Group {
@@ -103,7 +108,7 @@ struct ContentView: View {
             // it the system's dedicated search tab treatment rather than a
             // generic tab that happens to contain a search field.
             Tab("Discover", systemImage: "magnifyingglass", value: InkwellTab.discover, role: .search) {
-                DiscoverView()
+                DiscoverView(query: $discoverQuery)
             }
 
             Tab("Write", systemImage: "square.and.pencil", value: InkwellTab.writer) {
@@ -113,6 +118,12 @@ struct ContentView: View {
         // Reading is the point of the app: give the feed and the article
         // back the tab bar's worth of screen as soon as you scroll into them.
         .tabBarMinimizeBehavior(.onScrollDown)
+        // Must live on the TabView, not inside DiscoverView — see the note
+        // on DiscoverView.query.
+        .searchable(text: $discoverQuery, prompt: "Publications and articles")
+        .textInputAutocapitalization(.never)
+        .autocorrectionDisabled()
+        .tabViewSearchActivation(.searchTabSelection)
         .task {
             if !CommandLine.arguments.contains("-screenshot") {
                 await NotificationManager.shared.requestPermission()
