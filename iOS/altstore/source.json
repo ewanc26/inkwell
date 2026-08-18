@@ -27,6 +27,14 @@
       ],
       "versions": [
         {
+          "version": "2.0.0",
+          "buildVersion": "51",
+          "date": "2026-08-18",
+          "localizedDescription": "Discover is now a persistent tab alongside Read and Write, matching the Android app's navigation. Reader cards show the author's name. Discover publication rows show descriptions and format tags, and subscribed publications are visually distinguished. Internal refactor: large source files split into focused modules per AGENTS.md's file-size guidance, with no behavior changes beyond the fixes above.",
+          "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.0.0.ipa",
+          "size": 11381942
+        },
+        {
           "version": "1.0",
           "buildVersion": "50",
           "date": "2026-08-16",
