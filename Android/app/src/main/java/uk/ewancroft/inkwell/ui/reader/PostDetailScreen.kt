@@ -39,6 +39,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import uk.ewancroft.inkwell.shared.text.StringUtils
 import uk.ewancroft.inkwell.shared.verification.VerificationResult
 import uk.ewancroft.inkwell.data.model.common.StrongRef
 import uk.ewancroft.inkwell.util.formatPublishedDate
@@ -744,7 +745,7 @@ private fun LostContentBanner(lost: List<String>) {
 
 private fun buildCanonicalUrl(baseUrl: String?, path: String?): String? {
     if (baseUrl == null) return null
-    val trimmedBase = baseUrl.trimEnd('/')
+    val trimmedBase = StringUtils.trimTrailingSlash(baseUrl)
     val trimmedPath = path?.trimStart('/')?.trimEnd('/') ?: return trimmedBase
     return if (trimmedPath.isEmpty()) trimmedBase else "$trimmedBase/$trimmedPath"
 }

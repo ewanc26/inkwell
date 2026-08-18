@@ -20,7 +20,7 @@ import ATProtoKit
 public struct PubLeafletComment: ATRecordProtocol, Sendable {
 
     /// The identifier of the lexicon.
-    public static let type: String = "pub.leaflet.comment"
+    public static let type: String = sharedLeafletComment()
 
     /// AT-URI of the document being commented on.
     public let subject: String

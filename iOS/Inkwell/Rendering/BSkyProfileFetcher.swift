@@ -93,7 +93,7 @@ private actor BSkyProfileCache {
 /// Fetches Bluesky actor profiles from the public API (no auth required).
 enum BSkyProfileFetcher {
     private static let logger = Logger(subsystem: "uk.ewancroft.Inkwell", category: "BSkyProfile")
-    private static let baseURL = "https://public.api.bsky.app"
+    private static let baseURL = sharedPublicBskyApi()
     private static let session: URLSession = {
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = 10
@@ -113,7 +113,7 @@ enum BSkyProfileFetcher {
             return cached
         }
 
-        guard let url = URL(string: "\(baseURL)/xrpc/app.bsky.actor.getProfile?actor=\(did)") else {
+        guard let url = URL(string: "\(baseURL)/xrpc/\(sharedXrpcActorGetProfile())?actor=\(did)") else {
             throw URLError(.badURL)
         }
 
@@ -149,7 +149,7 @@ enum BSkyProfileFetcher {
         }
 
         // Resolve handle → DID
-        guard let resolveURL = URL(string: "\(baseURL)/xrpc/com.atproto.identity.resolveHandle?handle=\(normalised)") else {
+        guard let resolveURL = URL(string: "\(baseURL)/xrpc/\(sharedXrpcIdentityResolveHandle())?handle=\(normalised)") else {
             throw URLError(.badURL)
         }
 

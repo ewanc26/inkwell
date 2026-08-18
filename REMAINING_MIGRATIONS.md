@@ -1,6 +1,6 @@
 # Inkwell Shared Core — Remaining Migration Opportunities
 
-_Last updated: 2026-08-17_
+_Last updated: 2026-08-18_
 
 This document captures platform-specific backend logic that could still be migrated to the shared KMP module, ranked by impact and feasibility.
 
@@ -19,26 +19,26 @@ This document captures platform-specific backend logic that could still be migra
 | Constellation Pagination + Deduplication | ✅ | `69144b0` |
 | URL Utilities (`normalizedSite`, `canonicalUrl`) | ✅ | `69144b0` |
 | Neutral Shared-Model Layer (DTOs) | ✅ | `b1503c8` |
+| Content Format Block-Type Mapping | ✅ | shared converters for all 4 formats |
 
 ---
 
 ## Tier 1 — High Impact, High Feasibility
 
-### 1. Content Format Conversion Block-Type Mapping
+### 1. Content Format Conversion Block-Type Mapping ✅ COMPLETED
 
-**iOS:** `iOS/Inkwell/Rendering/ContentProvider.swift`  
-**Android:** `Android/app/src/main/java/uk/ewancroft/inkwell/ui/writer/MarkdownConverter.kt` + `Android/app/src/main/java/uk/ewancroft/inkwell/ui/reader/PcktOffprintConverter.kt`
+**Shared:** `shared/src/commonMain/kotlin/.../content/` with converters:
+- `LeafletContentConverter.kt` — MarkdownBlock ↔ Leaflet JSON (pages/blocks)
+- `PcktContentConverter.kt` — MarkdownBlock ↔ pckt JSON (items array)
+- `OffprintContentConverter.kt` — MarkdownBlock ↔ Offprint JSON (items array)
+- `MarkpubContentConverter.kt` — Markdown ↔ Markpub JSON (identity)
+- `ContentFormatDispatcher.kt` — unified dispatch by format name or `$type`
+- `BlockLossLabels.kt` — shared loss label maps per format
+- `JsonMapBridge.kt` — converts `Map<String, Any?>` ↔ kotlinx.serialization `JsonObject`
 
-**What's duplicated:**
-- Block-type string mapping (`"pub.leaflet.blocks.header"` ↔ `.heading`, `"pub.leaflet.blocks.paragraph"` ↔ `.paragraph`, etc.)
-- Loss-label dictionaries (which block types are unsupported per format)
-- Image CID detection (`url.hasPrefix("baf") || url.hasPrefix("Qm")`)
-- CDN URL construction (`https://cdn.bsky.app/img/feed_thumbnail/plain/{did}/{cid}`)
-- Facet-to-markdown and markdown-to-facet format-specific `$type` string handling
-
-**Effort:** High (~700 lines to unify, but algorithmically identical)  
-**Risk:** Medium — requires careful mapping of platform-specific content format types to shared abstractions  
-**Benefit:** Eliminates the largest remaining duplication; single source of truth for format conversion
+**Android:** `MarkdownConverter.kt` reduced from ~390 lines to ~25 lines; `PcktOffprintConverter.kt` reduced from ~360 lines to ~40 lines.
+**iOS:** `SharedKMP.swift` gains `sharedContentToMarkdown()`, `sharedMarkdownToContent()`, `sharedBlockLossLabels()` wrappers.
+**Tests:** `ContentConverterTest.kt` — 30+ tests covering round-trip for all four formats.
 
 ---
 
@@ -58,9 +58,9 @@ This document captures platform-specific backend logic that could still be migra
 
 ---
 
-### 3. Format Count Utility
+### 3. Format Count Utility ✅ COMPLETED
 
-**iOS:** `iOS/Inkwell/Rendering/BSkyPostEmbed.swift` (`formatCount(_ count: Int) -> String`)  
+**iOS:** `iOS/Inkwell/Rendering/BSkyPostEmbed.swift` (`formatCount(_ count: Int) -> String`) → now uses `sharedFormatCount()` from `SharedKMP.swift`  
 **Android:** `Android/app/src/main/java/uk/ewancroft/inkwell/ui/reader/LeafletBlockRenderer.kt` (`formatCount()`)
 
 **What's duplicated:**
@@ -69,6 +69,59 @@ This document captures platform-specific backend logic that could still be migra
 **Effort:** Trivial (~5 lines)  
 **Risk:** None  
 **Benefit:** Eliminates trivial duplication; proves shared utility pattern
+
+---
+
+### 3b. XRPC Endpoints & OAuth Scopes ✅ COMPLETED
+
+**iOS:** `iOS/Inkwell/Authentication/LoginStateManager.swift` — all hardcoded `/xrpc/...` paths and OAuth scope strings replaced with shared KMP wrappers:
+- `sharedXrpcServerGetSession()`, `sharedXrpcSyncGetBlob()`, `sharedXrpcRepoCreateRecord()`, `sharedXrpcRepoDeleteRecord()`, `sharedXrpcRepoGetRecord()`, `sharedXrpcRepoListRecords()`
+- `sharedOAuthScopeAtproto()`, `sharedOAuthScopeBlobAll()`, `sharedOAuthScopeRepoPublication()`, `sharedOAuthScopeRepoDocument()`, `sharedOAuthScopeRepoSubscription()`, `sharedOAuthScopeRepoRecommend()`
+
+**Additional iOS files migrated:**
+- `iOS/Inkwell/Rendering/BSkyProfileFetcher.swift` — `sharedPublicBskyApi()`, `sharedXrpcIdentityResolveHandle()`, `sharedXrpcActorGetProfile()`
+- `iOS/Inkwell/Rendering/ConstellationClient.swift` — `sharedConstellationApi()`, `sharedXrpcMicrocosmGetBacklinks()`
+- `iOS/Inkwell/Rendering/BSkyPostEmbed.swift` — Bluesky embed types and `sharedXrpcFeedGetPosts()`
+
+---
+
+### 3c. Search Result Classification ✅ COMPLETED
+
+**iOS:** `iOS/Inkwell/Features/Discover/StandardReaderAPI.swift` (`ReaderSearchResult.isPublication`, `isStandardSiteDocument`, `webURL`) → now uses shared KMP wrappers:
+- `sharedIsPublication(type:)` — checks `type == "publication"`
+- `sharedIsStandardSiteDocument(uri:)` — parses AT-URI and checks collection == `site.standard.document`
+- `sharedWebURL(basePath:path:rkey:platform:isPublication:)` — constructs canonical web URL
+
+---
+
+### 3d. Publication Matching ✅ COMPLETED
+
+**New shared KMP:** `shared/src/commonMain/kotlin/uk/ewancroft/inkwell/shared/content/PublicationMatcher.kt` — `documentBelongsToPublication(documentSite, publicationUri, publicationUrl)`
+
+**iOS files migrated:**
+- `iOS/Inkwell/Features/Subscriptions/NotificationManager.swift` — uses `sharedDocumentBelongsToPublication()` instead of `PublicationEntry.contains()`
+- `iOS/Inkwell/Rendering/StandardSitePostEmbed.swift` — uses shared publication matching
+- `iOS/Inkwell/Features/Reader/BrowseDocumentsView.swift` — uses shared publication matching
+- `iOS/Inkwell/Protocols/StandardSite/StandardSiteTypes.swift` — removed `PublicationEntry.contains()` extension (dead after migration)
+
+**Android files migrated:**
+- `Android/app/src/main/java/uk/ewancroft/inkwell/data/remote/InkwellNotificationManager.kt` — uses `PublicationMatcher.documentBelongsToPublication()` instead of inline matching
+
+---
+
+### 3e. Collection NSIDs ✅ COMPLETED
+
+**iOS files migrated:**
+- `iOS/Inkwell/Protocols/StandardSite/SiteStandardComment.swift` — `sharedLeafletComment()`
+- `iOS/Inkwell/Rendering/PollEmbedView.swift` — `sharedLeafletPollDefinition()`, `sharedLeafletPollVote()`
+- `iOS/Inkwell/Rendering/ConstellationClient.swift` — `sharedLeafletComment()` for backlink source
+
+---
+
+### 3f. Dead Code Removal ✅ COMPLETED
+
+- `iOS/Inkwell/Rendering/MarkdownRendererView.swift` — removed `applyInlineFormatting()` and `byteRangeToAttrRange()` (never called, dead code)
+- `iOS/InkwellTests/StandardSiteTests.swift` — updated `publicationVerificationURL()` test to match new return type (`String?` → `String`)
 
 ---
 
@@ -229,11 +282,15 @@ This document captures platform-specific backend logic that could still be migra
 
 ## Recommended Execution Order
 
-1. **`formatCount` utility** — trivial, low risk, proves the shared utility pattern
-2. **Inline markdown rendering** — high impact, clearly duplicated, pure text processing
-3. **Content format conversion** — highest impact but largest effort (~700 lines)
-4. **Standard.site post embed fetching** — medium impact, clear duplication
-5. **AT-URI type consolidation** — medium effort, pervasive but straightforward
-6. **Notification document-matching** — medium effort, sensitive but testable
-7. **Content type detection** — low effort, low risk
-8. **Record entry parsing** — higher effort, tightly coupled to I/O
+1. **`formatCount` utility** ✅ COMPLETED
+2. **XRPC endpoints & OAuth scopes** ✅ COMPLETED — all iOS hardcoded `/xrpc/...` paths and scope strings now use shared KMP wrappers; public API URLs (Bluesky, Constellation) also migrated
+3. **Search result classification** ✅ COMPLETED — iOS `ReaderSearchResult` computed properties now delegate to shared `SearchResultClassifier`
+4. **Publication matching** ✅ COMPLETED — new shared `PublicationMatcher.documentBelongsToPublication()` used by both platforms' notification and document-browsing code
+5. **Collection NSIDs** ✅ COMPLETED — poll definition/vote and comment collection strings migrated to shared `CollectionNsids`
+6. **Dead code removal** ✅ COMPLETED — removed unused iOS `applyInlineFormatting()` scanner and `byteRangeToAttrRange()`
+7. **Content format types** ✅ COMPLETED — shared converters for Leaflet/pckt/Offprint/Markpub with `ContentFormatDispatcher`, `BlockLossLabels`, and `JsonMapBridge`; Android `MarkdownConverter` and `PcktOffprintConverter` reduced to thin adapters
+8. **Standard.site post embed fetching** — publication matching shared; document fetching remains platform-specific due to different networking stacks
+9. **AT-URI type consolidation** — medium effort, pervasive but straightforward
+10. **Content type detection** — low effort, low risk
+11. **Record entry parsing** — higher effort, tightly coupled to I/O
+12. **Bluesky post/profile fetching patterns** — high effort, networking-coupled

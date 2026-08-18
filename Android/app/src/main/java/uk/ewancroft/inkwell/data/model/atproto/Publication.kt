@@ -10,6 +10,7 @@ package uk.ewancroft.inkwell.data.model.atproto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 import uk.ewancroft.inkwell.data.model.common.BlobRef
 import uk.ewancroft.inkwell.data.model.common.StrongRef
 import uk.ewancroft.inkwell.data.model.content.LeafletPage
@@ -23,7 +24,7 @@ import uk.ewancroft.inkwell.data.model.content.LeafletContent
  */
 @Serializable
 data class PublicationRecord(
-    @SerialName("\$type") val type: String = "site.standard.publication",
+    @SerialName("\$type") val type: String = CollectionNsids.PUBLICATION,
     val url: String,
     val name: String,
     val description: String? = null,
@@ -42,7 +43,7 @@ data class PublicationRecord(
  */
 @Serializable
 data class DocumentRecord(
-    @SerialName("\$type") val type: String = "site.standard.document",
+    @SerialName("\$type") val type: String = CollectionNsids.DOCUMENT,
     val site: String,
     val title: String,
     val publishedAt: String,

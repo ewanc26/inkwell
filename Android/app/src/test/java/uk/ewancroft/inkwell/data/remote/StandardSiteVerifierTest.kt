@@ -7,6 +7,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import uk.ewancroft.inkwell.data.model.atproto.DocumentRecord
 import uk.ewancroft.inkwell.data.model.atproto.PublicationRecord
+import uk.ewancroft.inkwell.shared.verification.VerificationFailure
+import uk.ewancroft.inkwell.shared.verification.VerificationResult
 import uk.ewancroft.inkwell.shared.verification.VerificationUrls
 
 /**

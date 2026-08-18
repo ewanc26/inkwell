@@ -25,6 +25,10 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import uk.ewancroft.inkwell.data.model.bluesky.BlueskyProfile
 import uk.ewancroft.inkwell.shared.AtUri
+import uk.ewancroft.inkwell.shared.content.ContentFormatDetector
+import uk.ewancroft.inkwell.shared.graph.CollectionNsids
+import uk.ewancroft.inkwell.shared.util.HandleUtils
+import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
 import uk.ewancroft.inkwell.data.model.content.LeafletPollDefinition
 import uk.ewancroft.inkwell.data.model.content.LeafletPollVote
 import java.net.URLEncoder
@@ -87,9 +91,9 @@ class PdsRepository @Inject constructor(
         cursor: String? = null,
         pdsUrl: String? = null,
     ): JsonObject {
-        val baseUrl = pdsUrl ?: resolvePdsUrl(did) ?: "https://public.api.bsky.app"
+        val baseUrl = pdsUrl ?: resolvePdsUrl(did) ?: XrpcEndpoints.PUBLIC_BSKY_API
         val urlStr = buildString {
-            append("$baseUrl/xrpc/com.atproto.repo.listRecords")
+            append("$baseUrl${XrpcEndpoints.REPO_LIST_RECORDS}")
             append("?repo=").append(enc(did))
             append("&collection=").append(enc(collection))
             append("&limit=$limit")
@@ -100,9 +104,9 @@ class PdsRepository @Inject constructor(
 
     suspend fun getRecord(uri: String, pdsUrl: String? = null): JsonObject {
         val parsed = requireNotNull(AtUri.parse(uri))
-        val baseUrl = pdsUrl ?: resolvePdsUrl(parsed.did) ?: "https://public.api.bsky.app"
+        val baseUrl = pdsUrl ?: resolvePdsUrl(parsed.did) ?: XrpcEndpoints.PUBLIC_BSKY_API
         val urlStr = buildString {
-            append("$baseUrl/xrpc/com.atproto.repo.getRecord")
+            append("$baseUrl${XrpcEndpoints.REPO_GET_RECORD}")
             append("?repo=").append(enc(parsed.did))
             append("&collection=").append(enc(parsed.collection))
             append("&rkey=").append(enc(parsed.recordKey))
@@ -184,12 +188,12 @@ class PdsRepository @Inject constructor(
         description: String? = null,
     ): JsonObject {
         val record = buildJsonObject {
-            put("\$type", "site.standard.publication")
+            put("\$type", CollectionNsids.PUBLICATION)
             put("url", url)
             put("name", name)
             if (description != null) put("description", description)
         }
-        return createRecord("site.standard.publication", record)
+        return createRecord(CollectionNsids.PUBLICATION, record)
     }
 
     suspend fun deleteRecord(collection: String, rkey: String) {
@@ -217,16 +221,16 @@ class PdsRepository @Inject constructor(
     // fetchSubscriptions / deleteSubscription.
 
     private companion object {
-        const val SUBSCRIPTION_COLLECTION = "site.standard.graph.subscription"
-        const val RECOMMEND_COLLECTION = "site.standard.graph.recommend"
-        const val COMMENT_COLLECTION = "pub.leaflet.comment"
+        const val SUBSCRIPTION_COLLECTION = CollectionNsids.GRAPH_SUBSCRIPTION
+        const val RECOMMEND_COLLECTION = CollectionNsids.GRAPH_RECOMMEND
+        const val COMMENT_COLLECTION = CollectionNsids.LEAFLET_COMMENT
     }
 
     data class SubscriptionEntry(val uri: String, val rkey: String, val publicationUri: String)
 
     /** Creates a `site.standard.graph.subscription` record: subscribes the signed-in user to [publicationUri]. */
     suspend fun createSubscription(publicationUri: String): JsonObject {
-        require(AtUri.parse(publicationUri)?.collection == "site.standard.publication") {
+        require(AtUri.parse(publicationUri)?.collection == CollectionNsids.PUBLICATION) {
             "publicationUri must reference a site.standard.publication record"
         }
         val record = buildJsonObject {
@@ -261,7 +265,7 @@ class PdsRepository @Inject constructor(
 
     /** Creates a `site.standard.graph.recommend` record: recommends [documentUri]. */
     suspend fun createRecommend(documentUri: String): JsonObject {
-        require(AtUri.parse(documentUri)?.collection == "site.standard.document") {
+        require(AtUri.parse(documentUri)?.collection == CollectionNsids.DOCUMENT) {
             "documentUri must reference a site.standard.document record"
         }
         val record = buildJsonObject {
@@ -328,7 +332,7 @@ class PdsRepository @Inject constructor(
     data class DocumentRecordEntry(val uri: String, val value: JsonObject)
 
     suspend fun fetchDocumentEntries(did: String, pdsUrl: String? = null): List<DocumentRecordEntry> =
-        listAllRecords(did, "site.standard.document", pdsUrl).map { DocumentRecordEntry(it.uri, it.value) }
+        listAllRecords(did, CollectionNsids.DOCUMENT, pdsUrl).map { DocumentRecordEntry(it.uri, it.value) }
 
     // ── Pagination helper ────────────────────────────────────────────────
 
@@ -367,20 +371,21 @@ class PdsRepository @Inject constructor(
     }
 
     suspend fun resolveHandle(handle: String): String {
-        val urlStr = "https://public.api.bsky.app/xrpc/com.atproto.identity.resolveHandle?handle=${enc(handle)}"
+        val normalized = HandleUtils.normalize(handle)
+        val urlStr = "${XrpcEndpoints.PUBLIC_BSKY_API}${XrpcEndpoints.IDENTITY_RESOLVE_HANDLE}?handle=${enc(normalized)}"
         val body: JsonObject = json.decodeFromString(executeGet(urlStr))
         return body["did"]?.jsonPrimitive?.content
             ?: throw IllegalStateException("resolveHandle returned no did")
     }
 
     suspend fun getProfile(did: String): BlueskyProfile {
-        val urlStr = "https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=${enc(did)}"
+        val urlStr = "${XrpcEndpoints.PUBLIC_BSKY_API}${XrpcEndpoints.ACTOR_GET_PROFILE}?actor=${enc(did)}"
         return json.decodeFromString(executeGet(urlStr))
     }
 
     suspend fun downloadBlob(cid: String, fromDID: String): ByteArray = withContext(Dispatchers.IO) {
-        val pdsUrl = resolvePdsUrl(fromDID) ?: "https://public.api.bsky.app"
-        val urlStr = "$pdsUrl/xrpc/com.atproto.sync.getBlob?cid=${enc(cid)}&did=${enc(fromDID)}"
+        val pdsUrl = resolvePdsUrl(fromDID) ?: XrpcEndpoints.PUBLIC_BSKY_API
+        val urlStr = "$pdsUrl${XrpcEndpoints.SYNC_GET_BLOB}?cid=${enc(cid)}&did=${enc(fromDID)}"
         val request = Request.Builder().url(urlStr).get().build()
         publicHttpClient.newCall(request).execute().use { response ->
             if (!response.isSuccessful) {
@@ -391,7 +396,7 @@ class PdsRepository @Inject constructor(
     }
 
     suspend fun getPollDefinition(did: String, rkey: String): LeafletPollDefinition {
-        val urlStr = "https://public.api.bsky.app/xrpc/com.atproto.repo.getRecord?repo=${enc(did)}&collection=pub.leaflet.poll.definition&rkey=${enc(rkey)}"
+        val urlStr = "${XrpcEndpoints.PUBLIC_BSKY_API}${XrpcEndpoints.REPO_GET_RECORD}?repo=${enc(did)}&collection=${CollectionNsids.LEAFLET_POLL_DEFINITION}&rkey=${enc(rkey)}"
         val body = executeGet(urlStr)
         val record = json.parseToJsonElement(body).jsonObject
         val value = record["value"]?.jsonObject ?: throw IllegalStateException("Missing poll value")
@@ -399,7 +404,7 @@ class PdsRepository @Inject constructor(
     }
 
     suspend fun listPollVotes(did: String, pollRkey: String): List<LeafletPollVote> {
-        val urlStr = "https://public.api.bsky.app/xrpc/com.atproto.repo.listRecords?repo=${enc(did)}&collection=pub.leaflet.poll.vote&limit=100"
+        val urlStr = "${XrpcEndpoints.PUBLIC_BSKY_API}${XrpcEndpoints.REPO_LIST_RECORDS}?repo=${enc(did)}&collection=${CollectionNsids.LEAFLET_POLL_VOTE}&limit=100"
         val body = executeGet(urlStr)
         val response = json.parseToJsonElement(body).jsonObject
         val records = response["records"]?.jsonArray.orEmpty()
@@ -423,9 +428,9 @@ class PdsRepository @Inject constructor(
             paramsSerializer = Unit.serializer(),
             input = buildJsonObject {
                 put("repo", session.did)
-                put("collection", "pub.leaflet.poll.vote")
+                put("collection", CollectionNsids.LEAFLET_POLL_VOTE)
                 put("record", buildJsonObject {
-                    put("\$type", "pub.leaflet.poll.vote")
+                    put("\$type", CollectionNsids.LEAFLET_POLL_VOTE)
                     put("poll", buildJsonObject {
                         put("uri", pollUri)
                     })

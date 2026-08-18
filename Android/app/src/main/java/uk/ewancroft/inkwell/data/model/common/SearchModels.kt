@@ -1,6 +1,7 @@
 package uk.ewancroft.inkwell.data.model.common
 
 import kotlinx.serialization.Serializable
+import uk.ewancroft.inkwell.shared.content.SearchResultClassifier
 
 @Serializable
 data class SearchResult(
@@ -17,10 +18,13 @@ data class SearchResult(
     val coverImage: String? = null,
     val handle: String? = null
 ) {
-    val isPublication: Boolean get() = type == "publication"
+    val isPublication: Boolean get() = SearchResultClassifier.isPublication(type)
 
     val isStandardSiteDocument: Boolean get() =
-        AtUri.parse(uri)?.collection == "site.standard.document"
+        SearchResultClassifier.isStandardSiteDocument(uri)
+
+    fun webURL(): String? =
+        SearchResultClassifier.webURL(basePath, path, rkey, platform, isPublication)
 }
 
 @Serializable

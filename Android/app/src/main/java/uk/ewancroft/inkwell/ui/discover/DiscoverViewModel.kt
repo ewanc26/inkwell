@@ -18,6 +18,7 @@ import uk.ewancroft.inkwell.data.model.common.SearchResponse
 import uk.ewancroft.inkwell.data.model.common.SearchResult
 import uk.ewancroft.inkwell.data.repository.PdsRepository
 import uk.ewancroft.inkwell.shared.AtUri
+import uk.ewancroft.inkwell.shared.content.SearchBackendUrl
 import uk.ewancroft.inkwell.ScreenshotConfig
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -117,7 +118,7 @@ class DiscoverViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSearching = true, error = null)
             try {
-                val url = "https://leaflet-search-backend.fly.dev/search?q=${
+                val url = "${SearchBackendUrl.BASE}/search?q=${
                     java.net.URLEncoder.encode(query, "UTF-8")
                 }&mode=keyword&limit=40&format=v2"
                 val body = withContext(Dispatchers.IO) {

@@ -452,7 +452,13 @@ struct BrowseDocumentsView: View {
             yours = documents.map { document in
                 ReaderFeedItem(
                     document: document,
-                    publication: publications.first(where: { $0.contains(document.record) }),
+                    publication: publications.first(where: { pub in
+                        sharedDocumentBelongsToPublication(
+                            documentSite: document.record.site,
+                            publicationUri: pub.uri,
+                            publicationUrl: pub.record.url
+                        )
+                    }),
                     authorProfile: ownProfile
                 )
             }

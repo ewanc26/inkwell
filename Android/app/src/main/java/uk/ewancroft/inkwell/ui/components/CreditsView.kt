@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import uk.ewancroft.inkwell.shared.content.SearchBackendUrl
 
 @Composable
 fun CreditsView(
@@ -80,7 +81,7 @@ fun CreditsView(
                 SectionHeader("Built On")
                 CreditRow(title = "atproto-kotlin", detail = "AT Protocol SDK + OAuth 2.1 by kikin81", url = "https://github.com/kikin81/atproto-kotlin", openUrl = ::openUrl)
                 CreditRow(title = "Standard.site", detail = "The publishing protocol Inkwell reads and writes", url = "https://standard.site", openUrl = ::openUrl)
-                CreditRow(title = "pub search", detail = "Cross-platform Standard.site search index", url = "https://leaflet-search-backend.fly.dev", openUrl = ::openUrl)
+                CreditRow(title = "pub search", detail = "Cross-platform Standard.site search index", url = SearchBackendUrl.BASE, openUrl = ::openUrl)
                 Spacer(Modifier.height(8.dp))
                 Text(
                     "Inkwell reads and writes Leaflet, Markpub, pckt, and Offprint content alongside the shared site.standard.* records.",

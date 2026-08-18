@@ -3,6 +3,7 @@ package uk.ewancroft.inkwell.data.model.bluesky
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
+import uk.ewancroft.inkwell.shared.content.BlueskyEmbedTypes
 
 /**
  * Bluesky post view models for embedded posts.
@@ -38,15 +39,15 @@ data class BSkyPostRecord(
 @Serializable
 sealed class BSkyEmbed {
     @Serializable
-    @SerialName("app.bsky.embed.images")
+    @SerialName(BlueskyEmbedTypes.IMAGES)
     data class Images(val images: List<BSkyImage>) : BSkyEmbed()
 
     @Serializable
-    @SerialName("app.bsky.embed.external")
+    @SerialName(BlueskyEmbedTypes.EXTERNAL)
     data class External(val external: BSkyExternal) : BSkyEmbed()
 
     @Serializable
-    @SerialName("app.bsky.embed.record")
+    @SerialName(BlueskyEmbedTypes.RECORD)
     data class Record(val record: BSkyEmbeddedRecord) : BSkyEmbed()
 
     @Serializable

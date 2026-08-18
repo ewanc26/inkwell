@@ -55,11 +55,11 @@ enum BSkyEmbed: Decodable, Sendable {
         let type = try container.decode(String.self, forKey: .type)
 
         switch type {
-        case "app.bsky.embed.images":
+        case sharedBlueskyEmbedImages():
             self = .images(try BSkyImagesEmbed(from: decoder))
-        case "app.bsky.embed.external":
+        case sharedBlueskyEmbedExternal():
             self = .external(try BSkyExternalEmbed(from: decoder))
-        case "app.bsky.embed.record":
+        case sharedBlueskyEmbedRecord():
             self = .record(try BSkyRecordEmbed(from: decoder))
         default:
             self = .unknown
@@ -128,7 +128,7 @@ private actor BSkyPostCache {
 /// Fetches Bluesky posts from the public API.
 enum BSkyPostFetcher {
     private static let logger = Logger(subsystem: "uk.ewancroft.Inkwell", category: "BSkyEmbed")
-    private static let baseURL = "https://public.api.bsky.app"
+    private static let baseURL = sharedPublicBskyApi()
     private static let session: URLSession = {
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = 10
@@ -152,7 +152,7 @@ enum BSkyPostFetcher {
         guard !uncached.isEmpty else { return results }
 
         let queryItems = uncached.map { URLQueryItem(name: "uris", value: $0) }
-        guard var components = URLComponents(string: "\(baseURL)/xrpc/app.bsky.feed.getPosts") else {
+        guard var components = URLComponents(string: "\(baseURL)\(sharedXrpcFeedGetPosts())") else {
             return results
         }
         components.queryItems = queryItems
@@ -369,17 +369,11 @@ struct BSkyPostEmbedView: View {
             Image(systemName: icon)
                 .font(.caption2)
             if let count {
-                Text(formatCount(count))
+                Text(sharedFormatCount(count))
                     .font(.caption2)
             }
         }
         .foregroundStyle(foregroundColor.opacity(0.4))
-    }
-
-    private func formatCount(_ count: Int) -> String {
-        if count >= 1_000_000 { return "\(count / 1_000_000)M" }
-        if count >= 1_000 { return "\(count / 1_000)K" }
-        return "\(count)"
     }
 
     private func host(from urlString: String) -> String {

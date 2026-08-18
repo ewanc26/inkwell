@@ -6,9 +6,9 @@
 #import <Foundation/NSString.h>
 #import <Foundation/NSValue.h>
 
-@class FacetConverter, InkwellSharedAtUri, InkwellSharedAtUriCompanion, InkwellSharedBasicTheme, InkwellSharedBlobRef, InkwellSharedByteSlice, InkwellSharedColorValue, InkwellSharedConstellationBacklink, InkwellSharedConstellationPagination, InkwellSharedConstellationResponse, InkwellSharedDocumentLinkScanner, InkwellSharedDocumentPreferences, InkwellSharedFacetDefinition, InkwellSharedFacetSchema, InkwellSharedKotlinArray<T>, InkwellSharedKotlinEnum<E>, InkwellSharedKotlinEnumCompanion, InkwellSharedKotlinException, InkwellSharedKotlinIllegalStateException, InkwellSharedKotlinNothing, InkwellSharedKotlinPair<__covariant A, __covariant B>, InkwellSharedKotlinRuntimeException, InkwellSharedKotlinThrowable, InkwellSharedKotlinx_serialization_coreSerialKind, InkwellSharedKotlinx_serialization_coreSerializersModule, InkwellSharedLeafletFacet, InkwellSharedLeafletFacetFeature, InkwellSharedLegacyPalette, InkwellSharedMarkdownBlock, InkwellSharedMarkdownBlockBlockquote, InkwellSharedMarkdownBlockCode, InkwellSharedMarkdownBlockHeading, InkwellSharedMarkdownBlockHorizontalRule, InkwellSharedMarkdownBlockImage, InkwellSharedMarkdownBlockMath, InkwellSharedMarkdownBlockOrderedList, InkwellSharedMarkdownBlockParagraph, InkwellSharedMarkdownBlockTaskList, InkwellSharedMarkdownBlockUnorderedList, InkwellSharedMarkdownListItem, InkwellSharedMarkdownParser, InkwellSharedMarkdownSerializer, InkwellSharedNotificationPolicy, InkwellSharedNotificationStyleNone, InkwellSharedNotificationStyleSingle, InkwellSharedNotificationStyleSummary, InkwellSharedPublicationPreferences, InkwellSharedPublicationTheme, InkwellSharedRgbColor, InkwellSharedRgbaColor, InkwellSharedSharedDocumentRecord, InkwellSharedSharedGraphRecommend, InkwellSharedSharedGraphSubscription, InkwellSharedSharedLeafletComment, InkwellSharedSharedLeafletCommentReplyRef, InkwellSharedSharedPublicationRecord, InkwellSharedSharedReaderTheme, InkwellSharedSharedReaderThemeCompanion, InkwellSharedSharedReaderThemeFontFamily, InkwellSharedStrongRef, InkwellSharedTipPromptPolicy, InkwellSharedUrlUtils, InkwellSharedVerificationFailure, InkwellSharedVerificationFailureDocumentLinkMissing, InkwellSharedVerificationFailureEndpointUnreachable, InkwellSharedVerificationFailureInvalidDocumentURL, InkwellSharedVerificationFailureInvalidPublicationURL, InkwellSharedVerificationFailureMalformedResponse, InkwellSharedVerificationFailureMismatchedURI, InkwellSharedVerificationFailureUnexpected, InkwellSharedVerificationResult, InkwellSharedVerificationResultFailed, InkwellSharedVerificationResultVerified, InkwellSharedVerificationUrls, RichTextFacet, RichTextFeature;
+@class FacetConverter, InkwellSharedAtUri, InkwellSharedAtUriCompanion, InkwellSharedBasicTheme, InkwellSharedBlobRef, InkwellSharedBlockLossLabels, InkwellSharedBlueskyEmbedTypes, InkwellSharedByteSlice, InkwellSharedCdnUrls, InkwellSharedCollectionNsids, InkwellSharedColorValue, InkwellSharedConstellationBacklink, InkwellSharedConstellationPagination, InkwellSharedConstellationResponse, InkwellSharedConstellationSourcePaths, InkwellSharedContentFormatDetector, InkwellSharedContentFormatDispatcher, InkwellSharedDocumentLinkScanner, InkwellSharedDocumentPreferences, InkwellSharedFacetDefinition, InkwellSharedFacetSchema, InkwellSharedHandleUtils, InkwellSharedInlineMarkdownScanner, InkwellSharedInlineSegment, InkwellSharedInlineSegmentBold, InkwellSharedInlineSegmentCode, InkwellSharedInlineSegmentItalic, InkwellSharedInlineSegmentLink, InkwellSharedInlineSegmentPlain, InkwellSharedInlineSegmentStrike, InkwellSharedJsonMapBridge, InkwellSharedKotlinArray<T>, InkwellSharedKotlinEnum<E>, InkwellSharedKotlinEnumCompanion, InkwellSharedKotlinException, InkwellSharedKotlinIllegalStateException, InkwellSharedKotlinIntIterator, InkwellSharedKotlinIntProgression, InkwellSharedKotlinIntProgressionCompanion, InkwellSharedKotlinIntRange, InkwellSharedKotlinIntRangeCompanion, InkwellSharedKotlinNothing, InkwellSharedKotlinPair<__covariant A, __covariant B>, InkwellSharedKotlinRuntimeException, InkwellSharedKotlinThrowable, InkwellSharedKotlinx_serialization_coreSerialKind, InkwellSharedKotlinx_serialization_coreSerializersModule, InkwellSharedKotlinx_serialization_jsonJsonElement, InkwellSharedKotlinx_serialization_jsonJsonElementCompanion, InkwellSharedLeafletContentConverter, InkwellSharedLeafletFacet, InkwellSharedLeafletFacetFeature, InkwellSharedLeafletTypes, InkwellSharedLegacyPalette, InkwellSharedMarkdownBlock, InkwellSharedMarkdownBlockBlockquote, InkwellSharedMarkdownBlockCode, InkwellSharedMarkdownBlockHeading, InkwellSharedMarkdownBlockHorizontalRule, InkwellSharedMarkdownBlockImage, InkwellSharedMarkdownBlockMath, InkwellSharedMarkdownBlockOrderedList, InkwellSharedMarkdownBlockParagraph, InkwellSharedMarkdownBlockTaskList, InkwellSharedMarkdownBlockUnorderedList, InkwellSharedMarkdownListItem, InkwellSharedMarkdownParser, InkwellSharedMarkdownSerializer, InkwellSharedMarkpubContentConverter, InkwellSharedMarkpubTypes, InkwellSharedNotificationPolicy, InkwellSharedNotificationStyleNone, InkwellSharedNotificationStyleSingle, InkwellSharedNotificationStyleSummary, InkwellSharedNumberFormat, InkwellSharedOAuthScopes, InkwellSharedOffprintContentConverter, InkwellSharedOffprintTypes, InkwellSharedPcktContentConverter, InkwellSharedPcktTypes, InkwellSharedPublicationMatcher, InkwellSharedPublicationPreferences, InkwellSharedPublicationTheme, InkwellSharedRgbColor, InkwellSharedRgbaColor, InkwellSharedSearchBackendUrl, InkwellSharedSearchResultClassifier, InkwellSharedSharedConvertResult, InkwellSharedSharedDocumentRecord, InkwellSharedSharedGraphRecommend, InkwellSharedSharedGraphSubscription, InkwellSharedSharedLeafletComment, InkwellSharedSharedLeafletCommentReplyRef, InkwellSharedSharedPublicationRecord, InkwellSharedSharedReaderTheme, InkwellSharedSharedReaderThemeCompanion, InkwellSharedSharedReaderThemeFontFamily, InkwellSharedSharedWriteResult, InkwellSharedStringUtils, InkwellSharedStrongRef, InkwellSharedTipPromptPolicy, InkwellSharedUrlUtils, InkwellSharedUtf8Offsets, InkwellSharedVerificationFailure, InkwellSharedVerificationFailureDocumentLinkMissing, InkwellSharedVerificationFailureEndpointUnreachable, InkwellSharedVerificationFailureInvalidDocumentURL, InkwellSharedVerificationFailureInvalidPublicationURL, InkwellSharedVerificationFailureMalformedResponse, InkwellSharedVerificationFailureMismatchedURI, InkwellSharedVerificationFailureUnexpected, InkwellSharedVerificationResult, InkwellSharedVerificationResultFailed, InkwellSharedVerificationResultVerified, InkwellSharedVerificationUrls, InkwellSharedXrpcEndpoints, RichTextFacet, RichTextFeature;
 
-@protocol InkwellSharedKotlinAnnotation, InkwellSharedKotlinComparable, InkwellSharedKotlinFunction, InkwellSharedKotlinIterator, InkwellSharedKotlinKAnnotatedElement, InkwellSharedKotlinKClass, InkwellSharedKotlinKClassifier, InkwellSharedKotlinKDeclarationContainer, InkwellSharedKotlinSuspendFunction2, InkwellSharedKotlinx_serialization_coreCompositeDecoder, InkwellSharedKotlinx_serialization_coreCompositeEncoder, InkwellSharedKotlinx_serialization_coreDecoder, InkwellSharedKotlinx_serialization_coreDeserializationStrategy, InkwellSharedKotlinx_serialization_coreEncoder, InkwellSharedKotlinx_serialization_coreKSerializer, InkwellSharedKotlinx_serialization_coreSerialDescriptor, InkwellSharedKotlinx_serialization_coreSerializationStrategy, InkwellSharedKotlinx_serialization_coreSerializersModuleCollector, InkwellSharedNotificationStyle;
+@protocol InkwellSharedKotlinAnnotation, InkwellSharedKotlinClosedRange, InkwellSharedKotlinComparable, InkwellSharedKotlinFunction, InkwellSharedKotlinIterable, InkwellSharedKotlinIterator, InkwellSharedKotlinKAnnotatedElement, InkwellSharedKotlinKClass, InkwellSharedKotlinKClassifier, InkwellSharedKotlinKDeclarationContainer, InkwellSharedKotlinOpenEndRange, InkwellSharedKotlinSuspendFunction2, InkwellSharedKotlinx_serialization_coreCompositeDecoder, InkwellSharedKotlinx_serialization_coreCompositeEncoder, InkwellSharedKotlinx_serialization_coreDecoder, InkwellSharedKotlinx_serialization_coreDeserializationStrategy, InkwellSharedKotlinx_serialization_coreEncoder, InkwellSharedKotlinx_serialization_coreKSerializer, InkwellSharedKotlinx_serialization_coreSerialDescriptor, InkwellSharedKotlinx_serialization_coreSerializationStrategy, InkwellSharedKotlinx_serialization_coreSerializersModuleCollector, InkwellSharedNotificationStyle;
 
 NS_ASSUME_NONNULL_BEGIN
 #pragma clang diagnostic push
@@ -271,6 +271,697 @@ __attribute__((swift_name("ConstellationResponse")))
 @end
 
 __attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("ConstellationSourcePaths")))
+@interface InkwellSharedConstellationSourcePaths : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)constellationSourcePaths __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedConstellationSourcePaths *shared __attribute__((swift_name("shared")));
+@property (readonly) NSString *EMBED_EXTERNAL_URI __attribute__((swift_name("EMBED_EXTERNAL_URI")));
+@property (readonly) NSString *MENTION_FACET_LINK __attribute__((swift_name("MENTION_FACET_LINK")));
+@end
+
+
+/**
+ * Shared loss label maps per content format.
+ *
+ * Maps block type strings that can't be represented as markdown to
+ * human-readable labels shown to the user. Centralises the labels
+ * currently duplicated across iOS ContentProvider.swift and Android
+ * PcktOffprintConverter.kt / MarkdownConverter.kt.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("BlockLossLabels")))
+@interface InkwellSharedBlockLossLabels : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Shared loss label maps per content format.
+ *
+ * Maps block type strings that can't be represented as markdown to
+ * human-readable labels shown to the user. Centralises the labels
+ * currently duplicated across iOS ContentProvider.swift and Android
+ * PcktOffprintConverter.kt / MarkdownConverter.kt.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)blockLossLabels __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedBlockLossLabels *shared __attribute__((swift_name("shared")));
+@property (readonly) NSDictionary<NSString *, NSString *> *leaflet __attribute__((swift_name("leaflet")));
+@property (readonly) NSDictionary<NSString *, NSString *> *offprint __attribute__((swift_name("offprint")));
+@property (readonly) NSDictionary<NSString *, NSString *> *pckt __attribute__((swift_name("pckt")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("BlueskyEmbedTypes")))
+@interface InkwellSharedBlueskyEmbedTypes : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)blueskyEmbedTypes __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedBlueskyEmbedTypes *shared __attribute__((swift_name("shared")));
+@property (readonly) NSString *EXTERNAL __attribute__((swift_name("EXTERNAL")));
+@property (readonly) NSString *IMAGES __attribute__((swift_name("IMAGES")));
+@property (readonly) NSString *RECORD __attribute__((swift_name("RECORD")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("CdnUrls")))
+@interface InkwellSharedCdnUrls : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)cdnUrls __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedCdnUrls *shared __attribute__((swift_name("shared")));
+- (NSString *)bskyThumbnailDid:(NSString *)did link:(NSString *)link __attribute__((swift_name("bskyThumbnail(did:link:)")));
+@end
+
+
+/**
+ * Shared content format type detection.
+ *
+ * Maps AT Protocol record `$type` strings to known content formats.
+ * Both platforms use these constants to dispatch rendering.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("ContentFormatDetector")))
+@interface InkwellSharedContentFormatDetector : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Shared content format type detection.
+ *
+ * Maps AT Protocol record `$type` strings to known content formats.
+ * Both platforms use these constants to dispatch rendering.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)contentFormatDetector __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedContentFormatDetector *shared __attribute__((swift_name("shared")));
+
+/**
+ * Returns true if [type] is a recognised content format.
+ */
+- (BOOL)isKnownType:(NSString * _Nullable)type __attribute__((swift_name("isKnown(type:)")));
+
+/**
+ * Returns true if [type] is a pckt or Offprint format
+ * (both use the same block-array converter).
+ */
+- (BOOL)isPcktOrOffprintType:(NSString * _Nullable)type __attribute__((swift_name("isPcktOrOffprint(type:)")));
+
+/**
+ * All known content format type strings.
+ */
+@property (readonly) NSArray<NSString *> *ALL __attribute__((swift_name("ALL")));
+@property (readonly) NSString *LEAFLET __attribute__((swift_name("LEAFLET")));
+@property (readonly) NSString *MARKPUB __attribute__((swift_name("MARKPUB")));
+@property (readonly) NSString *OFFPRINT __attribute__((swift_name("OFFPRINT")));
+@property (readonly) NSString *PCKT __attribute__((swift_name("PCKT")));
+@end
+
+
+/**
+ * Dispatches content conversion to the correct format-specific converter.
+ *
+ * This is the main entry point for shared content conversion. Both platforms
+ * call these functions instead of maintaining their own conversion logic.
+ *
+ * Mirrors iOS `ProviderRegistry` and Android `MarkdownConverter.convert`.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("ContentFormatDispatcher")))
+@interface InkwellSharedContentFormatDispatcher : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Dispatches content conversion to the correct format-specific converter.
+ *
+ * This is the main entry point for shared content conversion. Both platforms
+ * call these functions instead of maintaining their own conversion logic.
+ *
+ * Mirrors iOS `ProviderRegistry` and Android `MarkdownConverter.convert`.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)contentFormatDispatcher __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedContentFormatDispatcher *shared __attribute__((swift_name("shared")));
+
+/**
+ * Returns the content type string for a format name.
+ */
+- (NSString * _Nullable)contentTypeForFormatFormat:(NSString *)format __attribute__((swift_name("contentTypeForFormat(format:)")));
+
+/**
+ * Returns the format name for a content type string.
+ */
+- (NSString * _Nullable)formatForContentTypeType:(NSString * _Nullable)type __attribute__((swift_name("formatForContentType(type:)")));
+
+/**
+ * Converts markdown text to a format-specific content map.
+ *
+ * @param markdown The markdown source text.
+ * @param format The format identifier ("Leaflet", "Markpub", "pckt", "Offprint").
+ * @param uploadedBlobs Map of CID → blob JSON for image round-tripping.
+ * @return A [SharedWriteResult] with the content map and any lost content.
+ */
+- (InkwellSharedSharedWriteResult *)fromMarkdownMarkdown:(NSString *)markdown format:(NSString *)format uploadedBlobs:(NSDictionary<NSString *, NSDictionary<NSString *, id> *> *)uploadedBlobs __attribute__((swift_name("fromMarkdown(markdown:format:uploadedBlobs:)")));
+
+/**
+ * Returns true if the given content type is a pckt or Offprint format.
+ */
+- (BOOL)isPcktOrOffprintType:(NSString * _Nullable)type __attribute__((swift_name("isPcktOrOffprint(type:)")));
+
+/**
+ * Converts a content map to markdown, detecting the format from `$type`.
+ *
+ * @param content The content map with a `$type` field.
+ * @param authorDid The author's DID, used for CDN image URL resolution.
+ * @return A [SharedConvertResult] with the markdown blocks and any lost content.
+ */
+- (InkwellSharedSharedConvertResult *)toMarkdownContent:(NSDictionary<NSString *, id> *)content authorDid:(NSString *)authorDid __attribute__((swift_name("toMarkdown(content:authorDid:)")));
+
+/**
+ * Converts a content map to a raw markdown string.
+ *
+ * @param content The content map with a `$type` field.
+ * @param authorDid The author's DID, used for CDN image URL resolution.
+ * @return The markdown string, or empty if conversion fails.
+ */
+- (NSString *)toMarkdownStringContent:(NSDictionary<NSString *, id> *)content authorDid:(NSString *)authorDid __attribute__((swift_name("toMarkdownString(content:authorDid:)")));
+@end
+
+
+/**
+ * Converts between generic Map-based content representations (used by shared
+ * converters) and kotlinx.serialization JsonObjects (used by Android).
+ *
+ * This bridge lets the shared KMP converters remain JSON-library-agnostic
+ * while the Android platform layer keeps its existing kotlinx.serialization
+ * contract.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("JsonMapBridge")))
+@interface InkwellSharedJsonMapBridge : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Converts between generic Map-based content representations (used by shared
+ * converters) and kotlinx.serialization JsonObjects (used by Android).
+ *
+ * This bridge lets the shared KMP converters remain JSON-library-agnostic
+ * while the Android platform layer keeps its existing kotlinx.serialization
+ * contract.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)jsonMapBridge __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedJsonMapBridge *shared __attribute__((swift_name("shared")));
+
+/**
+ * Recursively converts a [JsonObject] to a [Map].
+ */
+- (NSDictionary<NSString *, id> *)jsonToMapObj:(NSDictionary<NSString *, InkwellSharedKotlinx_serialization_jsonJsonElement *> *)obj __attribute__((swift_name("jsonToMap(obj:)")));
+
+/**
+ * Recursively converts a [Map] tree to a [JsonObject].
+ */
+- (NSDictionary<NSString *, InkwellSharedKotlinx_serialization_jsonJsonElement *> *)mapToJsonMap:(NSDictionary<NSString *, id> *)map __attribute__((swift_name("mapToJson(map:)")));
+@end
+
+
+/**
+ * Converts between Leaflet content (`pub.leaflet.content`) and markdown blocks.
+ *
+ * Leaflet documents are a list of pages; we read and write a single
+ * `linearDocument` page whose blocks map closely to markdown. Inline
+ * formatting uses Leaflet's richtext facets.
+ *
+ * Mirrors iOS `LeafletProvider` and Android `MarkdownConverter.leafletBlockToJson`.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("LeafletContentConverter")))
+@interface InkwellSharedLeafletContentConverter : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Converts between Leaflet content (`pub.leaflet.content`) and markdown blocks.
+ *
+ * Leaflet documents are a list of pages; we read and write a single
+ * `linearDocument` page whose blocks map closely to markdown. Inline
+ * formatting uses Leaflet's richtext facets.
+ *
+ * Mirrors iOS `LeafletProvider` and Android `MarkdownConverter.leafletBlockToJson`.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)leafletContentConverter __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedLeafletContentConverter *shared __attribute__((swift_name("shared")));
+
+/**
+ * Converts markdown text to a Leaflet content map.
+ *
+ * @param markdown The markdown source text.
+ * @param uploadedBlobs Map of CID → blob JSON for image round-tripping.
+ */
+- (InkwellSharedSharedWriteResult *)fromMarkdownMarkdown:(NSString *)markdown uploadedBlobs:(NSDictionary<NSString *, NSDictionary<NSString *, id> *> *)uploadedBlobs __attribute__((swift_name("fromMarkdown(markdown:uploadedBlobs:)")));
+
+/**
+ * Converts a Leaflet content map to a [SharedConvertResult].
+ *
+ * The content map is expected to have the shape:
+ * ```
+ * { "$type": "pub.leaflet.content", "pages": [ { "blocks": [ ... ] } ] }
+ * ```
+ *
+ * Each block is a map with a `$type` key and format-specific fields.
+ */
+- (InkwellSharedSharedConvertResult *)toMarkdownContent:(NSDictionary<NSString *, id> *)content __attribute__((swift_name("toMarkdown(content:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("LeafletTypes")))
+@interface InkwellSharedLeafletTypes : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)leafletTypes __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedLeafletTypes *shared __attribute__((swift_name("shared")));
+@property (readonly) NSString *BLOCKS_BLOCKQUOTE __attribute__((swift_name("BLOCKS_BLOCKQUOTE")));
+@property (readonly) NSString *BLOCKS_BSKY_POST __attribute__((swift_name("BLOCKS_BSKY_POST")));
+@property (readonly) NSString *BLOCKS_BUTTON __attribute__((swift_name("BLOCKS_BUTTON")));
+@property (readonly) NSString *BLOCKS_CHECKLIST __attribute__((swift_name("BLOCKS_CHECKLIST")));
+@property (readonly) NSString *BLOCKS_CODE __attribute__((swift_name("BLOCKS_CODE")));
+@property (readonly) NSString *BLOCKS_DIVIDER __attribute__((swift_name("BLOCKS_DIVIDER")));
+@property (readonly) NSString *BLOCKS_HEADER __attribute__((swift_name("BLOCKS_HEADER")));
+@property (readonly) NSString *BLOCKS_HORIZONTAL_RULE __attribute__((swift_name("BLOCKS_HORIZONTAL_RULE")));
+@property (readonly) NSString *BLOCKS_IFRAME __attribute__((swift_name("BLOCKS_IFRAME")));
+@property (readonly) NSString *BLOCKS_IMAGE __attribute__((swift_name("BLOCKS_IMAGE")));
+@property (readonly) NSString *BLOCKS_MATH __attribute__((swift_name("BLOCKS_MATH")));
+@property (readonly) NSString *BLOCKS_ORDERED_LIST __attribute__((swift_name("BLOCKS_ORDERED_LIST")));
+@property (readonly) NSString *BLOCKS_PAGE __attribute__((swift_name("BLOCKS_PAGE")));
+@property (readonly) NSString *BLOCKS_PARAGRAPH __attribute__((swift_name("BLOCKS_PARAGRAPH")));
+@property (readonly) NSString *BLOCKS_POLL __attribute__((swift_name("BLOCKS_POLL")));
+@property (readonly) NSString *BLOCKS_POSTS_LIST __attribute__((swift_name("BLOCKS_POSTS_LIST")));
+@property (readonly) NSString *BLOCKS_SIGNUP __attribute__((swift_name("BLOCKS_SIGNUP")));
+@property (readonly) NSString *BLOCKS_STANDARD_SITE_POST __attribute__((swift_name("BLOCKS_STANDARD_SITE_POST")));
+@property (readonly) NSString *BLOCKS_TEXT __attribute__((swift_name("BLOCKS_TEXT")));
+@property (readonly) NSString *BLOCKS_UNORDERED_LIST __attribute__((swift_name("BLOCKS_UNORDERED_LIST")));
+@property (readonly) NSString *BLOCKS_WEBSITE __attribute__((swift_name("BLOCKS_WEBSITE")));
+@property (readonly) NSString *CONTENT __attribute__((swift_name("CONTENT")));
+@property (readonly) NSString *LIST_ITEM_ORDERED __attribute__((swift_name("LIST_ITEM_ORDERED")));
+@property (readonly) NSString *LIST_ITEM_UNORDERED __attribute__((swift_name("LIST_ITEM_UNORDERED")));
+@property (readonly) NSString *PAGES_LINEAR_DOCUMENT __attribute__((swift_name("PAGES_LINEAR_DOCUMENT")));
+@end
+
+
+/**
+ * Converts between Markpub content (`at.markpub.markdown`) and markdown blocks.
+ *
+ * Markpub stores GFM markdown directly, so conversion is near-identity:
+ * read the inline `text.markdown` and write it straight back. Nothing is
+ * ever lost.
+ *
+ * Mirrors iOS `MarkpubProvider` and Android `MarkdownConverter.buildMarkpubContent`.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("MarkpubContentConverter")))
+@interface InkwellSharedMarkpubContentConverter : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Converts between Markpub content (`at.markpub.markdown`) and markdown blocks.
+ *
+ * Markpub stores GFM markdown directly, so conversion is near-identity:
+ * read the inline `text.markdown` and write it straight back. Nothing is
+ * ever lost.
+ *
+ * Mirrors iOS `MarkpubProvider` and Android `MarkdownConverter.buildMarkpubContent`.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)markpubContentConverter __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedMarkpubContentConverter *shared __attribute__((swift_name("shared")));
+
+/**
+ * Converts markdown text to a Markpub content map.
+ *
+ * @param markdown The markdown source text.
+ */
+- (InkwellSharedSharedWriteResult *)fromMarkdownMarkdown:(NSString *)markdown __attribute__((swift_name("fromMarkdown(markdown:)")));
+
+/**
+ * Converts a Markpub content map to a [SharedConvertResult].
+ *
+ * The content map is expected to have the shape:
+ * ```
+ * { "$type": "at.markpub.markdown", "text": { "$type": "at.markpub.text", "markdown": "..." } }
+ * ```
+ */
+- (InkwellSharedSharedConvertResult *)toMarkdownContent:(NSDictionary<NSString *, id> *)content __attribute__((swift_name("toMarkdown(content:)")));
+
+/**
+ * Extracts the raw markdown string from a Markpub content map.
+ * Use this when you need the markdown text directly without block parsing.
+ */
+- (NSString *)toRawMarkdownContent:(NSDictionary<NSString *, id> *)content __attribute__((swift_name("toRawMarkdown(content:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("MarkpubTypes")))
+@interface InkwellSharedMarkpubTypes : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)markpubTypes __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedMarkpubTypes *shared __attribute__((swift_name("shared")));
+@property (readonly) NSString *CONTENT __attribute__((swift_name("CONTENT")));
+@property (readonly) NSString *TEXT __attribute__((swift_name("TEXT")));
+@end
+
+
+/**
+ * Converts between Offprint content (`app.offprint.content`) and markdown blocks.
+ *
+ * Offprint stores an `items` array of blocks. Blocks map closely to markdown;
+ * inline formatting uses Offprint's richtext facets. Headings are capped at
+ * level 3. Math blocks are supported natively. Blockquotes wrap inner text
+ * in a `content` array. Lists use `children` arrays.
+ *
+ * Mirrors iOS `OffprintProvider` and Android `MarkdownConverter.offprintBlockToJson`
+ * / `PcktOffprintConverter`.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OffprintContentConverter")))
+@interface InkwellSharedOffprintContentConverter : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Converts between Offprint content (`app.offprint.content`) and markdown blocks.
+ *
+ * Offprint stores an `items` array of blocks. Blocks map closely to markdown;
+ * inline formatting uses Offprint's richtext facets. Headings are capped at
+ * level 3. Math blocks are supported natively. Blockquotes wrap inner text
+ * in a `content` array. Lists use `children` arrays.
+ *
+ * Mirrors iOS `OffprintProvider` and Android `MarkdownConverter.offprintBlockToJson`
+ * / `PcktOffprintConverter`.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)offprintContentConverter __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedOffprintContentConverter *shared __attribute__((swift_name("shared")));
+
+/**
+ * Converts markdown text to an Offprint content map.
+ *
+ * @param markdown The markdown source text.
+ * @param uploadedBlobs Map of CID → blob JSON for image round-tripping.
+ */
+- (InkwellSharedSharedWriteResult *)fromMarkdownMarkdown:(NSString *)markdown uploadedBlobs:(NSDictionary<NSString *, NSDictionary<NSString *, id> *> *)uploadedBlobs __attribute__((swift_name("fromMarkdown(markdown:uploadedBlobs:)")));
+
+/**
+ * Converts an Offprint content map to a [SharedConvertResult].
+ *
+ * The content map is expected to have the shape:
+ * ```
+ * { "$type": "app.offprint.content", "items": [ ... ] }
+ * ```
+ */
+- (InkwellSharedSharedConvertResult *)toMarkdownContent:(NSDictionary<NSString *, id> *)content __attribute__((swift_name("toMarkdown(content:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OffprintTypes")))
+@interface InkwellSharedOffprintTypes : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)offprintTypes __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedOffprintTypes *shared __attribute__((swift_name("shared")));
+@property (readonly) NSString *BLOCK_BLOCKQUOTE __attribute__((swift_name("BLOCK_BLOCKQUOTE")));
+@property (readonly) NSString *BLOCK_BLUESKY_POST __attribute__((swift_name("BLOCK_BLUESKY_POST")));
+@property (readonly) NSString *BLOCK_BULLET_LIST __attribute__((swift_name("BLOCK_BULLET_LIST")));
+@property (readonly) NSString *BLOCK_BUTTON __attribute__((swift_name("BLOCK_BUTTON")));
+@property (readonly) NSString *BLOCK_CALLOUT __attribute__((swift_name("BLOCK_CALLOUT")));
+@property (readonly) NSString *BLOCK_CODE_BLOCK __attribute__((swift_name("BLOCK_CODE_BLOCK")));
+@property (readonly) NSString *BLOCK_HEADING __attribute__((swift_name("BLOCK_HEADING")));
+@property (readonly) NSString *BLOCK_HORIZONTAL_RULE __attribute__((swift_name("BLOCK_HORIZONTAL_RULE")));
+@property (readonly) NSString *BLOCK_IMAGE __attribute__((swift_name("BLOCK_IMAGE")));
+@property (readonly) NSString *BLOCK_IMAGE_CAROUSEL __attribute__((swift_name("BLOCK_IMAGE_CAROUSEL")));
+@property (readonly) NSString *BLOCK_IMAGE_DIFF __attribute__((swift_name("BLOCK_IMAGE_DIFF")));
+@property (readonly) NSString *BLOCK_IMAGE_GRID __attribute__((swift_name("BLOCK_IMAGE_GRID")));
+@property (readonly) NSString *BLOCK_MATH_BLOCK __attribute__((swift_name("BLOCK_MATH_BLOCK")));
+@property (readonly) NSString *BLOCK_PREFIX __attribute__((swift_name("BLOCK_PREFIX")));
+@property (readonly) NSString *BLOCK_TASK_LIST __attribute__((swift_name("BLOCK_TASK_LIST")));
+@property (readonly) NSString *BLOCK_TEXT __attribute__((swift_name("BLOCK_TEXT")));
+@property (readonly) NSString *BLOCK_WEB_BOOKMARK __attribute__((swift_name("BLOCK_WEB_BOOKMARK")));
+@property (readonly) NSString *BLOCK_WEB_EMBED __attribute__((swift_name("BLOCK_WEB_EMBED")));
+@property (readonly) NSString *CONTENT __attribute__((swift_name("CONTENT")));
+@end
+
+
+/**
+ * Converts between pckt content (`blog.pckt.content`) and markdown blocks.
+ *
+ * Pckt stores an `items` array of blocks. Blocks map closely to markdown;
+ * inline formatting uses pckt's richtext facets. Blockquotes wrap inner
+ * text in a `content` array containing a text block. Lists use `content`
+ * arrays with nested sub-lists.
+ *
+ * Mirrors iOS `PcktProvider` and Android `MarkdownConverter.pcktBlockToJson`
+ * / `PcktOffprintConverter`.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PcktContentConverter")))
+@interface InkwellSharedPcktContentConverter : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Converts between pckt content (`blog.pckt.content`) and markdown blocks.
+ *
+ * Pckt stores an `items` array of blocks. Blocks map closely to markdown;
+ * inline formatting uses pckt's richtext facets. Blockquotes wrap inner
+ * text in a `content` array containing a text block. Lists use `content`
+ * arrays with nested sub-lists.
+ *
+ * Mirrors iOS `PcktProvider` and Android `MarkdownConverter.pcktBlockToJson`
+ * / `PcktOffprintConverter`.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)pcktContentConverter __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedPcktContentConverter *shared __attribute__((swift_name("shared")));
+
+/**
+ * Converts markdown text to a pckt content map.
+ *
+ * @param markdown The markdown source text.
+ * @param uploadedBlobs Map of CID → blob JSON for image round-tripping.
+ */
+- (InkwellSharedSharedWriteResult *)fromMarkdownMarkdown:(NSString *)markdown uploadedBlobs:(NSDictionary<NSString *, NSDictionary<NSString *, id> *> *)uploadedBlobs __attribute__((swift_name("fromMarkdown(markdown:uploadedBlobs:)")));
+
+/**
+ * Converts a pckt content map to a [SharedConvertResult].
+ *
+ * The content map is expected to have the shape:
+ * ```
+ * { "$type": "blog.pckt.content", "items": [ ... ] }
+ * ```
+ */
+- (InkwellSharedSharedConvertResult *)toMarkdownContent:(NSDictionary<NSString *, id> *)content __attribute__((swift_name("toMarkdown(content:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PcktTypes")))
+@interface InkwellSharedPcktTypes : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)pcktTypes __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedPcktTypes *shared __attribute__((swift_name("shared")));
+@property (readonly) NSString *BLOCK_BLOCKQUOTE __attribute__((swift_name("BLOCK_BLOCKQUOTE")));
+@property (readonly) NSString *BLOCK_BLUESKY_EMBED __attribute__((swift_name("BLOCK_BLUESKY_EMBED")));
+@property (readonly) NSString *BLOCK_BULLET_LIST __attribute__((swift_name("BLOCK_BULLET_LIST")));
+@property (readonly) NSString *BLOCK_CODE_BLOCK __attribute__((swift_name("BLOCK_CODE_BLOCK")));
+@property (readonly) NSString *BLOCK_GALLERY __attribute__((swift_name("BLOCK_GALLERY")));
+@property (readonly) NSString *BLOCK_HARD_BREAK __attribute__((swift_name("BLOCK_HARD_BREAK")));
+@property (readonly) NSString *BLOCK_HEADING __attribute__((swift_name("BLOCK_HEADING")));
+@property (readonly) NSString *BLOCK_HORIZONTAL_RULE __attribute__((swift_name("BLOCK_HORIZONTAL_RULE")));
+@property (readonly) NSString *BLOCK_IFRAME __attribute__((swift_name("BLOCK_IFRAME")));
+@property (readonly) NSString *BLOCK_IMAGE __attribute__((swift_name("BLOCK_IMAGE")));
+@property (readonly) NSString *BLOCK_LIST_ITEM __attribute__((swift_name("BLOCK_LIST_ITEM")));
+@property (readonly) NSString *BLOCK_MATH_BLOCK __attribute__((swift_name("BLOCK_MATH_BLOCK")));
+@property (readonly) NSString *BLOCK_MENTION __attribute__((swift_name("BLOCK_MENTION")));
+@property (readonly) NSString *BLOCK_NOTE_EMBED __attribute__((swift_name("BLOCK_NOTE_EMBED")));
+@property (readonly) NSString *BLOCK_PREFIX __attribute__((swift_name("BLOCK_PREFIX")));
+@property (readonly) NSString *BLOCK_TABLE __attribute__((swift_name("BLOCK_TABLE")));
+@property (readonly) NSString *BLOCK_TASK_LIST __attribute__((swift_name("BLOCK_TASK_LIST")));
+@property (readonly) NSString *BLOCK_TEXT __attribute__((swift_name("BLOCK_TEXT")));
+@property (readonly) NSString *BLOCK_WEBSITE __attribute__((swift_name("BLOCK_WEBSITE")));
+@property (readonly) NSString *CONTENT __attribute__((swift_name("CONTENT")));
+@end
+
+
+/**
+ * Shared publication/document matching logic.
+ *
+ * Determines whether a document belongs to a publication by comparing
+ * the document's site against the publication's AT-URI and URL.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PublicationMatcher")))
+@interface InkwellSharedPublicationMatcher : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Shared publication/document matching logic.
+ *
+ * Determines whether a document belongs to a publication by comparing
+ * the document's site against the publication's AT-URI and URL.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)publicationMatcher __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedPublicationMatcher *shared __attribute__((swift_name("shared")));
+
+/**
+ * Returns true if [documentSite] belongs to the publication identified by
+ * [publicationUri] and [publicationUrl].
+ *
+ * Matches on:
+ * - Exact AT-URI equality: `documentSite == publicationUri`
+ * - Normalized URL equality: handles case differences and trailing slashes
+ * - Subpath prefix: `documentSite` starts with `publicationUrl/`
+ */
+- (BOOL)documentBelongsToPublicationDocumentSite:(NSString *)documentSite publicationUri:(NSString *)publicationUri publicationUrl:(NSString * _Nullable)publicationUrl __attribute__((swift_name("documentBelongsToPublication(documentSite:publicationUri:publicationUrl:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SearchBackendUrl")))
+@interface InkwellSharedSearchBackendUrl : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)searchBackendUrl __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedSearchBackendUrl *shared __attribute__((swift_name("shared")));
+@property (readonly) NSString *BASE __attribute__((swift_name("BASE")));
+@end
+
+
+/**
+ * Shared classification and URL construction for search/discovery results.
+ *
+ * Both platforms use the same logic to determine whether a search result
+ * is a publication or a Standard.site document, and to construct the
+ * canonical web URL for navigation.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SearchResultClassifier")))
+@interface InkwellSharedSearchResultClassifier : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Shared classification and URL construction for search/discovery results.
+ *
+ * Both platforms use the same logic to determine whether a search result
+ * is a publication or a Standard.site document, and to construct the
+ * canonical web URL for navigation.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)searchResultClassifier __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedSearchResultClassifier *shared __attribute__((swift_name("shared")));
+
+/**
+ * Returns true if [type] indicates a publication record.
+ */
+- (BOOL)isPublicationType:(NSString *)type __attribute__((swift_name("isPublication(type:)")));
+
+/**
+ * Returns true if [uri] is a `site.standard.document` record.
+ */
+- (BOOL)isStandardSiteDocumentUri:(NSString *)uri __attribute__((swift_name("isStandardSiteDocument(uri:)")));
+
+/**
+ * Constructs the canonical web URL for a search result.
+ *
+ * Returns null if [basePath] is null or empty.
+ *
+ * - Publications link to the origin directly.
+ * - Documents with a [path] link to `origin + path`.
+ * - Leaflet documents without a path fall back to `origin + rkey`.
+ */
+- (NSString * _Nullable)webURLBasePath:(NSString * _Nullable)basePath path:(NSString * _Nullable)path rkey:(NSString * _Nullable)rkey platform:(NSString * _Nullable)platform isPublication:(BOOL)isPublication __attribute__((swift_name("webURL(basePath:path:rkey:platform:isPublication:)")));
+@property (readonly) NSString *LEAFLET_PLATFORM __attribute__((swift_name("LEAFLET_PLATFORM")));
+@property (readonly) NSString *PUBLICATION_TYPE __attribute__((swift_name("PUBLICATION_TYPE")));
+@property (readonly) NSString *SITE_STANDARD_DOCUMENT __attribute__((swift_name("SITE_STANDARD_DOCUMENT")));
+@end
+
+
+/**
+ * Result of converting stored content to markdown.
+ *
+ * Mirrors iOS `ConvertResult` and Android `ConvertResult` in PcktOffprintConverter.kt.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SharedConvertResult")))
+@interface InkwellSharedSharedConvertResult : InkwellSharedBase
+- (instancetype)initWithBlocks:(NSArray<InkwellSharedMarkdownBlock *> *)blocks lost:(NSSet<NSString *> *)lost __attribute__((swift_name("init(blocks:lost:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedSharedConvertResult *)doCopyBlocks:(NSArray<InkwellSharedMarkdownBlock *> *)blocks lost:(NSSet<NSString *> *)lost __attribute__((swift_name("doCopy(blocks:lost:)")));
+
+/**
+ * Result of converting stored content to markdown.
+ *
+ * Mirrors iOS `ConvertResult` and Android `ConvertResult` in PcktOffprintConverter.kt.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Result of converting stored content to markdown.
+ *
+ * Mirrors iOS `ConvertResult` and Android `ConvertResult` in PcktOffprintConverter.kt.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Result of converting stored content to markdown.
+ *
+ * Mirrors iOS `ConvertResult` and Android `ConvertResult` in PcktOffprintConverter.kt.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSArray<InkwellSharedMarkdownBlock *> *blocks __attribute__((swift_name("blocks")));
+@property (readonly) NSSet<NSString *> *lost __attribute__((swift_name("lost")));
+@end
+
+
+/**
+ * Result of converting markdown to format-specific content.
+ *
+ * Uses generic maps to represent JSON-like structures that both platforms
+ * can consume: Android uses kotlinx.serialization `JsonObject`, iOS can
+ * bridge from `[String: Any]` dictionaries.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SharedWriteResult")))
+@interface InkwellSharedSharedWriteResult : InkwellSharedBase
+- (instancetype)initWithContent:(NSDictionary<NSString *, id> *)content lost:(NSSet<NSString *> *)lost __attribute__((swift_name("init(content:lost:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedSharedWriteResult *)doCopyContent:(NSDictionary<NSString *, id> *)content lost:(NSSet<NSString *> *)lost __attribute__((swift_name("doCopy(content:lost:)")));
+
+/**
+ * Result of converting markdown to format-specific content.
+ *
+ * Uses generic maps to represent JSON-like structures that both platforms
+ * can consume: Android uses kotlinx.serialization `JsonObject`, iOS can
+ * bridge from `[String: Any]` dictionaries.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Result of converting markdown to format-specific content.
+ *
+ * Uses generic maps to represent JSON-like structures that both platforms
+ * can consume: Android uses kotlinx.serialization `JsonObject`, iOS can
+ * bridge from `[String: Any]` dictionaries.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Result of converting markdown to format-specific content.
+ *
+ * Uses generic maps to represent JSON-like structures that both platforms
+ * can consume: Android uses kotlinx.serialization `JsonObject`, iOS can
+ * bridge from `[String: Any]` dictionaries.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSDictionary<NSString *, id> *content __attribute__((swift_name("content")));
+@property (readonly) NSSet<NSString *> *lost __attribute__((swift_name("lost")));
+@end
+
+__attribute__((objc_subclassing_restricted))
 @interface FacetConverter : InkwellSharedBase
 + (instancetype)alloc __attribute__((unavailable));
 + (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
@@ -351,6 +1042,186 @@ __attribute__((objc_subclassing_restricted))
 - (NSString *)description __attribute__((swift_name("description()")));
 @property (readonly) NSString *type __attribute__((swift_name("type")));
 @property (readonly) NSString * _Nullable uri __attribute__((swift_name("uri")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("CollectionNsids")))
+@interface InkwellSharedCollectionNsids : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)collectionNsids __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedCollectionNsids *shared __attribute__((swift_name("shared")));
+@property (readonly) NSString *DOCUMENT __attribute__((swift_name("DOCUMENT")));
+@property (readonly) NSString *GRAPH_RECOMMEND __attribute__((swift_name("GRAPH_RECOMMEND")));
+@property (readonly) NSString *GRAPH_SUBSCRIPTION __attribute__((swift_name("GRAPH_SUBSCRIPTION")));
+@property (readonly) NSString *LEAFLET_COMMENT __attribute__((swift_name("LEAFLET_COMMENT")));
+@property (readonly) NSString *LEAFLET_POLL_DEFINITION __attribute__((swift_name("LEAFLET_POLL_DEFINITION")));
+@property (readonly) NSString *LEAFLET_POLL_VOTE __attribute__((swift_name("LEAFLET_POLL_VOTE")));
+@property (readonly) NSString *PUBLICATION __attribute__((swift_name("PUBLICATION")));
+@end
+
+
+/**
+ * Platform-agnostic inline markdown scanner.
+ *
+ * Parses inline markdown syntax (**bold**, *italic*, `code`, ~~strike~~,
+ * [text](url)) into a list of [InlineSegment] items. Each platform maps
+ * these to its own attributed-string type (SwiftUI AttributedString,
+ * Compose AnnotatedString).
+ *
+ * The scanner strips markdown delimiters from the output text — segments
+ * contain the visible text only. Byte offsets are not tracked here; the
+ * caller already has the plaintext and can compute offsets if needed.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("InlineMarkdownScanner")))
+@interface InkwellSharedInlineMarkdownScanner : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Platform-agnostic inline markdown scanner.
+ *
+ * Parses inline markdown syntax (**bold**, *italic*, `code`, ~~strike~~,
+ * [text](url)) into a list of [InlineSegment] items. Each platform maps
+ * these to its own attributed-string type (SwiftUI AttributedString,
+ * Compose AnnotatedString).
+ *
+ * The scanner strips markdown delimiters from the output text — segments
+ * contain the visible text only. Byte offsets are not tracked here; the
+ * caller already has the plaintext and can compute offsets if needed.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)inlineMarkdownScanner __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedInlineMarkdownScanner *shared __attribute__((swift_name("shared")));
+
+/**
+ * Parses [text] for inline markdown and returns the list of segments.
+ * Unmatched delimiters are treated as literal text.
+ */
+- (NSArray<InkwellSharedInlineSegment *> *)scanText:(NSString *)text __attribute__((swift_name("scan(text:)")));
+@end
+
+
+/**
+ * A single segment of inline-formatted text.
+ */
+__attribute__((swift_name("InlineSegment")))
+@interface InkwellSharedInlineSegment : InkwellSharedBase
+@end
+
+
+/** Bold text (was wrapped in `**`). */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("InlineSegment.Bold")))
+@interface InkwellSharedInlineSegmentBold : InkwellSharedInlineSegment
+- (instancetype)initWithText:(NSString *)text __attribute__((swift_name("init(text:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedInlineSegmentBold *)doCopyText:(NSString *)text __attribute__((swift_name("doCopy(text:)")));
+
+/** Bold text (was wrapped in `**`). */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/** Bold text (was wrapped in `**`). */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/** Bold text (was wrapped in `**`). */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString *text __attribute__((swift_name("text")));
+@end
+
+
+/** Inline code (was wrapped in `` ` ``). */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("InlineSegment.Code")))
+@interface InkwellSharedInlineSegmentCode : InkwellSharedInlineSegment
+- (instancetype)initWithText:(NSString *)text __attribute__((swift_name("init(text:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedInlineSegmentCode *)doCopyText:(NSString *)text __attribute__((swift_name("doCopy(text:)")));
+
+/** Inline code (was wrapped in `` ` ``). */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/** Inline code (was wrapped in `` ` ``). */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/** Inline code (was wrapped in `` ` ``). */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString *text __attribute__((swift_name("text")));
+@end
+
+
+/** Italic text (was wrapped in `*`). */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("InlineSegment.Italic")))
+@interface InkwellSharedInlineSegmentItalic : InkwellSharedInlineSegment
+- (instancetype)initWithText:(NSString *)text __attribute__((swift_name("init(text:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedInlineSegmentItalic *)doCopyText:(NSString *)text __attribute__((swift_name("doCopy(text:)")));
+
+/** Italic text (was wrapped in `*`). */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/** Italic text (was wrapped in `*`). */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/** Italic text (was wrapped in `*`). */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString *text __attribute__((swift_name("text")));
+@end
+
+
+/** A hyperlink. [text] is the visible label, [url] is the destination. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("InlineSegment.Link")))
+@interface InkwellSharedInlineSegmentLink : InkwellSharedInlineSegment
+- (instancetype)initWithText:(NSString *)text url:(NSString *)url __attribute__((swift_name("init(text:url:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedInlineSegmentLink *)doCopyText:(NSString *)text url:(NSString *)url __attribute__((swift_name("doCopy(text:url:)")));
+
+/** A hyperlink. [text] is the visible label, [url] is the destination. */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/** A hyperlink. [text] is the visible label, [url] is the destination. */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/** A hyperlink. [text] is the visible label, [url] is the destination. */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString *text __attribute__((swift_name("text")));
+@property (readonly) NSString *url __attribute__((swift_name("url")));
+@end
+
+
+/** Plain text with no formatting. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("InlineSegment.Plain")))
+@interface InkwellSharedInlineSegmentPlain : InkwellSharedInlineSegment
+- (instancetype)initWithText:(NSString *)text __attribute__((swift_name("init(text:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedInlineSegmentPlain *)doCopyText:(NSString *)text __attribute__((swift_name("doCopy(text:)")));
+
+/** Plain text with no formatting. */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/** Plain text with no formatting. */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/** Plain text with no formatting. */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString *text __attribute__((swift_name("text")));
+@end
+
+
+/** Strikethrough text (was wrapped in `~~`). */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("InlineSegment.Strike")))
+@interface InkwellSharedInlineSegmentStrike : InkwellSharedInlineSegment
+- (instancetype)initWithText:(NSString *)text __attribute__((swift_name("init(text:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedInlineSegmentStrike *)doCopyText:(NSString *)text __attribute__((swift_name("doCopy(text:)")));
+
+/** Strikethrough text (was wrapped in `~~`). */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/** Strikethrough text (was wrapped in `~~`). */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/** Strikethrough text (was wrapped in `~~`). */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString *text __attribute__((swift_name("text")));
 @end
 
 
@@ -1292,6 +2163,23 @@ __attribute__((swift_name("StrongRef")))
 @property (readonly) NSString *uri __attribute__((swift_name("uri")));
 @end
 
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OAuthScopes")))
+@interface InkwellSharedOAuthScopes : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)oAuthScopes __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedOAuthScopes *shared __attribute__((swift_name("shared")));
+@property (readonly) NSString *ATPROTO __attribute__((swift_name("ATPROTO")));
+@property (readonly) NSString *AUTH_FULL __attribute__((swift_name("AUTH_FULL")));
+@property (readonly) NSString *AUTH_SOCIAL __attribute__((swift_name("AUTH_SOCIAL")));
+@property (readonly) NSString *BLOB_ALL __attribute__((swift_name("BLOB_ALL")));
+@property (readonly) NSString *REPO_DOCUMENT __attribute__((swift_name("REPO_DOCUMENT")));
+@property (readonly) NSString *REPO_PUBLICATION __attribute__((swift_name("REPO_PUBLICATION")));
+@property (readonly) NSString *REPO_RECOMMEND __attribute__((swift_name("REPO_RECOMMEND")));
+@property (readonly) NSString *REPO_SUBSCRIPTION __attribute__((swift_name("REPO_SUBSCRIPTION")));
+@end
+
 
 /**
  * Shared notification polling policy constants and decision logic.
@@ -1446,6 +2334,90 @@ __attribute__((swift_name("TipPromptPolicy")))
 
 
 /**
+ * Shared number formatting utility for displaying counts
+ * (likes, reposts, replies) in abbreviated form.
+ *
+ * Used by both platforms' Bluesky post embed rendering.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("NumberFormat")))
+@interface InkwellSharedNumberFormat : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Shared number formatting utility for displaying counts
+ * (likes, reposts, replies) in abbreviated form.
+ *
+ * Used by both platforms' Bluesky post embed rendering.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)numberFormat __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedNumberFormat *shared __attribute__((swift_name("shared")));
+
+/**
+ * Abbreviates a count: 1500000 → "1M", 2300 → "2K", 42 → "42".
+ */
+- (NSString *)formatCountCount:(int32_t)count __attribute__((swift_name("formatCount(count:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("StringUtils")))
+@interface InkwellSharedStringUtils : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)stringUtils __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedStringUtils *shared __attribute__((swift_name("shared")));
+- (NSString *)trimTrailingSlashValue:(NSString *)value __attribute__((swift_name("trimTrailingSlash(value:)")));
+@end
+
+
+/**
+ * Shared UTF-8 byte-offset ↔ character-index conversion.
+ *
+ * AT Protocol facet byte ranges are UTF-8 offsets, not platform
+ * character indices. Both platforms need to map these to local
+ * string indices for attributed-text rendering.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Utf8Offsets")))
+@interface InkwellSharedUtf8Offsets : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Shared UTF-8 byte-offset ↔ character-index conversion.
+ *
+ * AT Protocol facet byte ranges are UTF-8 offsets, not platform
+ * character indices. Both platforms need to map these to local
+ * string indices for attributed-text rendering.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)utf8Offsets __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedUtf8Offsets *shared __attribute__((swift_name("shared")));
+
+/**
+ * Returns the total UTF-8 byte length of [text].
+ */
+- (int32_t)byteLengthText:(NSString *)text __attribute__((swift_name("byteLength(text:)")));
+
+/**
+ * Converts a UTF-8 byte range [byteStart, byteEnd) to a
+ * character-index range within [text]. Returns [startChar, endChar]
+ * inclusive — endChar is the character containing the byte at byteEnd.
+ *
+ * Returns null if the range is invalid or empty.
+ */
+- (InkwellSharedKotlinIntRange * _Nullable)byteRangeToCharRangeText:(NSString *)text byteStart:(int32_t)byteStart byteEnd:(int32_t)byteEnd __attribute__((swift_name("byteRangeToCharRange(text:byteStart:byteEnd:)")));
+
+/**
+ * Returns the cumulative UTF-8 byte offset of a character index
+ * within [text]. Equivalent to counting bytes of all characters
+ * before [charIndex].
+ */
+- (int32_t)charIndexToByteOffsetText:(NSString *)text charIndex:(int32_t)charIndex __attribute__((swift_name("charIndexToByteOffset(text:charIndex:)")));
+@end
+
+
+/**
  * Shared reader theme resolution — the cascade logic and font-family matching
  * that is identical on both platforms.
  *
@@ -1576,6 +2548,16 @@ __attribute__((swift_name("UrlUtils")))
  * Returns the original string if it can't be parsed as a URL.
  */
 - (NSString *)normalizedSiteValue:(NSString *)value __attribute__((swift_name("normalizedSite(value:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("HandleUtils")))
+@interface InkwellSharedHandleUtils : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)handleUtils __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedHandleUtils *shared __attribute__((swift_name("shared")));
+- (NSString *)normalizeHandle:(NSString *)handle __attribute__((swift_name("normalize(handle:)")));
 @end
 
 __attribute__((objc_subclassing_restricted))
@@ -1735,6 +2717,27 @@ __attribute__((swift_name("VerificationUrls")))
 - (NSString * _Nullable)publicationVerificationUrlPublicationUrl:(NSString *)publicationUrl __attribute__((swift_name("publicationVerificationUrl(publicationUrl:)")));
 @end
 
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("XrpcEndpoints")))
+@interface InkwellSharedXrpcEndpoints : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)xrpcEndpoints __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedXrpcEndpoints *shared __attribute__((swift_name("shared")));
+@property (readonly) NSString *ACTOR_GET_PROFILE __attribute__((swift_name("ACTOR_GET_PROFILE")));
+@property (readonly) NSString *CONSTELLATION_API __attribute__((swift_name("CONSTELLATION_API")));
+@property (readonly) NSString *FEED_GET_POSTS __attribute__((swift_name("FEED_GET_POSTS")));
+@property (readonly) NSString *IDENTITY_RESOLVE_HANDLE __attribute__((swift_name("IDENTITY_RESOLVE_HANDLE")));
+@property (readonly) NSString *MICROCOSM_GET_BACKLINKS __attribute__((swift_name("MICROCOSM_GET_BACKLINKS")));
+@property (readonly) NSString *PUBLIC_BSKY_API __attribute__((swift_name("PUBLIC_BSKY_API")));
+@property (readonly) NSString *REPO_CREATE_RECORD __attribute__((swift_name("REPO_CREATE_RECORD")));
+@property (readonly) NSString *REPO_DELETE_RECORD __attribute__((swift_name("REPO_DELETE_RECORD")));
+@property (readonly) NSString *REPO_GET_RECORD __attribute__((swift_name("REPO_GET_RECORD")));
+@property (readonly) NSString *REPO_LIST_RECORDS __attribute__((swift_name("REPO_LIST_RECORDS")));
+@property (readonly) NSString *SERVER_GET_SESSION __attribute__((swift_name("SERVER_GET_SESSION")));
+@property (readonly) NSString *SYNC_GET_BLOB __attribute__((swift_name("SYNC_GET_BLOB")));
+@end
+
 __attribute__((swift_name("Kotlinx_serialization_coreSerializationStrategy")))
 @protocol InkwellSharedKotlinx_serialization_coreSerializationStrategy
 @required
@@ -1831,6 +2834,16 @@ __attribute__((swift_name("KotlinSuspendFunction2")))
 - (void)invokeP1:(id _Nullable)p1 p2:(id _Nullable)p2 completionHandler:(void (^)(id _Nullable_result, NSError * _Nullable))completionHandler __attribute__((swift_name("invoke(p1:p2:completionHandler:)")));
 @end
 
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.Serializable(with=NormalClass(value=kotlinx/serialization/json/JsonElementSerializer))
+*/
+__attribute__((swift_name("Kotlinx_serialization_jsonJsonElement")))
+@interface InkwellSharedKotlinx_serialization_jsonJsonElement : InkwellSharedBase
+@property (class, readonly, getter=companion) InkwellSharedKotlinx_serialization_jsonJsonElementCompanion *companion __attribute__((swift_name("companion")));
+@end
+
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("KotlinPair")))
 @interface InkwellSharedKotlinPair<__covariant A, __covariant B> : InkwellSharedBase
@@ -1841,6 +2854,69 @@ __attribute__((swift_name("KotlinPair")))
 - (NSString *)toString __attribute__((swift_name("toString()")));
 @property (readonly) A _Nullable first __attribute__((swift_name("first")));
 @property (readonly) B _Nullable second __attribute__((swift_name("second")));
+@end
+
+__attribute__((swift_name("KotlinIterable")))
+@protocol InkwellSharedKotlinIterable
+@required
+- (id<InkwellSharedKotlinIterator>)iterator __attribute__((swift_name("iterator()")));
+@end
+
+__attribute__((swift_name("KotlinIntProgression")))
+@interface InkwellSharedKotlinIntProgression : InkwellSharedBase <InkwellSharedKotlinIterable>
+@property (class, readonly, getter=companion) InkwellSharedKotlinIntProgressionCompanion *companion __attribute__((swift_name("companion")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (BOOL)isEmpty __attribute__((swift_name("isEmpty()")));
+- (InkwellSharedKotlinIntIterator *)iterator __attribute__((swift_name("iterator()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) int32_t first __attribute__((swift_name("first")));
+@property (readonly) int32_t last __attribute__((swift_name("last")));
+@property (readonly) int32_t step __attribute__((swift_name("step")));
+@end
+
+__attribute__((swift_name("KotlinClosedRange")))
+@protocol InkwellSharedKotlinClosedRange
+@required
+- (BOOL)containsValue:(id)value __attribute__((swift_name("contains(value:)")));
+- (BOOL)isEmpty __attribute__((swift_name("isEmpty()")));
+@property (readonly) id endInclusive __attribute__((swift_name("endInclusive")));
+@property (readonly) id start __attribute__((swift_name("start")));
+@end
+
+
+/**
+ * @note annotations
+ *   kotlin.SinceKotlin(version="1.9")
+*/
+__attribute__((swift_name("KotlinOpenEndRange")))
+@protocol InkwellSharedKotlinOpenEndRange
+@required
+- (BOOL)containsValue_:(id)value __attribute__((swift_name("contains(value_:)")));
+- (BOOL)isEmpty __attribute__((swift_name("isEmpty()")));
+@property (readonly) id endExclusive __attribute__((swift_name("endExclusive")));
+@property (readonly) id start __attribute__((swift_name("start")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("KotlinIntRange")))
+@interface InkwellSharedKotlinIntRange : InkwellSharedKotlinIntProgression <InkwellSharedKotlinClosedRange, InkwellSharedKotlinOpenEndRange>
+- (instancetype)initWithStart:(int32_t)start endInclusive:(int32_t)endInclusive __attribute__((swift_name("init(start:endInclusive:)"))) __attribute__((objc_designated_initializer));
+@property (class, readonly, getter=companion) InkwellSharedKotlinIntRangeCompanion *companion __attribute__((swift_name("companion")));
+- (BOOL)containsValue:(InkwellSharedInt *)value __attribute__((swift_name("contains(value:)")));
+- (BOOL)containsValue_:(InkwellSharedInt *)value __attribute__((swift_name("contains(value_:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (BOOL)isEmpty __attribute__((swift_name("isEmpty()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+
+/**
+ * @note annotations
+ *   kotlin.SinceKotlin(version="1.9")
+*/
+@property (readonly) InkwellSharedInt *endExclusive __attribute__((swift_name("endExclusive"))) __attribute__((deprecated("Can throw an exception when it's impossible to represent the value with Int type, for example, when the range includes MAX_VALUE. It's recommended to use 'endInclusive' property that doesn't throw.")));
+@property (readonly) InkwellSharedInt *endInclusive __attribute__((swift_name("endInclusive")));
+@property (readonly) InkwellSharedInt *start __attribute__((swift_name("start")));
 @end
 
 __attribute__((objc_subclassing_restricted))
@@ -2005,11 +3081,49 @@ __attribute__((swift_name("Kotlinx_serialization_coreDecoder")))
 @property (readonly) InkwellSharedKotlinx_serialization_coreSerializersModule *serializersModule __attribute__((swift_name("serializersModule")));
 @end
 
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("Kotlinx_serialization_jsonJsonElement.Companion")))
+@interface InkwellSharedKotlinx_serialization_jsonJsonElementCompanion : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedKotlinx_serialization_jsonJsonElementCompanion *shared __attribute__((swift_name("shared")));
+- (id<InkwellSharedKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end
+
 __attribute__((swift_name("KotlinIterator")))
 @protocol InkwellSharedKotlinIterator
 @required
 - (BOOL)hasNext __attribute__((swift_name("hasNext()")));
 - (id _Nullable)next __attribute__((swift_name("next()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("KotlinIntProgression.Companion")))
+@interface InkwellSharedKotlinIntProgressionCompanion : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedKotlinIntProgressionCompanion *shared __attribute__((swift_name("shared")));
+- (InkwellSharedKotlinIntProgression *)fromClosedRangeRangeStart:(int32_t)rangeStart rangeEnd:(int32_t)rangeEnd step:(int32_t)step __attribute__((swift_name("fromClosedRange(rangeStart:rangeEnd:step:)")));
+@end
+
+__attribute__((swift_name("KotlinIntIterator")))
+@interface InkwellSharedKotlinIntIterator : InkwellSharedBase <InkwellSharedKotlinIterator>
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+- (InkwellSharedInt *)next __attribute__((swift_name("next()")));
+- (int32_t)nextInt __attribute__((swift_name("nextInt()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("KotlinIntRange.Companion")))
+@interface InkwellSharedKotlinIntRangeCompanion : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedKotlinIntRangeCompanion *shared __attribute__((swift_name("shared")));
+@property (readonly) InkwellSharedKotlinIntRange *EMPTY __attribute__((swift_name("EMPTY")));
 @end
 
 __attribute__((swift_name("Kotlinx_serialization_coreCompositeEncoder")))

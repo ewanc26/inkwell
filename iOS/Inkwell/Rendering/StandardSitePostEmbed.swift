@@ -129,8 +129,11 @@ struct StandardSitePostEmbedView: View {
         if let doc = document {
             let pubs = (try? await loginStateManager.fetchPublications(fromDID: doc.authorDID)) ?? []
             publication = pubs.first(where: { pub in
-                // Match publication by site field
-                doc.record.site == pub.uri || pub.record.url == doc.record.site
+                sharedDocumentBelongsToPublication(
+                    documentSite: doc.record.site,
+                    publicationUri: pub.uri,
+                    publicationUrl: pub.record.url
+                )
             })
         }
 

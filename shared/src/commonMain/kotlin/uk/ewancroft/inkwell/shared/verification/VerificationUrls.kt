@@ -48,7 +48,7 @@ object VerificationUrls {
         val lowerScheme = trimmed.substringBefore("://").lowercase()
         val afterScheme = trimmed.substringAfter("://", "")
         if (lowerScheme != "https" || afterScheme.isEmpty()) return null
-        val host = afterScheme.substringBefore("/", "").substringBefore("?", "").substringBefore("#", "")
+        val host = afterScheme.substringBefore("/").substringBefore("?").substringBefore("#")
         if (host.isEmpty()) return null
         val path = afterScheme.substringAfter(host, "")
         return UrlParts(scheme = "https", host = host, path = path)
