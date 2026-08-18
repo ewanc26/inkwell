@@ -16,6 +16,8 @@ import androidx.compose.ui.platform.LocalContext
 import android.net.Uri
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import uk.ewancroft.inkwell.ui.components.CreditsView
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -42,6 +44,27 @@ fun WriterScreen(
     var formatExpanded by remember { mutableStateOf(false) }
     var showCredits by remember { mutableStateOf(false) }
     var showDocumentPicker by remember { mutableStateOf(false) }
+
+    // Local TextFieldValue tracks cursor/selection alongside the text, so
+    // FormattingToolbar can insert markdown at the actual cursor instead of
+    // always appending to the end. viewModel.markdown stays the source of
+    // truth for anything outside this editor (preview, publish, loss
+    // reporting) — this mirrors it, syncing text changes back down, and
+    // resyncing (with the cursor reset) only when the editor loads a
+    // different document's content rather than on every keystroke.
+    var markdownField by remember { mutableStateOf(TextFieldValue(uiState.markdown)) }
+    LaunchedEffect(uiState.markdown) {
+        // Only an *external* change (document load, image-upload markdown
+        // insertion) lands here — our own edits already match, since
+        // updateMarkdownField updates both in the same call.
+        if (uiState.markdown != markdownField.text) {
+            markdownField = TextFieldValue(uiState.markdown, TextRange(uiState.markdown.length))
+        }
+    }
+    fun updateMarkdownField(value: TextFieldValue) {
+        markdownField = value
+        if (value.text != uiState.markdown) viewModel.onMarkdownChanged(value.text)
+    }
 
     val formats = listOf("Leaflet", "Markpub", "pckt", "Offprint")
 
@@ -296,6 +319,8 @@ fun WriterScreen(
 
             // Formatting toolbar
             FormattingToolbar(
+                textFieldValue = markdownField,
+                onTextFieldValueChange = ::updateMarkdownField,
                 canUploadImages = when (uiState.selectedFormat) {
                     "Markpub" -> false
                     else -> true
@@ -322,7 +347,7 @@ fun WriterScreen(
 
             // Content editor
             OutlinedTextField(
-                value = uiState.markdown, onValueChange = { viewModel.onMarkdownChanged(it) },
+                value = markdownField, onValueChange = ::updateMarkdownField,
                 label = { Text("Content (Markdown)") },
                 modifier = Modifier.fillMaxWidth().weight(1f),
                 minLines = 10
