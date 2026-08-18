@@ -46,6 +46,10 @@ extension LoginStateManager {
 
     /// Uploads raw data as a blob to the user's PDS.
     func uploadBlob(_ data: Data, mimeType: String) async throws -> ComAtprotoLexicon.Repository.UploadBlobOutput {
+        if TestingMode.isEnabled {
+            TestingModeNotice.shared.report("Upload image")
+            throw LoginError.testingMode
+        }
         guard let authenticator, let pdsURL = resolvedPDSURL else {
             throw LoginError.notAuthenticated
         }

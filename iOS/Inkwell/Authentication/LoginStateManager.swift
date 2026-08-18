@@ -104,12 +104,4 @@ final class LoginStateManager {
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
     }
-
-    func setMockAuthenticated() {
-        self.isAuthenticated = true
-        self.currentHandle = "ewancroft.uk"
-        self.currentDID = "did:plc:ewancroft"
-        self.displayName = "Ewan Croft"
-        self.isRestoringSession = false
-    }
 }

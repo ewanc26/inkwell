@@ -295,26 +295,6 @@ struct WriteView: View {
                     }
                 }
                 .task {
-                    if CommandLine.arguments.contains("-screenshot") {
-                        let mockPub = SiteStandardLexicon.PublicationRecord(
-                            url: "https://ewancroft.uk",
-                            name: "Ewan's Corner",
-                            description: "Essays on open protocols, software, and digital garden notes."
-                        )
-                        viewModel.isLoadingPublications = false
-                        viewModel.publications = [PublicationEntry(uri: "at://did:plc:ewan/site.standard.publication/1", authorDID: "did:plc:ewan", record: mockPub)]
-                        viewModel.selectedPublication = viewModel.publications.first
-                        viewModel.title = "Building Decentralized Sites with AT Protocol"
-                        viewModel.path = "building-decentralized-sites"
-                        viewModel.markdown = "# Building Decentralized Sites\n\nPublishing directly to your Personal Data Server ensures full ownership of your content.\n\n## Why Metadata Matters\n- Full portability across PDS hosts\n- Cryptographic verification"
-                    }
-                }
-                .task {
-                    // The block above already seeds mock publications
-                    // directly; a real fetch here races it and, lacking a
-                    // session, fails with "Not authenticated" — which then
-                    // surfaces as a Couldn't Publish alert over the mock UI.
-                    guard !CommandLine.arguments.contains("-screenshot") else { return }
                     await viewModel.loadPublications()
                 }
                 .task(id: viewModel.selectedPublication?.uri) {

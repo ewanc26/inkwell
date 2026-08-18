@@ -14,6 +14,10 @@ enum LoginError: LocalizedError {
     case contentConversionFailed
     case pdsResolutionFailed
     case httpError(status: Int)
+    /// Thrown by the write choke points when `-testing` is set. Carries the
+    /// same wording as the root-level notice so a feature that surfaces its
+    /// own error alert still explains the real reason.
+    case testingMode
 
     var errorDescription: String? {
         switch self {
@@ -29,6 +33,8 @@ enum LoginError: LocalizedError {
             return "Could not resolve the repository's PDS. Check that the DID or handle is correct."
         case .httpError(let status):
             return httpErrorMessage(status: status)
+        case .testingMode:
+            return "You're in testing mode, so this action will not hit the network."
         }
     }
 

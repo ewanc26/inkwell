@@ -18,6 +18,7 @@ struct ContentView: View {
     /// between intent cases and anonymous integer tags.
     @State private var selectedTab: InkwellTab = .reader
     @State private var showingTip = false
+    @State private var testingNotice = TestingModeNotice.shared
 
     var body: some View {
         Group {
@@ -30,19 +31,13 @@ struct ContentView: View {
             }
         }
         .onAppear {
-            if CommandLine.arguments.contains("-tab-discover") {
-                selectedTab = .discover
-            } else if CommandLine.arguments.contains("-tab-writer") {
-                selectedTab = .writer
-            } else if CommandLine.arguments.contains("-tab-reader") {
-                selectedTab = .reader
+            if let tab = TestingMode.initialTab {
+                selectedTab = tab
             }
         }
         .task {
-            if !CommandLine.arguments.contains("-screenshot") {
-                if tipPromptManager.shouldShowTip {
-                    showingTip = true
-                }
+            if !TestingMode.suppressesInterruptions, tipPromptManager.shouldShowTip {
+                showingTip = true
             }
         }
         // Start loading the Reader feed as soon as the user's
@@ -50,7 +45,7 @@ struct ContentView: View {
         // so it's often already loaded (or well underway) by the time they
         // actually tap over to it.
         .task(id: loginStateManager.isAuthenticated) {
-            guard loginStateManager.isAuthenticated, !CommandLine.arguments.contains("-screenshot") else { return }
+            guard loginStateManager.isAuthenticated else { return }
             await ReaderFeedStore.shared.loadData(loginStateManager: loginStateManager)
         }
         .alert("Enjoying Inkwell?", isPresented: $showingTip) {
@@ -63,6 +58,21 @@ struct ContentView: View {
             }
         } message: {
             Text("If you find Inkwell useful, consider buying me a coffee to support ongoing development.")
+        }
+        .alert(
+            "Testing mode",
+            isPresented: Binding(
+                get: { testingNotice.isPresented },
+                set: { testingNotice.isPresented = $0 }
+            )
+        ) {
+            Button("OK", role: .cancel) { testingNotice.blockedAction = nil }
+        } message: {
+            Text(
+                testingNotice.blockedAction.map {
+                    "You're in testing mode, so this action will not hit the network.\n\n\($0) was not sent."
+                } ?? "You're in testing mode, so this action will not hit the network."
+            )
         }
         // Routes App Intent tab-switch notifications to the matching tab.
         // Posted by OpenReaderIntent, OpenWriterIntent, and
@@ -113,7 +123,7 @@ struct ContentView: View {
         // so this only applies on devices new enough to have it.
         .modifier(MinimizeTabBarOnScrollDown())
         .task {
-            if !CommandLine.arguments.contains("-screenshot") {
+            if !TestingMode.suppressesInterruptions {
                 await NotificationManager.shared.requestPermission()
                 await NotificationManager.shared.pollForNewDocuments(loginStateManager: loginStateManager)
             }

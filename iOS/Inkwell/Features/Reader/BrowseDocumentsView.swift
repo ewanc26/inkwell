@@ -43,67 +43,12 @@ struct BrowseDocumentsView: View {
                 }
                 .accountToolbar(showAbout: $showAbout)
                 .task {
-                    if CommandLine.arguments.contains("-screenshot") {
-                        let mockDoc = SiteStandardLexicon.DocumentRecord(
-                            site: "https://ewancroft.uk",
-                            title: "Publishing on the Open Web with Standard.site",
-                            publishedAt: Date(),
-                            path: "/publishing-on-open-web",
-                            description: "The Standard.site publishing spec brings structured, portable records to AT Protocol.",
-                            // Without this, ReadView has nothing to render
-                            // and falls back to its "Empty Document"
-                            // placeholder — not what a reader-app screenshot
-                            // should show when you open the one mock article.
-                            textContent: """
-                            Standard.site is a lightweight publishing lexicon for AT Protocol: your posts live in your own PDS as structured records, not locked inside any single app's database.
-
-                            Any client that speaks the lexicon — Inkwell, a website, a future reader nobody's built yet — can read, verify, and render them the same way.
-
-                            That's the whole pitch: write once, own the record, let it outlive the app.
-                            """
-                        )
-                        let mockPub = SiteStandardLexicon.PublicationRecord(
-                            url: "https://ewancroft.uk",
-                            name: "Ewan's Corner",
-                            description: "Essays on open protocols, software, and digital garden notes."
-                        )
-                        let mockItem = ReaderFeedItem(
-                            document: DocumentEntry(uri: "at://did:plc:ewan/site.standard.document/1", authorDID: "did:plc:ewan", record: mockDoc),
-                            publication: PublicationEntry(uri: "at://did:plc:ewan/site.standard.publication/1", authorDID: "did:plc:ewan", record: mockPub),
-                            authorProfile: BSkyActorProfile(
-                                did: "did:plc:ewan",
-                                handle: "ewancroft.uk",
-                                displayName: "Ewan Croft",
-                                description: nil,
-                                avatar: nil,
-                                banner: nil,
-                                followersCount: nil,
-                                followsCount: nil,
-                                postsCount: nil,
-                                createdAt: nil,
-                                indexedAt: nil,
-                                pinnedPost: nil,
-                                labels: nil,
-                                associated: nil,
-                                viewer: nil
-                            )
-                        )
-                        store.followingState.items = [mockItem]
-                        store.followingState.isLoading = false
-                        store.followingState.hasLoaded = true
-                        // Otherwise the "Yours" tab is stuck on its loading
-                        // spinner forever in screenshot mode — nothing else
-                        // ever flips isLoadingYours since loadYoursFeed()
-                        // (a real network call) is skipped entirely here.
-                        store.isLoadingYours = false
-                    } else {
-                        // Usually already loading (or loaded) by now — kicked
-                        // off proactively from ContentView as soon as the user
-                        // authenticated, not lazily on this view's first
-                        // appearance. This is a no-op in that case.
-                        await store.loadData(loginStateManager: loginStateManager)
-                        notificationManager.markAllAsRead()
-                    }
+                    // Usually already loading (or loaded) by now — kicked
+                    // off proactively from ContentView as soon as the user
+                    // authenticated, not lazily on this view's first
+                    // appearance. This is a no-op in that case.
+                    await store.loadData(loginStateManager: loginStateManager)
+                    notificationManager.markAllAsRead()
                 }
         }
     }
