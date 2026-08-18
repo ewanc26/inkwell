@@ -15,12 +15,7 @@ import SwiftUI
 struct DiscoverView: View {
     @Environment(LoginStateManager.self) private var loginStateManager
 
-    /// Owned by ContentView and bound to `.searchable` on the TabView, not
-    /// here — a `Tab(role: .search)`'s search field is only recognized when
-    /// `.searchable` is attached at the TabView level (matching Apple's own
-    /// search-role-tab example); attaching it inside this view's own
-    /// NavigationStack silently produces no search field at all.
-    @Binding var query: String
+    @State private var query = ""
     /// The query the currently-displayed results came back for, so the
     /// empty state can quote what was actually searched rather than
     /// whatever's been typed since.
@@ -77,6 +72,9 @@ struct DiscoverView: View {
                 placeholder
             }
             .navigationTitle("Discover")
+            .searchable(text: $query, prompt: "Publications and articles")
+            .textInputAutocapitalization(.never)
+            .autocorrectionDisabled()
             .onSubmit(of: .search) {
                 Task { await search() }
             }
@@ -143,7 +141,10 @@ struct DiscoverView: View {
                     subscriptions = ["at://did:plc:ewan/site.standard.publication/1"]
                 }
             }
-            .task { await loadSubscriptions() }
+            .task {
+                guard !CommandLine.arguments.contains("-screenshot") else { return }
+                await loadSubscriptions()
+            }
         }
     }
 
