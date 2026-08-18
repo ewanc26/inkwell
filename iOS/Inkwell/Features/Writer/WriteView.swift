@@ -23,6 +23,7 @@ struct WriteView: View {
     @State private var showSignIn = false
     @State private var showDocumentPicker = false
     @State private var selectedPhoto: PhotosPickerItem?
+    @State private var showToolbarPhotoPicker = false
     @State private var markdownSelection: TextSelection?
 
     init() {
@@ -125,7 +126,7 @@ struct WriteView: View {
                     if viewModel.isEditing {
                         Section {
                             HStack(spacing: 8) {
-                                Image(systemName: "edit")
+                                Image(systemName: "square.and.pencil")
                                     .foregroundStyle(.blue)
                                 Text("Editing existing document")
                                     .foregroundStyle(.blue)
@@ -169,9 +170,15 @@ struct WriteView: View {
                             markdown: $viewModel.markdown,
                             selection: $markdownSelection,
                             canUploadImages: viewModel.canUploadImages,
-                            onImagePicker: {}
+                            onImagePicker: { showToolbarPhotoPicker = true }
                         )
                         .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
+                        .photosPicker(
+                            isPresented: $showToolbarPhotoPicker,
+                            selection: $selectedPhoto,
+                            matching: .images,
+                            photoLibrary: .shared()
+                        )
                     }
 
                     // MARK: - Markdown editor + preview
@@ -303,6 +310,11 @@ struct WriteView: View {
                     }
                 }
                 .task {
+                    // The block above already seeds mock publications
+                    // directly; a real fetch here races it and, lacking a
+                    // session, fails with "Not authenticated" — which then
+                    // surfaces as a Couldn't Publish alert over the mock UI.
+                    guard !CommandLine.arguments.contains("-screenshot") else { return }
                     await viewModel.loadPublications()
                 }
                 .task(id: viewModel.selectedPublication?.uri) {
@@ -336,138 +348,6 @@ struct WriteView: View {
                 }
             }
         }
-    }
-}
-
-// MARK: - Document Picker Sheet
-
-private struct DocumentPickerSheet: View {
-    let loginStateManager: LoginStateManager
-    let publications: [PublicationEntry]
-    let selectedPublication: PublicationEntry?
-    let onSelectDocument: (String) -> Void
-
-    @Environment(\.dismiss) private var dismiss
-    @State private var documents: [(uri: String, title: String)] = []
-    @State private var isLoading = false
-    @State private var error: String?
-
-    var body: some View {
-        NavigationStack {
-            List {
-                if let error {
-                    Text(error)
-                        .foregroundStyle(.red)
-                }
-                if isLoading {
-                    ProgressView()
-                } else if documents.isEmpty {
-                    Text("No documents found.")
-                        .foregroundStyle(.secondary)
-                } else {
-                    ForEach(documents, id: \.uri) { doc in
-                        Button(doc.title) {
-                            onSelectDocument(doc.uri)
-                            dismiss()
-                        }
-                    }
-                }
-            }
-            .navigationTitle("Select Document")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
-                }
-            }
-            .task {
-                await loadDocuments()
-            }
-        }
-    }
-
-    private func loadDocuments() async {
-        guard let pub = selectedPublication else { return }
-        isLoading = true
-        defer { isLoading = false }
-
-        do {
-            let parsed = parseAtUri(pub.uri)
-            guard let did = parsed?.did else { return }
-
-            let records = try await loginStateManager.listRecordsPage(
-                from: did,
-                collection: SiteStandardLexicon.DocumentRecord.type,
-                limit: 25
-            )
-
-            documents = records.records.compactMap { record in
-                guard let value = record.value,
-                      let doc = try? value.getRecord(ofType: SiteStandardLexicon.DocumentRecord.self) else {
-                    return nil
-                }
-                return (record.uri, doc.title)
-            }
-        } catch {
-            self.error = error.localizedDescription
-        }
-    }
-}
-
-// MARK: - Create Publication View
-
-struct CreatePublicationView: View {
-    @Environment(\.dismiss) private var dismiss
-
-    let onCreate: (String, String, String?) -> Void
-
-    @State private var url = ""
-    @State private var name = ""
-    @State private var description = ""
-    @State private var isCreating = false
-
-    var body: some View {
-        NavigationStack {
-            Form {
-                Section {
-                    TextField("URL", text: $url, prompt: Text("https://mysite.com"))
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
-                        .keyboardType(.URL)
-                        .textContentType(.URL)
-                    TextField("Name", text: $name, prompt: Text("My Publication"))
-                    TextField("Description", text: $description, axis: .vertical)
-                        .lineLimit(2...4)
-                } footer: {
-                    Text("The site this publication lives at. You'll verify ownership of the domain before publishing to it.")
-                }
-            }
-            .navigationTitle("New Publication")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Create", action: create)
-                        .disabled(url.isEmpty || name.isEmpty || isCreating)
-                }
-            }
-        }
-    }
-
-    private func create() {
-        isCreating = true
-        var trimmedURL = url.trimmingCharacters(in: .whitespacesAndNewlines)
-        while trimmedURL.hasSuffix("/") {
-            trimmedURL.removeLast()
-        }
-        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        let trimmedDesc = description.trimmingCharacters(in: .whitespacesAndNewlines)
-
-        onCreate(trimmedURL, trimmedName, trimmedDesc.isEmpty ? nil : trimmedDesc)
-        isCreating = false
-        dismiss()
     }
 }
 
