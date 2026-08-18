@@ -337,6 +337,7 @@ fun WriterScreen(
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+                Spacer(Modifier.width(8.dp))
                 Switch(
                     checked = uiState.showPreview,
                     onCheckedChange = { viewModel.togglePreview() },
