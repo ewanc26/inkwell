@@ -342,3 +342,230 @@ func normalizedSite(_ value: String) -> String {
 func canonicalUrl(site: String, path: String?, publicationURL: String? = nil) -> String? {
     UrlUtils.shared.canonicalUrl(site: site, path: path, publicationUrl: publicationURL)
 }
+
+// MARK: - Number Formatting
+
+func sharedFormatCount(_ count: Int) -> String {
+    NumberFormat.shared.formatCount(count: Int32(count))
+}
+
+// MARK: - XRPC Endpoints
+
+func sharedXrpcRepoCreateRecord() -> String { XrpcEndpoints.shared.REPO_CREATE_RECORD }
+func sharedXrpcRepoDeleteRecord() -> String { XrpcEndpoints.shared.REPO_DELETE_RECORD }
+func sharedXrpcRepoGetRecord() -> String { XrpcEndpoints.shared.REPO_GET_RECORD }
+func sharedXrpcRepoListRecords() -> String { XrpcEndpoints.shared.REPO_LIST_RECORDS }
+func sharedXrpcSyncGetBlob() -> String { XrpcEndpoints.shared.SYNC_GET_BLOB }
+func sharedXrpcServerGetSession() -> String { XrpcEndpoints.shared.SERVER_GET_SESSION }
+func sharedXrpcIdentityResolveHandle() -> String { XrpcEndpoints.shared.IDENTITY_RESOLVE_HANDLE }
+func sharedXrpcActorGetProfile() -> String { XrpcEndpoints.shared.ACTOR_GET_PROFILE }
+func sharedXrpcFeedGetPosts() -> String { XrpcEndpoints.shared.FEED_GET_POSTS }
+func sharedXrpcMicrocosmGetBacklinks() -> String { XrpcEndpoints.shared.MICROCOSM_GET_BACKLINKS }
+func sharedPublicBskyApi() -> String { XrpcEndpoints.shared.PUBLIC_BSKY_API }
+func sharedConstellationApi() -> String { XrpcEndpoints.shared.CONSTELLATION_API }
+
+// MARK: - OAuth Scopes
+
+func sharedOAuthScopeAtproto() -> String { OAuthScopes.shared.ATPROTO }
+func sharedOAuthScopeBlobAll() -> String { OAuthScopes.shared.BLOB_ALL }
+func sharedOAuthScopeRepoPublication() -> String { OAuthScopes.shared.REPO_PUBLICATION }
+func sharedOAuthScopeRepoDocument() -> String { OAuthScopes.shared.REPO_DOCUMENT }
+func sharedOAuthScopeRepoSubscription() -> String { OAuthScopes.shared.REPO_SUBSCRIPTION }
+func sharedOAuthScopeRepoRecommend() -> String { OAuthScopes.shared.REPO_RECOMMEND }
+func sharedOAuthScopeAuthFull() -> String { OAuthScopes.shared.AUTH_FULL }
+func sharedOAuthScopeAuthSocial() -> String { OAuthScopes.shared.AUTH_SOCIAL }
+
+// MARK: - Content Format Detection
+
+func sharedContentFormat(type: String?) -> SharedContentFormat? {
+    guard let type else { return nil }
+    if ContentFormatDetector.shared.isKnown(type: type) {
+        if type == ContentFormatDetector.shared.LEAFLET { return .leaflet }
+        if type == ContentFormatDetector.shared.MARKPUB { return .markpub }
+        if type == ContentFormatDetector.shared.PCKT { return .pckt }
+        if type == ContentFormatDetector.shared.OFFPRINT { return .offprint }
+    }
+    return nil
+}
+
+enum SharedContentFormat: String {
+    case leaflet
+    case markpub
+    case pckt
+    case offprint
+
+    var typeString: String {
+        switch self {
+        case .leaflet: return ContentFormatDetector.shared.LEAFLET
+        case .markpub: return ContentFormatDetector.shared.MARKPUB
+        case .pckt: return ContentFormatDetector.shared.PCKT
+        case .offprint: return ContentFormatDetector.shared.OFFPRINT
+        }
+    }
+}
+
+func sharedIsPcktOrOffprint(type: String?) -> Bool {
+    ContentFormatDetector.shared.isPcktOrOffprint(type: type)
+}
+
+// MARK: - Leaflet Block Types
+
+func sharedLeafletBlockType(_ type: String) -> String? {
+    let t = LeafletTypes.shared
+    switch type {
+    case t.BLOCKS_TEXT: return t.BLOCKS_TEXT
+    case t.BLOCKS_HEADER: return t.BLOCKS_HEADER
+    case t.BLOCKS_PARAGRAPH: return t.BLOCKS_PARAGRAPH
+    case t.BLOCKS_BLOCKQUOTE: return t.BLOCKS_BLOCKQUOTE
+    case t.BLOCKS_CODE: return t.BLOCKS_CODE
+    case t.BLOCKS_MATH: return t.BLOCKS_MATH
+    case t.BLOCKS_IMAGE: return t.BLOCKS_IMAGE
+    case t.BLOCKS_HORIZONTAL_RULE: return t.BLOCKS_HORIZONTAL_RULE
+    case t.BLOCKS_UNORDERED_LIST: return t.BLOCKS_UNORDERED_LIST
+    case t.BLOCKS_ORDERED_LIST: return t.BLOCKS_ORDERED_LIST
+    case t.BLOCKS_CHECKLIST: return t.BLOCKS_CHECKLIST
+    case t.BLOCKS_BSKY_POST: return t.BLOCKS_BSKY_POST
+    case t.BLOCKS_STANDARD_SITE_POST: return t.BLOCKS_STANDARD_SITE_POST
+    case t.BLOCKS_WEBSITE: return t.BLOCKS_WEBSITE
+    case t.BLOCKS_IFRAME: return t.BLOCKS_IFRAME
+    case t.BLOCKS_BUTTON: return t.BLOCKS_BUTTON
+    case t.BLOCKS_DIVIDER: return t.BLOCKS_DIVIDER
+    case t.BLOCKS_PAGE: return t.BLOCKS_PAGE
+    case t.BLOCKS_POSTS_LIST: return t.BLOCKS_POSTS_LIST
+    case t.BLOCKS_SIGNUP: return t.BLOCKS_SIGNUP
+    case t.BLOCKS_POLL: return t.BLOCKS_POLL
+    default: return nil
+    }
+}
+
+// MARK: - Bluesky Embed Types
+
+func sharedBlueskyEmbedImages() -> String { BlueskyEmbedTypes.shared.IMAGES }
+func sharedBlueskyEmbedExternal() -> String { BlueskyEmbedTypes.shared.EXTERNAL }
+func sharedBlueskyEmbedRecord() -> String { BlueskyEmbedTypes.shared.RECORD }
+
+// MARK: - CDN URLs
+
+func sharedBskyThumbnail(did: String, link: String) -> String {
+    CdnUrls.shared.bskyThumbnail(did: did, link: link)
+}
+
+// MARK: - Collection NSIDs
+
+func sharedCollectionPublication() -> String { CollectionNsids.shared.PUBLICATION }
+func sharedCollectionDocument() -> String { CollectionNsids.shared.DOCUMENT }
+func sharedCollectionSubscription() -> String { CollectionNsids.shared.GRAPH_SUBSCRIPTION }
+func sharedCollectionRecommend() -> String { CollectionNsids.shared.GRAPH_RECOMMEND }
+func sharedLeafletComment() -> String { CollectionNsids.shared.LEAFLET_COMMENT }
+func sharedLeafletPollDefinition() -> String { CollectionNsids.shared.LEAFLET_POLL_DEFINITION }
+func sharedLeafletPollVote() -> String { CollectionNsids.shared.LEAFLET_POLL_VOTE }
+
+// MARK: - Search Backend
+
+func sharedSearchBackendUrl() -> String { SearchBackendUrl.shared.BASE }
+
+// MARK: - Publication Matching
+
+func sharedDocumentBelongsToPublication(documentSite: String, publicationUri: String, publicationUrl: String?) -> Bool {
+    PublicationMatcher.shared.documentBelongsToPublication(
+        documentSite: documentSite,
+        publicationUri: publicationUri,
+        publicationUrl: publicationUrl
+    )
+}
+
+// MARK: - Search Result Classification
+
+func sharedIsPublication(type: String) -> Bool {
+    SearchResultClassifier.shared.isPublication(type: type)
+}
+
+func sharedIsStandardSiteDocument(uri: String) -> Bool {
+    SearchResultClassifier.shared.isStandardSiteDocument(uri: uri)
+}
+
+func sharedWebURL(basePath: String?, path: String?, rkey: String?, platform: String?, isPublication: Bool) -> String? {
+    SearchResultClassifier.shared.webURL(
+        basePath: basePath,
+        path: path,
+        rkey: rkey,
+        platform: platform,
+        isPublication: isPublication
+    )
+}
+
+// MARK: - Handle Utilities
+
+func sharedNormalizeHandle(_ handle: String) -> String {
+    HandleUtils.shared.normalize(handle: handle)
+}
+
+// MARK: - String Utilities
+
+func sharedTrimTrailingSlash(_ value: String) -> String {
+    StringUtils.shared.trimTrailingSlash(value: value)
+}
+
+// MARK: - UTF-8 Offsets
+
+func sharedByteRangeToCharRange(_ text: String, byteStart: Int, byteEnd: Int) -> Range<Int>? {
+    let result = Utf8Offsets.shared.byteRangeToCharRange(text: text, byteStart: Int32(byteStart), byteEnd: Int32(byteEnd))
+    guard let result else { return nil }
+    return Int(result.first)..<Int(result.last) + 1
+}
+
+func sharedCharIndexToByteOffset(_ text: String, charIndex: Int) -> Int {
+    Int(Utf8Offsets.shared.charIndexToByteOffset(text: text, charIndex: Int32(charIndex)))
+}
+
+func sharedByteLength(_ text: String) -> Int {
+    Int(Utf8Offsets.shared.byteLength(text: text))
+}
+
+// MARK: - Content Format Converters
+
+/// Shared conversion result matching the KMP `SharedConvertResult`.
+struct SharedConvertResult {
+    let markdown: String
+    let lost: [String]
+}
+
+/// Shared write result matching the KMP `SharedWriteResult`.
+struct SharedWriteResult {
+    let content: [String: Any]
+    let lost: [String]
+}
+
+/// Converts a content dictionary (with `$type` key) to markdown blocks + lost labels.
+func sharedContentToMarkdown(_ content: [String: Any], authorDid: String = "") -> SharedConvertResult {
+    let converter = ContentFormatDispatcher.shared
+    let result = converter.toMarkdown(content: content, authorDid: authorDid)
+    let lostArray = (result.lost as? Set<String>) ?? []
+    let mdString = MarkdownSerializer.shared.serialize(blocks: result.blocks)
+    return SharedConvertResult(markdown: mdString, lost: Array(lostArray))
+}
+
+/// Converts markdown to a format-specific content dictionary.
+func sharedMarkdownToContent(_ markdown: String, format: String, uploadedBlobs: [String: [String: Any]] = [:]) -> SharedWriteResult {
+    let converter = ContentFormatDispatcher.shared
+    let result = converter.fromMarkdown(markdown: markdown, format: format, uploadedBlobs: uploadedBlobs)
+    guard let dict = result.content as? [String: Any] else {
+        return SharedWriteResult(content: [:], lost: [])
+    }
+    let lostArray = (result.lost as? Set<String>) ?? []
+    return SharedWriteResult(content: dict, lost: Array(lostArray))
+}
+
+/// Returns loss labels for unsupported blocks in a given format.
+func sharedBlockLossLabels(format: String) -> [String: String] {
+    switch format {
+    case "leaflet":
+        return BlockLossLabels.shared.leaflet as? [String: String] ?? [:]
+    case "pckt":
+        return BlockLossLabels.shared.pckt as? [String: String] ?? [:]
+    case "offprint":
+        return BlockLossLabels.shared.offprint as? [String: String] ?? [:]
+    default:
+        return [:]
+    }
+}

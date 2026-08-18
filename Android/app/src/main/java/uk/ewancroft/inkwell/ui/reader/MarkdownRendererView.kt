@@ -33,6 +33,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import uk.ewancroft.inkwell.shared.markdown.InlineMarkdownScanner
+import uk.ewancroft.inkwell.shared.markdown.InlineSegment
 
 /**
  * A Compose view that renders markdown text using the same MarkdownParser
@@ -289,6 +291,9 @@ private fun renderTaskList(
 /**
  * Renders markdown inline syntax (**bold**, *italic*, `code`,
  * ~~strike~~, [text](url)) as an AnnotatedString.
+ *
+ * Delegates scanning to [InlineMarkdownScanner] and maps the resulting
+ * segments to Compose [SpanStyle]s.
  */
 private fun renderInline(
     text: String,
@@ -296,92 +301,31 @@ private fun renderInline(
     accentColor: Color,
     uriHandler: androidx.compose.ui.platform.UriHandler,
 ): AnnotatedString {
+    val segments = InlineMarkdownScanner.scan(text)
     return buildAnnotatedString {
-        var i = 0
-        val chars = text.toCharArray()
-
-        while (i < chars.size) {
-            // Bold: **text**
-            if (i + 1 < chars.size && chars[i] == '*' && chars[i + 1] == '*') {
-                val end = findClosing(chars, i + 2, "**")
-                if (end > 0) {
-                    withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = bodyColor)) {
-                        append(text.substring(i + 2, end))
+        for (segment in segments) {
+            when (segment) {
+                is InlineSegment.Plain -> append(segment.text)
+                is InlineSegment.Bold -> withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = bodyColor)) {
+                    append(segment.text)
+                }
+                is InlineSegment.Italic -> withStyle(SpanStyle(fontStyle = FontStyle.Italic, color = bodyColor)) {
+                    append(segment.text)
+                }
+                is InlineSegment.Code -> withStyle(SpanStyle(fontFamily = FontFamily.Monospace, color = bodyColor)) {
+                    append(segment.text)
+                }
+                is InlineSegment.Strike -> withStyle(SpanStyle(textDecoration = TextDecoration.LineThrough, color = bodyColor)) {
+                    append(segment.text)
+                }
+                is InlineSegment.Link -> {
+                    pushStringAnnotation(tag = "URL", annotation = segment.url)
+                    withStyle(SpanStyle(color = accentColor, textDecoration = TextDecoration.Underline)) {
+                        append(segment.text)
                     }
-                    i = end + 2
-                    continue
+                    pop()
                 }
             }
-
-            // Italic: *text*
-            if (chars[i] == '*' && (i + 1 >= chars.size || chars[i + 1] != '*')) {
-                val end = findClosing(chars, i + 1, "*")
-                if (end > 0 && (end == 0 || chars[end - 1] != '*')) {
-                    withStyle(SpanStyle(fontStyle = FontStyle.Italic, color = bodyColor)) {
-                        append(text.substring(i + 1, end))
-                    }
-                    i = end + 1
-                    continue
-                }
-            }
-
-            // Strikethrough: ~~text~~
-            if (i + 1 < chars.size && chars[i] == '~' && chars[i + 1] == '~') {
-                val end = findClosing(chars, i + 2, "~~")
-                if (end > 0) {
-                    withStyle(SpanStyle(textDecoration = TextDecoration.LineThrough, color = bodyColor)) {
-                        append(text.substring(i + 2, end))
-                    }
-                    i = end + 2
-                    continue
-                }
-            }
-
-            // Inline code: `text`
-            if (chars[i] == '`') {
-                val end = findClosing(chars, i + 1, "`")
-                if (end > 0) {
-                    withStyle(SpanStyle(fontFamily = FontFamily.Monospace, color = bodyColor)) {
-                        append(text.substring(i + 1, end))
-                    }
-                    i = end + 1
-                    continue
-                }
-            }
-
-            // Link: [text](url)
-            if (chars[i] == '[') {
-                val closeBracket = text.indexOf(']', i + 1)
-                if (closeBracket > 0 && closeBracket + 1 < chars.size && chars[closeBracket + 1] == '(') {
-                    val closeParen = text.indexOf(')', closeBracket + 2)
-                    if (closeParen > 0) {
-                        val linkText = text.substring(i + 1, closeBracket)
-                        val url = text.substring(closeBracket + 2, closeParen)
-                        pushStringAnnotation(tag = "URL", annotation = url)
-                        withStyle(SpanStyle(color = accentColor, textDecoration = TextDecoration.Underline)) {
-                            append(linkText)
-                        }
-                        pop()
-                        i = closeParen + 1
-                        continue
-                    }
-                }
-            }
-
-            append(chars[i])
-            i++
         }
     }
-}
-
-private fun findClosing(text: CharArray, start: Int, delimiter: String): Int {
-    val delimChars = delimiter.toCharArray()
-    var i = start
-    while (i <= text.size - delimChars.size) {
-        if (text[i] == delimChars[0] && (delimChars.size == 1 || text[i + 1] == delimChars[1])) {
-            return i
-        }
-        i++
-    }
-    return -1
 }

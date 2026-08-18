@@ -48,14 +48,6 @@ struct PublicationEntry: Identifiable, Equatable, Hashable {
     var id: String { uri }
 }
 
-extension PublicationEntry {
-    /// Matches both the preferred publication AT-URI and the URL form used by
-    /// older and standalone Standard.site producers.
-    nonisolated func contains(_ document: SiteStandardLexicon.DocumentRecord) -> Bool {
-        document.site == uri || normalizedSite(document.site) == normalizedSite(record.url)
-    }
-}
-
 /// A document record enriched with its AT-URI and author DID.
 struct DocumentEntry: Identifiable, Equatable, Hashable {
     /// The AT-URI of the document record.

@@ -151,25 +151,25 @@ enum MarkdownSerializerEngine {
 struct LeafletProvider: ContentProvider {
     let id = "leaflet"
     let label = "Leaflet"
-    let contentType = "pub.leaflet.content"
+    let contentType = LeafletTypes.shared.CONTENT
     let supportsImages = true
 
     private let schema = FacetSchema.leaflet
-    private let b: (String) -> String = { "pub.leaflet.blocks.\($0)" }
 
-    /// Blocks that can't be represented as markdown, with human labels
-    /// matching standard.horse's LOSS_LABELS.
     private let lossLabels: [String: String] = [
-        "pub.leaflet.blocks.iframe": "embeds",
-        "pub.leaflet.blocks.website": "website cards",
-        "pub.leaflet.blocks.bskyPost": "Bluesky posts",
-        "pub.leaflet.blocks.standardSitePost": "linked posts",
-        "pub.leaflet.blocks.page": "sub-pages",
-        "pub.leaflet.blocks.poll": "polls",
-        "pub.leaflet.blocks.button": "buttons",
-        "pub.leaflet.blocks.postsList": "post lists",
-        "pub.leaflet.blocks.signup": "signup forms",
+        LeafletTypes.shared.BLOCKS_IFRAME: "embeds",
+        LeafletTypes.shared.BLOCKS_WEBSITE: "website cards",
+        LeafletTypes.shared.BLOCKS_BSKY_POST: "Bluesky posts",
+        LeafletTypes.shared.BLOCKS_STANDARD_SITE_POST: "linked posts",
+        LeafletTypes.shared.BLOCKS_PAGE: "sub-pages",
+        LeafletTypes.shared.BLOCKS_POLL: "polls",
+        LeafletTypes.shared.BLOCKS_BUTTON: "buttons",
+        LeafletTypes.shared.BLOCKS_POSTS_LIST: "post lists",
+        LeafletTypes.shared.BLOCKS_SIGNUP: "signup forms",
     ]
+    // NOTE: Loss labels are also defined in shared KMP BlockLossLabels.leaflet.
+    // The iOS providers keep their own copy for now because they work with
+    // typed Swift structs; the shared copy is used by Android and new code.
 
     func matches(_ content: UnknownType?) -> Bool {
         content?.getRecord(ofType: LeafletContent.self) != nil
@@ -215,45 +215,45 @@ struct LeafletProvider: ContentProvider {
         }
 
         switch block.type {
-        case b("text"):
+        case LeafletTypes.shared.BLOCKS_TEXT:
             let text = FacetConverter.facetsToMarkdown(
                 block.plaintext ?? "", facets: block.facets, schema: schema
             )
             // Empty text blocks (leaflet spacers) have no markdown equivalent.
             return text.isEmpty ? nil : .paragraph(text: text)
 
-        case b("header"):
+        case LeafletTypes.shared.BLOCKS_HEADER:
             let level = max(1, min(6, block.level ?? 1))
             let text = FacetConverter.facetsToMarkdown(
                 block.plaintext ?? "", facets: block.facets, schema: schema
             )
             return .heading(level: level, text: text)
 
-        case b("blockquote"):
+        case LeafletTypes.shared.BLOCKS_BLOCKQUOTE:
             let text = FacetConverter.facetsToMarkdown(
                 block.plaintext ?? "", facets: block.facets, schema: schema
             )
             return .blockquote(text: text)
 
-        case b("code"):
+        case LeafletTypes.shared.BLOCKS_CODE:
             return .code(language: block.language, content: block.plaintext ?? "")
 
-        case b("math"):
+        case LeafletTypes.shared.BLOCKS_MATH:
             return .math(tex: block.tex ?? "")
 
-        case b("horizontalRule"):
+        case LeafletTypes.shared.BLOCKS_HORIZONTAL_RULE:
             return .horizontalRule
 
-        case b("image"):
+        case LeafletTypes.shared.BLOCKS_IMAGE:
             // Image blobs are stored as PDS blobs; we reference by CID.
             let cid = block.image?.reference.link ?? ""
             return cid.isEmpty ? nil : .image(alt: block.alt ?? "", url: cid)
 
-        case b("unorderedList"):
+        case LeafletTypes.shared.BLOCKS_UNORDERED_LIST:
             let items = (block.children ?? []).map { leafletListItemToMarkdown($0) }
             return .unorderedList(items: items)
 
-        case b("orderedList"):
+        case LeafletTypes.shared.BLOCKS_ORDERED_LIST:
             let start = block.startIndex ?? 1
             let items = (block.children ?? []).map { leafletListItemToMarkdown($0) }
             return .orderedList(start: start, items: items)
@@ -272,11 +272,11 @@ struct LeafletProvider: ContentProvider {
         var text = ""
         if let content = item.content {
             switch content.type {
-            case b("text"):
+            case LeafletTypes.shared.BLOCKS_TEXT:
                 text = FacetConverter.facetsToMarkdown(
                     content.plaintext ?? "", facets: content.facets, schema: schema
                 )
-            case b("image"):
+            case LeafletTypes.shared.BLOCKS_IMAGE:
                 let cid = content.image?.reference.link ?? ""
                 text = "![\(content.alt ?? "")](\(cid))"
             default:
@@ -321,37 +321,37 @@ struct LeafletProvider: ContentProvider {
         case .heading(let level, let text):
             let (plaintext, facets) = FacetConverter.markdownToFacets(text, schema: schema)
             return LeafletBlock(
-                type: b("header"), plaintext: plaintext, level: level,
+                type: LeafletTypes.shared.BLOCKS_HEADER, plaintext: plaintext, level: level,
                 facets: facets.isEmpty ? nil : facets
             )
 
         case .paragraph(let text):
             let (plaintext, facets) = FacetConverter.markdownToFacets(text, schema: schema)
             return LeafletBlock(
-                type: b("text"), plaintext: plaintext,
+                type: LeafletTypes.shared.BLOCKS_TEXT, plaintext: plaintext,
                 facets: facets.isEmpty ? nil : facets
             )
 
         case .blockquote(let text):
             let (plaintext, facets) = FacetConverter.markdownToFacets(text, schema: schema)
             return LeafletBlock(
-                type: b("blockquote"), plaintext: plaintext,
+                type: LeafletTypes.shared.BLOCKS_BLOCKQUOTE, plaintext: plaintext,
                 facets: facets.isEmpty ? nil : facets
             )
 
         case .code(let language, let content):
             if language == "math" {
-                return LeafletBlock(type: b("math"), tex: content)
+                return LeafletBlock(type: LeafletTypes.shared.BLOCKS_MATH, tex: content)
             }
             return LeafletBlock(
-                type: b("code"), plaintext: content, language: language
+                type: LeafletTypes.shared.BLOCKS_CODE, plaintext: content, language: language
             )
 
         case .math(let tex):
-            return LeafletBlock(type: b("math"), tex: tex)
+            return LeafletBlock(type: LeafletTypes.shared.BLOCKS_MATH, tex: tex)
 
         case .horizontalRule:
-            return LeafletBlock(type: b("horizontalRule"))
+            return LeafletBlock(type: LeafletTypes.shared.BLOCKS_HORIZONTAL_RULE)
 
         case .image(let alt, let url):
             // Match CID against previous content's blobs (standard.horse pattern).
@@ -359,7 +359,7 @@ struct LeafletProvider: ContentProvider {
             let isCID = url.hasPrefix("baf") || url.hasPrefix("Qm")
             if isCID, let existingBlob = previousBlobs[url] {
                 return LeafletBlock(
-                    type: b("image"), image: existingBlob, alt: alt.isEmpty ? nil : alt
+                    type: LeafletTypes.shared.BLOCKS_IMAGE, image: existingBlob, alt: alt.isEmpty ? nil : alt
                 )
             }
             // External URLs can't be stored in leaflet format.
@@ -367,15 +367,15 @@ struct LeafletProvider: ContentProvider {
 
         case .unorderedList(let items):
             let listItems = items.map { markdownToLeafletListItem($0, ordered: false, previousBlobs: previousBlobs) }
-            return LeafletBlock(type: b("unorderedList"), children: listItems)
+            return LeafletBlock(type: LeafletTypes.shared.BLOCKS_UNORDERED_LIST, children: listItems)
 
         case .orderedList(let start, let items):
             let listItems = items.map { markdownToLeafletListItem($0, ordered: true, previousBlobs: previousBlobs) }
-            return LeafletBlock(type: b("orderedList"), children: listItems, startIndex: start)
+            return LeafletBlock(type: LeafletTypes.shared.BLOCKS_ORDERED_LIST, children: listItems, startIndex: start)
 
         case .taskList(let items):
             let listItems = items.map { markdownToLeafletListItem($0, ordered: false, previousBlobs: previousBlobs) }
-            return LeafletBlock(type: b("unorderedList"), children: listItems)
+            return LeafletBlock(type: LeafletTypes.shared.BLOCKS_UNORDERED_LIST, children: listItems)
         }
     }
 
@@ -389,7 +389,7 @@ struct LeafletProvider: ContentProvider {
             : "pub.leaflet.blocks.unorderedList#listItem"
         let (plaintext, facets) = FacetConverter.markdownToFacets(item.text, schema: schema)
         let content = LeafletBlock(
-            type: b("text"), plaintext: plaintext,
+            type: LeafletTypes.shared.BLOCKS_TEXT, plaintext: plaintext,
             facets: facets.isEmpty ? nil : facets
         )
         let children = item.children?.map { markdownToLeafletListItem($0, ordered: false, previousBlobs: previousBlobs) }
@@ -454,6 +454,7 @@ struct PcktProvider: ContentProvider {
         "blog.pckt.block.noteEmbed": "note embeds",
         "blog.pckt.block.hardBreak": "hard breaks",
     ]
+    // NOTE: Loss labels are also defined in shared KMP BlockLossLabels.pckt.
 
     func matches(_ content: UnknownType?) -> Bool {
         content?.getRecord(ofType: PcktContent.self) != nil
@@ -478,7 +479,7 @@ struct PcktProvider: ContentProvider {
 
     private func pcktBlockToMarkdown(_ block: PcktBlock, lost: inout Set<String>) -> MarkdownBlockNode? {
         switch block.type {
-        case b("text"):
+        case LeafletTypes.shared.BLOCKS_TEXT:
             let text = FacetConverter.facetsToMarkdown(
                 block.plaintext ?? "", facets: block.facets, schema: schema
             )
@@ -491,7 +492,7 @@ struct PcktProvider: ContentProvider {
             )
             return .heading(level: level, text: text)
 
-        case b("blockquote"):
+        case LeafletTypes.shared.BLOCKS_BLOCKQUOTE:
             let inner = block.content ?? []
             let text = inner.map { block in
                 FacetConverter.facetsToMarkdown(
@@ -503,13 +504,13 @@ struct PcktProvider: ContentProvider {
         case b("codeBlock"):
             return .code(language: block.language, content: block.plaintext ?? "")
 
-        case b("horizontalRule"):
+        case LeafletTypes.shared.BLOCKS_HORIZONTAL_RULE:
             return .horizontalRule
 
         case b("hardBreak"):
             return nil  // paragraph breaks already separate blocks
 
-        case b("image"):
+        case LeafletTypes.shared.BLOCKS_IMAGE:
             let attrs = block.attrs
             let url = attrs?.blob?.reference.link ?? attrs?.src ?? ""
             return .image(alt: attrs?.alt ?? "", url: url)
@@ -518,7 +519,7 @@ struct PcktProvider: ContentProvider {
             let items = (block.listContent ?? []).map { pcktListItemToMarkdown($0) }
             return .unorderedList(items: items)
 
-        case b("orderedList"):
+        case LeafletTypes.shared.BLOCKS_ORDERED_LIST:
             let start = block.start ?? 1
             let items = (block.listContent ?? []).map { pcktListItemToMarkdown($0) }
             return .orderedList(start: start, items: items)
@@ -542,11 +543,11 @@ struct PcktProvider: ContentProvider {
         var children: [MarkdownListItemNode]? = nil
         for block in item.content ?? [] {
             switch block.type {
-            case b("text"):
+            case LeafletTypes.shared.BLOCKS_TEXT:
                 text += FacetConverter.facetsToMarkdown(
                     block.plaintext ?? "", facets: block.facets, schema: schema
                 )
-            case b("bulletList"), b("orderedList"):
+            case b("bulletList"), LeafletTypes.shared.BLOCKS_ORDERED_LIST:
                 // A nested sub-list lives as another entry in this item's
                 // `content` array, alongside its text block — see
                 // standard.horse's `pckt.ts` `listItemToMdast`.
@@ -585,15 +586,15 @@ struct PcktProvider: ContentProvider {
         case .paragraph(let text):
             let (plaintext, facets) = FacetConverter.markdownToFacets(text, schema: schema)
             return PcktBlock(
-                type: b("text"), plaintext: plaintext,
+                type: LeafletTypes.shared.BLOCKS_TEXT, plaintext: plaintext,
                 facets: facets.isEmpty ? nil : facets
             )
 
         case .blockquote(let text):
             let (plaintext, facets) = FacetConverter.markdownToFacets(text, schema: schema)
             return PcktBlock(
-                type: b("blockquote"),
-                content: [PcktBlock(type: b("text"), plaintext: plaintext,
+                type: LeafletTypes.shared.BLOCKS_BLOCKQUOTE,
+                content: [PcktBlock(type: LeafletTypes.shared.BLOCKS_TEXT, plaintext: plaintext,
                                      facets: facets.isEmpty ? nil : facets)]
             )
 
@@ -607,12 +608,12 @@ struct PcktProvider: ContentProvider {
             return nil
 
         case .horizontalRule:
-            return PcktBlock(type: b("horizontalRule"))
+            return PcktBlock(type: LeafletTypes.shared.BLOCKS_HORIZONTAL_RULE)
 
         case .image(let alt, let url):
             // Pckt allows a plain URL src (unlike leaflet)
             return PcktBlock(
-                type: b("image"),
+                type: LeafletTypes.shared.BLOCKS_IMAGE,
                 attrs: PcktBlockAttrs(src: url, alt: alt)
             )
 
@@ -622,7 +623,7 @@ struct PcktProvider: ContentProvider {
 
         case .orderedList(let start, let items):
             let listItems = items.map { markdownToPcktListItem($0, isTaskItem: false) }
-            return PcktBlock(type: b("orderedList"), listContent: listItems, start: start)
+            return PcktBlock(type: LeafletTypes.shared.BLOCKS_ORDERED_LIST, listContent: listItems, start: start)
 
         case .taskList(let items):
             let listItems = items.map { markdownToPcktListItem($0, isTaskItem: true) }
@@ -633,7 +634,7 @@ struct PcktProvider: ContentProvider {
     private func markdownToPcktListItem(_ item: MarkdownListItemNode, isTaskItem: Bool) -> PcktListItem {
         let (plaintext, facets) = FacetConverter.markdownToFacets(item.text, schema: schema)
         var content: [PcktBlock] = [
-            PcktBlock(type: b("text"), plaintext: plaintext, facets: facets.isEmpty ? nil : facets)
+            PcktBlock(type: LeafletTypes.shared.BLOCKS_TEXT, plaintext: plaintext, facets: facets.isEmpty ? nil : facets)
         ]
         if let kids = item.children, !kids.isEmpty {
             // Nested sub-list: another entry in this item's `content` array,
@@ -673,6 +674,7 @@ struct OffprintProvider: ContentProvider {
         "app.offprint.block.imageCarousel": "image carousels",
         "app.offprint.block.imageDiff": "image comparisons",
     ]
+    // NOTE: Loss labels are also defined in shared KMP BlockLossLabels.offprint.
 
     func matches(_ content: UnknownType?) -> Bool {
         content?.getRecord(ofType: OffprintContent.self) != nil
@@ -697,7 +699,7 @@ struct OffprintProvider: ContentProvider {
 
     private func offprintBlockToMarkdown(_ block: OffprintBlock, lost: inout Set<String>) -> MarkdownBlockNode? {
         switch block.type {
-        case b("text"):
+        case LeafletTypes.shared.BLOCKS_TEXT:
             let text = FacetConverter.facetsToMarkdown(
                 block.plaintext ?? "", facets: block.facets, schema: schema
             )
@@ -710,7 +712,7 @@ struct OffprintProvider: ContentProvider {
             )
             return .heading(level: level, text: text)
 
-        case b("blockquote"):
+        case LeafletTypes.shared.BLOCKS_BLOCKQUOTE:
             let inner = block.content ?? []
             let text = inner.map { block in
                 FacetConverter.facetsToMarkdown(
@@ -725,10 +727,10 @@ struct OffprintProvider: ContentProvider {
         case b("mathBlock"):
             return .math(tex: block.plaintext ?? "")
 
-        case b("horizontalRule"):
+        case LeafletTypes.shared.BLOCKS_HORIZONTAL_RULE:
             return .horizontalRule
 
-        case b("image"):
+        case LeafletTypes.shared.BLOCKS_IMAGE:
             let cid = block.image?.reference.link ?? ""
             return .image(alt: block.alt ?? "", url: cid)
 
@@ -736,7 +738,7 @@ struct OffprintProvider: ContentProvider {
             let items = (block.children ?? []).map { offprintListItemToMarkdown($0) }
             return .unorderedList(items: items)
 
-        case b("orderedList"):
+        case LeafletTypes.shared.BLOCKS_ORDERED_LIST:
             let start = block.start ?? 1
             let items = (block.children ?? []).map { offprintListItemToMarkdown($0) }
             return .orderedList(start: start, items: items)
@@ -757,7 +759,7 @@ struct OffprintProvider: ContentProvider {
 
     private func offprintListItemToMarkdown(_ item: OffprintListItem) -> MarkdownListItemNode {
         var text = ""
-        if let content = item.content, content.type == b("text") {
+        if let content = item.content, content.type == LeafletTypes.shared.BLOCKS_TEXT {
             text = FacetConverter.facetsToMarkdown(
                 content.plaintext ?? "", facets: content.facets, schema: schema
             )
@@ -798,15 +800,15 @@ struct OffprintProvider: ContentProvider {
         case .paragraph(let text):
             let (plaintext, facets) = FacetConverter.markdownToFacets(text, schema: schema)
             return OffprintBlock(
-                type: b("text"), plaintext: plaintext,
+                type: LeafletTypes.shared.BLOCKS_TEXT, plaintext: plaintext,
                 facets: facets.isEmpty ? nil : facets
             )
 
         case .blockquote(let text):
             let (plaintext, facets) = FacetConverter.markdownToFacets(text, schema: schema)
             return OffprintBlock(
-                type: b("blockquote"),
-                content: [OffprintBlock(type: b("text"), plaintext: plaintext,
+                type: LeafletTypes.shared.BLOCKS_BLOCKQUOTE,
+                content: [OffprintBlock(type: LeafletTypes.shared.BLOCKS_TEXT, plaintext: plaintext,
                                         facets: facets.isEmpty ? nil : facets)]
             )
 
@@ -819,7 +821,7 @@ struct OffprintProvider: ContentProvider {
             return OffprintBlock(type: b("mathBlock"), plaintext: tex)
 
         case .horizontalRule:
-            return OffprintBlock(type: b("horizontalRule"))
+            return OffprintBlock(type: LeafletTypes.shared.BLOCKS_HORIZONTAL_RULE)
 
         case .image:
             // Offprint images are blob-only; external URLs can't be stored
@@ -831,7 +833,7 @@ struct OffprintProvider: ContentProvider {
 
         case .orderedList(let start, let items):
             let listItems = items.map { markdownToOffprintListItem($0, ordered: true) }
-            return OffprintBlock(type: b("orderedList"), children: listItems, start: start)
+            return OffprintBlock(type: LeafletTypes.shared.BLOCKS_ORDERED_LIST, children: listItems, start: start)
 
         case .taskList(let items):
             let listItems = items.map { markdownToOffprintListItem($0, ordered: false) }
@@ -842,7 +844,7 @@ struct OffprintProvider: ContentProvider {
     private func markdownToOffprintListItem(_ item: MarkdownListItemNode, ordered: Bool) -> OffprintListItem {
         let (plaintext, facets) = FacetConverter.markdownToFacets(item.text, schema: schema)
         let textBlock = OffprintBlock(
-            type: b("text"), plaintext: plaintext,
+            type: LeafletTypes.shared.BLOCKS_TEXT, plaintext: plaintext,
             facets: facets.isEmpty ? nil : facets
         )
         let children = item.children?.map { markdownToOffprintListItem($0, ordered: ordered) }

@@ -104,7 +104,13 @@ final class NotificationManager {
                 // Filter documents that belong to this publication.
                 let pubDocs: [DocumentEntry]
                 if let pubEntry {
-                    pubDocs = docs.filter { pubEntry.contains($0.record) }
+                    pubDocs = docs.filter {
+                        sharedDocumentBelongsToPublication(
+                            documentSite: $0.record.site,
+                            publicationUri: pubEntry.uri,
+                            publicationUrl: pubEntry.record.url
+                        )
+                    }
                 } else {
                     pubDocs = docs.filter { $0.record.site == sub.record.publication }
                 }

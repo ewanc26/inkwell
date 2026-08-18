@@ -53,7 +53,13 @@ import uk.ewancroft.inkwell.data.model.content.LeafletPollVote
 import uk.ewancroft.inkwell.data.model.content.ListItem as ListItemModel
 import uk.ewancroft.inkwell.data.repository.PdsRepository
 import uk.ewancroft.inkwell.shared.AtUri
+import uk.ewancroft.inkwell.shared.content.BlueskyEmbedTypes
+import uk.ewancroft.inkwell.shared.content.CdnUrls
+import uk.ewancroft.inkwell.shared.content.LeafletTypes
 import uk.ewancroft.inkwell.shared.facets.FacetSchema
+import uk.ewancroft.inkwell.shared.text.NumberFormat
+import uk.ewancroft.inkwell.shared.text.Utf8Offsets
+import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
 import uk.ewancroft.inkwell.util.formatPublishedDate
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,25 +81,25 @@ fun LeafletBlockContent(
     }
 
     when (block.type) {
-        "pub.leaflet.blocks.text" -> TextBlock(block, alignModifier, textAlign)
-        "pub.leaflet.blocks.header" -> HeaderBlock(block, alignModifier, textAlign)
-        "pub.leaflet.blocks.paragraph", "pub.leaflet.blocks.blockquote" -> ParagraphBlock(block, alignModifier, textAlign)
-        "pub.leaflet.blocks.code" -> CodeBlock(block)
-        "pub.leaflet.blocks.math" -> MathBlock(block)
-        "pub.leaflet.blocks.image" -> ImageBlock(block, authorDid)
-        "pub.leaflet.blocks.unorderedList" -> UnorderedListBlock(block, pollData, onLoadPoll, onCastVote)
-        "pub.leaflet.blocks.orderedList" -> OrderedListBlock(block, pollData, onLoadPoll, onCastVote)
-        "pub.leaflet.blocks.checklist" -> ChecklistBlock(block, pollData, onLoadPoll, onCastVote)
-        "pub.leaflet.blocks.bskyPost" -> BskyPostBlock(block)
-        "pub.leaflet.blocks.standardSitePost" -> StandardSitePostBlock(block)
-        "pub.leaflet.blocks.website" -> WebsiteEmbedBlock(block)
-        "pub.leaflet.blocks.iframe" -> IframeEmbedBlock(block)
-        "pub.leaflet.blocks.button" -> ButtonBlock(block)
-        "pub.leaflet.blocks.divider" -> DividerBlock()
-        "pub.leaflet.blocks.page" -> PageBlock(block)
-        "pub.leaflet.blocks.postsList" -> PostsListBlock(block)
-        "pub.leaflet.blocks.signup" -> SignupBlock()
-        "pub.leaflet.blocks.poll" -> PollBlock(block, authorDid, pollData, onLoadPoll, onCastVote)
+        LeafletTypes.BLOCKS_TEXT -> TextBlock(block, alignModifier, textAlign)
+        LeafletTypes.BLOCKS_HEADER -> HeaderBlock(block, alignModifier, textAlign)
+        LeafletTypes.BLOCKS_PARAGRAPH, LeafletTypes.BLOCKS_BLOCKQUOTE -> ParagraphBlock(block, alignModifier, textAlign)
+        LeafletTypes.BLOCKS_CODE -> CodeBlock(block)
+        LeafletTypes.BLOCKS_MATH -> MathBlock(block)
+        LeafletTypes.BLOCKS_IMAGE -> ImageBlock(block, authorDid)
+        LeafletTypes.BLOCKS_UNORDERED_LIST -> UnorderedListBlock(block, pollData, onLoadPoll, onCastVote)
+        LeafletTypes.BLOCKS_ORDERED_LIST -> OrderedListBlock(block, pollData, onLoadPoll, onCastVote)
+        LeafletTypes.BLOCKS_CHECKLIST -> ChecklistBlock(block, pollData, onLoadPoll, onCastVote)
+        LeafletTypes.BLOCKS_BSKY_POST -> BskyPostBlock(block)
+        LeafletTypes.BLOCKS_STANDARD_SITE_POST -> StandardSitePostBlock(block)
+        LeafletTypes.BLOCKS_WEBSITE -> WebsiteEmbedBlock(block)
+        LeafletTypes.BLOCKS_IFRAME -> IframeEmbedBlock(block)
+        LeafletTypes.BLOCKS_BUTTON -> ButtonBlock(block)
+        LeafletTypes.BLOCKS_DIVIDER -> DividerBlock()
+        LeafletTypes.BLOCKS_PAGE -> PageBlock(block)
+        LeafletTypes.BLOCKS_POSTS_LIST -> PostsListBlock(block)
+        LeafletTypes.BLOCKS_SIGNUP -> SignupBlock()
+        LeafletTypes.BLOCKS_POLL -> PollBlock(block, authorDid, pollData, onLoadPoll, onCastVote)
         else -> UnknownBlock(block)
     }
 }
@@ -144,40 +150,8 @@ fun buildAnnotatedString(text: String, facets: List<LeafletFacet>?): AnnotatedSt
     return builder.toAnnotatedString()
 }
 
-private fun byteOffsetsToCharRange(text: String, byteStart: Int, byteEnd: Int): IntRange? {
-    if (byteEnd <= byteStart || byteStart < 0) return null
-
-    var startChar = -1
-    var endChar = -1
-    var bytePos = 0
-
-    for (i in text.indices) {
-        val c = text[i]
-        val charBytes = when {
-            c.code < 0x80 -> 1
-            c.code < 0x800 -> 2
-            c.code < 0xD800 || c.code > 0xDFFF -> 3
-            else -> 4
-        }
-
-        if (startChar == -1 && bytePos + charBytes > byteStart) {
-            startChar = i
-        }
-        if (endChar == -1 && bytePos + charBytes > byteEnd) {
-            endChar = i
-        }
-
-        bytePos += charBytes
-        if (startChar != -1 && endChar != -1) break
-    }
-
-    if (startChar == -1) startChar = text.length
-    if (endChar == -1) endChar = text.length
-    if (bytePos < byteEnd) endChar = text.length
-
-    if (startChar >= endChar) return null
-    return startChar..endChar
-}
+private fun byteOffsetsToCharRange(text: String, byteStart: Int, byteEnd: Int): IntRange? =
+    Utf8Offsets.byteRangeToCharRange(text, byteStart, byteEnd)
 
 @Composable
 private fun FacetedText(
@@ -249,7 +223,7 @@ fun HeaderBlock(block: LeafletBlock, modifier: Modifier = Modifier, textAlign: T
 
 @Composable
 fun ParagraphBlock(block: LeafletBlock, modifier: Modifier = Modifier, textAlign: TextAlign = TextAlign.Start) {
-    if (block.type == "pub.leaflet.blocks.blockquote") {
+    if (block.type == LeafletTypes.BLOCKS_BLOCKQUOTE) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
                 Modifier.width(4.dp).height(40.dp).background(MaterialTheme.colorScheme.primary)
@@ -328,7 +302,7 @@ fun MathBlock(block: LeafletBlock) {
 
 @Composable
 fun ImageBlock(block: LeafletBlock, authorDid: String) {
-    val imageUrl = if (block.image?.link?.startsWith("http") == true) block.image.link else "https://cdn.bsky.app/img/feed_thumbnail/plain/${authorDid}/${block.image?.link}"
+    val imageUrl = if (block.image?.link?.startsWith("http") == true) block.image.link else CdnUrls.bskyThumbnail(authorDid, block.image?.link ?: "")
     AsyncImage(
         model = imageUrl,
         contentDescription = block.alt,
@@ -382,7 +356,7 @@ fun ListItem(
     onCastVote: suspend (String, List<String>) -> Unit = { _, _ -> },
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        if (item.type == "pub.leaflet.blocks.checklist") {
+        if (item.type == LeafletTypes.BLOCKS_CHECKLIST) {
             Box(
                 modifier = Modifier.size(20.dp),
                 contentAlignment = Alignment.Center
@@ -612,18 +586,12 @@ private fun PostStat(icon: androidx.compose.ui.graphics.vector.ImageVector, coun
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         Icon(icon, contentDescription = null, modifier = Modifier.size(12.dp))
         if (count != null) {
-            Text(formatCount(count), style = MaterialTheme.typography.labelSmall)
+            Text(NumberFormat.formatCount(count), style = MaterialTheme.typography.labelSmall)
         }
     }
 }
 
-private fun formatCount(count: Int): String {
-    return when {
-        count >= 1_000_000 -> "${count / 1_000_000}M"
-        count >= 1_000 -> "${count / 1_000}K"
-        else -> "$count"
-    }
-}
+// Delegates to shared KMP NumberFormat.formatCount
 
 @Composable
 fun StandardSitePostBlock(block: LeafletBlock) {
@@ -694,7 +662,7 @@ private suspend fun fetchStandardSitePost(uri: String): StandardSitePostData? {
             .build()
 
         // Fetch the document record
-        val docUrl = "https://public.api.bsky.app/xrpc/com.atproto.repo.getRecord?repo=${parsed.did}&collection=${parsed.collection}&rkey=${parsed.recordKey}"
+        val docUrl = "${XrpcEndpoints.PUBLIC_BSKY_API}${XrpcEndpoints.REPO_GET_RECORD}?repo=${parsed.did}&collection=${parsed.collection}&rkey=${parsed.recordKey}"
         val docRequest = okhttp3.Request.Builder().url(docUrl).build()
         val docResponse = client.newCall(docRequest).execute()
         if (!docResponse.isSuccessful) return null
@@ -714,7 +682,7 @@ private suspend fun fetchStandardSitePost(uri: String): StandardSitePostData? {
         if (siteUri != null && siteUri.startsWith("at://")) {
             val pubParsed = AtUri.parse(siteUri)
             if (pubParsed != null) {
-                val pubUrl = "https://public.api.bsky.app/xrpc/com.atproto.repo.getRecord?repo=${pubParsed.did}&collection=${pubParsed.collection}&rkey=${pubParsed.recordKey}"
+                val pubUrl = "${XrpcEndpoints.PUBLIC_BSKY_API}${XrpcEndpoints.REPO_GET_RECORD}?repo=${pubParsed.did}&collection=${pubParsed.collection}&rkey=${pubParsed.recordKey}"
                 val pubRequest = okhttp3.Request.Builder().url(pubUrl).build()
                 val pubResponse = client.newCall(pubRequest).execute()
                 if (pubResponse.isSuccessful) {
@@ -748,7 +716,7 @@ private fun StandardSitePostContent(doc: StandardSitePostData, isSmall: Boolean)
         // Cover image
         if (!isSmall && doc.coverImageCid != null) {
             AsyncImage(
-                model = "https://cdn.bsky.app/img/feed_thumbnail/plain/${doc.authorDid}/${doc.coverImageCid}",
+                model = CdnUrls.bskyThumbnail(doc.authorDid, doc.coverImageCid ?: ""),
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()

@@ -41,9 +41,21 @@ final class StandardSiteTests: XCTestCase {
         let urlDocument = document(site: "https://example.com/blog")
         let otherDocument = document(site: "https://elsewhere.example")
 
-        XCTAssertTrue(publication.contains(atDocument))
-        XCTAssertTrue(publication.contains(urlDocument))
-        XCTAssertFalse(publication.contains(otherDocument))
+        XCTAssertTrue(sharedDocumentBelongsToPublication(
+            documentSite: atDocument.site,
+            publicationUri: publication.uri,
+            publicationUrl: publication.record.url
+        ))
+        XCTAssertTrue(sharedDocumentBelongsToPublication(
+            documentSite: urlDocument.site,
+            publicationUri: publication.uri,
+            publicationUrl: publication.record.url
+        ))
+        XCTAssertFalse(sharedDocumentBelongsToPublication(
+            documentSite: otherDocument.site,
+            publicationUri: publication.uri,
+            publicationUrl: publication.record.url
+        ))
     }
 
     func testCanonicalURLUsesPublicationURLForATURISite() {
@@ -67,7 +79,7 @@ final class StandardSiteTests: XCTestCase {
         XCTAssertEqual(
             SiteStandardLexicon.Verification.publicationVerificationURL(
                 for: "https://example.com/writing/"
-            )?.absoluteString,
+            ),
             "https://example.com/.well-known/site.standard.publication/writing"
         )
     }

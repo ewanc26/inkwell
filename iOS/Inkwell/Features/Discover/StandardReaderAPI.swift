@@ -31,9 +31,9 @@ struct ReaderSearchResult: Identifiable, Codable, Equatable, Hashable {
     let handle: String?
 
     var id: String { uri }
-    var isPublication: Bool { type == "publication" }
+    var isPublication: Bool { sharedIsPublication(type: type) }
     var isStandardSiteDocument: Bool {
-        ATURI.parse(uri)?.collection == SiteStandardLexicon.DocumentRecord.type
+        sharedIsStandardSiteDocument(uri: uri)
     }
 
     var createdDate: Date? {
@@ -45,13 +45,14 @@ struct ReaderSearchResult: Identifiable, Codable, Equatable, Hashable {
 
     var webURL: URL? {
         guard let basePath, !basePath.isEmpty else { return nil }
-        let origin = basePath.hasPrefix("http") ? basePath : "https://\(basePath)"
-        if isPublication { return URL(string: origin) }
-        if let path, !path.isEmpty {
-            return URL(string: path.hasPrefix("/") ? origin + path : origin + "/" + path)
-        }
-        guard platform == "leaflet", let rkey else { return nil }
-        return URL(string: origin + "/" + rkey)
+        guard let urlString = sharedWebURL(
+            basePath: basePath,
+            path: path,
+            rkey: rkey,
+            platform: platform,
+            isPublication: isPublication
+        ) else { return nil }
+        return URL(string: urlString)
     }
 }
 

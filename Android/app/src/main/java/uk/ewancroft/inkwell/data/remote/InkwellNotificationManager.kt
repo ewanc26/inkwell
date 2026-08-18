@@ -24,6 +24,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import uk.ewancroft.inkwell.MainActivity
 import uk.ewancroft.inkwell.shared.AtUri
+import uk.ewancroft.inkwell.shared.content.PublicationMatcher
 import uk.ewancroft.inkwell.shared.policy.NotificationPolicy
 import uk.ewancroft.inkwell.shared.policy.NotificationStyle
 import uk.ewancroft.inkwell.data.repository.PdsRepository
@@ -95,8 +96,11 @@ class InkwellNotificationManager @Inject constructor(
                 if (allSeenURIs.contains(uri)) continue
                 val site = doc["site"]?.jsonPrimitive?.contentOrNull ?: continue
 
-                val matches = site == sub.publicationUri ||
-                    pubUrl != null && (site == pubUrl || site.startsWith("$pubUrl/"))
+                val matches = PublicationMatcher.documentBelongsToPublication(
+                    documentSite = site,
+                    publicationUri = sub.publicationUri,
+                    publicationUrl = pubUrl
+                )
                 if (!matches) continue
 
                 val title = doc["title"]?.jsonPrimitive?.contentOrNull ?: "Untitled"

@@ -26,6 +26,8 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import uk.ewancroft.inkwell.shared.graph.CollectionNsids
+import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -411,7 +413,7 @@ private fun DocumentPickerDialog(
         error = null
         try {
             val client = okhttp3.OkHttpClient()
-            val url = "https://public.api.bsky.app/xrpc/com.atproto.repo.listRecords?repo=${pub.did}&collection=site.standard.document&limit=25"
+            val url = "${XrpcEndpoints.PUBLIC_BSKY_API}${XrpcEndpoints.REPO_LIST_RECORDS}?repo=${pub.did}&collection=${CollectionNsids.DOCUMENT}&limit=25"
             val request = okhttp3.Request.Builder().url(url).get().build()
             val body = client.newCall(request).execute().body?.string() ?: return@LaunchedEffect
             val response = kotlinx.serialization.json.Json.parseToJsonElement(body).jsonObject

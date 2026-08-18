@@ -193,6 +193,23 @@ decoupled from both SDKs — a follow-on after the pure-logic modules are proven
 - iOS: `SharedModelMappers.swift` provides `toShared()` / `toiOS()` extensions for theme types, blob/strong refs
 - Complex AT Protocol records (`PublicationRecord`, `DocumentRecord` with `ATRecordProtocol`/`@Serializable`) remain platform-specific for network I/O, but simplified shared versions exist for future shared-logic use
 
+### Content Format Block-Type Mapping ✅
+- Shared: `shared/src/commonMain/kotlin/.../content/` with converters:
+  - `LeafletContentConverter.kt` — MarkdownBlock ↔ Leaflet JSON (pages/blocks)
+  - `PcktContentConverter.kt` — MarkdownBlock ↔ pckt JSON (items array)
+  - `OffprintContentConverter.kt` — MarkdownBlock ↔ Offprint JSON (items array)
+  - `MarkpubContentConverter.kt` — Markdown ↔ Markpub JSON (identity)
+  - `ContentFormatDispatcher.kt` — unified dispatch by format name or `$type`
+  - `BlockLossLabels.kt` — shared loss label maps per format (9 leaflet, 8 pckt, 8 offprint)
+  - `SharedConvertResult.kt` / `SharedWriteResult.kt` — result types
+  - `JsonMapBridge.kt` — converts `Map<String, Any?>` ↔ kotlinx.serialization `JsonObject`
+- Android: `MarkdownConverter.kt` reduced from ~390 lines to ~25 lines (thin adapter)
+- Android: `PcktOffprintConverter.kt` reduced from ~360 lines to ~40 lines (thin adapter)
+- Android: loss reporting now flows through shared `BlockLossLabels` (was silently dropped before)
+- iOS: `SharedKMP.swift` gains `sharedContentToMarkdown()`, `sharedMarkdownToContent()`, `sharedBlockLossLabels()` wrappers
+- iOS: `ContentProvider.swift` loss labels annotated as shared copies; providers retained for `UnknownType` integration
+- Tests: `ContentConverterTest.kt` — 30+ tests covering round-trip for all four formats, edge cases, dispatcher routing, and loss labels
+
 ## Risk Notes
 
 - KMP adds ~2-4 MB to iOS binary (Kotlin/Native runtime).

@@ -26,7 +26,7 @@ import OSLog
 /// via `com.atproto.repo.getRecord` on the commenter's PDS.
 enum ConstellationClient {
     private static let logger = Logger(subsystem: "uk.ewancroft.Inkwell", category: "Constellation")
-    private static let baseURL = "https://constellation.microcosm.blue"
+    private static let baseURL = sharedConstellationApi()
 
     private static let session: URLSession = {
         let config = URLSessionConfiguration.default
@@ -66,7 +66,7 @@ enum ConstellationClient {
     /// - Parameters:
     ///   - subject: The target AT-URI, DID, or HTTPS URL.
     ///   - source: The source collection and JSON path, joined by `:`.
-    ///     e.g. `"pub.leaflet.comment:subject"` for comments on a document.
+    ///     e.g. `"\(sharedLeafletComment()):subject"` for comments on a document.
     ///   - limit: Maximum backlinks per page (≤ 100).
     ///   - cursor: Pagination cursor from a previous page.
     /// - Returns: Backlinks and an optional cursor for the next page.
@@ -76,7 +76,7 @@ enum ConstellationClient {
         limit: Int = 50,
         cursor: String? = nil
     ) async throws -> (backlinks: [Backlink], cursor: String?) {
-        guard var components = URLComponents(string: "\(baseURL)/xrpc/blue.microcosm.links.getBacklinks") else {
+        guard var components = URLComponents(string: "\(baseURL)/xrpc/\(sharedXrpcMicrocosmGetBacklinks())") else {
             throw URLError(.badURL)
         }
 
@@ -122,7 +122,7 @@ enum ConstellationClient {
     ) async -> [Backlink] {
         await paginateBacklinks(
             subject: documentURI,
-            source: "pub.leaflet.comment:subject",
+            source: "\(sharedLeafletComment()):subject",
             maximumCount: maximumCount
         )
     }

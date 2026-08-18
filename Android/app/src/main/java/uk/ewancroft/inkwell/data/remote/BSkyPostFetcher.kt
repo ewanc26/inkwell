@@ -10,6 +10,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import uk.ewancroft.inkwell.data.model.bluesky.BSkyPostView
 import uk.ewancroft.inkwell.data.model.bluesky.GetPostsResponse
+import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
@@ -19,7 +20,6 @@ import java.util.concurrent.TimeUnit
  */
 object BSkyPostFetcher {
     private const val TAG = "BSkyPostFetcher"
-    private const val BASE_URL = "https://public.api.bsky.app"
 
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
 
@@ -39,7 +39,7 @@ object BSkyPostFetcher {
 
         return withContext(Dispatchers.IO) {
             try {
-                val url = "$BASE_URL/xrpc/app.bsky.feed.getPosts?uris=${java.net.URLEncoder.encode(uri, "UTF-8")}"
+                val url = "${XrpcEndpoints.PUBLIC_BSKY_API}${XrpcEndpoints.FEED_GET_POSTS}?uris=${java.net.URLEncoder.encode(uri, "UTF-8")}"
                 val request = Request.Builder().url(url).build()
                 val response = client.newCall(request).execute()
 

@@ -17,6 +17,9 @@ import kotlinx.serialization.json.put
 import uk.ewancroft.inkwell.data.model.atproto.PublicationRecord
 import uk.ewancroft.inkwell.shared.AtUri
 import uk.ewancroft.inkwell.data.remote.StandardSiteVerifier
+import uk.ewancroft.inkwell.shared.content.ContentFormatDetector
+import uk.ewancroft.inkwell.shared.graph.CollectionNsids
+import uk.ewancroft.inkwell.shared.text.StringUtils
 import uk.ewancroft.inkwell.shared.verification.VerificationFailure
 import uk.ewancroft.inkwell.shared.verification.VerificationResult
 import uk.ewancroft.inkwell.data.repository.PdsRepository
@@ -181,7 +184,7 @@ class WriterViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isCreating = true, createError = null)
             try {
-                val url = state.createUrl.trim().trimEnd('/')
+                val url = StringUtils.trimTrailingSlash(state.createUrl.trim())
                 val name = state.createName.trim()
                 val desc = state.createDescription.trim().ifBlank { null }
 
@@ -213,7 +216,7 @@ class WriterViewModel @Inject constructor(
                 val session = pdsRepository.getSession() ?: return@launch
                 val response = pdsRepository.listRecords(
                     did = session.did,
-                    collection = "site.standard.publication",
+                     collection = CollectionNsids.PUBLICATION,
                     pdsUrl = session.pdsUrl
                 )
                 val records = response["records"]?.jsonArray.orEmpty()
@@ -308,7 +311,7 @@ class WriterViewModel @Inject constructor(
                     }
 
                     val record = buildJsonObject {
-                        put("\$type", "site.standard.document")
+                         put("\$type", CollectionNsids.DOCUMENT)
                         put("site", pub.uri)
                         put("title", state.title.trim())
                         put("publishedAt", now)
@@ -339,7 +342,7 @@ class WriterViewModel @Inject constructor(
                     )
                 } else {
                     val record = buildJsonObject {
-                        put("\$type", "site.standard.document")
+                         put("\$type", CollectionNsids.DOCUMENT)
                         put("site", pub.uri)
                         put("title", state.title.trim())
                         put("publishedAt", now)
@@ -356,7 +359,7 @@ class WriterViewModel @Inject constructor(
                     }
 
                     val result = pdsRepository.createRecord(
-                        collection = "site.standard.document",
+                         collection = CollectionNsids.DOCUMENT,
                         record = record,
                     )
 
@@ -397,9 +400,9 @@ class WriterViewModel @Inject constructor(
                 val content = value["content"]?.jsonObject
                 val contentType = content?.get("\$type")?.jsonPrimitive?.contentOrNull
                 val format = when (contentType) {
-                    "at.markpub.markdown" -> "Markpub"
-                    "blog.pckt.content" -> "pckt"
-                    "app.offprint.content" -> "Offprint"
+                    ContentFormatDetector.MARKPUB -> "Markpub"
+                    ContentFormatDetector.PCKT -> "pckt"
+                    ContentFormatDetector.OFFPRINT -> "Offprint"
                     else -> "Leaflet"
                 }
 

@@ -22,6 +22,8 @@ import uk.ewancroft.inkwell.data.model.atproto.DocumentRecord
 import uk.ewancroft.inkwell.data.model.atproto.PublicationRecord
 import uk.ewancroft.inkwell.data.model.atproto.PublicationTheme
 import uk.ewancroft.inkwell.shared.AtUri
+import uk.ewancroft.inkwell.shared.content.ContentFormatDetector
+import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 import uk.ewancroft.inkwell.data.model.common.StrongRef
 import uk.ewancroft.inkwell.data.model.content.LeafletContent
 import uk.ewancroft.inkwell.data.model.content.LeafletPage
@@ -159,7 +161,7 @@ class PostDetailViewModel @Inject constructor(
 
                 if (_uiState.value.uri != uri) return@launch
                 val pubUri = if (site?.startsWith("at://") == true &&
-                    AtUri.parse(site)?.collection == "site.standard.publication") {
+                    AtUri.parse(site)?.collection == CollectionNsids.PUBLICATION) {
                     site
                 } else {
                     null
@@ -412,7 +414,7 @@ class PostDetailViewModel @Inject constructor(
         if (contentObj != null) {
             val formatType = contentObj["\$type"]?.jsonPrimitive?.contentOrNull
 
-            if (formatType == "pub.leaflet.content") {
+            if (formatType == ContentFormatDetector.LEAFLET) {
                 val leaflet = runCatching { json.decodeFromJsonElement<LeafletContent>(contentObj) }.getOrNull()
                 var pages = leaflet?.pages
                 if (pages.isNullOrEmpty() && leaflet?.blobPages != null) {
@@ -429,7 +431,7 @@ class PostDetailViewModel @Inject constructor(
                 }
             }
 
-            if (formatType == "at.markpub.markdown") {
+            if (formatType == ContentFormatDetector.MARKPUB) {
                 val markdown = contentObj["text"]?.jsonObject?.get("markdown")?.jsonPrimitive?.contentOrNull
                 if (!markdown.isNullOrBlank()) return ParseResult(DocumentContent.Markdown(markdown))
             }

@@ -15,7 +15,7 @@ import OSLog
 
 /// A `pub.leaflet.poll.definition` record.
 struct LeafletPollDefinition: ATRecordProtocol {
-    static let type = "pub.leaflet.poll.definition"
+    static let type = sharedLeafletPollDefinition()
 
     let name: String?
     let options: [PollOption]
@@ -28,7 +28,7 @@ struct LeafletPollDefinition: ATRecordProtocol {
 
 /// A `pub.leaflet.poll.vote` record.
 struct LeafletPollVote: ATRecordProtocol {
-    static let type = "pub.leaflet.poll.vote"
+    static let type = sharedLeafletPollVote()
 
     let poll: ComAtprotoLexicon.Repository.StrongReference
     let option: [String]
@@ -59,7 +59,7 @@ final class PollState {
         do {
             // Fetch the poll definition from the author's PDS
             let (_, _, value) = try await loginStateManager.getRepositoryRecord(
-                from: did, collection: "pub.leaflet.poll.definition",
+                from: did, collection: sharedLeafletPollDefinition(),
                 recordKey: Self.recordKey(from: recordURI)
             )
             definition = value?.getRecord(ofType: LeafletPollDefinition.self)
@@ -71,7 +71,7 @@ final class PollState {
         // Fetch all votes for this poll
         do {
             let votes = try await loginStateManager.listAllRecords(
-                from: did, collection: "pub.leaflet.poll.vote"
+                from: did, collection: sharedLeafletPollVote()
             )
             var counts: [String: Int] = [:]
             var myVoteOptions: [String]? = nil
@@ -114,7 +114,7 @@ final class PollState {
                 option: [option]
             )
             _ = try await loginStateManager.createRecord(
-                collection: "pub.leaflet.poll.vote",
+                    collection: sharedLeafletPollVote(),
                 record: UnknownType.record(vote)
             )
         } catch {

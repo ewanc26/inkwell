@@ -136,12 +136,12 @@ final class LoginStateManager {
             clientId: "https://inkwell.ewancroft.uk/client-metadata.json",
             clientPassword: "",
             scopes: [
-                "atproto",
-                "blob:*/*",
-                "repo:site.standard.publication",
-                "repo:site.standard.document",
-                "repo:site.standard.graph.subscription",
-                "repo:site.standard.graph.recommend"
+                sharedOAuthScopeAtproto(),
+                sharedOAuthScopeBlobAll(),
+                sharedOAuthScopeRepoPublication(),
+                sharedOAuthScopeRepoDocument(),
+                sharedOAuthScopeRepoSubscription(),
+                sharedOAuthScopeRepoRecommend()
             ],
             callbackURL: URL(string: "uk.ewancroft.inkwell:/callback")!
         )
@@ -489,7 +489,7 @@ final class LoginStateManager {
             // use unauthenticated requests so they would succeed either
             // way, masking a broken token until the first mutation.
             do {
-                _ = try await authenticatedData(path: "/xrpc/com.atproto.server.getSession")
+                _ = try await authenticatedData(path: sharedXrpcServerGetSession())
                 logger.info("[RestoreSession] token verification succeeded")
             } catch {
                 logger.warning("[RestoreSession] token verification failed (\(error.localizedDescription)) — clearing session")
@@ -684,7 +684,7 @@ final class LoginStateManager {
 
         if did == currentDID {
             return try await authenticatedData(
-                path: "/xrpc/com.atproto.sync.getBlob",
+                path: sharedXrpcSyncGetBlob(),
                 queryItems: [
                     URLQueryItem(name: "did", value: did),
                     URLQueryItem(name: "cid", value: cid),
@@ -693,7 +693,7 @@ final class LoginStateManager {
         } else {
             return try await unauthenticatedData(
                 pdsURL: pdsURL,
-                path: "/xrpc/com.atproto.sync.getBlob",
+                path: sharedXrpcSyncGetBlob(),
                 queryItems: [
                     URLQueryItem(name: "did", value: did),
                     URLQueryItem(name: "cid", value: cid),
@@ -735,7 +735,7 @@ final class LoginStateManager {
         let bodyData = try JSONEncoder().encode(body)
 
         let data = try await authenticatedData(
-            path: "/xrpc/com.atproto.repo.createRecord",
+            path: sharedXrpcRepoCreateRecord(),
             method: "POST",
             body: bodyData
         )
@@ -764,7 +764,7 @@ final class LoginStateManager {
         )
 
         _ = try await authenticatedData(
-            path: "/xrpc/com.atproto.repo.deleteRecord",
+            path: sharedXrpcRepoDeleteRecord(),
             method: "POST",
             body: bodyData
         )
@@ -787,13 +787,13 @@ final class LoginStateManager {
         let data: Data
         if did == currentDID {
             data = try await authenticatedData(
-                path: "/xrpc/com.atproto.repo.getRecord",
+                path: sharedXrpcRepoGetRecord(),
                 queryItems: queryItems
             )
         } else {
             data = try await unauthenticatedData(
                 pdsURL: pdsURL,
-                path: "/xrpc/com.atproto.repo.getRecord",
+                path: sharedXrpcRepoGetRecord(),
                 queryItems: queryItems
             )
         }
@@ -841,19 +841,19 @@ final class LoginStateManager {
                 do {
                     data = try await unauthenticatedData(
                         pdsURL: pdsURL,
-                        path: "/xrpc/com.atproto.repo.listRecords",
+                        path: sharedXrpcRepoListRecords(),
                         queryItems: queryItems
                     )
                 } catch LoginError.httpError(let status) where status == 401 || status == 403 {
                     data = try await authenticatedData(
-                        path: "/xrpc/com.atproto.repo.listRecords",
+                        path: sharedXrpcRepoListRecords(),
                         queryItems: queryItems
                     )
                 }
             } else {
                 data = try await unauthenticatedData(
                     pdsURL: pdsURL,
-                    path: "/xrpc/com.atproto.repo.listRecords",
+                    path: sharedXrpcRepoListRecords(),
                     queryItems: queryItems
                 )
             }
@@ -903,19 +903,19 @@ final class LoginStateManager {
             do {
                 data = try await unauthenticatedData(
                     pdsURL: pdsURL,
-                    path: "/xrpc/com.atproto.repo.listRecords",
+                    path: sharedXrpcRepoListRecords(),
                     queryItems: queryItems
                 )
             } catch LoginError.httpError(let status) where status == 401 || status == 403 {
                 data = try await authenticatedData(
-                    path: "/xrpc/com.atproto.repo.listRecords",
+                    path: sharedXrpcRepoListRecords(),
                     queryItems: queryItems
                 )
             }
         } else {
             data = try await unauthenticatedData(
                 pdsURL: pdsURL,
-                path: "/xrpc/com.atproto.repo.listRecords",
+                path: sharedXrpcRepoListRecords(),
                 queryItems: queryItems
             )
         }

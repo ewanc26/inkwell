@@ -14,6 +14,8 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import uk.ewancroft.inkwell.data.model.bluesky.BlueskyProfile
 import uk.ewancroft.inkwell.shared.AtUri
+import uk.ewancroft.inkwell.shared.graph.CollectionNsids
+import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
 import uk.ewancroft.inkwell.data.model.atproto.DocumentRecord
 import uk.ewancroft.inkwell.data.remote.StandardSiteVerifier
 import uk.ewancroft.inkwell.shared.verification.VerificationResult
@@ -147,7 +149,7 @@ class ReaderViewModel @Inject constructor(
                         val profile = runCatching { pdsRepository.getProfile(did) }.getOrNull()
                         val docsResponse = pdsRepository.listRecords(
                             did = did,
-                            collection = "site.standard.document",
+                            collection = CollectionNsids.DOCUMENT,
                             limit = 25,
                             cursor = cursor,
                         )
@@ -204,7 +206,7 @@ class ReaderViewModel @Inject constructor(
         try {
             val subscriptionsResponse = pdsRepository.listRecords(
                 did = session.did,
-                collection = "site.standard.graph.subscription",
+                collection = CollectionNsids.GRAPH_SUBSCRIPTION,
                 pdsUrl = session.pdsUrl
             )
 
@@ -227,7 +229,7 @@ class ReaderViewModel @Inject constructor(
 
                     val docsResponse = pdsRepository.listRecords(
                         did = parsed.did,
-                        collection = "site.standard.document",
+                         collection = CollectionNsids.DOCUMENT,
                         limit = 25
                     )
                     val docsJson = docsResponse["records"]?.jsonArray.orEmpty()
@@ -281,7 +283,7 @@ class ReaderViewModel @Inject constructor(
 
             val response = pdsRepository.listRecords(
                 did = session.did,
-                collection = "site.standard.document",
+                collection = CollectionNsids.DOCUMENT,
                 pdsUrl = session.pdsUrl
             )
             val docsJson = response["records"]?.jsonArray.orEmpty()

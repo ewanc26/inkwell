@@ -10,6 +10,7 @@ package uk.ewancroft.inkwell.data.model.graph
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 import uk.ewancroft.inkwell.data.model.content.LeafletFacet
 
 // ── standard.site: subscription (follow) ─────────────────────────────────
@@ -17,7 +18,7 @@ import uk.ewancroft.inkwell.data.model.content.LeafletFacet
 /** A follow/subscription edge: user subscribes to a publication. */
 @Serializable
 data class GraphSubscription(
-    @SerialName("\$type") val type: String = "site.standard.graph.subscription",
+    @SerialName("\$type") val type: String = CollectionNsids.GRAPH_SUBSCRIPTION,
     val publication: String,
     val createdAt: String? = null
 )
@@ -27,7 +28,7 @@ data class GraphSubscription(
 /** A recommendation edge: user recommends (likes/bookmarks) a document. */
 @Serializable
 data class GraphRecommend(
-    @SerialName("\$type") val type: String = "site.standard.graph.recommend",
+    @SerialName("\$type") val type: String = CollectionNsids.GRAPH_RECOMMEND,
     val document: String,
     val createdAt: String? = null
 )
@@ -37,7 +38,7 @@ data class GraphRecommend(
 /** A comment on a document, stored as `pub.leaflet.comment`. */
 @Serializable
 data class LeafletComment(
-    @SerialName("\$type") val type: String = "pub.leaflet.comment",
+    @SerialName("\$type") val type: String = CollectionNsids.LEAFLET_COMMENT,
     val subject: String,
     val plaintext: String,
     val facets: List<LeafletFacet>? = null,

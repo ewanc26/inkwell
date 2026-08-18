@@ -19,6 +19,8 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import uk.ewancroft.inkwell.shared.graph.CollectionNsids
+import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
 import java.net.URLEncoder
 import java.util.concurrent.TimeUnit
 import uk.ewancroft.inkwell.data.model.bluesky.ConstellationBacklink
@@ -26,10 +28,9 @@ import uk.ewancroft.inkwell.data.model.bluesky.ConstellationResponse
 import uk.ewancroft.inkwell.shared.constellation.ConstellationPagination
 import uk.ewancroft.inkwell.shared.constellation.ConstellationBacklink as SharedBacklink
 import uk.ewancroft.inkwell.shared.constellation.ConstellationResponse as SharedResponse
+import uk.ewancroft.inkwell.shared.constellation.ConstellationSourcePaths
 
 object ConstellationClient {
-    private const val BASE_URL = "https://constellation.microcosm.blue"
-
     private val json = Json { ignoreUnknownKeys = true }
 
     private val client = OkHttpClient.Builder()
@@ -51,7 +52,7 @@ object ConstellationClient {
         limit: Int = 50,
         cursor: String? = null
     ): ConstellationResponse = withContext(Dispatchers.IO) {
-        val urlBuilder = StringBuilder("$BASE_URL/xrpc/blue.microcosm.links.getBacklinks")
+        val urlBuilder = StringBuilder("${XrpcEndpoints.CONSTELLATION_API}${XrpcEndpoints.MICROCOSM_GET_BACKLINKS}")
             .append("?subject=").append(enc(subject))
             .append("&source=").append(enc(source))
             .append("&limit=").append(limit)
@@ -96,7 +97,7 @@ object ConstellationClient {
         val first = try {
             getBacklinks(
                 subject = documentUri,
-                source = "site.standard.graph.recommend:document",
+                source = "${CollectionNsids.GRAPH_RECOMMEND}:document",
                 limit = 1
             )
         } catch (_: Exception) {
@@ -108,11 +109,11 @@ object ConstellationClient {
 
     /** Recommends (standard.site graph edges) pointing at this document. */
     suspend fun getRecommendBacklinks(documentUri: String): List<ConstellationBacklink> =
-        paginateBacklinks(documentUri, "site.standard.graph.recommend:document")
+        paginateBacklinks(documentUri, "${CollectionNsids.GRAPH_RECOMMEND}:document")
 
     /** Comments (Leaflet pub.leaflet.comment records) pointing at this document. */
     suspend fun getCommentBacklinks(documentUri: String): List<ConstellationBacklink> =
-        paginateBacklinks(documentUri, "pub.leaflet.comment:subject")
+        paginateBacklinks(documentUri, "${CollectionNsids.LEAFLET_COMMENT}:subject")
 
     /**
      * Mentions in Bluesky posts: searches both link facets and embed.external URIs.
@@ -121,10 +122,10 @@ object ConstellationClient {
      */
     suspend fun getDocumentMentionBacklinks(url: String): List<ConstellationBacklink> = coroutineScope {
         val facets = async { paginateBacklinks(
-            url, "app.bsky.feed.post:facets[].features[app.bsky.richtext.facet#link].uri"
+            url, ConstellationSourcePaths.MENTION_FACET_LINK
         ) }
         val embeds = async { paginateBacklinks(
-            url, "app.bsky.feed.post:embed.external.uri"
+            url, ConstellationSourcePaths.EMBED_EXTERNAL_URI
         ) }
         val f = facets.await()
         val e = embeds.await()
