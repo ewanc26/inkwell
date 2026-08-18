@@ -428,137 +428,14 @@ fun WriterScreen(
             }
 
             if (uiState.showCreateDialog) {
-                AlertDialog(
-                    onDismissRequest = { viewModel.dismissCreateDialog() },
-                    title = { Text("New Publication") },
-                    text = {
-                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            OutlinedTextField(
-                                value = uiState.createUrl,
-                                onValueChange = { viewModel.onCreateUrlChanged(it) },
-                                label = { Text("URL (e.g. https://mysite.com)") },
-                                singleLine = true,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            OutlinedTextField(
-                                value = uiState.createName,
-                                onValueChange = { viewModel.onCreateNameChanged(it) },
-                                label = { Text("Publication Name") },
-                                singleLine = true,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            OutlinedTextField(
-                                value = uiState.createDescription,
-                                onValueChange = { viewModel.onCreateDescriptionChanged(it) },
-                                label = { Text("Description (optional)") },
-                                maxLines = 3,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            if (uiState.createError != null) {
-                                Text(
-                                    uiState.createError!!,
-                                    color = MaterialTheme.colorScheme.error,
-                                    style = MaterialTheme.typography.bodySmall
-                                )
-                            }
-                        }
-                    },
-                    confirmButton = {
-                        Button(
-                            onClick = { viewModel.createPublication() },
-                            enabled = uiState.createUrl.isNotBlank() && uiState.createName.isNotBlank() && !uiState.isCreating
-                        ) {
-                            if (uiState.isCreating) {
-                                CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp,
-                                    color = MaterialTheme.colorScheme.onPrimary)
-                                Spacer(Modifier.width(8.dp))
-                            }
-                            Text("Create")
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { viewModel.dismissCreateDialog() }) {
-                            Text("Cancel")
-                        }
-                    }
+                CreatePublicationDialog(
+                    uiState = uiState,
+                    onUrlChanged = { viewModel.onCreateUrlChanged(it) },
+                    onNameChanged = { viewModel.onCreateNameChanged(it) },
+                    onDescriptionChanged = { viewModel.onCreateDescriptionChanged(it) },
+                    onCreate = { viewModel.createPublication() },
+                    onDismiss = { viewModel.dismissCreateDialog() },
                 )
             }
         }
     }
-
-@Composable
-private fun DocumentPickerDialog(
-    publications: List<PublicationItem>,
-    selectedPublication: PublicationItem?,
-    onSelectDocument: (String) -> Unit,
-    onDismiss: () -> Unit,
-) {
-    data class DocumentItem(val uri: String, val title: String)
-
-    var selectedPub by remember { mutableStateOf<PublicationItem?>(selectedPublication) }
-    var documents by remember { mutableStateOf<List<DocumentItem>>(emptyList()) }
-    var isLoading by remember { mutableStateOf(false) }
-    var error by remember { mutableStateOf<String?>(null) }
-
-    LaunchedEffect(selectedPub) {
-        val pub = selectedPub ?: return@LaunchedEffect
-        isLoading = true
-        error = null
-        try {
-            val client = okhttp3.OkHttpClient()
-            val url = "${XrpcEndpoints.PUBLIC_BSKY_API}${XrpcEndpoints.REPO_LIST_RECORDS}?repo=${pub.did}&collection=${CollectionNsids.DOCUMENT}&limit=25"
-            val request = okhttp3.Request.Builder().url(url).get().build()
-            val body = client.newCall(request).execute().body?.string() ?: return@LaunchedEffect
-            val response = kotlinx.serialization.json.Json.parseToJsonElement(body).jsonObject
-            val records = response["records"]?.jsonArray.orEmpty()
-            documents = records.mapNotNull { record ->
-                val uri = record.jsonObject["uri"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null
-                val value = record.jsonObject["value"]?.jsonObject ?: return@mapNotNull null
-                val title = value["title"]?.jsonPrimitive?.contentOrNull ?: "Untitled"
-                DocumentItem(uri, title)
-            }
-        } catch (e: Exception) {
-            error = e.message
-        } finally {
-            isLoading = false
-        }
-    }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Select a document to edit") },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (error != null) {
-                    Text(error!!, color = MaterialTheme.colorScheme.error)
-                }
-                if (isLoading) {
-                    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(Modifier.size(24.dp))
-                    }
-                } else if (documents.isEmpty()) {
-                    Text("No documents found.", style = MaterialTheme.typography.bodyMedium)
-                } else {
-                    androidx.compose.foundation.lazy.LazyColumn(
-                        modifier = Modifier.heightIn(max = 300.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
-                    ) {
-                        items(documents) { doc ->
-                            TextButton(
-                                onClick = { onSelectDocument(doc.uri) },
-                                modifier = Modifier.fillMaxWidth(),
-                            ) {
-                                Text(doc.title)
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel")
-            }
-        },
-    )
-}

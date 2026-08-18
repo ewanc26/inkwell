@@ -20,6 +20,7 @@ import uk.ewancroft.inkwell.data.model.atproto.DocumentRecord
 import uk.ewancroft.inkwell.data.remote.StandardSiteVerifier
 import uk.ewancroft.inkwell.shared.verification.VerificationResult
 import uk.ewancroft.inkwell.data.repository.PdsRepository
+import uk.ewancroft.inkwell.data.repository.getProfile
 import uk.ewancroft.inkwell.ScreenshotConfig
 import uk.ewancroft.inkwell.util.formatPublishedDate
 import javax.inject.Inject

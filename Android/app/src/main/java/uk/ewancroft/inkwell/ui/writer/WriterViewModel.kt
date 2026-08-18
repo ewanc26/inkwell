@@ -7,79 +7,30 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.put
 import uk.ewancroft.inkwell.data.model.atproto.PublicationRecord
 import uk.ewancroft.inkwell.shared.AtUri
 import uk.ewancroft.inkwell.data.remote.StandardSiteVerifier
-import uk.ewancroft.inkwell.shared.content.ContentFormatDetector
-import uk.ewancroft.inkwell.shared.content.ContentFormatDispatcher
-import uk.ewancroft.inkwell.shared.content.JsonMapBridge
-import uk.ewancroft.inkwell.shared.markdown.MarkdownSerializer
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 import uk.ewancroft.inkwell.shared.text.StringUtils
-import uk.ewancroft.inkwell.shared.verification.VerificationFailure
 import uk.ewancroft.inkwell.shared.verification.VerificationResult
 import uk.ewancroft.inkwell.data.repository.PdsRepository
+import uk.ewancroft.inkwell.data.repository.createPublication
 import uk.ewancroft.inkwell.ScreenshotConfig
 import javax.inject.Inject
 
-data class PublicationItem(
-    val uri: String,
-    val name: String,
-    val did: String
-)
-
-data class WriterUiState(
-    val publications: List<PublicationItem> = emptyList(),
-    val selectedPublication: PublicationItem? = null,
-    val selectedFormat: String = "Leaflet",
-    val title: String = "",
-    val description: String = "",
-    val path: String = "",
-    val markdown: String = "",
-    val isPublishing: Boolean = false,
-    val publishError: String? = null,
-    val publishSuccess: String? = null,
-    val isVerifyingPublication: Boolean = false,
-    val verifiedPublicationUri: String? = null,
-    val verificationMessage: String? = null,
-    val isLoadingPublications: Boolean = false,
-    val showCreateDialog: Boolean = false,
-    val createUrl: String = "",
-    val createName: String = "",
-    val createDescription: String = "",
-    val isCreating: Boolean = false,
-    val createError: String? = null,
-    val publishedUri: String? = null,
-    val editingDocumentUri: String? = null,
-    val editingDocumentTitle: String? = null,
-    val editingDocumentDescription: String? = null,
-    val editingDocumentPath: String? = null,
-    val editingDocumentMarkdown: String? = null,
-    val editingDocumentFormat: String? = null,
-    val editingDocumentRevision: String? = null,
-    val isEditing: Boolean = false,
-    val uploadedBlobs: Map<String, JsonObject> = emptyMap(),
-    val lostFeatures: List<String> = emptyList(),
-    val showPreview: Boolean = true,
-)
-
 @HiltViewModel
 class WriterViewModel @Inject constructor(
-    private val pdsRepository: PdsRepository,
+    internal val pdsRepository: PdsRepository,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(WriterUiState())
-    val uiState: StateFlow<WriterUiState> = _uiState.asStateFlow()
+    internal val uiStateInternal = MutableStateFlow(WriterUiState())
+    val uiState: StateFlow<WriterUiState> = uiStateInternal.asStateFlow()
 
     fun selectPublication(publication: PublicationItem) {
-        _uiState.value = _uiState.value.copy(
+        uiStateInternal.value = uiStateInternal.value.copy(
             selectedPublication = publication,
             verifiedPublicationUri = null,
             verificationMessage = null,
@@ -90,9 +41,9 @@ class WriterViewModel @Inject constructor(
     }
 
     private fun verifySelectedPublication() {
-        val pub = _uiState.value.selectedPublication ?: return
+        val pub = uiStateInternal.value.selectedPublication ?: return
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(
+            uiStateInternal.value = uiStateInternal.value.copy(
                 isVerifyingPublication = true,
                 verifiedPublicationUri = null,
                 verificationMessage = null,
@@ -102,7 +53,7 @@ class WriterViewModel @Inject constructor(
                 val value = record["value"]?.jsonObject
                 val url = value?.get("url")?.jsonPrimitive?.content
                 if (url.isNullOrBlank()) {
-                    _uiState.value = _uiState.value.copy(
+                    uiStateInternal.value = uiStateInternal.value.copy(
                         isVerifyingPublication = false,
                         verificationMessage = "Publication has no URL to verify.",
                     )
@@ -113,19 +64,19 @@ class WriterViewModel @Inject constructor(
                     publicationURI = pub.uri,
                     publication = publication,
                 )
-                _uiState.value = when (result) {
-                    is VerificationResult.Verified -> _uiState.value.copy(
+                uiStateInternal.value = when (result) {
+                    is VerificationResult.Verified -> uiStateInternal.value.copy(
                         isVerifyingPublication = false,
                         verifiedPublicationUri = pub.uri,
                         verificationMessage = "Publication verified.",
                     )
-                    is VerificationResult.Failed -> _uiState.value.copy(
+                    is VerificationResult.Failed -> uiStateInternal.value.copy(
                         isVerifyingPublication = false,
                         verificationMessage = result.failure.reason,
                     )
                 }
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
+                uiStateInternal.value = uiStateInternal.value.copy(
                     isVerifyingPublication = false,
                     verificationMessage = "Verification failed: ${e.message}",
                 )
@@ -134,27 +85,27 @@ class WriterViewModel @Inject constructor(
     }
 
     fun selectFormat(format: String) {
-        _uiState.value = _uiState.value.copy(selectedFormat = format)
+        uiStateInternal.value = uiStateInternal.value.copy(selectedFormat = format)
     }
 
     fun onTitleChanged(title: String) {
-        _uiState.value = _uiState.value.copy(title = title, publishError = null, publishSuccess = null, publishedUri = null)
+        uiStateInternal.value = uiStateInternal.value.copy(title = title, publishError = null, publishSuccess = null, publishedUri = null)
     }
 
     fun onDescriptionChanged(description: String) {
-        _uiState.value = _uiState.value.copy(description = description)
+        uiStateInternal.value = uiStateInternal.value.copy(description = description)
     }
 
     fun onPathChanged(path: String) {
-        _uiState.value = _uiState.value.copy(path = path)
+        uiStateInternal.value = uiStateInternal.value.copy(path = path)
     }
 
     fun onMarkdownChanged(markdown: String) {
-        _uiState.value = _uiState.value.copy(markdown = markdown)
+        uiStateInternal.value = uiStateInternal.value.copy(markdown = markdown)
     }
 
     fun showCreateDialog() {
-        _uiState.value = _uiState.value.copy(
+        uiStateInternal.value = uiStateInternal.value.copy(
             showCreateDialog = true,
             createUrl = "",
             createName = "",
@@ -164,30 +115,30 @@ class WriterViewModel @Inject constructor(
     }
 
     fun dismissCreateDialog() {
-        _uiState.value = _uiState.value.copy(showCreateDialog = false)
+        uiStateInternal.value = uiStateInternal.value.copy(showCreateDialog = false)
     }
 
     fun onCreateUrlChanged(url: String) {
-        _uiState.value = _uiState.value.copy(createUrl = url, createError = null)
+        uiStateInternal.value = uiStateInternal.value.copy(createUrl = url, createError = null)
     }
 
     fun onCreateNameChanged(name: String) {
-        _uiState.value = _uiState.value.copy(createName = name, createError = null)
+        uiStateInternal.value = uiStateInternal.value.copy(createName = name, createError = null)
     }
 
     fun onCreateDescriptionChanged(description: String) {
-        _uiState.value = _uiState.value.copy(createDescription = description)
+        uiStateInternal.value = uiStateInternal.value.copy(createDescription = description)
     }
 
     fun createPublication() {
-        val state = _uiState.value
+        val state = uiStateInternal.value
         if (state.createUrl.isBlank() || state.createName.isBlank()) {
-            _uiState.value = state.copy(createError = "URL and Name are required")
+            uiStateInternal.value = state.copy(createError = "URL and Name are required")
             return
         }
 
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isCreating = true, createError = null)
+            uiStateInternal.value = uiStateInternal.value.copy(isCreating = true, createError = null)
             try {
                 val url = StringUtils.trimTrailingSlash(state.createUrl.trim())
                 val name = state.createName.trim()
@@ -195,14 +146,14 @@ class WriterViewModel @Inject constructor(
 
                 val result = pdsRepository.createPublication(url = url, name = name, description = desc)
                 val newUri = result["uri"]?.jsonPrimitive?.content
-                _uiState.value = _uiState.value.copy(
+                uiStateInternal.value = uiStateInternal.value.copy(
                     isCreating = false,
                     showCreateDialog = false,
                     publishSuccess = "Publication record created. Configure its verification endpoint before publishing.",
                 )
                 loadPublications(selecting = newUri)
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
+                uiStateInternal.value = uiStateInternal.value.copy(
                     isCreating = false,
                     createError = "Failed to create publication: ${e.message}",
                 )
@@ -216,7 +167,7 @@ class WriterViewModel @Inject constructor(
             return
         }
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoadingPublications = true)
+            uiStateInternal.value = uiStateInternal.value.copy(isLoadingPublications = true)
             try {
                 val session = pdsRepository.getSession() ?: return@launch
                 val response = pdsRepository.listRecords(
@@ -235,7 +186,7 @@ class WriterViewModel @Inject constructor(
                         PublicationItem(uri, name, parsed?.did ?: session.did)
                     } catch (_: Exception) { null }
                 }
-                _uiState.value = _uiState.value.copy(
+                uiStateInternal.value = uiStateInternal.value.copy(
                     publications = pubs,
                     selectedPublication = selecting?.let { uri ->
                         pubs.firstOrNull { it.uri == uri }
@@ -243,7 +194,7 @@ class WriterViewModel @Inject constructor(
                     isLoadingPublications = false
                 )
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
+                uiStateInternal.value = uiStateInternal.value.copy(
                     isLoadingPublications = false,
                     publishError = "Failed to load publications: ${e.message}"
                 )
@@ -257,7 +208,7 @@ class WriterViewModel @Inject constructor(
             name = "Ewan's Corner",
             did = "did:plc:ewan",
         )
-        _uiState.value = _uiState.value.copy(
+        uiStateInternal.value = uiStateInternal.value.copy(
             publications = listOf(pub),
             selectedPublication = pub,
             selectedFormat = "Leaflet",
@@ -275,206 +226,8 @@ class WriterViewModel @Inject constructor(
         )
     }
 
-    fun publish() {
-        val state = _uiState.value
-        val pub = state.selectedPublication ?: return
-
-        if (state.title.isBlank()) {
-            _uiState.value = state.copy(publishError = "Title is required")
-            return
-        }
-
-        if (state.verifiedPublicationUri == null) {
-            _uiState.value = state.copy(publishError = "Publication must be verified before publishing")
-            return
-        }
-
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isPublishing = true, publishError = null, publishSuccess = null)
-            try {
-                val now = java.time.Instant.now().toString()
-
-                val normalizedPath = state.path.trim().let { p ->
-                    when {
-                        p.isEmpty() -> ""
-                        p.startsWith("/") -> p
-                        else -> "/$p"
-                    }
-                }
-
-                val content = MarkdownConverter.convert(state.markdown, state.selectedFormat, state.uploadedBlobs)
-                val plaintext = markdownToPlaintext(state.markdown)
-
-                if (state.editingDocumentUri != null) {
-                    val revision = state.editingDocumentRevision
-                    if (revision == null) {
-                        _uiState.value = _uiState.value.copy(
-                            isPublishing = false,
-                            publishError = "Missing revision for existing document",
-                        )
-                        return@launch
-                    }
-
-                    val record = buildJsonObject {
-                         put("\$type", CollectionNsids.DOCUMENT)
-                        put("site", pub.uri)
-                        put("title", state.title.trim())
-                        put("publishedAt", now)
-                        if (state.description.isNotBlank()) {
-                            put("description", state.description.trim())
-                        }
-                        if (normalizedPath.isNotBlank()) {
-                            put("path", normalizedPath)
-                        }
-                        put("content", content)
-                        if (plaintext.isNotBlank()) {
-                            put("textContent", plaintext)
-                        }
-                    }
-
-                    val result = pdsRepository.updateRecord(
-                        uri = state.editingDocumentUri,
-                        record = record,
-                        revision = revision,
-                    )
-
-                    _uiState.value = _uiState.value.copy(
-                        isPublishing = false,
-                        publishSuccess = "Updated successfully.",
-                        publishedUri = state.editingDocumentUri,
-                        editingDocumentUri = null,
-                        editingDocumentRevision = null,
-                    )
-                } else {
-                    val record = buildJsonObject {
-                         put("\$type", CollectionNsids.DOCUMENT)
-                        put("site", pub.uri)
-                        put("title", state.title.trim())
-                        put("publishedAt", now)
-                        if (state.description.isNotBlank()) {
-                            put("description", state.description.trim())
-                        }
-                        if (normalizedPath.isNotBlank()) {
-                            put("path", normalizedPath)
-                        }
-                        put("content", content)
-                        if (plaintext.isNotBlank()) {
-                            put("textContent", plaintext)
-                        }
-                    }
-
-                    val result = pdsRepository.createRecord(
-                         collection = CollectionNsids.DOCUMENT,
-                        record = record,
-                    )
-
-                    val publishedUri = result["uri"]?.jsonPrimitive?.content
-                    _uiState.value = _uiState.value.copy(
-                        isPublishing = false,
-                        publishSuccess = "Published successfully.",
-                        publishedUri = publishedUri,
-                        title = "",
-                        description = "",
-                        path = "",
-                        markdown = "",
-                        uploadedBlobs = emptyMap(),
-                    )
-                }
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    isPublishing = false,
-                    publishError = "Failed to publish: ${e.message}"
-                )
-            }
-        }
-    }
-
-    fun loadDocumentForEditing(uri: String) {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isEditing = true, publishError = null)
-            try {
-                val record = pdsRepository.getRecord(uri)
-                val value = record["value"]?.jsonObject ?: throw IllegalStateException("Missing document value")
-                val cid = record["cid"]?.jsonPrimitive?.content ?: throw IllegalStateException("Missing revision")
-
-                val title = value["title"]?.jsonPrimitive?.content ?: ""
-                val description = value["description"]?.jsonPrimitive?.contentOrNull ?: ""
-                val path = value["path"]?.jsonPrimitive?.contentOrNull ?: ""
-
-                val content = value["content"]?.jsonObject
-                val contentType = content?.get("\$type")?.jsonPrimitive?.contentOrNull
-                val format = when (contentType) {
-                    ContentFormatDetector.MARKPUB -> "Markpub"
-                    ContentFormatDetector.PCKT -> "pckt"
-                    ContentFormatDetector.OFFPRINT -> "Offprint"
-                    else -> "Leaflet"
-                }
-
-                // Convert content to markdown via shared KMP for loss reporting
-                val markdownResult = if (content != null) {
-                    val contentMap = JsonMapBridge.jsonToMap(content)
-                    ContentFormatDispatcher.toMarkdown(contentMap)
-                } else null
-
-                val markdownText = markdownResult?.let {
-                    MarkdownSerializer.serialize(it.blocks)
-                } ?: value["textContent"]?.jsonPrimitive?.contentOrNull ?: ""
-
-                val lostFeatures = markdownResult?.lost?.toList() ?: emptyList()
-
-                val existingBlobs = harvestBlobRefs(markdownText)
-
-                _uiState.value = _uiState.value.copy(
-                    editingDocumentUri = uri,
-                    editingDocumentTitle = title,
-                    editingDocumentDescription = description,
-                    editingDocumentPath = path,
-                    editingDocumentMarkdown = markdownText,
-                    editingDocumentRevision = cid,
-                    title = title,
-                    description = description,
-                    path = path,
-                    markdown = markdownText,
-                    selectedFormat = format,
-                    uploadedBlobs = existingBlobs,
-                    lostFeatures = lostFeatures,
-                    verifiedPublicationUri = null,
-                    verificationMessage = null,
-                    isEditing = false,
-                )
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    isEditing = false,
-                    publishError = "Failed to load document: ${e.message}",
-                )
-            }
-        }
-    }
-
-    private fun harvestBlobRefs(markdown: String?): Map<String, JsonObject> {
-        if (markdown == null) return emptyMap()
-        val regex = Regex("^!\\[([^\\]]*)\\]\\(([^)]+)\\)$", RegexOption.MULTILINE)
-        return regex.findAll(markdown).associate {
-            val url = it.groupValues[2]
-            url to buildJsonObject { put("\$link", url) }
-        }
-    }
-
-    fun cancelEditing() {
-        _uiState.value = _uiState.value.copy(
-            editingDocumentUri = null,
-            editingDocumentRevision = null,
-            editingDocumentTitle = null,
-            editingDocumentDescription = null,
-            editingDocumentPath = null,
-            editingDocumentMarkdown = null,
-            uploadedBlobs = emptyMap(),
-            lostFeatures = emptyList(),
-        )
-    }
-
     fun togglePreview() {
-        _uiState.value = _uiState.value.copy(showPreview = !_uiState.value.showPreview)
+        uiStateInternal.value = uiStateInternal.value.copy(showPreview = !uiStateInternal.value.showPreview)
     }
 
     fun uploadImage(bytes: ByteArray, mimeType: String) {
@@ -487,33 +240,17 @@ class WriterViewModel @Inject constructor(
                     ?: throw Exception("Missing blob reference in upload response")
 
                 val markdown = "\n![Image]($blobLink)\n"
-                val newBlobs = _uiState.value.uploadedBlobs + (blobLink to blobRef)
-                _uiState.value = _uiState.value.copy(
-                    markdown = _uiState.value.markdown + markdown,
+                val newBlobs = uiStateInternal.value.uploadedBlobs + (blobLink to blobRef)
+                uiStateInternal.value = uiStateInternal.value.copy(
+                    markdown = uiStateInternal.value.markdown + markdown,
                     uploadedBlobs = newBlobs,
                     publishError = null,
                 )
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
+                uiStateInternal.value = uiStateInternal.value.copy(
                     publishError = "Failed to upload image: ${e.message}",
                 )
             }
         }
-    }
-
-    private fun markdownToPlaintext(markdown: String): String {
-        var text = markdown
-        text = text.replace(Regex("^#{1,6}\\s+", RegexOption.MULTILINE), "")
-        text = text.replace(Regex("^[-*]\\s+", RegexOption.MULTILINE), "")
-        text = text.replace(Regex("^>\\s*", RegexOption.MULTILINE), "")
-        text = text.replace(Regex("```[\\s\\S]*?```"), "")
-        text = text.replace(Regex("\\*\\*(.+?)\\*\\*"), "$1")
-        text = text.replace(Regex("\\*(.+?)\\*"), "$1")
-        text = text.replace(Regex("~~(.+?)~~"), "$1")
-        text = text.replace(Regex("`(.+?)`"), "$1")
-        text = text.replace(Regex("!\\[(.+?)\\]\\((.+?)\\)"), "$1")
-        text = text.replace(Regex("\\[(.+?)\\]\\((.+?)\\)"), "$1")
-        text = text.replace(Regex("^---$|^\\*\\*\\*$", RegexOption.MULTILINE), "")
-        return text.trim()
     }
 }
