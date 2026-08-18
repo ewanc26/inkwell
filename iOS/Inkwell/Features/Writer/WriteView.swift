@@ -400,12 +400,11 @@ private struct DocumentPickerSheet: View {
             )
 
             documents = records.records.compactMap { record in
-                guard let uri = record.uri,
-                      let value = record.value,
+                guard let value = record.value,
                       let doc = try? value.getRecord(ofType: SiteStandardLexicon.DocumentRecord.self) else {
                     return nil
                 }
-                return (uri, doc.title)
+                return (record.uri, doc.title)
             }
         } catch {
             self.error = error.localizedDescription
