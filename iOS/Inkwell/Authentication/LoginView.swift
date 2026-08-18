@@ -69,46 +69,50 @@ struct LoginView: View {
     }
 
     private var onboardingSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             Label {
-                Text("Read long-form posts from any standard.site blog — directly from the AT Protocol network, no middleman.")
-                    .font(.callout)
+                Text("Read long-form posts from the AT Protocol network.")
+                    .font(.footnote)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             } icon: {
                 Image(systemName: "book")
                     .foregroundStyle(.blue)
-                    .frame(width: 20)
+                    .frame(width: 16)
             }
 
             Label {
-                Text("Subscribe to publications, leave comments, and recommend posts. Your data stays in your PDS.")
-                    .font(.callout)
+                Text("Subscribe, comment, and recommend — your data stays in your PDS.")
+                    .font(.footnote)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             } icon: {
                 Image(systemName: "bell")
                     .foregroundStyle(.orange)
-                    .frame(width: 20)
+                    .frame(width: 16)
             }
 
             Label {
-                Text("Write and publish your own posts using the standard.site lexicon.")
-                    .font(.callout)
+                Text("Write and publish your own posts.")
+                    .font(.footnote)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             } icon: {
                 Image(systemName: "square.and.pencil")
                     .foregroundStyle(.green)
-                    .frame(width: 20)
+                    .frame(width: 16)
             }
         }
-        .padding(16)
-        // A semantic grouped-content fill rather than a translucent
-        // quaternary shape style, so the panel keeps its contrast in dark
-        // mode and with Increase Contrast turned on.
+        .padding(12)
+        // secondarySystemBackground, not secondarySystemGroupedBackground —
+        // this panel sits directly on the screen's plain .systemBackground,
+        // and secondarySystemGroupedBackground is white-on-white against
+        // that in light mode (it's meant to sit on .systemGroupedBackground
+        // instead). secondarySystemBackground is the correct pairing for
+        // "elevated content directly on plain systemBackground" and keeps
+        // contrast in both light and dark mode.
         .background(
-            Color(uiColor: .secondarySystemGroupedBackground),
+            Color(uiColor: .secondarySystemBackground),
             in: .rect(cornerRadius: 12, style: .continuous)
         )
     }
