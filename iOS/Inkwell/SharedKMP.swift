@@ -352,9 +352,11 @@ func sharedFormatCount(_ count: Int) -> String {
 // MARK: - XRPC Endpoints
 
 func sharedXrpcRepoCreateRecord() -> String { XrpcEndpoints.shared.REPO_CREATE_RECORD }
+func sharedXrpcRepoPutRecord() -> String { XrpcEndpoints.shared.REPO_PUT_RECORD }
 func sharedXrpcRepoDeleteRecord() -> String { XrpcEndpoints.shared.REPO_DELETE_RECORD }
 func sharedXrpcRepoGetRecord() -> String { XrpcEndpoints.shared.REPO_GET_RECORD }
 func sharedXrpcRepoListRecords() -> String { XrpcEndpoints.shared.REPO_LIST_RECORDS }
+func sharedXrpcRepoUploadBlob() -> String { XrpcEndpoints.shared.REPO_UPLOAD_BLOB }
 func sharedXrpcSyncGetBlob() -> String { XrpcEndpoints.shared.SYNC_GET_BLOB }
 func sharedXrpcServerGetSession() -> String { XrpcEndpoints.shared.SERVER_GET_SESSION }
 func sharedXrpcIdentityResolveHandle() -> String { XrpcEndpoints.shared.IDENTITY_RESOLVE_HANDLE }
