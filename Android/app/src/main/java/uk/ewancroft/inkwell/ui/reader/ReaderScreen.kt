@@ -17,7 +17,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import uk.ewancroft.inkwell.ScreenshotConfig
+import uk.ewancroft.inkwell.TestingConfig
 import uk.ewancroft.inkwell.ui.reader.InkwellNotificationViewModel
 import uk.ewancroft.inkwell.ui.components.CreditsView
 import uk.ewancroft.inkwell.util.TipPromptManager
@@ -49,7 +49,7 @@ fun ReaderScreen(
         }
     }
 
-    if (!ScreenshotConfig.enabled && !hasRequestedNotificationPermission) {
+    if (!TestingConfig.suppressesInterruptions && !hasRequestedNotificationPermission) {
         LaunchedEffect(Unit) {
             hasRequestedNotificationPermission = true
             notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
@@ -57,7 +57,9 @@ fun ReaderScreen(
     }
 
     LaunchedEffect(Unit) {
-        if (uk.ewancroft.inkwell.util.TipPromptManager.shouldShowTip(appContext)) {
+        if (!TestingConfig.suppressesInterruptions &&
+            uk.ewancroft.inkwell.util.TipPromptManager.shouldShowTip(appContext)
+        ) {
             showTipPrompt = true
         }
     }

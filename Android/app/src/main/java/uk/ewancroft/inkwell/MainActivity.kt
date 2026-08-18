@@ -14,6 +14,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
@@ -43,14 +46,14 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         TipPromptManager.recordLaunch(this)
         enableEdgeToEdge()
-        ScreenshotConfig.enabled = intent.getBooleanExtra("screenshot", false)
-        ScreenshotConfig.tab = intent.getStringExtra("tab") ?: "reader"
+        TestingConfig.enabled = intent.getBooleanExtra("testing", false)
+        TestingConfig.tab = intent.getStringExtra("tab") ?: "reader"
         pendingDocumentUri.value = intent.getStringExtra("documentURI")
         setContent {
             val viewModel: AuthViewModel = hiltViewModel()
 
             val authState by viewModel.uiState.collectAsStateWithLifecycle()
-            val isAuthenticated = ScreenshotConfig.enabled || (authState is AuthUiState.LoggedIn)
+            val isAuthenticated = authState is AuthUiState.LoggedIn
 
             val intentToHandle = pendingIntent.value ?: intent
             LaunchedEffect(intentToHandle) {
@@ -61,7 +64,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            var showSplash by remember { mutableStateOf(!ScreenshotConfig.enabled) }
+            var showSplash by remember { mutableStateOf(!TestingConfig.enabled) }
             val splashOpacity = remember { Animatable(1f) }
 
             LaunchedEffect(Unit) {
@@ -78,14 +81,6 @@ class MainActivity : ComponentActivity() {
                 val splashMarkColor = if (isSystemInDarkTheme()) Color(0xFFFFFFFF) else Color(0xFF000000)
                 Box(Modifier.fillMaxSize()) {
                     when {
-                        ScreenshotConfig.enabled -> {
-                            InkwellNavHost(
-                                isAuthenticated = true,
-                                onSignOut = { viewModel.logout() },
-                                pendingDocumentUri = pendingDocumentUri.value,
-                                onDocumentNavigated = { pendingDocumentUri.value = null },
-                            )
-                        }
                         authState is AuthUiState.Loading -> {
                             Box(
                                 modifier = Modifier.fillMaxSize(),
@@ -124,6 +119,21 @@ class MainActivity : ComponentActivity() {
                                 color = splashMarkColor,
                             )
                         }
+                    }
+
+                    // Hoisted above the nav host so a blocked write explains
+                    // itself here rather than under a screen's own error
+                    // banner, which would read as a genuine failure.
+                    val blockedAction by TestingConfig.blockedAction.collectAsStateWithLifecycle()
+                    if (blockedAction != null) {
+                        AlertDialog(
+                            onDismissRequest = { TestingConfig.clear() },
+                            title = { Text("Testing mode") },
+                            text = { Text("${TestingConfig.MESSAGE}\n\n$blockedAction was not sent.") },
+                            confirmButton = {
+                                TextButton(onClick = { TestingConfig.clear() }) { Text("OK") }
+                            },
+                        )
                     }
                 }
             }
