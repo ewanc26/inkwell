@@ -1,6 +1,4 @@
 {
   "installCommand": "pnpm install",
-  "rewrites": [
-    { "source": "/favicon.ico", "destination": "/favicon.svg" }
-  ]
+  "rewrites": [{ "source": "/favicon.ico", "destination": "/favicon.svg" }]
 }

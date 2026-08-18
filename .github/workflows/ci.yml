@@ -45,6 +45,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Select an Xcode version with the iOS 26 SDK
+        run: |
+          best=""
+          for app in /Applications/Xcode*.app; do
+            if "$app/Contents/Developer/usr/bin/xcodebuild" -showsdks 2>/dev/null | grep -q "iphonesimulator26"; then
+              best="$app"
+            fi
+          done
+          if [ -z "$best" ]; then
+            echo "No installed Xcode has the iOS 26 SDK. Available Xcode versions:" >&2
+            ls /Applications | grep -i xcode >&2
+            exit 1
+          fi
+          echo "Selecting $best"
+          sudo xcode-select -s "$best/Contents/Developer"
+          xcodebuild -version
+
       - name: Resolve an available iOS Simulator destination
         id: destination
         run: |
