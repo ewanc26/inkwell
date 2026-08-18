@@ -26,6 +26,14 @@
       "versions": [
         {
           "version": "2.0.0",
+          "buildVersion": "52",
+          "date": "2026-08-18",
+          "localizedDescription": "Lowers the minimum supported iOS version from 26.0 to 18.0 for broader device compatibility — the two iOS 26-only visual effects used (tab bar minimize-on-scroll, the Reader feed switcher's scroll-edge bar) now fall back gracefully on older versions instead of being required. No other behavior changes from build 51.",
+          "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.0.0.ipa",
+          "size": 11400915
+        },
+        {
+          "version": "2.0.0",
           "buildVersion": "51",
           "date": "2026-08-18",
           "localizedDescription": "Discover is now a persistent tab alongside Read and Write, matching the Android app's navigation. Reader cards show the author's name. Discover publication rows show descriptions and format tags, and subscribed publications are visually distinguished. Internal refactor: large source files split into focused modules per AGENTS.md's file-size guidance, with no behavior changes beyond the fixes above.",
