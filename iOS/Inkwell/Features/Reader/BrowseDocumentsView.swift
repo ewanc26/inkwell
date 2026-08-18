@@ -77,7 +77,23 @@ struct BrowseDocumentsView: View {
                         let mockItem = ReaderFeedItem(
                             document: DocumentEntry(uri: "at://did:plc:ewan/site.standard.document/1", authorDID: "did:plc:ewan", record: mockDoc),
                             publication: PublicationEntry(uri: "at://did:plc:ewan/site.standard.publication/1", authorDID: "did:plc:ewan", record: mockPub),
-                            authorProfile: nil
+                            authorProfile: BSkyActorProfile(
+                                did: "did:plc:ewan",
+                                handle: "ewancroft.uk",
+                                displayName: "Ewan Croft",
+                                description: nil,
+                                avatar: nil,
+                                banner: nil,
+                                followersCount: nil,
+                                followsCount: nil,
+                                postsCount: nil,
+                                createdAt: nil,
+                                indexedAt: nil,
+                                pinnedPost: nil,
+                                labels: nil,
+                                associated: nil,
+                                viewer: nil
+                            )
                         )
                         store.followingState.items = [mockItem]
                         store.followingState.isLoading = false

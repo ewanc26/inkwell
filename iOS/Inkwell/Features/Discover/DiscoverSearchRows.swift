@@ -107,10 +107,16 @@ struct PublicationSearchRow: View {
                 Text(publication.title)
                     .font(.headline)
                     .lineLimit(2)
-                if let basePath = publication.basePath {
-                    Text(basePath)
+                if let snippet = publication.snippet, !snippet.isEmpty {
+                    Text(snippet)
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                        .lineLimit(2)
+                }
+                if publication.platform != nil || publication.basePath != nil {
+                    Text([publication.platform, publication.basePath].compactMap { $0 }.joined(separator: " · "))
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
                         .lineLimit(1)
                         .truncationMode(.middle)
                 }
