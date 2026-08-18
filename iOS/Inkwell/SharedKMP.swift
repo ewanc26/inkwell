@@ -40,7 +40,7 @@ struct FacetSchema {
             code: d.code as String,
             strike: d.strike as String,
             link: d.link as String,
-            lossy: d.lossy as? [String: String] ?? [:]
+            lossy: d.lossy
         )
     }()
     static let pckt: FacetSchema = {
@@ -53,7 +53,7 @@ struct FacetSchema {
             code: d.code as String,
             strike: d.strike as String,
             link: d.link as String,
-            lossy: d.lossy as? [String: String] ?? [:]
+            lossy: d.lossy
         )
     }()
     static let offprint: FacetSchema = {
@@ -66,7 +66,7 @@ struct FacetSchema {
             code: d.code as String,
             strike: d.strike as String,
             link: d.link as String,
-            lossy: d.lossy as? [String: String] ?? [:]
+            lossy: d.lossy
         )
     }()
 }
@@ -506,7 +506,10 @@ func sharedNormalizeHandle(_ handle: String) -> String {
 /// completion — a safety cap so a misbehaving PDS returning an endless
 /// cursor can't hang the caller forever. Shared with Android so both
 /// platforms give up at the same point.
-var sharedMaxRecordsPerList: Int { Int(RecordListPolicy.shared.MAX_RECORDS) }
+/// `nonisolated` because it is used as a default argument (see
+/// `LoginStateManager.listAllRecords`), and default arguments are
+/// evaluated in the caller's context rather than on the main actor.
+nonisolated var sharedMaxRecordsPerList: Int { Int(RecordListPolicy.shared.MAX_RECORDS) }
 
 // MARK: - String Utilities
 
@@ -548,7 +551,7 @@ struct SharedWriteResult {
 func sharedContentToMarkdown(_ content: [String: Any], authorDid: String = "") -> SharedConvertResult {
     let converter = ContentFormatDispatcher.shared
     let result = converter.toMarkdown(content: content, authorDid: authorDid)
-    let lostArray = (result.lost as? Set<String>) ?? []
+    let lostArray = result.lost
     let mdString = MarkdownSerializer.shared.serialize(blocks: result.blocks)
     return SharedConvertResult(markdown: mdString, lost: Array(lostArray))
 }
@@ -557,22 +560,19 @@ func sharedContentToMarkdown(_ content: [String: Any], authorDid: String = "") -
 func sharedMarkdownToContent(_ markdown: String, format: String, uploadedBlobs: [String: [String: Any]] = [:]) -> SharedWriteResult {
     let converter = ContentFormatDispatcher.shared
     let result = converter.fromMarkdown(markdown: markdown, format: format, uploadedBlobs: uploadedBlobs)
-    guard let dict = result.content as? [String: Any] else {
-        return SharedWriteResult(content: [:], lost: [])
-    }
-    let lostArray = (result.lost as? Set<String>) ?? []
-    return SharedWriteResult(content: dict, lost: Array(lostArray))
+    let lostArray = result.lost
+    return SharedWriteResult(content: result.content, lost: Array(lostArray))
 }
 
 /// Returns loss labels for unsupported blocks in a given format.
 func sharedBlockLossLabels(format: String) -> [String: String] {
     switch format {
     case "leaflet":
-        return BlockLossLabels.shared.leaflet as? [String: String] ?? [:]
+        return BlockLossLabels.shared.leaflet
     case "pckt":
-        return BlockLossLabels.shared.pckt as? [String: String] ?? [:]
+        return BlockLossLabels.shared.pckt
     case "offprint":
-        return BlockLossLabels.shared.offprint as? [String: String] ?? [:]
+        return BlockLossLabels.shared.offprint
     default:
         return [:]
     }

@@ -1485,7 +1485,7 @@ extension URLError {
 /// closures — e.g. the `URLResponseProvider` and `DPoPSigner.JWTGenerator`
 /// closures passed to `Authenticator`, which run concurrently and can't
 /// otherwise share a plain `var`.
-final class LockedBox<Value>: @unchecked Sendable {
+nonisolated final class LockedBox<Value>: @unchecked Sendable {
     private let lock = NSLock()
     private var _value: Value
 

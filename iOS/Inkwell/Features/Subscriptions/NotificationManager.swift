@@ -70,6 +70,7 @@ final class NotificationManager {
         } catch {
             // Permission denied — notifications just won't fire, but the
             // in-app notification list still works.
+            logger.error("[NotificationManager] authorization request failed: \(error.localizedDescription)")
         }
     }
 
@@ -82,103 +83,98 @@ final class NotificationManager {
     func pollForNewDocuments(loginStateManager: LoginStateManager) async {
         guard loginStateManager.isAuthenticated else { return }
 
-        do {
-            // Use try? so a DPoP nonce collision (e.g. BrowseDocumentsView
-            // racing the same fetchSubscriptions call) degrades gracefully
-            // instead of logging an error. The cache in LoginStateManager
-            // ensures subsequent polls hit memory, not the network.
-            let subs = (try? await loginStateManager.fetchSubscriptions()) ?? []
-            var newDocs: [(doc: DocumentEntry, pub: PublicationEntry?)] = []
-            var allSeenURIs = Set<String>(lastSeenURIs)
+        // Every fetch below uses try? so a DPoP nonce collision (e.g.
+        // BrowseDocumentsView racing the same fetchSubscriptions call)
+        // degrades gracefully instead of failing the whole poll — polling
+        // is best-effort. The cache in LoginStateManager ensures subsequent
+        // polls hit memory, not the network.
+        let subs = (try? await loginStateManager.fetchSubscriptions()) ?? []
+        var newDocs: [(doc: DocumentEntry, pub: PublicationEntry?)] = []
+        var allSeenURIs = Set<String>(lastSeenURIs)
 
-            for sub in subs {
-                guard let pubURI = sub.publicationURI else { continue }
+        for sub in subs {
+            guard let pubURI = sub.publicationURI else { continue }
 
-                // Fetch the publication record for metadata.
-                let pubs: [PublicationEntry] = (try? await loginStateManager.fetchPublications(fromDID: pubURI.did)) ?? []
-                let pubEntry = pubs.first(where: { $0.uri == sub.record.publication })
+            // Fetch the publication record for metadata.
+            let pubs: [PublicationEntry] = (try? await loginStateManager.fetchPublications(fromDID: pubURI.did)) ?? []
+            let pubEntry = pubs.first(where: { $0.uri == sub.record.publication })
 
-                // Fetch documents from the publication author's repo.
-                let docs: [DocumentEntry] = (try? await loginStateManager.fetchDocuments(fromDID: pubURI.did)) ?? []
+            // Fetch documents from the publication author's repo.
+            let docs: [DocumentEntry] = (try? await loginStateManager.fetchDocuments(fromDID: pubURI.did)) ?? []
 
-                // Filter documents that belong to this publication.
-                let pubDocs: [DocumentEntry]
-                if let pubEntry {
-                    pubDocs = docs.filter {
-                        sharedDocumentBelongsToPublication(
-                            documentSite: $0.record.site,
-                            publicationUri: pubEntry.uri,
-                            publicationUrl: pubEntry.record.url
-                        )
-                    }
-                } else {
-                    pubDocs = docs.filter { $0.record.site == sub.record.publication }
+            // Filter documents that belong to this publication.
+            let pubDocs: [DocumentEntry]
+            if let pubEntry {
+                pubDocs = docs.filter {
+                    sharedDocumentBelongsToPublication(
+                        documentSite: $0.record.site,
+                        publicationUri: pubEntry.uri,
+                        publicationUrl: pubEntry.record.url
+                    )
                 }
-
-                // Find documents we haven't seen before.
-                for doc in pubDocs {
-                    if !allSeenURIs.contains(doc.uri) {
-                        newDocs.append((doc, pubEntry))
-                        allSeenURIs.insert(doc.uri)
-                    }
-                }
+            } else {
+                pubDocs = docs.filter { $0.record.site == sub.record.publication }
             }
 
-            // Only send notifications if this isn't the first poll (first
-            // poll just establishes the baseline of existing documents).
-            let lastPoll = defaults.object(forKey: lastPollKey) as? Date
-            let isFirstPoll = isFirstPoll(lastPollEpochMillis: Int64(lastPoll?.timeIntervalSince1970 ?? -1))
-
-            if !isFirstPoll && !newDocs.isEmpty {
-                // Sort newest first.
-                newDocs.sort { $0.doc.record.publishedAt > $1.doc.record.publishedAt }
-
-                switch notificationStyle(newDocCount: Int32(newDocs.count)) {
-                case .single:
-                    let doc = newDocs[0]
-                    await sendNotification(
-                        title: doc.pub?.record.name ?? "New Document",
-                        body: doc.doc.record.title,
-                        documentURI: doc.doc.uri
-                    )
-                case .summary(let count):
-                    let newest = newDocs[0]
-                    await sendNotification(
-                        title: "\(count) New Documents",
-                        body: "Latest: \(newest.doc.record.title) from \(newest.pub?.record.name ?? "a publication")",
-                        documentURI: newest.doc.uri
-                    )
-                case .none:
-                    break
+            // Find documents we haven't seen before.
+            for doc in pubDocs {
+                if !allSeenURIs.contains(doc.uri) {
+                    newDocs.append((doc, pubEntry))
+                    allSeenURIs.insert(doc.uri)
                 }
-
-                // Update in-app notification list.
-                let newNotifications = newDocs.map { doc in
-                    StandardSiteNotification(
-                        documentURI: doc.doc.uri,
-                        documentTitle: doc.doc.record.title,
-                        publicationName: doc.pub?.record.name,
-                        publishedAt: doc.doc.record.publishedAt,
-                        date: Date()
-                    )
-                }
-                notifications.insert(contentsOf: newNotifications, at: 0)
-
-                // Keep only the most recent notifications.
-                notifications = trimNotifications(notifications) as? [StandardSiteNotification] ?? notifications
-
-                unreadCount += newDocs.count
-                persistNotifications()
             }
-
-            // Update last-seen URIs and poll time.
-            saveLastSeenURIs(allSeenURIs)
-            defaults.set(Date(), forKey: lastPollKey)
-
-        } catch {
-            // Silent failure — polling is best-effort.
-            logger.error("[NotificationManager] poll failed: \(error.localizedDescription)")
         }
+
+        // Only send notifications if this isn't the first poll (first
+        // poll just establishes the baseline of existing documents).
+        let lastPoll = defaults.object(forKey: lastPollKey) as? Date
+        let isFirstPoll = isFirstPoll(lastPollEpochMillis: Int64(lastPoll?.timeIntervalSince1970 ?? -1))
+
+        if !isFirstPoll && !newDocs.isEmpty {
+            // Sort newest first.
+            newDocs.sort { $0.doc.record.publishedAt > $1.doc.record.publishedAt }
+
+            switch notificationStyle(newDocCount: Int32(newDocs.count)) {
+            case .single:
+                let doc = newDocs[0]
+                await sendNotification(
+                    title: doc.pub?.record.name ?? "New Document",
+                    body: doc.doc.record.title,
+                    documentURI: doc.doc.uri
+                )
+            case .summary(let count):
+                let newest = newDocs[0]
+                await sendNotification(
+                    title: "\(count) New Documents",
+                    body: "Latest: \(newest.doc.record.title) from \(newest.pub?.record.name ?? "a publication")",
+                    documentURI: newest.doc.uri
+                )
+            case .none:
+                break
+            }
+
+            // Update in-app notification list.
+            let newNotifications = newDocs.map { doc in
+                StandardSiteNotification(
+                    documentURI: doc.doc.uri,
+                    documentTitle: doc.doc.record.title,
+                    publicationName: doc.pub?.record.name,
+                    publishedAt: doc.doc.record.publishedAt,
+                    date: Date()
+                )
+            }
+            notifications.insert(contentsOf: newNotifications, at: 0)
+
+            // Keep only the most recent notifications.
+            notifications = trimNotifications(notifications) as? [StandardSiteNotification] ?? notifications
+
+            unreadCount += newDocs.count
+            persistNotifications()
+        }
+
+        // Update last-seen URIs and poll time.
+        saveLastSeenURIs(allSeenURIs)
+        defaults.set(Date(), forKey: lastPollKey)
     }
 
     /// Marks all notifications as read.
@@ -214,6 +210,7 @@ final class NotificationManager {
             try await UNUserNotificationCenter.current().add(request)
         } catch {
             // Notification delivery failed — not critical.
+            logger.error("[NotificationManager] failed to schedule notification: \(error.localizedDescription)")
         }
     }
 
