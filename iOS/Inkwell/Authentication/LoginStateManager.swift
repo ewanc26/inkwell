@@ -639,6 +639,41 @@ final class LoginStateManager {
         }
     }
 
+    // MARK: - Blob Upload
+
+    /// Uploads raw data as a blob to the user's PDS.
+    func uploadBlob(_ data: Data, mimeType: String) async throws -> ComAtprotoLexicon.Repository.UploadBlobOutput {
+        guard let authenticator, let pdsURL = resolvedPDSURL else {
+            throw LoginError.notAuthenticated
+        }
+
+        let boundary = "inkwell-upload-\(Int(Date().timeIntervalSince1970 * 1000))"
+        let url = pdsURL.appendingPathComponent(sharedXrpcRepoUploadBlob())
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+
+        var body = Data()
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"upload\"; filename=\"blob\"\r\n".data(using: .utf8)!)
+        body.append("Content-Type: \(mimeType)\r\n\r\n".data(using: .utf8)!)
+        body.append(data)
+        body.append("\r\n--\(boundary)--\r\n".data(using: .utf8)!)
+        request.httpBody = body
+
+        let (responseData, response) = try await authenticator.response(for: request)
+
+        guard let http = response as? HTTPURLResponse,
+              (200...299).contains(http.statusCode) else {
+            let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+            throw LoginError.httpError(status: status)
+        }
+
+        return try JSONDecoder().decode(ComAtprotoLexicon.Repository.UploadBlobOutput.self, from: responseData)
+    }
+
     // MARK: - Record CRUD
 
     /// Creates an AT Protocol record in the user's repository.
@@ -705,6 +740,50 @@ final class LoginStateManager {
             method: "POST",
             body: bodyData
         )
+    }
+
+    /// Updates an existing AT Protocol record in the user's repository.
+    @discardableResult
+    func updateRecord(
+        collection: String,
+        recordKey: String,
+        record: UnknownType,
+        revision: String
+    ) async throws -> ComAtprotoLexicon.Repository.StrongReference {
+        guard let did = currentDID else {
+            throw LoginError.notAuthenticated
+        }
+
+        struct PutRecordBody: Encodable {
+            let repo: String
+            let collection: String
+            let rkey: String
+            let record: UnknownType
+            let validate: Bool
+            let swapCommit: String
+
+            enum CodingKeys: String, CodingKey {
+                case repo, collection, rkey, record, validate, swapCommit
+            }
+        }
+
+        let body = PutRecordBody(
+            repo: did,
+            collection: collection,
+            rkey: recordKey,
+            record: record,
+            validate: true,
+            swapCommit: revision
+        )
+        let bodyData = try JSONEncoder().encode(body)
+
+        let data = try await authenticatedData(
+            path: sharedXrpcRepoPutRecord(),
+            method: "POST",
+            body: bodyData
+        )
+
+        return try JSONDecoder().decode(ComAtprotoLexicon.Repository.StrongReference.self, from: data)
     }
 
     /// Fetches and decodes a single record from a repository.
