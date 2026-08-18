@@ -10,7 +10,8 @@
   Link Handling so the OS routes the OAuth callback back to Inkwell
   without a browser redirect page.
 -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -22,6 +23,24 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.Inkwell">
+
+        <!--
+          InkwellApp.onCreate() initializes WorkManager itself (via
+          HiltWorkerFactory, for Hilt-injected workers) — disable
+          WorkManager's own automatic androidx.startup initializer, which
+          otherwise runs first and makes the manual initialize() call
+          throw "WorkManager is already initialized".
+        -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
 
         <activity
             android:name=".MainActivity"

@@ -36,8 +36,8 @@ object UrlUtils {
         if (scheme != "https") return null
         val afterScheme = trimmed.substring(schemeEnd + 3)
         val hostEnd = afterScheme.indexOfAny(charArrayOf('/', '?', '#'))
-        val host = afterScheme.substring(0, hostEnd).ifEmpty { return null }
-        val basePath = afterScheme.substring(hostEnd).trim('/')
+        val host = (if (hostEnd >= 0) afterScheme.substring(0, hostEnd) else afterScheme).ifEmpty { return null }
+        val basePath = (if (hostEnd >= 0) afterScheme.substring(hostEnd) else "").trim('/')
         val docPath = path?.trim('/') ?: return "https://$host/${basePath.trim('/')}".trimEnd('/')
         val fullPath = listOf(basePath, docPath).filter { it.isNotEmpty() }.joinToString("/")
         return "https://$host/$fullPath"

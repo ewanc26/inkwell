@@ -86,16 +86,21 @@ private func harvestImageBlobs(from value: Any, into out: inout [String: ComAtpr
 /// Delegates to shared KMP for canonical conversion.
 enum FacetConverter {
 
+    // These call the global bridge functions of the same name declared in
+    // SharedKMP.swift. Unqualified calls here would instead resolve to the
+    // sibling static method on this same enum (Swift prefers member lookup
+    // over the enclosing/global scope), causing infinite self-recursion —
+    // qualify with the module name to reach the intended global function.
     static func facetsToMarkdown(_ plaintext: String, facets: [LeafletFacet]?, schema: FacetSchema, lost: inout Set<String>) -> String {
-        facetsToMarkdown(plaintext, facets: facets, schema: schema, lost: &lost)
+        Inkwell.facetsToMarkdown(plaintext, facets: facets, schema: schema, lost: &lost)
     }
 
     static func facetsToMarkdown(_ plaintext: String, facets: [LeafletFacet]?, schema: FacetSchema) -> String {
-        facetsToMarkdown(plaintext, facets: facets, schema: schema)
+        Inkwell.facetsToMarkdown(plaintext, facets: facets, schema: schema)
     }
 
     static func markdownToFacets(_ markdown: String, schema: FacetSchema) -> (plaintext: String, facets: [LeafletFacet]) {
-        markdownToFacets(markdown, schema: schema)
+        Inkwell.markdownToFacets(markdown, schema: schema)
     }
 }
 
