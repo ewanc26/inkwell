@@ -231,7 +231,12 @@ private fun FeedContent(
     val pullToRefreshState = rememberPullToRefreshState()
     PullToRefreshBox(
         state = pullToRefreshState,
-        isRefreshing = isLoading,
+        // Only show the pull-to-refresh spinner for a refresh of an
+        // already-populated list — the centered CircularProgressIndicator
+        // below owns the empty-list first-load case. Tying this to
+        // isLoading unconditionally showed both spinners at once on
+        // initial load.
+        isRefreshing = isLoading && posts.isNotEmpty(),
         onRefresh = onRefresh,
         modifier = Modifier.fillMaxSize(),
     ) {
