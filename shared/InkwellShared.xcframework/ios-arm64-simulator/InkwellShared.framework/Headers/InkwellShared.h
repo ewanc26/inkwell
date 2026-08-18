@@ -2767,6 +2767,8 @@ __attribute__((swift_name("XrpcEndpoints")))
 @property (readonly) NSString *REPO_DELETE_RECORD __attribute__((swift_name("REPO_DELETE_RECORD")));
 @property (readonly) NSString *REPO_GET_RECORD __attribute__((swift_name("REPO_GET_RECORD")));
 @property (readonly) NSString *REPO_LIST_RECORDS __attribute__((swift_name("REPO_LIST_RECORDS")));
+@property (readonly) NSString *REPO_PUT_RECORD __attribute__((swift_name("REPO_PUT_RECORD")));
+@property (readonly) NSString *REPO_UPLOAD_BLOB __attribute__((swift_name("REPO_UPLOAD_BLOB")));
 @property (readonly) NSString *SERVER_GET_SESSION __attribute__((swift_name("SERVER_GET_SESSION")));
 @property (readonly) NSString *SYNC_GET_BLOB __attribute__((swift_name("SYNC_GET_BLOB")));
 @end
