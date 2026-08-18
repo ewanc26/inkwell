@@ -28,6 +28,8 @@ import uk.ewancroft.inkwell.shared.content.PublicationMatcher
 import uk.ewancroft.inkwell.shared.policy.NotificationPolicy
 import uk.ewancroft.inkwell.shared.policy.NotificationStyle
 import uk.ewancroft.inkwell.data.repository.PdsRepository
+import uk.ewancroft.inkwell.data.repository.fetchDocumentEntries
+import uk.ewancroft.inkwell.data.repository.fetchSubscriptions
 import javax.inject.Inject
 import javax.inject.Singleton
 

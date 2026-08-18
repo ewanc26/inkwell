@@ -10,8 +10,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.decodeFromJsonElement
@@ -22,77 +20,24 @@ import uk.ewancroft.inkwell.data.model.atproto.DocumentRecord
 import uk.ewancroft.inkwell.data.model.atproto.PublicationRecord
 import uk.ewancroft.inkwell.data.model.atproto.PublicationTheme
 import uk.ewancroft.inkwell.shared.AtUri
-import uk.ewancroft.inkwell.shared.content.ContentFormatDetector
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
-import uk.ewancroft.inkwell.data.model.common.StrongRef
-import uk.ewancroft.inkwell.data.model.content.LeafletContent
-import uk.ewancroft.inkwell.data.model.content.LeafletPage
 import uk.ewancroft.inkwell.data.model.content.LeafletPollDefinition
-import uk.ewancroft.inkwell.data.model.content.LeafletPollVote
 import uk.ewancroft.inkwell.data.model.graph.LeafletComment
-import uk.ewancroft.inkwell.data.model.bluesky.ConstellationBacklink
 import uk.ewancroft.inkwell.data.remote.ConstellationClient
 import uk.ewancroft.inkwell.data.remote.StandardSiteVerifier
 import uk.ewancroft.inkwell.shared.verification.VerificationFailure
 import uk.ewancroft.inkwell.shared.verification.VerificationResult
 import uk.ewancroft.inkwell.data.repository.PdsRepository
+import uk.ewancroft.inkwell.data.repository.CommentEntry as PdsCommentEntry
+import uk.ewancroft.inkwell.data.repository.createComment
+import uk.ewancroft.inkwell.data.repository.createRecommend
+import uk.ewancroft.inkwell.data.repository.createSubscription
+import uk.ewancroft.inkwell.data.repository.deleteRecommend
+import uk.ewancroft.inkwell.data.repository.deleteSubscription
+import uk.ewancroft.inkwell.data.repository.fetchComments
+import uk.ewancroft.inkwell.data.repository.fetchRecommends
+import uk.ewancroft.inkwell.data.repository.fetchSubscriptions
 import javax.inject.Inject
-
-sealed class DocumentContent {
-    data class Leaflet(val pages: List<LeafletPage>, val authorDid: String) : DocumentContent()
-    data class Markdown(val text: String) : DocumentContent()
-    data class PlainText(val text: String) : DocumentContent()
-    data object Empty : DocumentContent()
-    data class Unsupported(val formatType: String?) : DocumentContent()
-}
-
-data class PostDetailUiState(
-    val uri: String = "",
-    val isLoading: Boolean = true,
-    val loadError: String? = null,
-    val title: String? = null,
-    val description: String? = null,
-    val publishedAt: String? = null,
-    val path: String? = null,
-    val coverUrl: String? = null,
-    val content: DocumentContent = DocumentContent.Empty,
-    val lostContent: List<String> = emptyList(),
-    val publicationUri: String? = null,
-    val publicationUrl: String? = null,
-
-    val documentTheme: PublicationTheme? = null,
-    val publicationTheme: PublicationTheme? = null,
-    val basicTheme: BasicTheme? = null,
-
-    val verification: VerificationResult? = null,
-
-    val isSubscribed: Boolean = false,
-    val subscriptionRkey: String? = null,
-    val isLoadingSubscriptionState: Boolean = false,
-    val hasLoadedSubscriptionState: Boolean = false,
-    val isTogglingSubscription: Boolean = false,
-    val subscriptionError: String? = null,
-
-    val isRecommended: Boolean = false,
-    val recommendRkey: String? = null,
-    val recommendCount: Int = 0,
-    val isLoadingRecommendState: Boolean = false,
-    val hasLoadedRecommendState: Boolean = false,
-    val isTogglingRecommend: Boolean = false,
-    val recommendError: String? = null,
-
-    val comments: List<CommentEntry> = emptyList(),
-    val newCommentText: String = "",
-    val isSubmittingComment: Boolean = false,
-    val isLoadingComments: Boolean = false,
-    val replyToComment: CommentEntry? = null,
-    val commentError: String? = null,
-
-    val previousUri: String? = null,
-    val previousTitle: String? = null,
-    val nextUri: String? = null,
-    val nextTitle: String? = null,
-)
 
 @HiltViewModel
 class PostDetailViewModel @Inject constructor(
@@ -403,76 +348,6 @@ class PostDetailViewModel @Inject constructor(
         }
     }
 
-    private data class ParseResult(val content: DocumentContent, val lost: List<String> = emptyList())
-
-    private suspend fun parseContent(
-        contentObj: JsonObject?,
-        textContent: String?,
-        authorDid: String,
-        documentUri: String,
-    ): ParseResult {
-        if (contentObj != null) {
-            val formatType = contentObj["\$type"]?.jsonPrimitive?.contentOrNull
-
-            if (formatType == ContentFormatDetector.LEAFLET) {
-                val leaflet = runCatching { json.decodeFromJsonElement<LeafletContent>(contentObj) }.getOrNull()
-                var pages = leaflet?.pages
-                if (pages.isNullOrEmpty() && leaflet?.blobPages != null) {
-                    pages = runCatching {
-                        val blobData = pdsRepository.downloadBlob(
-                            cid = leaflet.blobPages.link,
-                            fromDID = authorDid
-                        )
-                        json.decodeFromString<List<LeafletPage>>(blobData.decodeToString())
-                    }.getOrNull()
-                }
-                if (!pages.isNullOrEmpty()) {
-                    return ParseResult(DocumentContent.Leaflet(pages, authorDid))
-                }
-            }
-
-            if (formatType == ContentFormatDetector.MARKPUB) {
-                val markdown = contentObj["text"]?.jsonObject?.get("markdown")?.jsonPrimitive?.contentOrNull
-                if (!markdown.isNullOrBlank()) return ParseResult(DocumentContent.Markdown(markdown))
-            }
-
-            if (PcktOffprintConverter.isSupported(formatType)) {
-                val result = PcktOffprintConverter.toMarkdown(contentObj, formatType!!, authorDid)
-                if (!result.markdown.isNullOrBlank()) return ParseResult(DocumentContent.Markdown(result.markdown), result.lost)
-            }
-
-            val extracted = StringBuilder()
-            collectPlaintext(contentObj, extracted)
-            if (extracted.isNotBlank()) return ParseResult(DocumentContent.PlainText(extracted.toString()))
-
-            if (!textContent.isNullOrBlank()) return ParseResult(DocumentContent.PlainText(textContent))
-
-            return ParseResult(DocumentContent.Unsupported(formatType))
-        }
-
-        if (!textContent.isNullOrBlank()) return ParseResult(DocumentContent.PlainText(textContent))
-
-        return ParseResult(DocumentContent.Empty)
-    }
-
-    private fun collectPlaintext(element: JsonElement, out: StringBuilder) {
-        when (element) {
-            is JsonObject -> {
-                val text = element["plaintext"]?.jsonPrimitive?.contentOrNull
-                if (!text.isNullOrBlank()) {
-                    if (out.isNotEmpty()) out.append("\n\n")
-                    out.append(text)
-                }
-                for ((key, child) in element) {
-                    if (key == "plaintext") continue
-                    collectPlaintext(child, out)
-                }
-            }
-            is JsonArray -> element.forEach { collectPlaintext(it, out) }
-            else -> {}
-        }
-    }
-
     // MARK: - Comments
 
     fun loadComments(documentUri: String, forceRefresh: Boolean = false) {
@@ -482,7 +357,7 @@ class PostDetailViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                val repoComments = mutableListOf<PdsRepository.CommentEntry>()
+                val repoComments = mutableListOf<PdsCommentEntry>()
                 val session = pdsRepository.getSession()
 
                 if (session != null) {
@@ -500,7 +375,7 @@ class PostDetailViewModel @Inject constructor(
                             val value = record["value"]?.jsonObject ?: continue
                             val comment = json.decodeFromJsonElement(LeafletComment.serializer(), value)
                             repoComments.add(
-                                PdsRepository.CommentEntry(
+                                PdsCommentEntry(
                                     uri = backlink.recordUri,
                                     rkey = backlink.rkey,
                                     comment = comment
@@ -581,80 +456,6 @@ class PostDetailViewModel @Inject constructor(
         val totalVotes: Int,
     )
 
-    private val _pollData = MutableStateFlow<Map<String, PollData>>(emptyMap())
-    val pollData: StateFlow<Map<String, PollData>> = _pollData.asStateFlow()
-
-    fun loadPoll(pollRef: StrongRef) {
-        val pollUri = pollRef.uri
-        val cached = _pollData.value[pollUri]
-        if (cached != null) return
-
-        viewModelScope.launch {
-            try {
-                val parsed = AtUri.parse(pollUri) ?: return@launch
-                val did = parsed.did
-                val rkey = parsed.recordKey ?: return@launch
-
-                val definition = runCatching {
-                    pdsRepository.getPollDefinition(did, rkey)
-                }.getOrNull() ?: return@launch
-
-                val votes = runCatching {
-                    pdsRepository.listPollVotes(did, rkey)
-                }.getOrNull() ?: emptyList()
-
-                val voteCounts = mutableMapOf<String, Int>()
-                votes.forEach { vote ->
-                    vote.option?.forEach { option ->
-                        voteCounts[option] = (voteCounts[option] ?: 0) + 1
-                    }
-                }
-
-                val session = runCatching { pdsRepository.getSession() }.getOrNull()
-                val myVote = votes.firstOrNull { it.poll.uri == pollUri }?.option
-
-                val totalVotes = voteCounts.values.sum()
-                val data = PollData(
-                    definition = definition,
-                    voteCounts = voteCounts,
-                    myVote = myVote,
-                    totalVotes = totalVotes,
-                )
-
-                _pollData.value = _pollData.value + (pollUri to data)
-            } catch (e: Exception) {
-                Log.w("PostDetailVM", "Failed to load poll data for $pollUri", e)
-            }
-        }
-    }
-
-    fun castVote(pollUri: String, options: List<String>) {
-        val currentData = _pollData.value[pollUri] ?: return
-        viewModelScope.launch {
-            try {
-                val parsed = AtUri.parse(pollUri) ?: return@launch
-                pdsRepository.createPollVote(parsed.did, pollUri, options)
-
-                val newVoteCounts = currentData.voteCounts.toMutableMap()
-                options.forEach { option ->
-                    newVoteCounts[option] = (newVoteCounts[option] ?: 0) + 1
-                }
-
-                val updated = currentData.copy(
-                    voteCounts = newVoteCounts,
-                    myVote = options,
-                    totalVotes = currentData.totalVotes + options.size,
-                )
-                _pollData.value = _pollData.value + (pollUri to updated)
-            } catch (e: Exception) {
-                Log.e("PostDetailVM", "Failed to cast vote on $pollUri", e)
-            }
-        }
-    }
+    internal val pollDataInternal = MutableStateFlow<Map<String, PollData>>(emptyMap())
+    val pollData: StateFlow<Map<String, PollData>> = pollDataInternal.asStateFlow()
 }
-
-data class CommentEntry(
-    val uri: String,
-    val recordKey: String,
-    val record: uk.ewancroft.inkwell.data.model.graph.LeafletComment,
-)

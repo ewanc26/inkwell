@@ -6,6 +6,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -25,6 +26,8 @@ fun FeedbackDialog(
     viewModel: FeedbackViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsState()
+
+    DisposableEffect(Unit) { onDispose { viewModel.reset() } }
 
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = true)) {
         Surface(shape = MaterialTheme.shapes.large, tonalElevation = 6.dp) {
