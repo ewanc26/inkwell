@@ -5,9 +5,11 @@ object XrpcEndpoints {
     const val CONSTELLATION_API = "https://constellation.microcosm.blue"
 
     const val REPO_CREATE_RECORD = "/xrpc/com.atproto.repo.createRecord"
+    const val REPO_PUT_RECORD = "/xrpc/com.atproto.repo.putRecord"
     const val REPO_DELETE_RECORD = "/xrpc/com.atproto.repo.deleteRecord"
     const val REPO_GET_RECORD = "/xrpc/com.atproto.repo.getRecord"
     const val REPO_LIST_RECORDS = "/xrpc/com.atproto.repo.listRecords"
+    const val REPO_UPLOAD_BLOB = "/xrpc/com.atproto.repo.uploadBlob"
     const val SYNC_GET_BLOB = "/xrpc/com.atproto.sync.getBlob"
     const val SERVER_GET_SESSION = "/xrpc/com.atproto.server.getSession"
     const val IDENTITY_RESOLVE_HANDLE = "/xrpc/com.atproto.identity.resolveHandle"
