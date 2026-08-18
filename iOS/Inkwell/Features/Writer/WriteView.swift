@@ -23,6 +23,7 @@ struct WriteView: View {
     @State private var showSignIn = false
     @State private var showDocumentPicker = false
     @State private var selectedPhoto: PhotosPickerItem?
+    @State private var markdownSelection: TextSelection?
 
     init() {
         let lsm = LoginStateManager()
@@ -166,6 +167,7 @@ struct WriteView: View {
                     Section {
                         FormattingToolbar(
                             markdown: $viewModel.markdown,
+                            selection: $markdownSelection,
                             canUploadImages: viewModel.canUploadImages,
                             onImagePicker: {}
                         )
@@ -176,7 +178,7 @@ struct WriteView: View {
                     Section {
                         VStack(spacing: 0) {
                             // Editor
-                            TextEditor(text: $viewModel.markdown)
+                            TextEditor(text: $viewModel.markdown, selection: $markdownSelection)
                                 .frame(minHeight: 200)
                                 .font(.body.monospaced())
                                 .textInputAutocapitalization(.sentences)
