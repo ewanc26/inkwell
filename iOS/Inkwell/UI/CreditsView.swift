@@ -16,6 +16,7 @@ struct CreditsView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var isConfirmingSignOut = false
+    @State private var isShowingFeedback = false
 
     private var versionString: String {
         let shortVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
@@ -90,6 +91,13 @@ struct CreditsView: View {
                             .foregroundStyle(.pink)
                     }
 
+                    Button {
+                        isShowingFeedback = true
+                    } label: {
+                        Label("Send Feedback", systemImage: "exclamationmark.bubble")
+                            .foregroundStyle(.primary)
+                    }
+
                     creditRow(
                         title: "Source on GitHub",
                         detail: "ewanc26/inkwell",
@@ -153,6 +161,9 @@ struct CreditsView: View {
                 Button("Cancel", role: .cancel) {}
             } message: {
                 Text("Your publications and subscriptions stay in your PDS. You can sign back in at any time.")
+            }
+            .sheet(isPresented: $isShowingFeedback) {
+                FeedbackView()
             }
         }
     }
