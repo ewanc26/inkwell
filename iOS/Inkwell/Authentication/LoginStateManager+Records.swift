@@ -17,6 +17,10 @@ extension LoginStateManager {
         record: UnknownType,
         shouldValidate: Bool = false
     ) async throws -> ComAtprotoLexicon.Repository.StrongReference {
+        if TestingMode.isEnabled {
+            TestingModeNotice.shared.report("Create \(collection) record")
+            throw LoginError.testingMode
+        }
         guard let did = currentDID else {
             throw LoginError.notAuthenticated
         }
@@ -51,6 +55,10 @@ extension LoginStateManager {
 
     /// Deletes an AT Protocol record from the user's repository.
     func deleteRecord(collection: String, recordKey: String) async throws {
+        if TestingMode.isEnabled {
+            TestingModeNotice.shared.report("Delete \(collection) record")
+            throw LoginError.testingMode
+        }
         guard let did = currentDID else {
             throw LoginError.notAuthenticated
         }
@@ -84,6 +92,10 @@ extension LoginStateManager {
         record: UnknownType,
         revision: String
     ) async throws -> ComAtprotoLexicon.Repository.StrongReference {
+        if TestingMode.isEnabled {
+            TestingModeNotice.shared.report("Update \(collection) record")
+            throw LoginError.testingMode
+        }
         guard let did = currentDID else {
             throw LoginError.notAuthenticated
         }

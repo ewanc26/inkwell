@@ -19,6 +19,10 @@ extension LoginStateManager {
     /// must be one of `UserInputFeedback.tags`.
     @discardableResult
     func submitFeedback(title: String, body: String?, tag: String?) async throws -> ComAtprotoLexicon.Repository.StrongReference {
+        if TestingMode.isEnabled {
+            TestingModeNotice.shared.report("Send feedback")
+            throw LoginError.testingMode
+        }
         guard !title.isEmpty, title.count <= UserInputFeedback.titleMaxLength else {
             throw LoginError.invalidURI
         }

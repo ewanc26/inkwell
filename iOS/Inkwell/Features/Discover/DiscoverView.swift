@@ -90,61 +90,7 @@ struct DiscoverView: View {
             } message: {
                 Text(errorMessage ?? "")
             }
-            .task {
-                if CommandLine.arguments.contains("-screenshot") {
-                    query = "Standard.site"
-                    searchedQuery = query
-                    results = [
-                        ReaderSearchResult(
-                            type: "publication",
-                            uri: "at://did:plc:ewan/site.standard.publication/1",
-                            did: "did:plc:ewan",
-                            title: "Ewan's Corner",
-                            snippet: "Essays on open protocols, software, and digital garden notes.",
-                            createdAt: "2026-06-20T12:00:00Z",
-                            rkey: "1",
-                            basePath: "ewancroft.uk",
-                            platform: "leaflet",
-                            path: nil,
-                            coverImage: nil,
-                            handle: "ewancroft.uk"
-                        ),
-                        ReaderSearchResult(
-                            type: "publication",
-                            uri: "at://did:plc:atproto/site.standard.publication/2",
-                            did: "did:plc:atproto",
-                            title: "AT Protocol Weekly",
-                            snippet: "Weekly round-up of lexicons and PDS updates across the network.",
-                            createdAt: "2026-06-18T10:00:00Z",
-                            rkey: "2",
-                            basePath: "atproto.news",
-                            platform: "leaflet",
-                            path: nil,
-                            coverImage: nil,
-                            handle: "atproto.news"
-                        ),
-                        ReaderSearchResult(
-                            type: "publication",
-                            uri: "at://did:plc:leaflet/site.standard.publication/3",
-                            did: "did:plc:leaflet",
-                            title: "Leaflet Lab",
-                            snippet: "Deep dives into block-based document design and web publishing.",
-                            createdAt: "2026-06-15T08:00:00Z",
-                            rkey: "3",
-                            basePath: "leaflet.pub",
-                            platform: "leaflet",
-                            path: nil,
-                            coverImage: nil,
-                            handle: "leaflet.pub"
-                        )
-                    ]
-                    subscriptions = ["at://did:plc:ewan/site.standard.publication/1"]
-                }
-            }
-            .task {
-                guard !CommandLine.arguments.contains("-screenshot") else { return }
-                await loadSubscriptions()
-            }
+            .task { await loadSubscriptions() }
         }
     }
 

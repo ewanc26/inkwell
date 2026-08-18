@@ -64,11 +64,7 @@ struct InkwellApp: App {
                     await SiteStandardLexicon.registerRecordTypes()
                     await ContentFormatRegistration.registerRecordTypes()
 
-                    if CommandLine.arguments.contains("-screenshot") {
-                        loginStateManager.setMockAuthenticated()
-                    } else {
-                        await loginStateManager.restoreSessionIfPossible()
-                    }
+                    await loginStateManager.restoreSessionIfPossible()
 
                     BackgroundRefreshManager.shared.configure {
                         await NotificationManager.shared.pollForNewDocuments(
