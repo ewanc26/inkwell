@@ -339,7 +339,7 @@ struct BrowseDocumentsView: View {
                     )
                     let mockItem = ReaderFeedItem(
                         document: DocumentEntry(uri: "at://did:plc:ewan/site.standard.document/1", authorDID: "did:plc:ewan", record: mockDoc),
-                        publication: nil,
+                        publication: PublicationEntry(uri: "at://did:plc:ewan/site.standard.publication/1", authorDID: "did:plc:ewan", record: mockPub),
                         authorProfile: nil
                     )
                     store.followingState.items = [mockItem]
