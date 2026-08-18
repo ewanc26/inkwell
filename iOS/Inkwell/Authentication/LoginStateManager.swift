@@ -814,7 +814,7 @@ final class LoginStateManager {
     func listAllRecords(
         from did: String,
         collection: String,
-        maximumCount: Int = 1_000
+        maximumCount: Int = sharedMaxRecordsPerList
     ) async throws -> [RepositoryRecord] {
         let pdsURL = try await repositoryPDSURL(for: did)
 
