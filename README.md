@@ -1,10 +1,12 @@
 # Inkwell
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="iOS/logo-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="iOS/logo-light.svg">
-  <img alt="Inkwell" src="iOS/logo-light.svg" width="110">
-</picture>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="iOS/logo-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="iOS/logo-light.svg">
+    <img alt="Inkwell" src="iOS/logo-light.svg" width="110">
+  </picture>
+</p>
 
 <p align="center">
   <a href="https://github.com/ewanc26/inkwell/releases/latest?q=ios-v"><img src="https://img.shields.io/github/v/release/ewanc26/inkwell?filter=ios-v*&label=iOS&logo=apple&logoColor=white" alt="Latest iOS release"></a>
