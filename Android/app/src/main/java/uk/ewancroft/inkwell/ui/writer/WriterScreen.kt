@@ -1,6 +1,8 @@
 package uk.ewancroft.inkwell.ui.writer
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -108,7 +110,11 @@ fun WriterScreen(
         }
     ) { padding ->
         Column(
-            Modifier.padding(padding).padding(horizontal = 16.dp).fillMaxSize(),
+            Modifier
+                .padding(padding)
+                .padding(horizontal = 16.dp)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             if (uiState.isLoadingPublications) {
@@ -341,7 +347,7 @@ fun WriterScreen(
             OutlinedTextField(
                 value = markdownField, onValueChange = ::updateMarkdownField,
                 label = { Text("Content (Markdown)") },
-                modifier = Modifier.fillMaxWidth().weight(1f),
+                modifier = Modifier.fillMaxWidth().heightIn(min = 240.dp),
                 minLines = 10
             )
 
