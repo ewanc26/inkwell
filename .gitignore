@@ -54,7 +54,7 @@ Android/gradle/gradle-daemon-jvm.properties
 Android/.externalNativeBuild/
 Android/.cxx/
 Android/.letta/
-.letta/worktrees/
+.letta/
 
 # Release signing — never commit the keystore or its credentials.
 Android/keystore.properties
