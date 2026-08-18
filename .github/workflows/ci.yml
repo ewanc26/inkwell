@@ -64,24 +64,49 @@ jobs:
 
       - name: Resolve an available iOS Simulator destination
         id: destination
+        working-directory: iOS
         run: |
-          device=$(xcrun simctl list devices available iOS -j | jq -r '
-            [.devices[][] | select(.name | startswith("iPhone"))][0].name
+          # The runner's newest installed Simulator runtime may lag behind
+          # the test target's deployment target (both track whatever Xcode
+          # version the original author has locally) — pick the
+          # highest-versioned iPhone runtime available, then separately
+          # decide whether it's new enough to actually run tests on.
+          best=$(xcrun simctl list devices available iOS -j | jq -r '
+            [.devices | to_entries[] | . as $e | $e.value[] | select(.name | startswith("iPhone")) |
+              {name: .name, runtimeId: $e.key}] |
+            sort_by(.runtimeId) | last
           ')
-          if [ -z "$device" ] || [ "$device" = "null" ]; then
+          name=$(echo "$best" | jq -r '.name')
+          runtime_id=$(echo "$best" | jq -r '.runtimeId')
+          if [ -z "$name" ] || [ "$name" = "null" ]; then
             echo "No iOS Simulator device found" >&2
             exit 1
           fi
-          echo "name=$device" >> "$GITHUB_OUTPUT"
+          runtime_version=$(echo "$runtime_id" | grep -oE '[0-9]+-[0-9]+(-[0-9]+)?$' | tr '-' '.')
+          test_min=$(xcodebuild -showBuildSettings -project Inkwell.xcodeproj -target InkwellTests 2>/dev/null \
+            | awk -F'= ' '/^ *IPHONEOS_DEPLOYMENT_TARGET =/ {print $2; exit}')
+          echo "Newest available runtime: $runtime_version ($name); InkwellTests requires >= $test_min"
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          if [ -n "$test_min" ] && printf '%s\n%s\n' "$test_min" "$runtime_version" | sort -V | tail -1 | grep -qx "$test_min" && [ "$test_min" != "$runtime_version" ]; then
+            echo "runnable=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "runnable=true" >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: Build and test
+      - name: Build (and test, if a compatible Simulator runtime is available)
         working-directory: iOS
         run: |
+          action=build
+          if [ "${{ steps.destination.outputs.runnable }}" = "true" ]; then
+            action="build test"
+          else
+            echo "::warning::No installed Simulator runtime satisfies InkwellTests' deployment target — building only, not running tests."
+          fi
           xcodebuild \
             -project Inkwell.xcodeproj \
             -scheme Inkwell \
             -destination "platform=iOS Simulator,name=${{ steps.destination.outputs.name }}" \
-            build test
+            $action
 
   android:
     name: Android build + lint + test
