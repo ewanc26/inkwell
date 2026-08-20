@@ -5,25 +5,34 @@ import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Feedback
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import coil.compose.AsyncImage
+import uk.ewancroft.inkwell.data.model.bluesky.BlueskyProfile
+import uk.ewancroft.inkwell.data.remote.BSkyListFetcher
 import uk.ewancroft.inkwell.shared.content.SearchBackendUrl
+import uk.ewancroft.inkwell.shared.support.SupportersList
 import uk.ewancroft.inkwell.ui.feedback.FeedbackDialog
 
 @Composable
@@ -34,9 +43,14 @@ fun CreditsView(
 ) {
     val context = LocalContext.current
     var showFeedback by remember { mutableStateOf(false) }
+    var supporters by remember { mutableStateOf<List<BlueskyProfile>>(emptyList()) }
 
     if (showFeedback) {
         FeedbackDialog(onDismiss = { showFeedback = false })
+    }
+
+    LaunchedEffect(Unit) {
+        supporters = BSkyListFetcher.fetchListMembers(SupportersList.URI)
     }
 
     fun openUrl(url: String) {
@@ -99,6 +113,24 @@ fun CreditsView(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+
+                if (supporters.isNotEmpty()) {
+                    Spacer(Modifier.height(24.dp))
+                    HorizontalDivider()
+                    Spacer(Modifier.height(16.dp))
+
+                    // Supporters
+                    SectionHeader("Supporters")
+                    supporters.forEach { supporter ->
+                        SupporterRow(supporter = supporter, openUrl = ::openUrl)
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        "Everyone who's tipped Inkwell via Ko-fi or GitHub Sponsors, listed on Bluesky. Thank you.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
 
                 Spacer(Modifier.height(24.dp))
                 HorizontalDivider()
@@ -220,6 +252,44 @@ private fun CreditRow(title: String, detail: String, url: String, openUrl: (Stri
             Modifier.size(16.dp),
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+    }
+}
+
+@Composable
+private fun SupporterRow(supporter: BlueskyProfile, openUrl: (String) -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth().clickable { openUrl("https://bsky.app/profile/${supporter.handle}") }.padding(vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (supporter.avatar != null) {
+            AsyncImage(
+                model = supporter.avatar,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.size(36.dp).clip(CircleShape),
+            )
+        } else {
+            Icon(
+                Icons.Filled.Person,
+                contentDescription = null,
+                modifier = Modifier.size(36.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Spacer(Modifier.width(12.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                supporter.displayName?.ifEmpty { null } ?: "@${supporter.handle}",
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 1,
+            )
+            Text(
+                "@${supporter.handle}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+            )
+        }
     }
 }
 
