@@ -20,6 +20,7 @@ AI tools may be used when contributing. Add `Co-authored-by:` trailers crediting
 - Read `README.md`, `PRODUCT.md`, `DESIGN.md`, `.impeccable/design.json`, `src/lib/config.ts`, and every touched route/style.
 - Audit claims against the owned sibling directories `../iOS/` and `../Android/` before changing product, security, privacy, moderation, platform, or availability copy. The website must not turn planned/model-only code into a shipped feature.
 - `src/routes/+page.svelte` is the landing page; `/privacy` and `/terms` are substantive legal promises; `/client-metadata.json` is a live OAuth client identity consumed by PDS servers. `src/routes/+layout.svelte` owns metadata/navigation/footer and client-side mobile navigation.
+- `static/og-cover.png` is the Open Graph/Twitter card advertised by `src/routes/+layout.svelte`. It is generated artwork, not hand-drawn: edit `tools/og-cover/template.html`, run `pnpm og`, and commit the regenerated PNG in the same change. Keep `OG_IMAGE`'s dimensions and alt text in `src/lib/config.ts` matching what the template actually renders.
 - `src/lib/styles/` is a token-first Tailwind v4/CSS system. `static/` currently contains only favicon, robots, and wordmark—font CSS references `/fonts/inter.woff2` and `/fonts/jetbrains-mono.woff2`, but those assets are absent and therefore fall back to system fonts.
 
 ## Product and Legal Accuracy
@@ -47,6 +48,7 @@ AI tools may be used when contributing. Add `Co-authored-by:` trailers crediting
 ## Tooling and Validation
 
 - pnpm is authoritative (`pnpm-lock.yaml` and `pnpm-workspace.yaml`; no npm lock). Vercel installs with `pnpm install` on Node 22. Run `pnpm install --frozen-lockfile`, `pnpm check`, and `pnpm build`.
+- `pnpm og` re-renders the social cover through headless Chromium; it needs a Chrome/Chromium binary (set `CHROME_PATH` if it isn't in a standard location) but no extra dependencies. It is not part of `pnpm build` — the PNG is committed, so the site builds and deploys without a browser.
 - There is no `lint` or test script. `pnpm format` writes files, so use `pnpm exec prettier --check --ignore-unknown .` for a non-mutating formatting check.
 - Preview home/privacy/terms, inspect `/client-metadata.json`, check all external/CTA/legal links, production metadata, 404s, missing font/network requests, light/dark contrast, reduced motion, keyboard/mobile navigation, and narrow/zoomed layouts.
 - Do not commit `node_modules/`, `.svelte-kit/`, `.vercel/`, build output, `.env`, local design-tool settings, or generated deployment state.
@@ -54,4 +56,5 @@ AI tools may be used when contributing. Add `Co-authored-by:` trailers crediting
 ## Things that look wrong but are not
 
 - **Website links to self-hosted AltStore and F-Droid** rather than App Store / Play Store listings — those stores do not have published listings yet.
+- **`static/og-cover.png` is a committed binary** that duplicates what `tools/og-cover/template.html` describes — social scrapers don't run CSS, webfonts, or `light-dark()`, so the card has to ship as pixels.
 - **`static/` contains only favicon, robots, and wordmark** — font assets are referenced but absent, falling back to system fonts by design.
