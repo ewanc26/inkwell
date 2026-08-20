@@ -357,6 +357,10 @@
       gap: var(--space-md);
     }
 
+    .footer-copyright {
+      white-space: normal;
+    }
+
     .footer-nav {
       gap: var(--space-xs) var(--space-sm);
     }
