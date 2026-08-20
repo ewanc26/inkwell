@@ -7,7 +7,7 @@
 
 <script lang="ts">
   import "../routes/layout.css";
-  import { SITE, NAV_LINKS } from "$lib/config";
+  import { SITE, NAV_LINKS, OG_IMAGE } from "$lib/config";
   import { page } from "$app/state";
   import { Menu, X } from "@lucide/svelte";
 
@@ -37,6 +37,10 @@
   // Absolute, per-route URL for canonical + og:url. Built from the
   // configured origin so previews/localhost never leak into metadata.
   const canonical = $derived(new URL(page.url.pathname, SITE.url).href);
+
+  // Scrapers won't resolve a root-relative image path, so the cover is
+  // advertised absolutely — same reasoning as og:url above.
+  const ogImage = new URL(OG_IMAGE.path, SITE.url).href;
 </script>
 
 <svelte:head>
@@ -49,9 +53,18 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content={canonical} />
   <meta property="og:locale" content="en_GB" />
-  <meta name="twitter:card" content="summary" />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:image:type" content={OG_IMAGE.type} />
+  <meta property="og:image:width" content={String(OG_IMAGE.width)} />
+  <meta property="og:image:height" content={String(OG_IMAGE.height)} />
+  <meta property="og:image:alt" content={OG_IMAGE.alt} />
+  <!-- summary_large_image, not summary: with a cover this wide, the small
+       card would centre-crop the mark out of the frame. -->
+  <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content={SITE.title} />
   <meta name="twitter:description" content={SITE.description} />
+  <meta name="twitter:image" content={ogImage} />
+  <meta name="twitter:image:alt" content={OG_IMAGE.alt} />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 </svelte:head>
 

@@ -1,0 +1,201 @@
+<!doctype html>
+<!--
+  Source artwork for static/og-cover.png — the Open Graph / Twitter card
+  image for inkwell.ewancroft.uk.
+
+  This is the *source*, not a served page: it is rendered once to a PNG by
+  tools/og-cover/render.mjs, and the PNG is what ships in static/. Social
+  scrapers won't run CSS custom properties, webfonts, or light-dark(), so
+  the design has to be baked into pixels.
+
+  It pulls the real token file rather than restating the palette, so the
+  card can't drift from the site's colours. Fonts are re-declared here with
+  paths relative to this file because fonts.css uses server-absolute
+  /fonts/… URLs that don't resolve from this directory.
+
+  Edit this file, re-run `node tools/og-cover/render.mjs`, and commit both.
+-->
+<html lang="en-gb">
+  <head>
+    <meta charset="utf-8" />
+    <title>Inkwell — Open Graph cover</title>
+
+    <link rel="stylesheet" href="../../src/lib/styles/tokens.css" />
+
+    <style>
+      @font-face {
+        font-family: "Inter";
+        font-style: normal;
+        font-weight: 400 800;
+        src: url("../../static/fonts/inter-variable.woff2")
+          format("woff2-variations");
+      }
+
+      @font-face {
+        font-family: "JetBrains Mono";
+        font-style: normal;
+        font-weight: 400;
+        src: url("../../static/fonts/jetbrains-mono.woff2") format("woff2");
+      }
+
+      /*
+        Fixed 1200×630 (1.91:1) — the size every major scraper crops to.
+        Everything below is unlayered, so it wins over tokens.css's
+        @layer base defaults without needing !important. The card is a
+        light-theme rendering: a social image can't respond to the
+        viewer's colour scheme, and paper-on-ink is Inkwell's default.
+      */
+      html {
+        color-scheme: light;
+      }
+
+      body {
+        position: relative;
+        box-sizing: border-box;
+        width: 1200px;
+        height: 630px;
+        margin: 0;
+        overflow: hidden;
+        padding: 72px 80px 64px;
+        display: flex;
+        flex-direction: column;
+        background: var(--background-50);
+        color: var(--text-950);
+        font-family: "Inter", sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* Mark and copy, split by the same hairline the site uses for surfaces. */
+      .masthead {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 56px;
+      }
+
+      .mark {
+        flex: none;
+        height: 300px;
+        width: auto;
+        color: var(--text-950);
+      }
+
+      .rule {
+        flex: none;
+        align-self: stretch;
+        width: 1px;
+        margin: 18px 0;
+        background: var(--background-200);
+      }
+
+      .wordmark {
+        margin: 0;
+        font-size: 108px;
+        font-weight: 800;
+        line-height: 0.95;
+        letter-spacing: -0.05em;
+      }
+
+      .tagline {
+        margin: 26px 0 0;
+        max-width: 720px;
+        font-size: 38px;
+        font-weight: 400;
+        line-height: 1.32;
+        letter-spacing: -0.015em;
+        text-wrap: balance;
+        color: var(--text-900);
+      }
+
+      /* Mono footer, mirroring the landing page's .page-meta row. */
+      .footer {
+        flex: none;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 32px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 20px;
+        color: var(--text-600);
+      }
+
+      .footer p {
+        margin: 0;
+      }
+
+      .meta span + span::before {
+        content: "\00b7";
+        margin: 0 14px;
+        color: var(--primary-500);
+      }
+
+      /*
+        The only accent green besides the ink drop: a flat bar on the bottom
+        edge, so the card still reads as Inkwell's when a client renders it
+        against dark chrome. Absolute, not fixed — headless Chromium's
+        viewport is shorter than the page, and fixed would ride it up.
+      */
+      .accent-bar {
+        position: absolute;
+        inset: auto 0 0 0;
+        height: 10px;
+        background: var(--accent-500);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="masthead">
+      <!--
+        The Inkwell mark, geometry-identical to static/wordmark.svg and
+        InkwellMark.swift: serif I letterform above a brand-green ink drop.
+      -->
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 400 952"
+        fill="none"
+        class="mark"
+        role="img"
+        aria-label="Inkwell"
+      >
+        <rect
+          x="40"
+          y="40"
+          width="320"
+          height="80"
+          rx="16"
+          fill="currentColor"
+        />
+        <rect x="125" y="120" width="150" height="640" fill="currentColor" />
+        <rect
+          x="40"
+          y="760"
+          width="320"
+          height="80"
+          rx="16"
+          fill="currentColor"
+        />
+        <circle cx="200" cy="880" r="32" fill="var(--accent-500)" />
+      </svg>
+
+      <div class="rule"></div>
+
+      <div class="copy">
+        <p class="wordmark">Inkwell</p>
+        <p class="tagline">
+          Read, discover, and publish Standard.site writing from your own PDS.
+        </p>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p class="meta">
+        <span>AT Protocol</span><span>OAuth 2.1</span
+        ><span>iOS &amp; Android</span>
+      </p>
+      <p>inkwell.ewancroft.uk</p>
+    </div>
+
+    <div class="accent-bar"></div>
+  </body>
+</html>

@@ -10,6 +10,25 @@ export const SITE = {
   url: "https://inkwell.ewancroft.uk",
 };
 
+// ── Social cover image ───────────────────────────────────────────
+// The card social clients render when a link to the site is shared.
+// It is a committed PNG rather than anything generated per-request:
+// scrapers fetch it without running our CSS, and most cache it hard.
+// Regenerate with `pnpm og` after editing tools/og-cover/template.html.
+//
+// Dimensions are declared alongside the URL because Slack, Discord, and
+// Facebook lay the card out from the meta tags before the image itself
+// finishes downloading — without them the embed reflows or falls back
+// to a small thumbnail.
+
+export const OG_IMAGE = {
+  path: "/og-cover.png",
+  type: "image/png",
+  width: 1200,
+  height: 630,
+  alt: "The Inkwell mark beside the Inkwell wordmark and the line: Read, discover, and publish Standard.site writing from your own PDS.",
+} as const;
+
 export const NAV_LINKS = [
   { label: "Home", url: "/" },
   { label: "Get Inkwell", url: "/#download" },
