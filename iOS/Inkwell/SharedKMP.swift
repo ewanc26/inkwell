@@ -362,6 +362,7 @@ func sharedXrpcServerGetSession() -> String { XrpcEndpoints.shared.SERVER_GET_SE
 func sharedXrpcIdentityResolveHandle() -> String { XrpcEndpoints.shared.IDENTITY_RESOLVE_HANDLE }
 func sharedXrpcActorGetProfile() -> String { XrpcEndpoints.shared.ACTOR_GET_PROFILE }
 func sharedXrpcFeedGetPosts() -> String { XrpcEndpoints.shared.FEED_GET_POSTS }
+func sharedXrpcGraphGetList() -> String { XrpcEndpoints.shared.GRAPH_GET_LIST }
 func sharedXrpcMicrocosmGetBacklinks() -> String { XrpcEndpoints.shared.MICROCOSM_GET_BACKLINKS }
 func sharedPublicBskyApi() -> String { XrpcEndpoints.shared.PUBLIC_BSKY_API }
 func sharedConstellationApi() -> String { XrpcEndpoints.shared.CONSTELLATION_API }

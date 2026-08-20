@@ -26,6 +26,21 @@ data class BlueskyProfile(
     val postsCount: Int? = null
 )
 
+// ── Bluesky List (app.bsky.graph.getList) ────────────────────────────────
+
+/** A single member of a Bluesky list — the subject's profile view. */
+@Serializable
+data class BlueskyListItem(
+    val subject: BlueskyProfile
+)
+
+/** Response from `app.bsky.graph.getList`. */
+@Serializable
+data class GetListResponse(
+    val items: List<BlueskyListItem> = emptyList(),
+    val cursor: String? = null
+)
+
 // ── Constellation Backlinks ──────────────────────────────────────────────
 
 /**

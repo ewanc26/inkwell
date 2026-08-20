@@ -17,6 +17,8 @@ struct CreditsView: View {
 
     @State private var isConfirmingSignOut = false
     @State private var isShowingFeedback = false
+    @State private var supporters: [BSkyActorProfile] = []
+    @State private var hasLoadedSupporters = false
 
     private var versionString: String {
         let shortVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
@@ -81,6 +83,33 @@ struct CreditsView: View {
                     Text("Built On")
                 } footer: {
                     Text("Inkwell reads and writes Leaflet, Markpub, pckt, and Offprint content alongside the shared site.standard.* records.")
+                }
+
+                if !supporters.isEmpty {
+                    Section {
+                        ForEach(supporters) { supporter in
+                            if let url = URL(string: "https://bsky.app/profile/\(supporter.handle)") {
+                                Link(destination: url) {
+                                    HStack(spacing: 12) {
+                                        AccountAvatar(url: supporter.avatar.flatMap(URL.init(string:)), size: 36)
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(supporter.displayName?.isEmpty == false ? supporter.displayName! : "@\(supporter.handle)")
+                                                .foregroundStyle(.primary)
+                                                .lineLimit(1)
+                                            Text("@\(supporter.handle)")
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                                .lineLimit(1)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } header: {
+                        Text("Supporters")
+                    } footer: {
+                        Text("Everyone who's tipped Inkwell via Ko-fi or GitHub Sponsors, listed on Bluesky. Thank you.")
+                    }
                 }
 
                 Section {
@@ -164,6 +193,11 @@ struct CreditsView: View {
             }
             .sheet(isPresented: $isShowingFeedback) {
                 FeedbackView()
+            }
+            .task {
+                guard !hasLoadedSupporters else { return }
+                hasLoadedSupporters = true
+                supporters = await BSkyListFetcher.fetchListMembers(listUri: SupportersList.uri)
             }
         }
     }

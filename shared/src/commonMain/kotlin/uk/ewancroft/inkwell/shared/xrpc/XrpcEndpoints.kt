@@ -15,5 +15,6 @@ object XrpcEndpoints {
     const val IDENTITY_RESOLVE_HANDLE = "/xrpc/com.atproto.identity.resolveHandle"
     const val ACTOR_GET_PROFILE = "/xrpc/app.bsky.actor.getProfile"
     const val FEED_GET_POSTS = "/xrpc/app.bsky.feed.getPosts"
+    const val GRAPH_GET_LIST = "/xrpc/app.bsky.graph.getList"
     const val MICROCOSM_GET_BACKLINKS = "/xrpc/blue.microcosm.links.getBacklinks"
 }
