@@ -19,6 +19,7 @@ struct InkwellApp: App {
     /// ignoresSafeArea still intercepts all touches at screen top.
     @State private var showSplash = true
     @State private var splashOpacity: Double = 1.0
+    @State private var customisation = CustomisationSettings.shared
 
     var body: some Scene {
         WindowGroup {
@@ -73,6 +74,7 @@ struct InkwellApp: App {
                     }
                     BackgroundRefreshManager.shared.schedule()
                 }
+            .preferredColorScheme(customisation.appearanceOverride)
         }
     }
 }
