@@ -49,6 +49,17 @@ final class NotificationManager {
     private let lastPollKey = "standardSite.lastPollTime"
     private let notificationsKey = "standardSite.notifications"
     private let unreadCountKey = "standardSite.unreadCount"
+    private let notificationsEnabledKey = "standardSite.notificationsEnabled"
+
+    /// User-facing on/off switch, surfaced in SettingsView. Distinct from
+    /// the OS permission: this gates whether a *banner* is sent, not
+    /// whether polling happens -- the in-app notification list and unread
+    /// badge keep working either way, since they reflect "new documents
+    /// exist", not "you were interrupted about them".
+    var notificationsEnabled: Bool {
+        get { defaults.object(forKey: notificationsEnabledKey) as? Bool ?? true }
+        set { defaults.set(newValue, forKey: notificationsEnabledKey) }
+    }
 
     private init() {
         if let data = defaults.data(forKey: notificationsKey),
@@ -137,18 +148,22 @@ final class NotificationManager {
             switch notificationStyle(newDocCount: Int32(newDocs.count)) {
             case .single:
                 let doc = newDocs[0]
-                await sendNotification(
-                    title: doc.pub?.record.name ?? "New Document",
-                    body: doc.doc.record.title,
-                    documentURI: doc.doc.uri
-                )
+                if notificationsEnabled {
+                    await sendNotification(
+                        title: doc.pub?.record.name ?? "New Document",
+                        body: doc.doc.record.title,
+                        documentURI: doc.doc.uri
+                    )
+                }
             case .summary(let count):
                 let newest = newDocs[0]
-                await sendNotification(
-                    title: "\(count) New Documents",
-                    body: "Latest: \(newest.doc.record.title) from \(newest.pub?.record.name ?? "a publication")",
-                    documentURI: newest.doc.uri
-                )
+                if notificationsEnabled {
+                    await sendNotification(
+                        title: "\(count) New Documents",
+                        body: "Latest: \(newest.doc.record.title) from \(newest.pub?.record.name ?? "a publication")",
+                        documentURI: newest.doc.uri
+                    )
+                }
             case .none:
                 break
             }
