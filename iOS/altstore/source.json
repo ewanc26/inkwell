@@ -25,6 +25,14 @@
       ],
       "versions": [
         {
+          "version": "2.1.0",
+          "buildVersion": "53",
+          "date": "2026-08-21",
+          "localizedDescription": "Adds a Bluesky supporters section to Credits, crediting everyone who's tipped via Ko-fi or GitHub Sponsors. Credits is now reachable from the sign-in screen too, without an account. Fixes three public-API calls (profile lookups, handle resolution, Constellation backlink queries) that were silently failing due to a duplicated /xrpc/ path segment.",
+          "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.1.0.ipa",
+          "size": 11458992
+        },
+        {
           "version": "2.0.0",
           "buildVersion": "52",
           "date": "2026-08-18",
