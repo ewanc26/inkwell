@@ -20,7 +20,7 @@ Inkwell acts as a portal to the AT Protocol network. You are solely responsible 
 
 You retain all rights in what you write. Publishing through Inkwell grants the developer no licence over your content.
 
-If you use the optional in-app feedback feature, the record you create is public and is stored in your own repository; see section 7 of the [Privacy Policy](/privacy).
+If you use the optional in-app feedback feature, the record you create is public and is stored in your own repository; see section 7 of the [Privacy Policy](https://inkwell.ewancroft.uk/privacy).
 
 ## 5. Decentralised network disclaimer
 
