@@ -25,7 +25,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
@@ -71,12 +70,16 @@ fun SettingsDialog(
     var isConfirmingSignOut by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-    var isUnlocked by remember { mutableStateOf(CustomisationPreferences.isUnlocked(context)) }
-    var licenseKeyInput by remember { mutableStateOf("") }
-    var licenseKeyError by remember { mutableStateOf(false) }
     var accentColorHex by remember { mutableStateOf(CustomisationPreferences.getAccentColorHex(context)) }
     var fontFamilyOverride by remember { mutableStateOf(CustomisationPreferences.getFontFamilyOverride(context)) }
     var appearanceOverride by remember { mutableStateOf(CustomisationPreferences.getAppearanceOverride(context)) }
+    var showCustomisationTipPrompt by remember { mutableStateOf(false) }
+
+    fun promptForTipIfNeeded() {
+        if (!CustomisationPreferences.hasShownTipPrompt(context)) {
+            showCustomisationTipPrompt = true
+        }
+    }
 
     var fontSizeScale by remember { mutableStateOf(AccessibilityPreferences.getFontSizeScale(context)) }
     var boldText by remember { mutableStateOf(AccessibilityPreferences.getBoldText(context)) }
@@ -107,6 +110,35 @@ fun SettingsDialog(
             dismissButton = {
                 TextButton(onClick = { isConfirmingSignOut = false }) {
                     Text("Cancel")
+                }
+            },
+        )
+    }
+
+    if (showCustomisationTipPrompt) {
+        AlertDialog(
+            onDismissRequest = {
+                showCustomisationTipPrompt = false
+                CustomisationPreferences.markTipPromptShown(context)
+            },
+            title = { Text("Enjoying Customisation?") },
+            text = { Text("These overrides are free for everyone. If you find them useful, consider a tip to support ongoing development.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showCustomisationTipPrompt = false
+                    CustomisationPreferences.markTipPromptShown(context)
+                    val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://ko-fi.com/ewancroft"))
+                    context.startActivity(intent)
+                }) {
+                    Text("Tip Me")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showCustomisationTipPrompt = false
+                    CustomisationPreferences.markTipPromptShown(context)
+                }) {
+                    Text("Maybe Later")
                 }
             },
         )
@@ -228,136 +260,104 @@ fun SettingsDialog(
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-                    if (isUnlocked) {
-                        SectionHeader("Customisation")
-                        Text(
-                            "Accent Color",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-                        )
-                        Row(
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        ) {
-                            for (hex in ACCENT_SWATCHES) {
-                                ColorSwatch(
-                                    hex = hex,
-                                    selected = accentColorHex.equals(hex, ignoreCase = true),
-                                    onClick = {
-                                        accentColorHex = hex
-                                        CustomisationPreferences.setAccentColorHex(context, hex)
-                                    },
-                                )
-                            }
-                        }
-                        Text(
-                            "Reading Font",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-                        )
-                        Row(
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            for (family in SharedReaderTheme.FontFamily.entries) {
-                                FilterChip(
-                                    selected = fontFamilyOverride == family,
-                                    onClick = {
-                                        fontFamilyOverride = family
-                                        CustomisationPreferences.setFontFamilyOverride(context, family)
-                                    },
-                                    label = { Text(family.name) },
-                                )
-                            }
-                        }
-                        Text(
-                            "Appearance",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-                        )
-                        Row(
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            FilterChip(
-                                selected = appearanceOverride == null,
+                    SectionHeader("Customisation")
+                    Text(
+                        "Accent Color",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                    )
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        for (hex in ACCENT_SWATCHES) {
+                            ColorSwatch(
+                                hex = hex,
+                                selected = accentColorHex.equals(hex, ignoreCase = true),
                                 onClick = {
-                                    appearanceOverride = null
-                                    CustomisationPreferences.setAppearanceOverride(context, null)
+                                    accentColorHex = hex
+                                    CustomisationPreferences.setAccentColorHex(context, hex)
+                                    promptForTipIfNeeded()
                                 },
-                                label = { Text("System") },
-                            )
-                            FilterChip(
-                                selected = appearanceOverride == CustomisationPreferences.AppearanceOverride.LIGHT,
-                                onClick = {
-                                    appearanceOverride = CustomisationPreferences.AppearanceOverride.LIGHT
-                                    CustomisationPreferences.setAppearanceOverride(context, CustomisationPreferences.AppearanceOverride.LIGHT)
-                                },
-                                label = { Text("Light") },
-                            )
-                            FilterChip(
-                                selected = appearanceOverride == CustomisationPreferences.AppearanceOverride.DARK,
-                                onClick = {
-                                    appearanceOverride = CustomisationPreferences.AppearanceOverride.DARK
-                                    CustomisationPreferences.setAppearanceOverride(context, CustomisationPreferences.AppearanceOverride.DARK)
-                                },
-                                label = { Text("Dark") },
                             )
                         }
-                        SettingsRow(
-                            title = "Reset to Defaults",
-                            titleColor = MaterialTheme.colorScheme.error,
+                    }
+                    Text(
+                        "Reading Font",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                    )
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        for (family in SharedReaderTheme.FontFamily.entries) {
+                            FilterChip(
+                                selected = fontFamilyOverride == family,
+                                onClick = {
+                                    fontFamilyOverride = family
+                                    CustomisationPreferences.setFontFamilyOverride(context, family)
+                                    promptForTipIfNeeded()
+                                },
+                                label = { Text(family.name) },
+                            )
+                        }
+                    }
+                    Text(
+                        "Appearance",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                    )
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        FilterChip(
+                            selected = appearanceOverride == null,
                             onClick = {
-                                accentColorHex = null
-                                fontFamilyOverride = null
                                 appearanceOverride = null
-                                CustomisationPreferences.setAccentColorHex(context, null)
-                                CustomisationPreferences.setFontFamilyOverride(context, null)
                                 CustomisationPreferences.setAppearanceOverride(context, null)
+                                promptForTipIfNeeded()
                             },
+                            label = { Text("System") },
                         )
-                        Text(
-                            "Overrides apply everywhere, including publications that set their own theme.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                        )
-                    } else {
-                        SectionHeader("Customisation")
-                        OutlinedTextField(
-                            value = licenseKeyInput,
-                            onValueChange = { licenseKeyInput = it },
-                            label = { Text("License Key") },
-                            singleLine = true,
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-                        )
-                        SettingsRow(
-                            title = "Unlock",
+                        FilterChip(
+                            selected = appearanceOverride == CustomisationPreferences.AppearanceOverride.LIGHT,
                             onClick = {
-                                if (CustomisationPreferences.unlock(context, licenseKeyInput)) {
-                                    isUnlocked = true
-                                    licenseKeyError = false
-                                    licenseKeyInput = ""
-                                } else {
-                                    licenseKeyError = true
-                                }
+                                appearanceOverride = CustomisationPreferences.AppearanceOverride.LIGHT
+                                CustomisationPreferences.setAppearanceOverride(context, CustomisationPreferences.AppearanceOverride.LIGHT)
+                                promptForTipIfNeeded()
                             },
+                            label = { Text("Light") },
                         )
-                        if (licenseKeyError) {
-                            Text(
-                                "That key didn't verify. Check it was copied in full.",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.padding(horizontal = 16.dp),
-                            )
-                        }
-                        Text(
-                            "A one-off £5 unlocks accent colour, reading font, and light/dark overrides that apply everywhere you read, including publications with their own theme. Pay via Ko-fi or GitHub Sponsors (under About → Support) and mention you'd like the customisation unlock — you'll get a key back to paste in here.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        FilterChip(
+                            selected = appearanceOverride == CustomisationPreferences.AppearanceOverride.DARK,
+                            onClick = {
+                                appearanceOverride = CustomisationPreferences.AppearanceOverride.DARK
+                                CustomisationPreferences.setAppearanceOverride(context, CustomisationPreferences.AppearanceOverride.DARK)
+                                promptForTipIfNeeded()
+                            },
+                            label = { Text("Dark") },
                         )
                     }
+                    SettingsRow(
+                        title = "Reset to Defaults",
+                        titleColor = MaterialTheme.colorScheme.error,
+                        onClick = {
+                            accentColorHex = null
+                            fontFamilyOverride = null
+                            appearanceOverride = null
+                            CustomisationPreferences.setAccentColorHex(context, null)
+                            CustomisationPreferences.setFontFamilyOverride(context, null)
+                            CustomisationPreferences.setAppearanceOverride(context, null)
+                        },
+                    )
+                    Text(
+                        "Overrides apply everywhere, including publications that set their own theme. Free — if you find it useful, a tip (About → Support) helps keep Inkwell going.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    )
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
