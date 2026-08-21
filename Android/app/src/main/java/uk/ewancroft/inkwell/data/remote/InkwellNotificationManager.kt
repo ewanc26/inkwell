@@ -153,6 +153,7 @@ class InkwellNotificationManager @Inject constructor(
                 )
             }
             saveNotifications(notificationEntries)
+            prefs.edit().putInt(UNREAD_COUNT_KEY, getUnreadCount() + newDocs.size).apply()
         }
 
         saveLastSeenURIs(allSeenURIs)
@@ -227,7 +228,6 @@ class InkwellNotificationManager @Inject constructor(
         val limited = NotificationPolicy.trimNotifications(existing)
         val jsonStr = json.encodeToString(limited)
         prefs.edit().putString(NOTIFICATIONS_KEY, jsonStr).apply()
-        prefs.edit().putInt(UNREAD_COUNT_KEY, limited.size).apply()
     }
 }
 

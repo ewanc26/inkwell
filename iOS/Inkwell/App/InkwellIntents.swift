@@ -93,6 +93,16 @@ extension Notification.Name {
     /// Posted when an App Intent requests a tab switch. The host app's
     /// ContentView observes this to programmatically change the selected tab.
     static let inkwellOpenTab = Notification.Name("inkwellOpenTab")
+
+    /// Posted when a tapped local notification (see NotificationDelegate)
+    /// requests opening a specific document. BrowseDocumentsView observes
+    /// this to push the document onto its navigation stack; ContentView
+    /// observes it to switch to the Reader tab first if needed.
+    static let inkwellOpenDocument = Notification.Name("inkwellOpenDocument")
+}
+
+enum InkwellDocumentKey {
+    static let uri = "inkwellDocumentURI"
 }
 
 // MARK: - App Shortcuts Provider

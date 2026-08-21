@@ -16,6 +16,7 @@
 
 import BackgroundTasks
 import UIKit
+import UserNotifications
 
 enum InkwellIdentifiers {
     static let lexiconNamespace = "uk.ewancroft.inkwell"
@@ -93,6 +94,7 @@ final class InkwellAppDelegate: NSObject, UIApplicationDelegate {
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
         BackgroundRefreshManager.shared.register()
+        UNUserNotificationCenter.current().delegate = NotificationDelegate.shared
         configureNavigationBar()
         return true
     }
