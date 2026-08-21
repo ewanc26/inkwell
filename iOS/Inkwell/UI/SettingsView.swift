@@ -23,9 +23,8 @@ struct SettingsView: View {
     @State private var showAbout = false
 
     @State private var customisation = CustomisationSettings.shared
-    @State private var licenseKeyInput = ""
-    @State private var licenseKeyError = false
     @State private var accentColor: Color?
+    @State private var showCustomisationTipPrompt = false
 
     @State private var accessibility = AccessibilitySettings.shared
 
@@ -80,70 +79,51 @@ struct SettingsView: View {
                     Text("These apply on top of your device's own Text Size and accessibility settings, and are always free.")
                 }
 
-                if customisation.isUnlocked {
-                    Section {
-                        ColorPicker(
-                            "Accent Color",
-                            selection: Binding(
-                                get: { accentColor ?? .accentColor },
-                                set: { newValue in
-                                    accentColor = newValue
-                                    customisation.accentColorHex = newValue.toHexString()
-                                }
-                            )
-                        )
-                        Picker("Reading Font", selection: Binding(
-                            get: { customisation.fontFamilyOverride ?? .sans },
-                            set: { customisation.fontFamilyOverride = $0 }
-                        )) {
-                            Text("Sans-Serif").tag(ReaderTheme.FontFamily.sans)
-                            Text("Serif").tag(ReaderTheme.FontFamily.serif)
-                            Text("Rounded").tag(ReaderTheme.FontFamily.rounded)
-                            Text("Monospaced").tag(ReaderTheme.FontFamily.monospaced)
-                        }
-                        Picker("Appearance", selection: Binding(
-                            get: { customisation.appearanceOverride },
-                            set: { customisation.appearanceOverride = $0 }
-                        )) {
-                            Text("System").tag(ColorScheme?.none)
-                            Text("Light").tag(ColorScheme?.some(.light))
-                            Text("Dark").tag(ColorScheme?.some(.dark))
-                        }
-                        Button("Reset to Defaults", role: .destructive) {
-                            accentColor = nil
-                            customisation.accentColorHex = nil
-                            customisation.fontFamilyOverride = nil
-                            customisation.appearanceOverride = nil
-                        }
-                    } header: {
-                        Text("Customisation")
-                    } footer: {
-                        Text("Overrides apply everywhere, including publications that set their own theme.")
-                    }
-                } else {
-                    Section {
-                        TextField("License Key", text: $licenseKeyInput)
-                            .textInputAutocapitalization(.never)
-                            .autocorrectionDisabled()
-                        Button("Unlock") {
-                            if customisation.unlock(withKey: licenseKeyInput) {
-                                licenseKeyError = false
-                                licenseKeyInput = ""
-                            } else {
-                                licenseKeyError = true
+                Section {
+                    ColorPicker(
+                        "Accent Color",
+                        selection: Binding(
+                            get: { accentColor ?? .accentColor },
+                            set: { newValue in
+                                accentColor = newValue
+                                customisation.accentColorHex = newValue.toHexString()
+                                promptForTipIfNeeded()
                             }
+                        )
+                    )
+                    Picker("Reading Font", selection: Binding(
+                        get: { customisation.fontFamilyOverride ?? .sans },
+                        set: {
+                            customisation.fontFamilyOverride = $0
+                            promptForTipIfNeeded()
                         }
-                        .disabled(licenseKeyInput.isEmpty)
-                        if licenseKeyError {
-                            Text("That key didn't verify. Check it was copied in full.")
-                                .foregroundStyle(.red)
-                                .font(.caption)
-                        }
-                    } header: {
-                        Text("Customisation")
-                    } footer: {
-                        Text("A one-off £5 unlocks accent colour, reading font, and light/dark overrides that apply everywhere you read, including publications with their own theme. Pay via Ko-fi or GitHub Sponsors (under About → Support) and mention you'd like the customisation unlock — you'll get a key back to paste in here.")
+                    )) {
+                        Text("Sans-Serif").tag(ReaderTheme.FontFamily.sans)
+                        Text("Serif").tag(ReaderTheme.FontFamily.serif)
+                        Text("Rounded").tag(ReaderTheme.FontFamily.rounded)
+                        Text("Monospaced").tag(ReaderTheme.FontFamily.monospaced)
                     }
+                    Picker("Appearance", selection: Binding(
+                        get: { customisation.appearanceOverride },
+                        set: {
+                            customisation.appearanceOverride = $0
+                            promptForTipIfNeeded()
+                        }
+                    )) {
+                        Text("System").tag(ColorScheme?.none)
+                        Text("Light").tag(ColorScheme?.some(.light))
+                        Text("Dark").tag(ColorScheme?.some(.dark))
+                    }
+                    Button("Reset to Defaults", role: .destructive) {
+                        accentColor = nil
+                        customisation.accentColorHex = nil
+                        customisation.fontFamilyOverride = nil
+                        customisation.appearanceOverride = nil
+                    }
+                } header: {
+                    Text("Customisation")
+                } footer: {
+                    Text("Overrides apply everywhere, including publications that set their own theme. Free — if you find it useful, a tip (About → Support) helps keep Inkwell going.")
                 }
 
                 Section("Legal") {
@@ -187,7 +167,23 @@ struct SettingsView: View {
             } message: {
                 Text("Your publications and subscriptions stay in your PDS. You can sign back in at any time.")
             }
+            .alert("Enjoying Customisation?", isPresented: $showCustomisationTipPrompt) {
+                Button("Maybe Later", role: .cancel) { customisation.markTipPromptShown() }
+                Button("Tip Me") {
+                    if let url = URL(string: "https://ko-fi.com/ewancroft") {
+                        UIApplication.shared.open(url)
+                    }
+                    customisation.markTipPromptShown()
+                }
+            } message: {
+                Text("These overrides are free for everyone. If you find them useful, consider a tip to support ongoing development.")
+            }
         }
+    }
+
+    private func promptForTipIfNeeded() {
+        guard !customisation.hasShownTipPrompt else { return }
+        showCustomisationTipPrompt = true
     }
 
     private var appVersionString: String {

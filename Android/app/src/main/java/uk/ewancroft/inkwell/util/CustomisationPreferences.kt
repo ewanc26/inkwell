@@ -4,10 +4,14 @@ import android.content.Context
 import uk.ewancroft.inkwell.shared.theme.SharedReaderTheme
 
 /**
- * User-chosen appearance overrides, unlocked by a paid license key (see
- * LicenseVerifier.kt). Deliberately takes priority over whatever a
- * publication's own theme sets -- the point is reading everything the
- * way *you* want, not just a fallback for publications that set nothing.
+ * User-chosen appearance overrides -- free for everyone, not gated.
+ * Deliberately takes priority over whatever a publication's own theme
+ * sets -- the point is reading everything the way *you* want, not just
+ * a fallback for publications that set nothing.
+ *
+ * The first time someone actually changes one of these, SettingsDialog
+ * shows a one-off tip nudge (Ko-fi/GitHub Sponsors) rather than gating
+ * the feature behind payment -- a soft ask, not a paywall.
  *
  * Context-parameterised rather than Hilt-injected to match
  * TipPromptManager's existing convention for lightweight preference
@@ -15,22 +19,19 @@ import uk.ewancroft.inkwell.shared.theme.SharedReaderTheme
  */
 object CustomisationPreferences {
     private const val PREFS_NAME = "inkwell_customisation"
-    private const val UNLOCKED_KEY = "unlocked"
     private const val ACCENT_COLOR_HEX_KEY = "accent_color_hex"
     private const val FONT_FAMILY_KEY = "font_family"
     private const val APPEARANCE_OVERRIDE_KEY = "appearance_override"
+    private const val HAS_SHOWN_TIP_PROMPT_KEY = "has_shown_tip_prompt"
 
     enum class AppearanceOverride { LIGHT, DARK }
 
     private fun prefs(context: Context) = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-    fun isUnlocked(context: Context): Boolean = prefs(context).getBoolean(UNLOCKED_KEY, false)
+    fun hasShownTipPrompt(context: Context): Boolean = prefs(context).getBoolean(HAS_SHOWN_TIP_PROMPT_KEY, false)
 
-    /** Returns true and persists the unlock if the key verifies. */
-    fun unlock(context: Context, key: String): Boolean {
-        if (!LicenseVerifier.isValid(key)) return false
-        prefs(context).edit().putBoolean(UNLOCKED_KEY, true).apply()
-        return true
+    fun markTipPromptShown(context: Context) {
+        prefs(context).edit().putBoolean(HAS_SHOWN_TIP_PROMPT_KEY, true).apply()
     }
 
     fun getAccentColorHex(context: Context): String? = prefs(context).getString(ACCENT_COLOR_HEX_KEY, null)

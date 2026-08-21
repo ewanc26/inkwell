@@ -2,10 +2,14 @@
 //  CustomisationSettings.swift
 //  Inkwell
 //
-//  User-chosen appearance overrides, unlocked by a paid license key (see
-//  LicenseVerifier.swift). Deliberately takes priority over whatever a
-//  publication's own theme sets -- the point is reading everything the
-//  way *you* want, not just a fallback for publications that set nothing.
+//  User-chosen appearance overrides -- free for everyone, not gated.
+//  Deliberately takes priority over whatever a publication's own theme
+//  sets -- the point is reading everything the way *you* want, not just
+//  a fallback for publications that set nothing.
+//
+//  The first time someone actually changes one of these, SettingsView
+//  shows a one-off tip nudge (Ko-fi/GitHub Sponsors) rather than gating
+//  the feature behind payment -- a soft ask, not a paywall.
 //
 
 import SwiftUI
@@ -17,12 +21,10 @@ final class CustomisationSettings {
     static let shared = CustomisationSettings()
 
     private let defaults = UserDefaults.standard
-    private let unlockedKey = "customisation.unlocked"
     private let accentColorHexKey = "customisation.accentColorHex"
     private let fontFamilyKey = "customisation.fontFamily"
     private let appearanceOverrideKey = "customisation.appearanceOverride"
-
-    private(set) var isUnlocked: Bool
+    private let hasShownTipPromptKey = "customisation.hasShownTipPrompt"
 
     var accentColorHex: String? {
         didSet { defaults.set(accentColorHex, forKey: accentColorHexKey) }
@@ -44,8 +46,9 @@ final class CustomisationSettings {
         }
     }
 
+    private(set) var hasShownTipPrompt: Bool
+
     private init() {
-        isUnlocked = defaults.bool(forKey: unlockedKey)
         accentColorHex = defaults.string(forKey: accentColorHexKey)
         fontFamilyOverride = (defaults.string(forKey: fontFamilyKey)).flatMap(ReaderTheme.FontFamily.init(rawValue:))
         appearanceOverride = switch defaults.string(forKey: appearanceOverrideKey) {
@@ -53,15 +56,12 @@ final class CustomisationSettings {
         case "dark": .dark
         default: nil
         }
+        hasShownTipPrompt = defaults.bool(forKey: hasShownTipPromptKey)
     }
 
-    /// Returns true and persists the unlock if the key verifies.
-    @discardableResult
-    func unlock(withKey key: String) -> Bool {
-        guard LicenseVerifier.isValid(licenseKey: key) else { return false }
-        isUnlocked = true
-        defaults.set(true, forKey: unlockedKey)
-        return true
+    func markTipPromptShown() {
+        hasShownTipPrompt = true
+        defaults.set(true, forKey: hasShownTipPromptKey)
     }
 
     /// 0xRRGGBB, matching SharedReaderTheme's Int colour convention -- fed
