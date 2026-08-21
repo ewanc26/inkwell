@@ -53,6 +53,10 @@ data class SharedReaderTheme(
             // not just a fallback for publications that set nothing.
             overrideAccentRgb: Int? = null,
             overrideFontFamily: FontFamily? = null,
+            // Accessibility overrides -- free, unlike the two above, and
+            // applied last since a publication's aesthetic choices should
+            // never be able to produce illegible text.
+            increaseContrast: Boolean = false,
         ): SharedReaderTheme {
             val background = firstNonNullInt(
                 richBackgroundColor,
@@ -67,7 +71,7 @@ data class SharedReaderTheme(
                 background
             )
 
-            val foreground = firstNonNullInt(
+            var foreground = firstNonNullInt(
                 richPrimaryColor,
                 paletteText?.let { hexToRgb(it) },
                 basicForeground?.let { hexToRgb(it) },
@@ -88,6 +92,15 @@ data class SharedReaderTheme(
                 0xFFFFFFFF.toInt()
             )
 
+            if (increaseContrast) {
+                // Snap to pure black/white rather than compute a target
+                // contrast ratio -- matches how iOS/Android's own system
+                // "Increase Contrast" settings behave (maximum, not a
+                // negotiated ratio), and is trivially correct regardless
+                // of what a publication's rich theme set.
+                foreground = if (isPerceptuallyDark(background)) 0xFFFFFFFF.toInt() else 0xFF000000.toInt()
+            }
+
             val pageWidth = (richPageWidth ?: 680).coerceIn(320, 1000)
 
             return SharedReaderTheme(
@@ -101,6 +114,18 @@ data class SharedReaderTheme(
                 headingFontFamily = overrideFontFamily ?: fontFamilyFor(richHeadingFont ?: richSharedFont),
                 bodyFontFamily = overrideFontFamily ?: fontFamilyFor(richBodyFont ?: richSharedFont),
             )
+        }
+
+        /** Standard perceived-luminance formula (Rec. 601): true below the
+         *  midpoint, i.e. a color dark enough to need light content on top
+         *  of it. [rgbInt] is 0xRRGGBB, matching this file's Int colour
+         *  convention. */
+        fun isPerceptuallyDark(rgbInt: Int): Boolean {
+            val r = (rgbInt shr 16) and 0xFF
+            val g = (rgbInt shr 8) and 0xFF
+            val b = rgbInt and 0xFF
+            val luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255.0
+            return luminance < 0.5
         }
 
         fun fontFamilyFor(identifier: String?): FontFamily {

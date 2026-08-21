@@ -42,6 +42,8 @@ data class ReaderTheme(
             // into the same shared resolver call.
             overrideAccentRgb: Int? = null,
             overrideFontFamily: SharedReaderTheme.FontFamily? = null,
+            // Accessibility override -- free, unlike the two above.
+            increaseContrast: Boolean = false,
         ): ReaderTheme {
             val rich = documentTheme ?: publicationTheme
             val palette = if (isDarkTheme) rich?.dark else rich?.light
@@ -68,6 +70,7 @@ data class ReaderTheme(
                 basicAccentForeground = basicTheme?.accentForeground?.toHexString(),
                 overrideAccentRgb = overrideAccentRgb,
                 overrideFontFamily = overrideFontFamily,
+                increaseContrast = increaseContrast,
             )
 
             return ReaderTheme(

@@ -223,11 +223,19 @@ struct MarkdownRendererView: View {
     /// Converts markdown inline syntax (**bold**, *italic*, `code`,
     /// ~~strike~~, [text](url)) to an AttributedString.
     private func renderInline(_ text: String) -> AttributedString {
-        (try? AttributedString(
+        var attributed = (try? AttributedString(
             markdown: text,
             options: AttributedString.MarkdownParsingOptions(
                 interpretedSyntax: .inlineOnlyPreservingWhitespace
             )
         )) ?? AttributedString(text)
+
+        if AccessibilitySettings.shared.underlineLinks {
+            for run in attributed.runs where run.link != nil {
+                attributed[run.range].underlineStyle = .single
+            }
+        }
+
+        return attributed
     }
 }

@@ -69,6 +69,7 @@ struct ReaderTheme {
         let palette = isDark ? rich?.dark : rich?.light
 
         let customisation = CustomisationSettings.shared
+        let accessibility = AccessibilitySettings.shared
 
         let shared = resolveReaderTheme(
             richBackgroundColor: rich?.backgroundColor?.rgbInt,
@@ -91,7 +92,8 @@ struct ReaderTheme {
             basicAccent: basic?.accent.hexString,
             basicAccentForeground: basic?.accentForeground.hexString,
             overrideAccentRgb: customisation.accentColorRgbInt,
-            overrideFontFamily: customisation.fontFamilyOverride?.toShared()
+            overrideFontFamily: customisation.fontFamilyOverride?.toShared(),
+            increaseContrast: accessibility.increaseContrast
         )
 
         background = Color(rgbInt: Int(shared.backgroundRgb))
@@ -106,13 +108,42 @@ struct ReaderTheme {
     }
 
     func headingFont(_ style: Font.TextStyle, weight: Font.Weight? = nil) -> Font {
-        let font = Font.system(style, design: headingFamily.design)
-        return weight.map(font.weight) ?? font
+        Self.scaledFont(style, family: headingFamily, weight: weight)
     }
 
     func bodyFont(_ style: Font.TextStyle, weight: Font.Weight? = nil) -> Font {
-        let font = Font.system(style, design: bodyFamily.design)
-        return weight.map(font.weight) ?? font
+        Self.scaledFont(style, family: bodyFamily, weight: weight)
+    }
+
+    /// Applies AccessibilitySettings' font size scale and bold-text
+    /// override on top of the system's own Dynamic Type size for [style]
+    /// -- the two compose rather than compete, same as iOS's own
+    /// accessibility text size and Bold Text settings do for system UI.
+    private static func scaledFont(_ style: Font.TextStyle, family: FontFamily, weight: Font.Weight?) -> Font {
+        let accessibility = AccessibilitySettings.shared
+        let baseSize = UIFont.preferredFont(forTextStyle: style.uiKit).pointSize
+        let scaledSize = baseSize * accessibility.fontSizeScale
+        let resolvedWeight = accessibility.boldText ? .bold : (weight ?? .regular)
+        return .system(size: scaledSize, weight: resolvedWeight, design: family.design)
+    }
+}
+
+private extension Font.TextStyle {
+    var uiKit: UIFont.TextStyle {
+        switch self {
+        case .largeTitle: return .largeTitle
+        case .title: return .title1
+        case .title2: return .title2
+        case .title3: return .title3
+        case .headline: return .headline
+        case .subheadline: return .subheadline
+        case .body: return .body
+        case .callout: return .callout
+        case .footnote: return .footnote
+        case .caption: return .caption1
+        case .caption2: return .caption2
+        default: return .body
+        }
     }
 }
 
