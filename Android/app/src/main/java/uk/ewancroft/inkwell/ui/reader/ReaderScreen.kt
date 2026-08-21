@@ -64,6 +64,11 @@ fun ReaderScreen(
         }
     }
 
+    // Mirrors iOS BrowseDocumentsView's `.task { ...; notificationManager.markAllAsRead() }`.
+    LaunchedEffect(Unit) {
+        notificationViewModel.markAllAsRead()
+    }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(

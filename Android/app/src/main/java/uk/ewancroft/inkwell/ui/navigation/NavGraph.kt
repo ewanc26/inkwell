@@ -12,9 +12,12 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import uk.ewancroft.inkwell.ui.auth.LoginScreen
 import uk.ewancroft.inkwell.ui.reader.ReaderScreen
 import uk.ewancroft.inkwell.ui.reader.PostDetailScreen
+import uk.ewancroft.inkwell.ui.reader.InkwellNotificationViewModel
 import uk.ewancroft.inkwell.ui.writer.WriterScreen
 import uk.ewancroft.inkwell.ui.discover.DiscoverScreen
 import java.net.URLDecoder
@@ -45,6 +48,15 @@ fun InkwellNavHost(
         bottomNavItems.any { it.route == dest.route }
     } == true
 
+    val notificationViewModel: InkwellNotificationViewModel = hiltViewModel()
+    val unreadCount by notificationViewModel.unreadCount.collectAsStateWithLifecycle()
+    // The worker updates the persisted count out-of-band, so re-read it
+    // whenever the current destination changes (e.g. landing back on the
+    // Reader tab) rather than only once at first composition.
+    LaunchedEffect(currentDestination?.route) {
+        notificationViewModel.refreshUnreadCount()
+    }
+
     LaunchedEffect(pendingDocumentUri) {
         if (pendingDocumentUri != null) {
             val encoded = URLEncoder.encode(pendingDocumentUri, StandardCharsets.UTF_8.name())
@@ -74,10 +86,18 @@ fun InkwellNavHost(
                         val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
                         NavigationBarItem(
                             icon = {
-                                Icon(
-                                    if (selected) screen.selectedIcon else screen.icon,
-                                    contentDescription = screen.label,
-                                )
+                                val icon = @Composable {
+                                    Icon(
+                                        if (selected) screen.selectedIcon else screen.icon,
+                                        contentDescription = screen.label,
+                                    )
+                                }
+                                // Mirrors iOS's `Tab("Read", ...).badge(notificationManager.unreadCount)`.
+                                if (screen == Screen.Reader && unreadCount > 0) {
+                                    BadgedBox(badge = { Badge { Text("$unreadCount") } }) { icon() }
+                                } else {
+                                    icon()
+                                }
                             },
                             label = { Text(screen.label) },
                             selected = selected,

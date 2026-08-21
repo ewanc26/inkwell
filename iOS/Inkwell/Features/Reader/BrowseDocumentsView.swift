@@ -21,9 +21,10 @@ struct BrowseDocumentsView: View {
     @State private var store = ReaderFeedStore.shared
 
     @State private var showAbout = false
+    @State private var path = NavigationPath()
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             content
                 // As a safe-area bar rather than a plain VStack row (on iOS
                 // 26+), the feed switcher picks up the scroll-edge effect:
@@ -33,6 +34,9 @@ struct BrowseDocumentsView: View {
                 // safe-area inset without that effect.
                 .modifier(FeedSwitcherBar(selection: $store.selectedFeed))
                 .navigationTitle("Reader")
+                .navigationDestination(for: String.self) { documentURI in
+                    RemoteDocumentView(documentURI: documentURI)
+                }
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button("Refresh", systemImage: "arrow.clockwise") {
@@ -49,6 +53,13 @@ struct BrowseDocumentsView: View {
                     // appearance. This is a no-op in that case.
                     await store.loadData(loginStateManager: loginStateManager)
                     notificationManager.markAllAsRead()
+                }
+                // Posted by NotificationDelegate when a tapped local
+                // notification names a document — pushes it onto this
+                // tab's own stack rather than replacing whatever's showing.
+                .onReceive(NotificationCenter.default.publisher(for: .inkwellOpenDocument)) { notification in
+                    guard let uri = notification.userInfo?[InkwellDocumentKey.uri] as? String else { return }
+                    path.append(uri)
                 }
         }
     }
