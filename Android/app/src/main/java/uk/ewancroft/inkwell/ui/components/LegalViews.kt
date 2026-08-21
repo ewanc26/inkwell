@@ -16,35 +16,29 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import uk.ewancroft.inkwell.shared.legal.LegalDocuments
 import uk.ewancroft.inkwell.ui.reader.MarkdownRendererView
 
 /**
  * Privacy Policy and Terms of Service screens, rendered natively in-app
- * instead of opening the website -- mirrors iOS LegalViews.swift. The
- * documents live as markdown assets under assets/legal (privacy.md,
- * terms.md), generated from the same source in the repo-root legal
- * directory as the iOS and website copies, by tools/legal/render.mjs --
- * do not hand-edit the assets, edit the source and regenerate.
+ * instead of opening the website -- mirrors iOS LegalViews.swift. The text
+ * itself lives in the shared KMP module (LegalDocuments, generated from
+ * the repo-root legal directory by tools/legal/render.mjs) so iOS and
+ * Android read the exact same markdown; do not hand-edit LegalDocuments.kt,
+ * edit the source and regenerate.
  */
-enum class LegalDocumentType(val title: String, val assetPath: String) {
-    PrivacyPolicy("Privacy Policy", "legal/privacy.md"),
-    TermsOfService("Terms of Service", "legal/terms.md"),
+enum class LegalDocumentType(val title: String, val markdown: String) {
+    PrivacyPolicy("Privacy Policy", LegalDocuments.privacyMarkdown),
+    TermsOfService("Terms of Service", LegalDocuments.termsMarkdown),
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LegalDocumentDialog(documentType: LegalDocumentType, onDismiss: () -> Unit) {
-    val context = LocalContext.current
-    val markdown = remember(documentType) {
-        context.assets.open(documentType.assetPath).bufferedReader().use { it.readText() }
-    }
-
     Dialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false),
@@ -73,7 +67,7 @@ fun LegalDocumentDialog(documentType: LegalDocumentType, onDismiss: () -> Unit) 
                         .verticalScroll(rememberScrollState())
                         .padding(vertical = 8.dp),
                 ) {
-                    MarkdownRendererView(markdown = markdown)
+                    MarkdownRendererView(markdown = documentType.markdown)
                 }
             }
         }

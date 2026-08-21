@@ -581,3 +581,10 @@ func sharedBlockLossLabels(format: String) -> [String: String] {
         return [:]
     }
 }
+
+// MARK: - Legal Documents
+
+enum SharedLegalDocuments {
+    static var privacyMarkdown: String { InkwellShared.LegalDocuments.shared.privacyMarkdown }
+    static var termsMarkdown: String { InkwellShared.LegalDocuments.shared.termsMarkdown }
+}
