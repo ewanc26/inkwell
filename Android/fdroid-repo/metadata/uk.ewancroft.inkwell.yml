@@ -54,5 +54,5 @@ Description: |-
 # still-pending submission.
 AutoUpdateMode: None
 UpdateCheckMode: None
-CurrentVersion: '2.1.0'
-CurrentVersionCode: 8
+CurrentVersion: '2.2.0'
+CurrentVersionCode: 9
