@@ -167,7 +167,7 @@ fun CreditsView(
                     }
                 }
                 CreditRow(title = "Source on GitHub", detail = "ewanc26/inkwell", url = "https://github.com/ewanc26/inkwell", openUrl = ::openUrl)
-                CreditRow(title = "Ewan Croft", detail = "Developer — support links on ewancroft.uk", url = "https://ewancroft.uk", openUrl = ::openUrl)
+                CreditRow(title = "Ewan Croft", detail = "Developer", url = "https://ewancroft.uk", openUrl = ::openUrl)
 
                 Spacer(Modifier.height(24.dp))
                 HorizontalDivider()
