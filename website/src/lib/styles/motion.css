@@ -1,44 +1,61 @@
 /* ================================================================
- * motion.css — Entrance animations and interaction feedback
+ * motion.css — Hero choreography, scroll reveals, interaction feedback
  *
- * Entrance is always exponential easing at --duration-slow, a calm
- * fade with a small upward drift — never a bounce.  Direct-manipulation
- * feedback (press) is a quick, decisive scale.  All durations and
- * easings come from tokens.css and collapse under reduced motion via
- * system.css.
+ * Three layers, in order of budget:
+ *   1. The hero — the page's one orchestrated moment. Staged on load:
+ *      the mark rises, its ink drop falls into the well, then the
+ *      headline and calls to action follow.
+ *   2. Reveals — sibling stagger for genuine lists (screenshot rows,
+ *      card grids) as they scroll into view. Not a blanket fade on
+ *      every section; a section is not a list.
+ *   3. Feedback — press, hover, and disclosure states.
+ *
+ * Everything eases out exponentially from tokens.css and collapses
+ * under reduced motion via system.css.
  * ================================================================ */
 
-/* ── Entrance animation ──────────────────────────────────────── */
+/* ── 1. Hero choreography ────────────────────────────────────── */
 
-.animate-in {
+.hero-mark {
   animation: fade-slide-up var(--duration-slow) var(--ease-out-expo) both;
 }
 
-/* ── Staggered delays ────────────────────────────────────────── */
-
-.stagger-1 {
-  animation-delay: 100ms;
-}
-.stagger-2 {
-  animation-delay: 200ms;
-}
-.stagger-3 {
-  animation-delay: 300ms;
-}
-.stagger-4 {
-  animation-delay: 400ms;
-}
-.stagger-5 {
-  animation-delay: 500ms;
+/* The ink drop falls after the well is in place. transform-box keeps the
+   SVG circle's transform origin on the shape rather than the viewBox. */
+.hero-mark .ink-drop {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: ink-fall 600ms var(--ease-out-expo) 220ms both;
 }
 
-/* ── Hero reveal ─────────────────────────────────────────────── */
-
-.hero-reveal {
-  animation: hero-reveal var(--duration-slow) var(--ease-out-expo) both;
+/* Steps are tight on purpose: with five items, a larger interval pushes the
+   calls to action past the ~800ms where an entrance stops reading as one
+   gesture and starts reading as a queue. */
+.hero-item {
+  animation: fade-slide-up 420ms var(--ease-out-expo) both;
+  animation-delay: calc(90ms + var(--i, 0) * 55ms);
 }
 
-/* ── Interaction feedback ────────────────────────────────────── */
+/* ── 2. Scroll reveals ───────────────────────────────────────── */
+
+/* Visible by default. Only the js-motion opt-in (set pre-paint, and never
+   under reduced motion) arms the pre-reveal state, so content can never be
+   stranded invisible by an observer that didn't fire. */
+.js-motion .reveal {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity var(--duration-slow) var(--ease-out-expo),
+    transform var(--duration-slow) var(--ease-out-expo);
+}
+
+.js-motion .reveal.is-revealed {
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(var(--i, 0) * 60ms);
+}
+
+/* ── 3. Interaction feedback ─────────────────────────────────── */
 
 .active-press {
   transition: transform var(--duration-fast) var(--ease-out-quart);
@@ -46,4 +63,45 @@
 
 .active-press:active {
   transform: scale(0.98);
+}
+
+/* Trailing arrows lead the eye toward the destination on hover. */
+.section-link::after,
+.callout a svg {
+  transition: transform var(--duration-fast) var(--ease-out-quart);
+}
+
+.section-link:hover::after,
+.callout a:hover svg {
+  transform: translateX(3px);
+}
+
+/* Disclosure. `interpolate-size` lets the panel transition to its
+   intrinsic height; browsers without it open instantly, which is fine. */
+@supports (interpolate-size: allow-keywords) {
+  :root {
+    interpolate-size: allow-keywords;
+  }
+
+  .faq-item::details-content {
+    block-size: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition:
+      block-size var(--duration-normal) var(--ease-out-quart),
+      opacity var(--duration-fast) var(--ease-out-quart),
+      content-visibility var(--duration-normal) allow-discrete;
+  }
+
+  .faq-item[open]::details-content {
+    block-size: auto;
+    opacity: 1;
+  }
+}
+
+/* The mobile nav panel drops from under the header rather than appearing. */
+@media (max-width: 800px) {
+  .nav-links.open {
+    animation: fade-slide-down var(--duration-fast) var(--ease-out-quart) both;
+  }
 }

@@ -316,12 +316,12 @@
     gap: var(--space-lg);
   }
 
+  /* Deliberately not a flex container: the inline links are part of a
+     sentence, and flex `gap` would space them like separate items. */
   .footer-copyright {
-    display: inline-flex;
-    align-items: center;
     flex-shrink: 0;
-    gap: var(--space-sm);
     font-family: var(--font-mono);
+    line-height: 1.6;
     white-space: nowrap;
     margin: 0;
   }
@@ -387,12 +387,15 @@
     flex-direction: column;
     transition:
       background-color var(--duration-fast) var(--ease-out-quart),
-      border-color var(--duration-fast) var(--ease-out-quart);
+      border-color var(--duration-fast) var(--ease-out-quart),
+      transform var(--duration-fast) var(--ease-out-quart);
   }
 
+  /* A 2px lift, not a shadow — elevation stays tonal per DESIGN.md. */
   .feature-card:hover {
     background-color: var(--surface-sunken);
     border-color: var(--color-background-300);
+    transform: translateY(-2px);
   }
 
   .feature-card h3 {
@@ -527,12 +530,108 @@
     white-space: nowrap;
   }
 
+  /* ── Comparison list ───────────────────────────────────────── */
+  /* Three columns on desktop, stacked with inline labels on narrow
+     screens. The contrast between the two value columns carries the
+     argument: the browser column sits at muted weight, the Inkwell
+     column at full body strength. No accent fill — per DESIGN.md the
+     accent stays an interactive signal, not a persuasion device. */
+
+  .compare {
+    margin: 0;
+    padding: var(--space-xs);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+    background: var(--surface-raised);
+    border: 1px solid var(--surface-color);
+    border-radius: var(--radius-md);
+  }
+
+  .compare-head,
+  .compare-row {
+    display: grid;
+    grid-template-columns: minmax(8rem, 0.8fr) 1.1fr 1.1fr;
+    gap: var(--space-md);
+    align-items: baseline;
+    padding: var(--space-3);
+  }
+
+  .compare-head {
+    padding-block: var(--space-xs);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-600);
+  }
+
+  .compare-row {
+    border-radius: var(--radius-sm);
+  }
+
+  .compare-row + .compare-row {
+    border-top: 1px solid var(--surface-color);
+  }
+
+  .compare dt {
+    font-size: var(--text-md);
+    font-weight: 600;
+    color: var(--color-text-950);
+    line-height: 1.4;
+  }
+
+  .compare dd {
+    margin: 0;
+    line-height: 1.6;
+    font-size: var(--text-sm);
+  }
+
+  .compare-web {
+    color: var(--color-text-700);
+  }
+
+  .compare-app {
+    color: var(--color-text-900);
+  }
+
+  /* Column headers do the labelling on wide screens; these repeat them
+     per cell once the grid collapses. */
+  .compare-label {
+    display: none;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-600);
+    margin-bottom: var(--space-2xs);
+  }
+
+  @media (max-width: 720px) {
+    .compare-head {
+      display: none;
+    }
+
+    .compare-row {
+      grid-template-columns: 1fr;
+      gap: var(--space-sm);
+    }
+
+    .compare-label {
+      display: block;
+    }
+  }
+
   /* ── Screenshot frames ─────────────────────────────────────── */
 
   .screenshot-frame {
     border: 1px solid var(--surface-color);
     border-radius: var(--radius-md);
     background-color: var(--surface-raised);
+    transition:
+      border-color var(--duration-fast) var(--ease-out-quart),
+      transform var(--duration-fast) var(--ease-out-quart);
+  }
+
+  figure:hover > .screenshot-frame {
+    border-color: var(--color-primary-500);
+    transform: translateY(-3px);
   }
 
   .screenshot-caption {
@@ -554,6 +653,13 @@
     color: var(--color-primary-600);
     text-decoration: none;
     transition: color var(--duration-fast) var(--ease-out-quart);
+  }
+
+  /* The arrow is generated rather than typed into each link, so it can be
+     nudged on hover without wrapping every label in a span. */
+  .section-link::after {
+    content: "\2192";
+    display: inline-block;
   }
 
   .section-link:hover {
@@ -639,5 +745,68 @@
     border-radius: var(--radius-xs);
     background-color: var(--surface-raised);
     border: 1px solid var(--surface-color);
+  }
+
+  /* ── FAQ disclosures ────────────────────────────────────────── */
+
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .faq-item {
+    background-color: var(--surface-raised);
+    border: 1px solid var(--surface-color);
+    border-radius: var(--radius-md);
+    transition: border-color var(--duration-fast) var(--ease-out-quart);
+  }
+
+  .faq-item[open] {
+    border-color: var(--color-background-300);
+  }
+
+  .faq-item summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    padding: var(--space-3) var(--space-md);
+    min-height: var(--control-size);
+    font-weight: 600;
+    font-size: var(--text-md);
+    color: var(--color-text-950);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .faq-item summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-item summary::after {
+    content: "+";
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-lg);
+    color: var(--color-primary-500);
+    transition: transform var(--duration-fast) var(--ease-out-quart);
+  }
+
+  .faq-item[open] summary::after {
+    transform: rotate(45deg);
+  }
+
+  .faq-item summary:focus-visible {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: -2px;
+    border-radius: var(--radius-sm);
+  }
+
+  .faq-item p {
+    margin: 0;
+    padding: 0 var(--space-md) var(--space-md);
+    color: var(--color-text-800);
+    line-height: 1.65;
   }
 }

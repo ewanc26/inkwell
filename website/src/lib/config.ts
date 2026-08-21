@@ -31,9 +31,10 @@ export const OG_IMAGE = {
 
 export const NAV_LINKS = [
   { label: "Home", url: "/" },
+  { label: "Features", url: "/features" },
+  { label: "Security", url: "/security" },
+  { label: "About", url: "/about" },
   { label: "Get Inkwell", url: "/#download" },
-  { label: "Privacy", url: "/privacy" },
-  { label: "Terms", url: "/terms" },
   { label: "Source", url: "https://github.com/ewanc26/inkwell" },
 ] as const;
 
