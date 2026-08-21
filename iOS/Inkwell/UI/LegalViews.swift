@@ -25,60 +25,127 @@ enum LegalDocumentType {
         switch self {
         case .privacyPolicy:
             return """
-            **Version 1.1 — Effective Date: 13 August 2026**
-            
-            Inkwell is a decentralized client for the Standard.site ecosystem on the AT Protocol. We believe your data belongs to you. This policy applies to Inkwell for iOS (version 1.0, build 49, distributed via AltStore) and Inkwell for Android (version 1.0.0, distributed via a self-hosted F-Droid repository).
-            
-            **1. Data Collection & Usage**
-            Inkwell is a localized client application. The developer (Ewan Croft) does not collect, store, or harvest personal data, analytics, or usage metrics on proprietary servers. Inkwell contains no ads, tracking, or analytics software. All content you read, write, or publish is communicated directly between your device and the relevant Personal Data Server (PDS) or the wider AT Protocol network.
-            
-            **2. Data Stored on Your Device**
-            * **iOS:** Your OAuth session (access and refresh tokens) and the P-256 DPoP private key are stored in Apple's Keychain. Non-sensitive handle and PDS hints, notification state, and a local record of recently seen URIs are stored in UserDefaults.
-            * **Android:** Your OAuth session is stored in EncryptedSharedPreferences, backed by a hardware-backed MasterKey.
-            
-            **3. Authentication**
-            Inkwell uses OAuth 2.1 to sign in to your AT Protocol account securely via the system browser. Inkwell never sees or stores your account password or app password.
-            
-            **4. Notifications**
-            On iOS, with your permission, Inkwell may show local notifications when a publication you follow publishes a new document. Notifications are generated on-device from background refresh; Inkwell does not use push notification services. Notification state and already-seen URIs are stored locally. The Android build declares the notification permission but does not yet send notifications.
-            
-            **5. Backup**
-            The Android build allows Android's automatic cloud backup of app data, which may include your stored OAuth session. You can disable this in your device's backup settings or by signing out. iOS Keychain items are not synchronized to iCloud or included in ordinary device backups.
+            **Version 2.0 — Effective Date: 21 August 2026**
 
-            **6. Third-Party Services**
-            To function, Inkwell communicates with external services:
-            * **Your PDS & AT Protocol:** Standard network infrastructure to fetch and publish your content.
-            * **AT Protocol identity services:** Standard DNS and PLC directory lookups for identity resolution.
-            * **Leaflet Search:** Used as a cross-platform search index for Standard.site records.
-            * **Constellation (microcosm.blue):** Used to discover cross-repository backlinks and recommend counts.
-            Queries to these public services are subject to their respective privacy and data retention policies.
-            
-            **7. Changes to this Policy**
-            We may update this policy occasionally to reflect new features or legal requirements. Continued use of the app constitutes acceptance of these changes.
-            
-            **8. Contact**
-            For privacy-related inquiries, please email contact@ewancroft.uk or create an issue on the GitHub repository for Inkwell.
+            Inkwell is a decentralised client for the Standard.site ecosystem on the AT Protocol. Your data belongs to you. This policy applies to Inkwell for iOS (version 2.1.1, build 54, distributed via AltStore), Inkwell for Android (version 2.1.0, distributed via a self-hosted F-Droid repository), and the website at inkwell.ewancroft.uk.
+
+            **1. Who is responsible for your data**
+            Inkwell is developed and published by Ewan Croft, an individual developer based in the United Kingdom, acting as the data controller for the limited processing described here. This policy is written to meet the UK GDPR and the Data Protection Act 2018. Contact: contact@ewancroft.uk.
+
+            Inkwell is a client, not a service. For the content you read and publish on the AT Protocol network, **your Personal Data Server (PDS) operator is the controller**, not Inkwell. If you self-host your PDS, you are the controller of your own repository.
+
+            **2. Data collection & usage**
+            Inkwell is a local client application. The developer does not collect, store, or harvest personal data, analytics, or usage metrics on proprietary servers. Inkwell contains no ads, no tracking, no analytics SDKs, and no crash-reporting SDKs. All content you read, write, or publish is communicated directly between your device and the relevant PDS or the wider AT Protocol network. There are two narrow exceptions, in sections 7 and 8.
+
+            **3. Data stored on your device**
+            * **iOS:** Your OAuth session (access and refresh tokens) and the P-256 DPoP private key are stored in Apple's Keychain, with the `kSecAttrAccessibleAfterFirstUnlock` protection class. Your handle, PDS hints, notification state, reader preferences, and a local record of recently seen record URIs are stored in UserDefaults.
+            * **Android:** Your OAuth session is stored in EncryptedSharedPreferences, backed by a hardware-backed MasterKey. Notification state, already-seen record URIs, and preferences are stored in app-private SharedPreferences.
+
+            This data never leaves your device except as part of a device backup (section 6). Signing out or uninstalling removes it.
+
+            **4. Authentication**
+            Inkwell uses OAuth 2.1 with DPoP to sign in to your AT Protocol account via the system browser. Inkwell never sees or stores your account password or an app password. Your tokens stay on your device and are sent only to your own PDS.
+
+            **5. Notifications**
+            On both iOS and Android, with your permission, Inkwell may show local notifications when a publication you subscribe to publishes a new document. Notifications are generated on-device by periodic background polling — background app refresh on iOS, WorkManager on Android. Inkwell uses no push provider, and no notification data reaches the developer. Notification state and already-seen URIs are stored locally and pruned automatically.
+
+            **6. Backup**
+            The Android build permits Android's automatic cloud backup of app data, which may include your encrypted OAuth session. You can disable this in your device's backup settings, or sign out first.
+
+            On iOS, Keychain items are not synchronised to iCloud Keychain, because Inkwell does not mark them as synchronisable. However, because they use the `AfterFirstUnlock` protection class rather than a device-only class, they *can* be included in an encrypted iCloud or Finder backup and restored to a replacement device. Sign out before taking a backup if you do not want that.
+
+            **7. In-app feedback (optional)**
+            If you use "Send Feedback", Inkwell creates an `app.userinput.discussion` record **in your own repository**, pointing at Inkwell's feedback space on userinput.app, which is operated by the developer. That record is public: it contains the title and body you wrote, the time you wrote it, and is attributable to your DID and handle. It is visible to anyone on the network and may be mirrored by third-party indexes outside the developer's control.
+            * **Legal basis:** consent (UK GDPR Art. 6(1)(a)). The feature is optional and the app is fully usable without it.
+            * **Retention:** the record lives in your repository until you delete it. It is not copied into any other system.
+            * **Deletion:** because the record is yours, you can delete it from your own repository at any time with any AT Protocol client, which removes it from the board.
+
+            Do not put sensitive personal information in feedback.
+
+            **8. The website**
+            inkwell.ewancroft.uk is hosted on Vercel, which acts as a processor and records standard server request logs (including IP addresses) for security and delivery. The site sets no cookies, runs no analytics, and embeds no third-party trackers. Legal basis: legitimate interests (Art. 6(1)(f)). Vercel may process log data outside the UK, including in the United States, under the UK Addendum to the EU Standard Contractual Clauses.
+
+            **9. Third-party services**
+            To function, Inkwell contacts external services directly from your device. Your IP address is necessarily visible to each. None of them report back to the developer.
+            * **Your PDS & the AT Protocol network:** to fetch and publish your content.
+            * **AT Protocol identity services:** DNS and plc.directory lookups for identity resolution.
+            * **Leaflet Search (leaflet-search-backend.fly.dev):** a cross-platform search index for Standard.site records. Your search terms are sent to it.
+            * **Constellation (constellation.microcosm.blue):** to discover cross-repository backlinks and recommend counts.
+            * **Bluesky CDN (cdn.bsky.app):** to load images and cover art stored as blobs.
+            * **Bluesky public API (public.api.bsky.app):** to render embedded Bluesky posts, profiles, and lists inside documents you read.
+            * **userinput.app:** only if you use the optional feedback feature (section 7).
+            * **Ko-fi and GitHub Sponsors:** only if you tap a support link, which opens them in your browser. Any payment is handled entirely by them; the developer never receives your payment details through Inkwell.
+
+            Queries to these services are subject to their own privacy and retention policies. The legal basis is performance of the service you asked for (Art. 6(1)(b)) or, for the optional ones, your consent.
+
+            **10. Your rights**
+            Under the UK GDPR you have the right to access, rectify, erase, restrict, object to, and port your personal data, and to withdraw consent at any time without affecting processing already carried out.
+
+            In practice, because the developer holds almost nothing: data on your device is under your sole control and is removed by signing out or uninstalling; data in your AT Protocol repository is under your control and your PDS operator's, and can be edited or deleted with any client; and feedback records can be deleted by you as described in section 7. For anything else, email contact@ewancroft.uk and you will receive a response within one month.
+
+            If you are unhappy with how your data has been handled, you can complain to the Information Commissioner's Office at ico.org.uk/make-a-complaint, by calling 0303 123 1113, or by writing to Information Commissioner's Office, Wycliffe House, Water Lane, Wilmslow, Cheshire SK9 5AF. You may also seek a judicial remedy.
+
+            **11. Automated decision-making**
+            Inkwell does not carry out profiling or automated decision-making that produces legal or similarly significant effects.
+
+            **12. Children**
+            Inkwell is not directed at children and is not intended for anyone under 13. The developer does not knowingly process the personal data of children under 13.
+
+            **13. Changes to this policy**
+            This policy may be updated to reflect new features or legal requirements. The version number and effective date at the top always reflect the current version, and the full history is in the public Git repository. Material changes will be surfaced in the app or in the release notes rather than made silently.
+
+            **14. Contact**
+            For privacy-related enquiries, email contact@ewancroft.uk or open an issue on the GitHub repository for Inkwell.
             """
             
         case .termsOfService:
             return """
-            **Version 1.1 — Effective Date: 13 August 2026**
-            
-            By downloading or using Inkwell (the "App"), you agree to these terms. Inkwell is provided for iOS (version 1.0, build 49) via AltStore and for Android (version 1.0.0) via a self-hosted F-Droid repository. It is not distributed through the Apple App Store or Google Play.
-            
-            Inkwell is free and open-source software licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). No store-imposed end-user license agreement applies to the AltStore or F-Droid distribution channels.
-            
-            **1. User-Generated Content (UGC)**
-            Inkwell acts as a portal to the AT Protocol network. You are solely responsible for the content you publish through it. You must not publish illegal, harmful, or abusive content, and you must comply with the terms of the Personal Data Server (PDS) you use and of the AT Protocol network. The developer does not host user content and does not act as a moderator of the network.
-            
-            **2. Decentralized Network Disclaimer**
-            Because Inkwell connects to a decentralized network, the developer has no control over the content published by other users, nor over the availability of PDSs, search indexes, and other network infrastructure. You may encounter content you find objectionable, and the developer is not responsible for it.
-            
-            **3. "As Is" Basis**
-            Inkwell is provided "as is", without warranty of any kind, express or implied, including merchantability and fitness for a particular purpose. The developer is not liable for any data loss, service interruptions, or issues arising from your PDS or the AT Protocol network.
-            
-            **4. Experimental Software**
-            The Android build is an experimental prototype. Features, behavior, and performance may be incomplete or change without notice. Install and use at your own risk.
+            **Version 2.0 — Effective Date: 21 August 2026**
+
+            By downloading or using Inkwell (the "App"), you agree to these terms. Inkwell is provided for iOS (version 2.1.1, build 54) via AltStore and for Android (version 2.1.0) via a self-hosted F-Droid repository. It is not distributed through the Apple App Store or Google Play.
+
+            The App is published by Ewan Croft, an individual developer based in the United Kingdom ("the developer"), contactable at contact@ewancroft.uk.
+
+            **1. Licence**
+            Inkwell is free and open-source software licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). Your rights to use, study, modify, and redistribute the App come from that licence. Nothing in these terms restricts the freedoms the AGPL-3.0 grants you; where these terms and the AGPL-3.0 conflict, the AGPL-3.0 prevails. No store-imposed end-user licence agreement applies to the AltStore or F-Droid distribution channels.
+
+            **2. Eligibility**
+            You must be at least 13 years old to use Inkwell. If you are under 18, you should have your parent or guardian's permission.
+
+            **3. What Inkwell is, and is not**
+            Inkwell is a client. It is not a hosting service, a publishing platform, or a social network. You bring your own AT Protocol account and your own Personal Data Server (PDS). The developer operates no user accounts, hosts no user content, and charges nothing for the App.
+
+            **4. User-generated content**
+            Inkwell acts as a portal to the AT Protocol network. You are solely responsible for the content you publish through it. You must not publish illegal, harmful, or abusive content, and you must comply with the terms of the PDS you use and of the AT Protocol network. The developer does not host user content and does not act as a moderator of the network.
+
+            You retain all rights in what you write. Publishing through Inkwell grants the developer no licence over your content.
+
+            If you use the optional in-app feedback feature, the record you create is public and is stored in your own repository; see section 7 of the Privacy Policy.
+
+            **5. Decentralised network disclaimer**
+            Because Inkwell connects to a decentralised network, the developer has no control over content published by other users, nor over the availability of PDSs, search indexes, identity directories, or other network infrastructure. You may encounter content you find objectionable, and the developer is not responsible for it. Third-party services that Inkwell contacts are governed by their own terms.
+
+            **6. "As is" basis and liability**
+            Inkwell is provided free of charge, "as is" and "as available", without warranty of any kind, express or implied, including any implied warranty of merchantability, satisfactory quality, or fitness for a particular purpose, to the fullest extent permitted by law.
+
+            To that same extent, the developer is not liable for data loss, service interruptions, lost profits, or any indirect or consequential loss, or for problems arising from your PDS, the AT Protocol network, or any third-party service.
+
+            **Nothing in these terms limits or excludes the developer's liability for death or personal injury caused by negligence, for fraud or fraudulent misrepresentation, or for any other liability that cannot lawfully be limited or excluded.** If you are a consumer, you have statutory rights under the Consumer Rights Act 2015 and other UK consumer law that these terms do not affect. Nothing here requires you to accept a limitation broader than the AGPL-3.0's own disclaimer in sections 15 to 17 of that licence.
+
+            **7. Pre-release software**
+            Inkwell is distributed outside the mainstream app stores and is under active development. Features, behaviour, and performance may change, break, or be removed without notice, and updates arrive only through AltStore or the F-Droid repository. Keep your own copies of writing that matters to you. Install and use at your own risk.
+
+            **8. Support**
+            Support is offered on a best-effort basis through the GitHub repository and the in-app feedback feature. No service level is promised, and voluntary donations via Ko-fi or GitHub Sponsors do not purchase support, features, or any other entitlement.
+
+            **9. Termination**
+            You may stop using Inkwell at any time by signing out and uninstalling it. The developer may discontinue distribution or updates at any time; because Inkwell is AGPL-3.0 software, you keep the copy you have and the right to fork it. Sections 4, 5, 6, and 11 survive termination.
+
+            **10. Changes to these terms**
+            These terms may be updated to reflect new features or legal requirements. The version number and effective date at the top always reflect the current version, and the full history is in the public Git repository. Material changes will be surfaced in the app or in the release notes. If you do not agree to a change, stop using the App.
+
+            **11. Governing law**
+            These terms are governed by the laws of England and Wales, and the courts of England and Wales have jurisdiction. If you are a consumer resident elsewhere in the United Kingdom, you may bring proceedings in your own jurisdiction, and you keep the protection of any mandatory consumer law that applies where you live.
             """
         }
     }
