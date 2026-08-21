@@ -52,6 +52,7 @@ struct AccountMenu: View {
     @Binding var showAbout: Bool
 
     @State private var isConfirmingSignOut = false
+    @State private var showSettings = false
 
     var body: some View {
         Menu {
@@ -59,6 +60,10 @@ struct AccountMenu: View {
                 Section(loginStateManager.displayName ?? "Signed in") {
                     Text("@\(handle)")
                 }
+            }
+
+            Button("Settings", systemImage: "gearshape") {
+                showSettings = true
             }
 
             Button("About Inkwell", systemImage: "info.circle") {
@@ -76,6 +81,9 @@ struct AccountMenu: View {
             AccountAvatar(url: loginStateManager.avatarURL)
         }
         .accessibilityLabel("Account")
+        .sheet(isPresented: $showSettings) {
+            SettingsView()
+        }
         .confirmationDialog(
             "Sign out of Inkwell?",
             isPresented: $isConfirmingSignOut,

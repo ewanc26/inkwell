@@ -12,7 +12,9 @@
 
 import SwiftUI
 
-enum LegalDocumentType {
+enum LegalDocumentType: Hashable, Identifiable {
+    var id: Self { self }
+
     case privacyPolicy
     case termsOfService
 

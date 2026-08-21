@@ -26,6 +26,16 @@ class InkwellNotificationViewModel @Inject constructor(
     /** Backs the in-app notification list -- mirrors iOS `NotificationManager.notifications`. */
     val notifications: StateFlow<List<InkwellNotification>> = _notifications.asStateFlow()
 
+    private val _notificationsEnabled = MutableStateFlow(notificationManager.isNotificationsEnabled())
+
+    /** Backs SettingsScreen's toggle -- mirrors iOS `NotificationManager.notificationsEnabled`. */
+    val notificationsEnabled: StateFlow<Boolean> = _notificationsEnabled.asStateFlow()
+
+    fun setNotificationsEnabled(enabled: Boolean) {
+        notificationManager.setNotificationsEnabled(enabled)
+        _notificationsEnabled.value = enabled
+    }
+
     fun schedulePeriodicPoll() {
         viewModelScope.launch {
             notificationManager.schedulePeriodicPoll()

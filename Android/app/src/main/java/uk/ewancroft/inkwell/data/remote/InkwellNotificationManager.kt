@@ -49,6 +49,7 @@ class InkwellNotificationManager @Inject constructor(
         const val LAST_POLL_KEY = "last_poll_time"
         const val NOTIFICATIONS_KEY = "notifications"
         const val UNREAD_COUNT_KEY = "unread_count"
+        const val NOTIFICATIONS_ENABLED_KEY = "notifications_enabled"
     }
 
     init {
@@ -126,19 +127,23 @@ class InkwellNotificationManager @Inject constructor(
             when (val style = NotificationPolicy.notificationStyle(newDocs.size)) {
                 is NotificationStyle.Single -> {
                     val doc = newDocs[0]
-                    sendNotification(
-                        title = doc.publicationName ?: "New Document",
-                        body = doc.title,
-                        documentURI = doc.uri
-                    )
+                    if (isNotificationsEnabled()) {
+                        sendNotification(
+                            title = doc.publicationName ?: "New Document",
+                            body = doc.title,
+                            documentURI = doc.uri
+                        )
+                    }
                 }
                 is NotificationStyle.Summary -> {
                     val newest = newDocs[0]
-                    sendNotification(
-                        title = "${style.count} New Documents",
-                        body = "Latest: ${newest.title} from ${newest.publicationName ?: "a publication"}",
-                        documentURI = newest.uri
-                    )
+                    if (isNotificationsEnabled()) {
+                        sendNotification(
+                            title = "${style.count} New Documents",
+                            body = "Latest: ${newest.title} from ${newest.publicationName ?: "a publication"}",
+                            documentURI = newest.uri
+                        )
+                    }
                 }
                 NotificationStyle.None -> {}
             }
@@ -172,6 +177,17 @@ class InkwellNotificationManager @Inject constructor(
     /** Mirrors iOS `NotificationManager.clearAll()`. */
     fun clearAll() {
         prefs.edit().remove(NOTIFICATIONS_KEY).putInt(UNREAD_COUNT_KEY, 0).apply()
+    }
+
+    /** User-facing on/off switch, surfaced in SettingsScreen. Distinct from
+     *  the OS permission (POST_NOTIFICATIONS): this gates whether a *banner*
+     *  is sent, not whether polling happens -- the in-app notification list
+     *  and unread badge keep working either way, since they reflect
+     *  "new documents exist", not "you were interrupted about them". */
+    fun isNotificationsEnabled(): Boolean = prefs.getBoolean(NOTIFICATIONS_ENABLED_KEY, true)
+
+    fun setNotificationsEnabled(enabled: Boolean) {
+        prefs.edit().putBoolean(NOTIFICATIONS_ENABLED_KEY, enabled).apply()
     }
 
     private fun createNotificationChannel() {
