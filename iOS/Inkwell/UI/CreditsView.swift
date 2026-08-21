@@ -134,7 +134,7 @@ struct CreditsView: View {
                     )
                     creditRow(
                         title: "Ewan Croft",
-                        detail: "Developer — support links on ewancroft.uk",
+                        detail: "Developer",
                         url: "https://ewancroft.uk"
                     )
                 } header: {
