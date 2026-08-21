@@ -60,7 +60,7 @@ Platform-specific guidance lives in:
 - **Website:** `website/` is the SvelteKit/Vercel marketing, legal, and OAuth-metadata site shared by both apps.
   - `website/src/routes/+page.svelte` is the landing page; `/privacy` and `/terms` are substantive legal promises; `/client-metadata.json` is a live OAuth client identity consumed by PDS servers.
   - `website/src/lib/config.ts` owns install-source URLs, site metadata, and nav links.
-- **Legal docs:** `legal/privacy.md` and `legal/terms.md` (plus `legal/meta.json` for version/date/build strings) are the single source for the Privacy Policy and Terms of Service. Never hand-edit `iOS/Inkwell/UI/LegalViews.swift`'s generated content or `website/src/routes/{privacy,terms}/+page.svelte` between their `GENERATED-LEGAL` markers — edit the source and run `node tools/legal/render.mjs`. CI's `legal-sync` job runs `node tools/legal/render.mjs --check` and fails if the generated copies are stale.
+- **Legal docs:** `legal/privacy.md` and `legal/terms.md` (plus `legal/meta.json` for the legal document's own version/effective date) are the single source for the Privacy Policy and Terms of Service. Never hand-edit `iOS/Inkwell/UI/LegalViews.swift`'s generated content or `website/src/routes/{privacy,terms}/+page.svelte` between their `GENERATED-LEGAL` markers — edit the source and run `node tools/legal/render.mjs`. The iOS/Android app version strings quoted in the text are read directly from `iOS/Inkwell.xcodeproj/project.pbxproj` and `Android/app/build.gradle.kts` at generation time, not hand-typed, so they can't drift from what's actually shipped. CI's `legal-sync` job runs `node tools/legal/render.mjs --check` and fails if the generated copies (or the quoted versions) are stale.
 
 ## OAuth and Data Invariants
 
