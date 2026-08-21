@@ -42,7 +42,7 @@
   <h2>4. User-generated content</h2>
   <p>Inkwell acts as a portal to the AT Protocol network. You are solely responsible for the content you publish through it. You must not publish illegal, harmful, or abusive content, and you must comply with the terms of the PDS you use and of the AT Protocol network. The developer does not host user content and does not act as a moderator of the network.</p>
   <p>You retain all rights in what you write. Publishing through Inkwell grants the developer no licence over your content.</p>
-  <p>If you use the optional in-app feedback feature, the record you create is public and is stored in your own repository; see section 7 of the <a href="/privacy">Privacy Policy</a>.</p>
+  <p>If you use the optional in-app feedback feature, the record you create is public and is stored in your own repository; see section 7 of the <a href="https://inkwell.ewancroft.uk/privacy">Privacy Policy</a>.</p>
   <h2>5. Decentralised network disclaimer</h2>
   <p>Because Inkwell connects to a decentralised network, the developer has no control over content published by other users, nor over the availability of PDSs, search indexes, identity directories, or other network infrastructure. You may encounter content you find objectionable, and the developer is not responsible for it. Third-party services that Inkwell contacts are governed by their own terms.</p>
   <h2>6. “As is” basis and liability</h2>

@@ -1,4 +1,6 @@
-By downloading or using Inkwell (the “App”), you agree to these terms. Inkwell is provided for iOS ({{IOS_VERSION}}) via AltStore and for Android ({{ANDROID_VERSION}}) via a self-hosted F-Droid repository. It is not distributed through the Apple App Store or Google Play.
+**Version 2.0 — Effective Date: 21 August 2026**
+
+By downloading or using Inkwell (the “App”), you agree to these terms. Inkwell is provided for iOS (version 2.1.1, build 54) via AltStore and for Android (version 2.1.0) via a self-hosted F-Droid repository. It is not distributed through the Apple App Store or Google Play.
 
 The App is published by Ewan Croft, an individual developer based in the United Kingdom (“the developer”), contactable at [contact@ewancroft.uk](mailto:contact@ewancroft.uk).
 

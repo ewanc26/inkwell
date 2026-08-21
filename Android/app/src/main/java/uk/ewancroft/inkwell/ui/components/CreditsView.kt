@@ -46,6 +46,8 @@ fun CreditsView(
     val context = LocalContext.current
     var showFeedback by remember { mutableStateOf(false) }
     var showSupport by remember { mutableStateOf(false) }
+    var showPrivacy by remember { mutableStateOf(false) }
+    var showTerms by remember { mutableStateOf(false) }
     var supporters by remember { mutableStateOf<List<BlueskyProfile>>(emptyList()) }
 
     if (showFeedback) {
@@ -54,6 +56,14 @@ fun CreditsView(
 
     if (showSupport) {
         SupportDialog(onDismiss = { showSupport = false })
+    }
+
+    if (showPrivacy) {
+        LegalDocumentDialog(documentType = LegalDocumentType.PrivacyPolicy, onDismiss = { showPrivacy = false })
+    }
+
+    if (showTerms) {
+        LegalDocumentDialog(documentType = LegalDocumentType.TermsOfService, onDismiss = { showTerms = false })
     }
 
     LaunchedEffect(Unit) {
@@ -179,14 +189,14 @@ fun CreditsView(
                     "Privacy Policy",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.fillMaxWidth().clickable { openUrl("https://inkwell.ewancroft.uk/privacy") },
+                    modifier = Modifier.fillMaxWidth().clickable { showPrivacy = true },
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
                     "Terms of Service",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.fillMaxWidth().clickable { openUrl("https://inkwell.ewancroft.uk/terms") },
+                    modifier = Modifier.fillMaxWidth().clickable { showTerms = true },
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
