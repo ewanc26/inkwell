@@ -12,6 +12,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Cheap and correctness-critical (catches the in-app Legal screens
+  # drifting from the website copy, or either drifting from the
+  # legal/*.md source), so it runs unconditionally rather than being
+  # gated by the path filter below.
+  legal-sync:
+    name: Legal docs in sync
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node tools/legal/render.mjs --check
+
   # Detect which part of the monorepo actually changed so an
   # iOS-only or Android-only commit doesn't pay for the other
   # platform's (much slower) build.
