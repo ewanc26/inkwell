@@ -77,7 +77,7 @@ struct CreditsView: View {
                     creditRow(
                         title: "pub search",
                         detail: "Cross-platform Standard.site search index",
-                        url: "https://leaflet-search-backend.fly.dev"
+                        url: sharedSearchBackendUrl()
                     )
                 } header: {
                     Text("Built On")
@@ -155,11 +155,13 @@ struct CreditsView: View {
                     Text("Legal")
                 }
 
-                Section {
-                    Button(role: .destructive) {
-                        isConfirmingSignOut = true
-                    } label: {
-                        Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
+                if loginStateManager.isAuthenticated {
+                    Section {
+                        Button(role: .destructive) {
+                            isConfirmingSignOut = true
+                        } label: {
+                            Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
+                        }
                     }
                 }
 

@@ -76,7 +76,7 @@ enum ConstellationClient {
         limit: Int = 50,
         cursor: String? = nil
     ) async throws -> (backlinks: [Backlink], cursor: String?) {
-        guard var components = URLComponents(string: "\(baseURL)/xrpc/\(sharedXrpcMicrocosmGetBacklinks())") else {
+        guard var components = URLComponents(string: "\(baseURL)\(sharedXrpcMicrocosmGetBacklinks())") else {
             throw URLError(.badURL)
         }
 

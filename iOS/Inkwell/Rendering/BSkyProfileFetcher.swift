@@ -113,7 +113,7 @@ enum BSkyProfileFetcher {
             return cached
         }
 
-        guard let url = URL(string: "\(baseURL)/xrpc/\(sharedXrpcActorGetProfile())?actor=\(did)") else {
+        guard let url = URL(string: "\(baseURL)\(sharedXrpcActorGetProfile())?actor=\(did)") else {
             throw URLError(.badURL)
         }
 
@@ -149,7 +149,7 @@ enum BSkyProfileFetcher {
         }
 
         // Resolve handle → DID
-        guard let resolveURL = URL(string: "\(baseURL)/xrpc/\(sharedXrpcIdentityResolveHandle())?handle=\(normalised)") else {
+        guard let resolveURL = URL(string: "\(baseURL)\(sharedXrpcIdentityResolveHandle())?handle=\(normalised)") else {
             throw URLError(.badURL)
         }
 
