@@ -5,7 +5,7 @@ Guidance for agents working on `inkwell.ewancroft.uk`, the SvelteKit/Vercel prod
 ## Principles
 
 1. **Platform fidelity first** — SvelteKit SSR, Vercel deployment, and the site's calm editorial system come first. Don't port app UI patterns without explicit adaptation.
-2. **Legal accuracy** — privacy, terms, and OAuth metadata are live promises to users and PDS servers. Claims must match both apps' actual behavior.
+2. **Legal accuracy** — privacy, terms, and OAuth metadata are live promises to users and PDS servers. Claims must match both apps' actual behaviour.
 3. **Honest stubs** — unimplemented features say so explicitly. Never fabricate distribution channels or capabilities.
 4. **No duplication** — reuse config, metadata, and legal text from sibling directories rather than copy-pasting.
 
@@ -25,7 +25,7 @@ AI tools may be used when contributing. Add `Co-authored-by:` trailers crediting
 
 ## Product and Legal Accuracy
 
-- iOS is the primary implementation; Android is experimental and materially incomplete. Its current writer ignores format selection, full detail/comments/interactions and verification are unfinished, and WorkManager notifications do not exist. Do not repeat the landing page's stronger parity claims without implementing and verifying them. See `../Android/AGENTS.md` for Android capability gaps.
+- iOS is the primary implementation; Android is still labelled experimental but has closed most of the parity gap: the writer honours format selection (Leaflet/Markpub/pckt/Offprint via `MarkdownConverter`), the detail screen renders full content plus comments/interactions, subscribe/recommend are wired end-to-end, publication/document verification is implemented (`StandardSiteVerifier.kt`, with document-only feed-card coverage — AT-URI-site documents in the feed aren't yet verified), and WorkManager-based background notification polling exists. Do not claim parity beyond this — see `../Android/AGENTS.md`'s "Current Capability Gaps" section for the authoritative, current boundary before writing or updating Android-facing copy.
 - The Terms claim native mute/block/report tools. Confirm those exact user-facing flows in both applicable clients before retaining or expanding the promise. Legal copy, App Store status, and “available” wording require evidence, not roadmap intent.
 - `/privacy` and `/terms` are generated from `../legal/privacy.md` and `../legal/terms.md` (the single source also compiled into the shared KMP module's `LegalDocuments.kt`, which iOS and Android render natively in-app) via `node tools/legal/render.mjs` — do not hand-edit the HTML between the `GENERATED-LEGAL` markers in `src/routes/{privacy,terms}/+page.svelte`, edit the source `.md` and regenerate. Keep platform-specific storage and third-party disclosures in the source accurate; see `../iOS/AGENTS.md` and `../Android/AGENTS.md` for platform-specific storage details.
 - There is no App Store or Play Store listing. The hero's "Get Inkwell" CTA anchors to `#download`, which links the real, self-hosted AltStore source (`static/altstore/source.json`) and F-Droid repo (`static/fdroid/repo/`) — see `ALTSTORE_SOURCE_LINK`/`FDROID_REPO_LINK` in `src/lib/config.ts`. The Android card is explicitly labelled experimental. Never add placeholder store IDs or imply production distribution; if either source is unpublished or moved, update or remove its CTA in the same change.
@@ -36,7 +36,7 @@ AI tools may be used when contributing. Add `Co-authored-by:` trailers crediting
 - The exact endpoint URL is the OAuth `client_id`. Keep `client_id`, `client_uri`, native callback, application type, grant/response types, DPoP requirement, and scope synchronized with both apps and the publicly deployed response.
 - The live endpoint currently advertises granular publication/document/subscription/recommend/blob scopes. The iOS repo's checked-in `oauth/client-metadata.json` still says only `atproto`, even though iOS runtime and Android use granular scopes; resolve that discrepancy deliberately.
 - iOS implements writes to `pub.leaflet.comment`, but the website/runtime granular scopes omit that collection. Do not claim working comments until authorization and hosted metadata are proven together. See `../iOS/AGENTS.md` and `../Android/AGENTS.md` for client-side OAuth rules.
-- Treat metadata edits as authentication changes. Validate response content type/cache behavior from production and perform fresh login, cancel/state failure, refresh, restore, and logout against representative PDS servers.
+- Treat metadata edits as authentication changes. Validate response content type/cache behaviour from production and perform fresh login, cancel/state failure, refresh, restore, and logout against representative PDS servers.
 
 ## Design and Accessibility
 

@@ -16,6 +16,7 @@
 -->
 
 <script lang="ts">
+  import { reveal } from "$lib/motion";
   import { SITE } from "$lib/config";
 </script>
 
@@ -23,7 +24,7 @@
   <title>Terms of Service — {SITE.title}</title>
 </svelte:head>
 
-<article class="site-container prose py-16 animate-in">
+<article class="site-container prose py-16 reveal" use:reveal>
   <h1>Terms of Service &amp; EULA</h1>
 
   <!-- GENERATED-LEGAL:BEGIN terms -->

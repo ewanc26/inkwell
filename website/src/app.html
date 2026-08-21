@@ -8,6 +8,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="text-scale" content="scale" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Opts the page into scroll-triggered reveals before first paint, so
+         revealed content is never briefly visible and then hidden. Content is
+         visible by default: without this class (no JS, no IntersectionObserver,
+         or reduced motion) every .reveal simply renders in place. -->
+    <script>
+      if (
+        "IntersectionObserver" in window &&
+        !matchMedia("(prefers-reduced-motion: reduce)").matches
+      )
+        document.documentElement.classList.add("js-motion");
+    </script>
     %sveltekit.head%
   </head>
   <!-- Hover-based preloading: prefetches data when the cursor rests on a

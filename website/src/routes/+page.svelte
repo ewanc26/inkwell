@@ -1,19 +1,19 @@
 <!--
-  Landing page — the product pitch, one page, one purpose.
-  Hero wordmark -> download (AltStore / F-Droid) -> screenshots ->
-  feature grid -> security callout -> what's new. No secondary
-  navigation; every link either installs the app or leads to the
-  privacy/terms that build trust.
+  Landing page — the top-of-funnel pitch. Hero wordmark -> download
+  (AltStore / F-Droid) -> screenshots -> compressed feature teaser ->
+  security teaser -> comparison -> FAQ -> availability -> final CTA.
+  Deeper content now lives on /features, /security, and /about; this
+  page links out rather than cramming everything into one scroll.
 -->
 
 <script lang="ts">
+  import { reveal } from "$lib/motion";
   import { SITE, ALTSTORE_SOURCE_LINK, FDROID_REPO_LINK } from "$lib/config";
   import {
     BookOpen,
     Compass,
     PenLine,
     Shield,
-    Globe,
     ArrowRight,
     Download,
     Apple,
@@ -26,7 +26,7 @@
 </svelte:head>
 
 <!-- Hero -->
-<section class="site-container page-hd hero-reveal">
+<section class="site-container page-hd">
   <!--
     Wordmark SVG — mirrors InkwellMark.swift in the iOS app.
     The capsule shapes and ink-drop circle are the app icon's
@@ -37,35 +37,41 @@
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 400 952"
     fill="none"
-    class="mb-8 h-20 w-auto sm:h-24"
+    class="hero-mark mb-8 h-20 w-auto sm:h-24"
     aria-label="Inkwell"
     role="img"
   >
     <rect x="40" y="40" width="320" height="80" rx="16" fill="currentColor" />
     <rect x="125" y="120" width="150" height="640" fill="currentColor" />
     <rect x="40" y="760" width="320" height="80" rx="16" fill="currentColor" />
-    <circle cx="200" cy="880" r="32" fill="var(--color-accent, #64BB44)" />
+    <circle
+      class="ink-drop"
+      cx="200"
+      cy="880"
+      r="32"
+      fill="var(--color-accent, #64BB44)"
+    />
   </svg>
 
-  <h1 class="page-title page-title--hero">
+  <h1 class="page-title page-title--hero hero-item" style="--i: 0">
     Read, discover, and publish
     <span class="text-accent">Standard.site</span>
     writing
   </h1>
 
-  <p class="page-desc">
+  <p class="page-desc hero-item" style="--i: 1">
     Inkwell is a reader and writer for the Standard.site publishing ecosystem
     on AT Protocol. Available for iOS and Android. Your writing lives on your
     Personal Data Server — no silos, no lock-in.
   </p>
 
-  <p class="page-meta" aria-label="Product metadata">
+  <p class="page-meta hero-item" style="--i: 2" aria-label="Product metadata">
     <span>AT Protocol</span>
     <span>OAuth 2.1</span>
     <span>iOS &amp; Android</span>
   </p>
 
-  <div class="flex flex-wrap items-center gap-4">
+  <div class="hero-item flex flex-wrap items-center gap-4" style="--i: 3">
     <a href="#download" class="btn btn-primary active-press">
       <Download class="h-4 w-4" />
       Get Inkwell
@@ -78,7 +84,11 @@
     </a>
   </div>
 
-  <p class="mt-6 flex flex-wrap items-center gap-2" aria-label="Project badges">
+  <p
+    class="hero-item mt-6 flex flex-wrap items-center gap-2"
+    style="--i: 4"
+    aria-label="Project badges"
+  >
     <a href="https://github.com/ewanc26/inkwell/releases/latest?q=ios-v">
       <img
         src="https://img.shields.io/github/v/release/ewanc26/inkwell?filter=ios-v*&label=iOS&logo=apple&logoColor=white"
@@ -121,7 +131,7 @@
   </p>
 
   <div class="feature-grid">
-    <div class="feature-card animate-in stagger-1">
+    <div class="feature-card reveal" use:reveal={0}>
       <div class="feature-icon"><Apple class="h-5 w-5" /></div>
       <h3>iOS, via AltStore</h3>
       <p>
@@ -143,7 +153,7 @@
       </p>
     </div>
 
-    <div class="feature-card animate-in stagger-1">
+    <div class="feature-card reveal" use:reveal={0}>
       <div class="feature-icon"><Smartphone class="h-5 w-5" /></div>
       <h3>Android, via F-Droid</h3>
       <p>
@@ -180,7 +190,7 @@
   <div class="mb-16">
     <h3 class="section-heading">iOS</h3>
     <div class="flex flex-wrap items-center justify-start gap-8">
-      <figure class="animate-in stagger-1">
+      <figure class="reveal" use:reveal={0}>
         <img
           src="/screenshots/ios/reader.png"
           alt="Inkwell reader on iOS showing a published document"
@@ -191,7 +201,7 @@
         />
         <figcaption class="screenshot-caption">Read</figcaption>
       </figure>
-      <figure class="animate-in stagger-2">
+      <figure class="reveal" use:reveal={1}>
         <img
           src="/screenshots/ios/discover.png"
           alt="Inkwell discover on iOS showing search results"
@@ -202,7 +212,7 @@
         />
         <figcaption class="screenshot-caption">Discover</figcaption>
       </figure>
-      <figure class="animate-in stagger-3">
+      <figure class="reveal" use:reveal={2}>
         <img
           src="/screenshots/ios/writer.png"
           alt="Inkwell writer on iOS showing the compose screen"
@@ -213,7 +223,7 @@
         />
         <figcaption class="screenshot-caption">Write</figcaption>
       </figure>
-      <figure class="animate-in stagger-4">
+      <figure class="reveal" use:reveal={3}>
         <img
           src="/screenshots/ios/post.png"
           alt="A verified article open in Inkwell on iOS"
@@ -230,7 +240,7 @@
   <div>
     <h3 class="section-heading">Android</h3>
     <div class="flex flex-wrap items-center justify-start gap-8">
-      <figure class="animate-in stagger-1">
+      <figure class="reveal" use:reveal={0}>
         <img
           src="/screenshots/android/reader.png"
           alt="Inkwell reader on Android showing a published document"
@@ -241,7 +251,7 @@
         />
         <figcaption class="screenshot-caption">Read</figcaption>
       </figure>
-      <figure class="animate-in stagger-2">
+      <figure class="reveal" use:reveal={1}>
         <img
           src="/screenshots/android/discover.png"
           alt="Inkwell discover on Android showing search results"
@@ -252,7 +262,7 @@
         />
         <figcaption class="screenshot-caption">Discover</figcaption>
       </figure>
-      <figure class="animate-in stagger-3">
+      <figure class="reveal" use:reveal={2}>
         <img
           src="/screenshots/android/writer.png"
           alt="Inkwell writer on Android showing the compose screen"
@@ -263,7 +273,7 @@
         />
         <figcaption class="screenshot-caption">Write</figcaption>
       </figure>
-      <figure class="animate-in stagger-4">
+      <figure class="reveal" use:reveal={3}>
         <img
           src="/screenshots/android/post.png"
           alt="A verified article open in Inkwell on Android"
@@ -278,101 +288,209 @@
   </div>
 </section>
 
-<!-- Features -->
+<!-- Features (compressed) -->
 <section class="site-container pb-12">
   <h2 class="section-title">
     What Inkwell does
   </h2>
 
   <div class="feature-grid">
-    <div class="feature-card animate-in stagger-1">
+    <div class="feature-card reveal" use:reveal={0}>
       <div class="feature-icon"><BookOpen class="h-5 w-5" /></div>
-      <h3>Read</h3>
+      <h3>Read &amp; Discover</h3>
       <p>
-        Browse publications and documents from across the Standard.site
-        ecosystem. Renders Markpub Markdown, Leaflet pages, pckt blocks,
-        and Offprint content — all from their owning PDS.
+        Browse publications and documents across the Standard.site
+        ecosystem — Markpub, Leaflet, pckt, and Offprint content, rendered
+        natively from their owning PDS. Search the public index and
+        subscribe to the publications you follow.
       </p>
     </div>
 
-    <div class="feature-card animate-in stagger-1">
-      <div class="feature-icon"><Compass class="h-5 w-5" /></div>
-      <h3>Discover</h3>
-      <p>
-        Search the cross-platform public index and subscribe to publications.
-        On iOS, background refresh can keep your feed current and notify you
-        when new documents appear.
-      </p>
-    </div>
-
-    <div class="feature-card animate-in stagger-1">
+    <div class="feature-card reveal" use:reveal={0}>
       <div class="feature-icon"><PenLine class="h-5 w-5" /></div>
       <h3>Write</h3>
       <p>
-        Compose in Markdown and publish to your PDS in your choice of
-        format — Markpub, Leaflet, pckt, or Offprint. Your writing, your
-        data portability.
+        Compose in Markdown and publish to your own PDS in your choice of
+        format. Your writing stays a portable record in your repository —
+        not locked into Inkwell.
       </p>
     </div>
 
-    <div class="feature-card animate-in stagger-2">
-      <div class="feature-icon"><Globe class="h-5 w-5" /></div>
-      <h3>AT Protocol Native</h3>
-      <p>
-        Sign in to your PDS with OAuth — no app passwords needed.
-        Records live in your repository under your control.
-      </p>
-    </div>
-
-    <div class="feature-card animate-in stagger-2">
+    <div class="feature-card reveal" use:reveal={0}>
       <div class="feature-icon"><Shield class="h-5 w-5" /></div>
-      <h3>Verification Built In</h3>
+      <h3>Native &amp; verified</h3>
       <p>
-        Every publication and document can be verified against its
-        .well-known endpoint and canonical &lt;link&gt; tags. Know your
-        sources are authentic.
-      </p>
-    </div>
-
-    <div class="feature-card animate-in stagger-2">
-      <div class="feature-icon"><Apple class="h-5 w-5" /></div>
-      <h3>iOS &amp; Android</h3>
-      <p>
-        The primary iOS app is built with SwiftUI and respects Dynamic Type,
-        accessibility, and system theme. The Jetpack Compose Android port is
-        experimental and does not yet include every iOS feature.
+        OAuth sign-in with no app passwords, and every publication or
+        document can be checked against its <code>.well-known</code>
+        endpoint and canonical link before you trust it.
       </p>
     </div>
   </div>
+
+  <a href="/features" class="section-link">See all features</a>
 </section>
 
-<!-- Secure by design -->
+<!-- Secure by design (teaser) -->
 <section class="site-container py-12">
-  <div class="callout animate-in stagger-3">
+  <div class="callout reveal" use:reveal={2}>
     <h2>Secure by design</h2>
     <p>
       Inkwell uses OAuth 2.1 to sign in to your Personal Data Server.
       Your browser opens once to approve access — no password is ever
       seen or stored by the app. Tokens are DPoP-bound and held in the
-      platform&rsquo;s secure store — Apple&rsquo;s Keychain on iOS,
-      encrypted shared preferences on Android.
+      platform&rsquo;s secure store, and there's no analytics or tracking
+      in the app or on this site.
     </p>
-    <a href="/privacy" class="active-press">
-      Read the Privacy Policy <ArrowRight class="h-3 w-3" />
+    <a href="/security" class="active-press">
+      Read about security <ArrowRight class="h-3 w-3" />
     </a>
   </div>
 </section>
 
-<!-- What's new -->
+<!-- Why not just the browser -->
+<section class="site-container py-12">
+  <h2 class="section-title">Why not just use the browser?</h2>
+  <p class="mb-6 max-w-[42rem] text-lg leading-relaxed text-pretty">
+    Standard.site content is on the open web, so you can always read it in
+    a browser tab. Here's what a native client adds.
+  </p>
+  <dl class="compare">
+    <div class="compare-head" aria-hidden="true">
+      <span></span>
+      <span>In a browser tab</span>
+      <span>In Inkwell</span>
+    </div>
+    <div class="compare-row">
+      <dt>Sign-in</dt>
+      <dd class="compare-web">
+        <span class="compare-label">In a browser tab</span>
+        Sign in again at each publication you visit
+      </dd>
+      <dd class="compare-app">
+        <span class="compare-label">In Inkwell</span>
+        One OAuth sign-in to your PDS, then you're done
+      </dd>
+    </div>
+    <div class="compare-row">
+      <dt>Credentials</dt>
+      <dd class="compare-web">
+        <span class="compare-label">In a browser tab</span>
+        Held in ordinary browser session state
+      </dd>
+      <dd class="compare-app">
+        <span class="compare-label">In Inkwell</span>
+        Held in the Keychain or EncryptedSharedPreferences
+      </dd>
+    </div>
+    <div class="compare-row">
+      <dt>Following writers</dt>
+      <dd class="compare-web">
+        <span class="compare-label">In a browser tab</span>
+        Bookmark each site and check back manually
+      </dd>
+      <dd class="compare-app">
+        <span class="compare-label">In Inkwell</span>
+        One subscribed feed across every publication
+      </dd>
+    </div>
+    <div class="compare-row">
+      <dt>Authenticity</dt>
+      <dd class="compare-web">
+        <span class="compare-label">In a browser tab</span>
+        Judge it by the address bar
+      </dd>
+      <dd class="compare-app">
+        <span class="compare-label">In Inkwell</span>
+        Checked against <code>.well-known</code> and the canonical link
+      </dd>
+    </div>
+    <div class="compare-row">
+      <dt>Writing</dt>
+      <dd class="compare-web">
+        <span class="compare-label">In a browser tab</span>
+        A separate web editor, wherever you publish
+      </dd>
+      <dd class="compare-app">
+        <span class="compare-label">In Inkwell</span>
+        Compose and publish without leaving the app
+      </dd>
+    </div>
+  </dl>
+</section>
+
+<!-- FAQ -->
+<section class="site-container py-12">
+  <h2 class="section-title">Frequently asked</h2>
+  <div class="faq-list">
+    <details class="faq-item">
+      <summary>Is Inkwell in the App Store or Play Store?</summary>
+      <p>
+        Not yet. Inkwell installs from its own self-hosted AltStore source
+        (iOS) or F-Droid repository (Android) — see the
+        <a href="/#download">download section</a> above for both. Getting
+        into the App Store and Play Store is a genuine goal, not a
+        deliberate choice to stay off them — it's held back by the
+        developer account fees, not by anything about how Inkwell works.
+      </p>
+    </details>
+    <details class="faq-item">
+      <summary>What happens to my writing if Inkwell shuts down?</summary>
+      <p>
+        Nothing happens to it — your documents are AT Protocol records in
+        your own repository on your PDS, not data stored by Inkwell. Any
+        client that speaks the Standard.site record schemas can read or
+        edit them, with or without Inkwell.
+      </p>
+    </details>
+    <details class="faq-item">
+      <summary>Do I need to know AT Protocol to use this?</summary>
+      <p>
+        No. You'll need an AT Protocol account and a PDS to sign in with —
+        Inkwell doesn't create one for you — but from there it works like
+        any reading and writing app. See <a href="/about">About</a> if
+        you'd like the background.
+      </p>
+    </details>
+    <details class="faq-item">
+      <summary>Is Android ready?</summary>
+      <p>
+        It's still labelled experimental, but it's close behind iOS: reading,
+        discovery, writing in any Standard.site format, comments, verification,
+        and background notifications all work. iOS remains the primary,
+        more polished implementation.
+      </p>
+    </details>
+    <details class="faq-item">
+      <summary>What does verification protect against?</summary>
+      <p>
+        A publication or document can claim a canonical web address, but a
+        claim alone isn't proof. Inkwell checks that claim against the
+        site's <code>.well-known</code> endpoint and its canonical
+        <code>&lt;link&gt;</code> tag, surfacing a mismatch instead of
+        silently trusting it. More detail on <a href="/security">Security</a>.
+      </p>
+    </details>
+  </div>
+</section>
+
+<!-- Availability -->
 <section class="site-container py-12">
   <h2 class="section-title">Availability</h2>
   <div class="callout">
-    <h3>iOS first, Android in progress</h3>
+    <h3>iOS first, Android close behind</h3>
     <p class="text-pretty">
       Inkwell&rsquo;s iOS app is the primary implementation. The Android app is
-      available as an experimental build for readers who would like to follow
-      its development; its writer, detail, comment, and notification features
-      are still catching up.
+      still labelled experimental, but reading, discovery, writing across
+      every Standard.site format, comments, verification, and background
+      notifications are all implemented and usable today.
     </p>
   </div>
+</section>
+
+<!-- Final CTA -->
+<section class="site-container pb-16 text-center">
+  <a href="#download" class="btn btn-primary active-press">
+    <Download class="h-4 w-4" />
+    Get Inkwell
+  </a>
 </section>

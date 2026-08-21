@@ -76,14 +76,29 @@
   }
 }
 
-@keyframes hero-reveal {
+@keyframes fade-slide-down {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(-6px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* The wordmark's ink drop falling into the well. */
+@keyframes ink-fall {
+  from {
+    opacity: 0;
+    transform: translateY(-72px) scale(0.5);
+  }
+  55% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -100,5 +115,10 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    /* Delays must go too. A staggered entrance uses fill-mode `both`, so a
+       surviving delay leaves the element parked on its `from` keyframe —
+       invisible — for the length of the stagger. */
+    animation-delay: 0ms !important;
+    transition-delay: 0ms !important;
   }
 }
