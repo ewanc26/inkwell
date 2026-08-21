@@ -25,6 +25,14 @@
       ],
       "versions": [
         {
+          "version": "2.2.0",
+          "buildVersion": "55",
+          "date": "2026-08-21",
+          "localizedDescription": "Adds a full Settings screen (notifications toggle, legal, about, sign out) and an in-app notification list you can review and clear. Tapping a notification now opens the document directly instead of just opening the app. Notifications also now display while the app is in the foreground, not just in the background.",
+          "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.2.0.ipa",
+          "size": 11167793
+        },
+        {
           "version": "2.1.1",
           "buildVersion": "54",
           "date": "2026-08-21",
