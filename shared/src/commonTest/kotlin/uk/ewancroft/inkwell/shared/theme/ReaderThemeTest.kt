@@ -124,4 +124,45 @@ class ReaderThemeTest {
         val theme2 = SharedReaderTheme.resolve(richShowPageBackground = true)
         assertTrue(theme2.showPageBackground)
     }
+
+    // ── customisation overrides ────────────────────────────────────────
+
+    @Test
+    fun overrideAccentWinsOverRichTheme() {
+        val theme = SharedReaderTheme.resolve(
+            richAccentBackgroundColor = 0x007AFF,
+            overrideAccentRgb = 0xFF3B30,
+        )
+        assertEquals(0xFF3B30, theme.accentRgb)
+    }
+
+    @Test
+    fun overrideAccentWinsOverEveryTierIncludingSystemDefault() {
+        val theme = SharedReaderTheme.resolve(overrideAccentRgb = 0xAF52DE)
+        assertEquals(0xAF52DE, theme.accentRgb)
+    }
+
+    @Test
+    fun noOverrideAccentFallsBackToRichTheme() {
+        val theme = SharedReaderTheme.resolve(richAccentBackgroundColor = 0x007AFF)
+        assertEquals(0x007AFF, theme.accentRgb)
+    }
+
+    @Test
+    fun overrideFontFamilyAppliesToBothHeadingAndBody() {
+        val theme = SharedReaderTheme.resolve(
+            richHeadingFont = "Lora",
+            richBodyFont = "Quattro",
+            overrideFontFamily = SharedReaderTheme.FontFamily.Rounded,
+        )
+        assertEquals(SharedReaderTheme.FontFamily.Rounded, theme.headingFontFamily)
+        assertEquals(SharedReaderTheme.FontFamily.Rounded, theme.bodyFontFamily)
+    }
+
+    @Test
+    fun noOverrideFontFamilyFallsBackToRichFonts() {
+        val theme = SharedReaderTheme.resolve(richHeadingFont = "Lora", richBodyFont = "Quattro")
+        assertEquals(SharedReaderTheme.FontFamily.Serif, theme.headingFontFamily)
+        assertEquals(SharedReaderTheme.FontFamily.Monospaced, theme.bodyFontFamily)
+    }
 }

@@ -8,9 +8,17 @@
 //  BasicDefinition → system appearance, so a publication that sets nothing
 //  still renders legibly without ever looking broken.
 //
+//  The cascade itself lives in shared KMP (SharedReaderTheme.resolve,
+//  called via resolveReaderTheme in SharedKMP.swift) and is identical to
+//  Android's ui/reader/ReaderTheme.kt -- this file only converts iOS's
+//  native Leaflet/theme models to the shared function's inputs and its
+//  Int/enum outputs back to SwiftUI Color/Font, the same adapter role
+//  Android's wrapper plays for Compose Color.
+//
 
 import SwiftUI
 import UIKit
+import InkwellShared
 
 struct ReaderTheme {
     enum FontFamily: String, Equatable {
@@ -48,7 +56,7 @@ struct ReaderTheme {
         let basic = publication?.basicTheme
 
         // Which of the theme's dark/light palettes actually matches what
-        // `background` will resolve to below — not just the device's
+        // the background will resolve to — not just the device's
         // appearance. A publication can set a fixed `backgroundColor`
         // independent of its dark/light palettes; picking foreground/accent
         // from the palette keyed to the device's colorScheme in that case
@@ -60,30 +68,41 @@ struct ReaderTheme {
         let isDark = rich?.backgroundColor?.color.isPerceptuallyDark ?? (colorScheme == .dark)
         let palette = isDark ? rich?.dark : rich?.light
 
-        background = rich?.backgroundColor?.color
-            ?? Color(hex: palette?.background)
-            ?? basic?.background.color
-            ?? Color(uiColor: .systemBackground)
-        pageBackground = rich?.pageBackground?.color
-            ?? Color(hex: palette?.surfaceHover)
-            ?? background
-        foreground = rich?.primary?.color
-            ?? Color(hex: palette?.text)
-            ?? basic?.foreground.color
-            ?? (isDark ? .white : .black)
-        accent = rich?.accentBackground?.color
-            ?? Color(hex: palette?.link ?? palette?.accent)
-            ?? basic?.accent.color
-            ?? .accentColor
-        accentForeground = rich?.accentText?.color
-            ?? basic?.accentForeground.color
-            ?? Color(uiColor: .systemBackground)
-        pageWidth = CGFloat(min(max(rich?.pageWidth ?? 680, 320), 1_000))
-        showPageBackground = rich?.showPageBackground ?? false
+        let customisation = CustomisationSettings.shared
 
-        let sharedFont = rich?.font
-        headingFamily = Self.family(for: rich?.headingFont ?? sharedFont)
-        bodyFamily = Self.family(for: rich?.bodyFont ?? sharedFont)
+        let shared = resolveReaderTheme(
+            richBackgroundColor: rich?.backgroundColor?.rgbInt,
+            richPageBackgroundColor: rich?.pageBackground?.rgbInt,
+            richPrimaryColor: rich?.primary?.rgbInt,
+            richAccentBackgroundColor: rich?.accentBackground?.rgbInt,
+            richAccentTextColor: rich?.accentText?.rgbInt,
+            richPageWidth: rich?.pageWidth,
+            richShowPageBackground: rich?.showPageBackground,
+            richHeadingFont: rich?.headingFont,
+            richBodyFont: rich?.bodyFont,
+            richSharedFont: rich?.font,
+            paletteBackground: palette?.background,
+            paletteText: palette?.text,
+            paletteLink: palette?.link,
+            paletteAccent: palette?.accent,
+            paletteSurfaceHover: palette?.surfaceHover,
+            basicBackground: basic?.background.hexString,
+            basicForeground: basic?.foreground.hexString,
+            basicAccent: basic?.accent.hexString,
+            basicAccentForeground: basic?.accentForeground.hexString,
+            overrideAccentRgb: customisation.accentColorRgbInt,
+            overrideFontFamily: customisation.fontFamilyOverride?.toShared()
+        )
+
+        background = Color(rgbInt: Int(shared.backgroundRgb))
+        pageBackground = Color(rgbInt: Int(shared.pageBackgroundRgb))
+        foreground = Color(rgbInt: Int(shared.foregroundRgb))
+        accent = Color(rgbInt: Int(shared.accentRgb))
+        accentForeground = Color(rgbInt: Int(shared.accentForegroundRgb))
+        pageWidth = CGFloat(shared.pageWidthDp)
+        showPageBackground = shared.showPageBackground
+        headingFamily = shared.headingFontFamily.toLocal()
+        bodyFamily = shared.bodyFontFamily.toLocal()
     }
 
     func headingFont(_ style: Font.TextStyle, weight: Font.Weight? = nil) -> Font {
@@ -95,26 +114,39 @@ struct ReaderTheme {
         let font = Font.system(style, design: bodyFamily.design)
         return weight.map(font.weight) ?? font
     }
+}
 
-    /// Maps a Leaflet font identifier to a `Font.Design` family. `nil` means
-    /// no font was specified anywhere in the resolved theme, so this falls
-    /// back to the system font rather than assuming an editorial serif —
-    /// theming should be opt-in, driven entirely by what the publication
-    /// actually set.
-    nonisolated static func family(for identifier: String?) -> FontFamily {
-        guard let identifier else { return .sans }
-        let value = identifier.lowercased()
+// MARK: - Shared KMP Conversion
 
-        if value.contains("mono") || value.contains("quattro") || value.contains("code") {
-            return .monospaced
+private extension SiteStandardLexicon.Theme.ColorValue {
+    /// 0xRRGGBB, matching SharedReaderTheme's Int colour convention.
+    var rgbInt: Int { (r << 16) | (g << 8) | b }
+}
+
+private extension SiteStandardLexicon.Theme.RGBColor {
+    var hexString: String { String(format: "#%02X%02X%02X", r, g, b) }
+}
+
+private extension ReaderTheme.FontFamily {
+    func toShared() -> InkwellShared.SharedReaderTheme.FontFamily {
+        switch self {
+        case .sans: return .sans
+        case .serif: return .serif
+        case .rounded: return .rounded
+        case .monospaced: return .monospaced
         }
-        if value.contains("lora") || value.contains("newsreader") || value.contains("serif") || value.contains("georgia") {
-            return .serif
+    }
+}
+
+private extension InkwellShared.SharedReaderTheme.FontFamily {
+    func toLocal() -> ReaderTheme.FontFamily {
+        switch self {
+        case .sans: return .sans
+        case .serif: return .serif
+        case .rounded: return .rounded
+        case .monospaced: return .monospaced
+        default: return .sans
         }
-        if value.contains("atkinson") || value.contains("rounded") {
-            return .rounded
-        }
-        return .sans
     }
 }
 
@@ -127,16 +159,13 @@ private extension Color {
         return (0.299 * r + 0.587 * g + 0.114 * b) < 0.5
     }
 
-    init?(hex: String?) {
-        guard var value = hex?.trimmingCharacters(in: .whitespacesAndNewlines), !value.isEmpty else {
-            return nil
-        }
-        if value.hasPrefix("#") { value.removeFirst() }
-        guard value.count == 6, let rgb = UInt64(value, radix: 16) else { return nil }
+    /// Reads only the RGB bytes, ignoring any alpha byte -- SharedReaderTheme's
+    /// Int outputs aren't guaranteed to carry a meaningful top byte.
+    init(rgbInt: Int) {
         self.init(
-            red: Double((rgb >> 16) & 0xff) / 255,
-            green: Double((rgb >> 8) & 0xff) / 255,
-            blue: Double(rgb & 0xff) / 255
+            red: Double((rgbInt >> 16) & 0xff) / 255,
+            green: Double((rgbInt >> 8) & 0xff) / 255,
+            blue: Double(rgbInt & 0xff) / 255
         )
     }
 }

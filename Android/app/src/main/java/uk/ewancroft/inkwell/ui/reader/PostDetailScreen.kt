@@ -34,13 +34,17 @@ fun PostDetailScreen(
     viewModel: PostDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val isDarkTheme = androidx.compose.foundation.isSystemInDarkTheme()
+    val isDarkTheme = uk.ewancroft.inkwell.ui.theme.LocalForceDarkTheme.current
+        ?: androidx.compose.foundation.isSystemInDarkTheme()
+    val context = androidx.compose.ui.platform.LocalContext.current
     val readerTheme = remember(uiState.documentTheme, uiState.publicationTheme, uiState.basicTheme, isDarkTheme) {
         ReaderTheme.resolve(
             documentTheme = uiState.documentTheme,
             publicationTheme = uiState.publicationTheme,
             basicTheme = uiState.basicTheme,
             isDarkTheme = isDarkTheme,
+            overrideAccentRgb = uk.ewancroft.inkwell.util.CustomisationPreferences.getAccentColorRgbInt(context),
+            overrideFontFamily = uk.ewancroft.inkwell.util.CustomisationPreferences.getFontFamilyOverride(context),
         )
     }
 

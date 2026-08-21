@@ -33,6 +33,8 @@ import uk.ewancroft.inkwell.ui.auth.AuthViewModel
 import uk.ewancroft.inkwell.ui.components.InkwellMark
 import uk.ewancroft.inkwell.ui.navigation.InkwellNavHost
 import uk.ewancroft.inkwell.ui.theme.InkwellTheme
+import uk.ewancroft.inkwell.ui.theme.LocalForceDarkTheme
+import uk.ewancroft.inkwell.util.CustomisationPreferences
 
 import uk.ewancroft.inkwell.util.TipPromptManager
 
@@ -50,6 +52,13 @@ class MainActivity : ComponentActivity() {
         TestingConfig.tab = intent.getStringExtra("tab") ?: "reader"
         pendingDocumentUri.value = intent.getStringExtra("documentURI")
         setContent {
+            val forceDarkTheme = when (CustomisationPreferences.getAppearanceOverride(this)) {
+                CustomisationPreferences.AppearanceOverride.LIGHT -> false
+                CustomisationPreferences.AppearanceOverride.DARK -> true
+                null -> null
+            }
+
+            CompositionLocalProvider(LocalForceDarkTheme provides forceDarkTheme) {
             val viewModel: AuthViewModel = hiltViewModel()
 
             val authState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -77,8 +86,9 @@ class MainActivity : ComponentActivity() {
             }
 
             InkwellTheme {
-                val splashBg = if (isSystemInDarkTheme()) Color(0xFF000000) else Color(0xFFFFFFFF)
-                val splashMarkColor = if (isSystemInDarkTheme()) Color(0xFFFFFFFF) else Color(0xFF000000)
+                val isDark = LocalForceDarkTheme.current ?: isSystemInDarkTheme()
+                val splashBg = if (isDark) Color(0xFF000000) else Color(0xFFFFFFFF)
+                val splashMarkColor = if (isDark) Color(0xFFFFFFFF) else Color(0xFF000000)
                 Box(Modifier.fillMaxSize()) {
                     when {
                         authState is AuthUiState.Loading -> {
@@ -136,6 +146,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 }
+            }
             }
         }
     }

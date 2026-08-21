@@ -35,6 +35,13 @@ data class ReaderTheme(
             publicationTheme: PublicationTheme? = null,
             basicTheme: BasicTheme? = null,
             isDarkTheme: Boolean,
+            // User-set overrides from paid customisation, highest priority --
+            // deliberately override even a publication's own rich theme,
+            // since the point is reading everything the way *you* want.
+            // Mirrors iOS ReaderTheme.swift threading CustomisationSettings
+            // into the same shared resolver call.
+            overrideAccentRgb: Int? = null,
+            overrideFontFamily: SharedReaderTheme.FontFamily? = null,
         ): ReaderTheme {
             val rich = documentTheme ?: publicationTheme
             val palette = if (isDarkTheme) rich?.dark else rich?.light
@@ -59,6 +66,8 @@ data class ReaderTheme(
                 basicForeground = basicTheme?.foreground?.toHexString(),
                 basicAccent = basicTheme?.accent?.toHexString(),
                 basicAccentForeground = basicTheme?.accentForeground?.toHexString(),
+                overrideAccentRgb = overrideAccentRgb,
+                overrideFontFamily = overrideFontFamily,
             )
 
             return ReaderTheme(

@@ -15,6 +15,7 @@ package uk.ewancroft.inkwell.ui.theme
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
 import uk.ewancroft.inkwell.data.model.atproto.BasicTheme
 import uk.ewancroft.inkwell.data.model.atproto.ColorValue
@@ -82,6 +83,18 @@ data class ResolvedTheme(
 // ── Theme Resolution ─────────────────────────────────────────────────────
 
 /**
+ * The user's Settings → Customisation appearance override (light/dark),
+ * provided at the app root in MainActivity from
+ * CustomisationPreferences.getAppearanceOverride. Null means "follow the
+ * system" -- every isSystemInDarkTheme() call site in the app should read
+ * `LocalForceDarkTheme.current ?: isSystemInDarkTheme()` instead, so the
+ * override actually reaches app chrome, reader theming, and anywhere else
+ * that branches on light/dark. Mirrors iOS's `.preferredColorScheme`
+ * override at the WindowGroup root.
+ */
+val LocalForceDarkTheme = compositionLocalOf<Boolean?> { null }
+
+/**
  * Resolves a publication/document theme cascade into a ResolvedTheme.
  *
  * Priority (highest first):
@@ -96,7 +109,7 @@ fun resolveTheme(
     basicTheme: BasicTheme? = null,
     documentTheme: PublicationTheme? = null
 ): ResolvedTheme {
-    val isDark = isSystemInDarkTheme()
+    val isDark = LocalForceDarkTheme.current ?: isSystemInDarkTheme()
 
     val accent = documentTheme?.accentBackground?.toColor()
         ?: publicationTheme?.accentBackground?.toColor()
@@ -151,7 +164,7 @@ fun InkwellTheme(
     content: @Composable () -> Unit
 ) {
     val theme = resolvedTheme
-    val isDark = isSystemInDarkTheme()
+    val isDark = LocalForceDarkTheme.current ?: isSystemInDarkTheme()
 
     val colorScheme = if (theme != null) {
         // Document/publication theme — map resolved palette to Material 3

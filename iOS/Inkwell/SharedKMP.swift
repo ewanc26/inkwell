@@ -147,6 +147,8 @@ func resolveReaderTheme(
     basicForeground: String? = nil,
     basicAccent: String? = nil,
     basicAccentForeground: String? = nil,
+    overrideAccentRgb: Int? = nil,
+    overrideFontFamily: InkwellShared.SharedReaderTheme.FontFamily? = nil
 ) -> SharedReaderTheme {
     SharedReaderTheme.Companion.shared.resolve(
         richBackgroundColor: richBackgroundColor.map { KotlinInt(value: Int32($0)) },
@@ -167,7 +169,9 @@ func resolveReaderTheme(
         basicBackground: basicBackground,
         basicForeground: basicForeground,
         basicAccent: basicAccent,
-        basicAccentForeground: basicAccentForeground
+        basicAccentForeground: basicAccentForeground,
+        overrideAccentRgb: overrideAccentRgb.map { KotlinInt(value: Int32($0)) },
+        overrideFontFamily: overrideFontFamily
     )
 }
 

@@ -47,6 +47,12 @@ data class SharedReaderTheme(
             basicForeground: String? = null,
             basicAccent: String? = null,
             basicAccentForeground: String? = null,
+            // User-set overrides from paid customisation, highest priority --
+            // deliberately override even a publication's own rich theme,
+            // since the point is "read everything the way *you* want",
+            // not just a fallback for publications that set nothing.
+            overrideAccentRgb: Int? = null,
+            overrideFontFamily: FontFamily? = null,
         ): SharedReaderTheme {
             val background = firstNonNullInt(
                 richBackgroundColor,
@@ -68,7 +74,7 @@ data class SharedReaderTheme(
                 0xFF1A1A1A.toInt()
             )
 
-            val accent = firstNonNullInt(
+            val accent = overrideAccentRgb ?: firstNonNullInt(
                 richAccentBackgroundColor,
                 paletteLink?.let { hexToRgb(it) },
                 paletteAccent?.let { hexToRgb(it) },
@@ -92,8 +98,8 @@ data class SharedReaderTheme(
                 accentForegroundRgb = accentForeground,
                 pageWidthDp = pageWidth,
                 showPageBackground = richShowPageBackground ?: false,
-                headingFontFamily = fontFamilyFor(richHeadingFont ?: richSharedFont),
-                bodyFontFamily = fontFamilyFor(richBodyFont ?: richSharedFont),
+                headingFontFamily = overrideFontFamily ?: fontFamilyFor(richHeadingFont ?: richSharedFont),
+                bodyFontFamily = overrideFontFamily ?: fontFamilyFor(richBodyFont ?: richSharedFont),
             )
         }
 
