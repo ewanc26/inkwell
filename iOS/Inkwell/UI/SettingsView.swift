@@ -27,6 +27,8 @@ struct SettingsView: View {
     @State private var licenseKeyError = false
     @State private var accentColor: Color?
 
+    @State private var accessibility = AccessibilitySettings.shared
+
     var body: some View {
         NavigationStack {
             Form {
@@ -53,6 +55,29 @@ struct SettingsView: View {
                     Text("Notifications")
                 } footer: {
                     Text("Inkwell polls your subscriptions in the background and notifies you about new documents. Turning this off keeps the in-app notification list working but stops system banners. The system permission (above) controls whether banners can appear at all.")
+                }
+
+                Section {
+                    VStack(alignment: .leading) {
+                        Text("Text Size")
+                        Slider(value: $accessibility.fontSizeScale, in: 0.8...1.5, step: 0.1) {
+                            Text("Text Size")
+                        } minimumValueLabel: {
+                            Text("A").font(.caption)
+                        } maximumValueLabel: {
+                            Text("A").font(.title2)
+                        }
+                    }
+                    Toggle("Bold Text", isOn: $accessibility.boldText)
+                    Toggle("Increase Contrast", isOn: $accessibility.increaseContrast)
+                    Toggle("Underline Links", isOn: $accessibility.underlineLinks)
+                    Button("Reset to Defaults", role: .destructive) {
+                        accessibility.resetToDefaults()
+                    }
+                } header: {
+                    Text("Accessibility")
+                } footer: {
+                    Text("These apply on top of your device's own Text Size and accessibility settings, and are always free.")
                 }
 
                 if customisation.isUnlocked {

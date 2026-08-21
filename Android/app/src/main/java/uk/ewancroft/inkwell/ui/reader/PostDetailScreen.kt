@@ -45,6 +45,7 @@ fun PostDetailScreen(
             isDarkTheme = isDarkTheme,
             overrideAccentRgb = uk.ewancroft.inkwell.util.CustomisationPreferences.getAccentColorRgbInt(context),
             overrideFontFamily = uk.ewancroft.inkwell.util.CustomisationPreferences.getFontFamilyOverride(context),
+            increaseContrast = uk.ewancroft.inkwell.util.AccessibilityPreferences.getIncreaseContrast(context),
         )
     }
 

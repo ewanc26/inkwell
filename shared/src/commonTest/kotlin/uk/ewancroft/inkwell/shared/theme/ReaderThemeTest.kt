@@ -165,4 +165,51 @@ class ReaderThemeTest {
         assertEquals(SharedReaderTheme.FontFamily.Serif, theme.headingFontFamily)
         assertEquals(SharedReaderTheme.FontFamily.Monospaced, theme.bodyFontFamily)
     }
+
+    // ── accessibility: isPerceptuallyDark ─────────────────────────────
+
+    @Test
+    fun isPerceptuallyDarkForBlackAndWhite() {
+        assertTrue(SharedReaderTheme.isPerceptuallyDark(0x000000))
+        assertFalse(SharedReaderTheme.isPerceptuallyDark(0xFFFFFF))
+    }
+
+    @Test
+    fun isPerceptuallyDarkForMidTones() {
+        assertFalse(SharedReaderTheme.isPerceptuallyDark(0xF5F5F5)) // near-white default background
+        assertTrue(SharedReaderTheme.isPerceptuallyDark(0x1A1A1A)) // near-black default foreground
+    }
+
+    // ── accessibility: increaseContrast ────────────────────────────────
+
+    @Test
+    fun increaseContrastSnapsForegroundToWhiteOnDarkBackground() {
+        val theme = SharedReaderTheme.resolve(
+            richBackgroundColor = 0x000000,
+            richPrimaryColor = 0x888888, // low-contrast grey a publication might pick
+            increaseContrast = true,
+        )
+        // 0xFFFFFFFF.toInt(), matching this function's existing convention
+        // for opaque fallback colours (see accentForeground's default).
+        assertEquals(0xFFFFFFFF.toInt(), theme.foregroundRgb)
+    }
+
+    @Test
+    fun increaseContrastSnapsForegroundToBlackOnLightBackground() {
+        val theme = SharedReaderTheme.resolve(
+            richBackgroundColor = 0xFFFFFF,
+            richPrimaryColor = 0xAAAAAA,
+            increaseContrast = true,
+        )
+        assertEquals(0xFF000000.toInt(), theme.foregroundRgb)
+    }
+
+    @Test
+    fun noIncreaseContrastKeepsRichForeground() {
+        val theme = SharedReaderTheme.resolve(
+            richBackgroundColor = 0x000000,
+            richPrimaryColor = 0x888888,
+        )
+        assertEquals(0x888888, theme.foregroundRgb)
+    }
 }

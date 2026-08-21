@@ -27,6 +27,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -46,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import uk.ewancroft.inkwell.shared.theme.SharedReaderTheme
+import uk.ewancroft.inkwell.util.AccessibilityPreferences
 import uk.ewancroft.inkwell.util.CustomisationPreferences
 
 /**
@@ -75,6 +77,11 @@ fun SettingsDialog(
     var accentColorHex by remember { mutableStateOf(CustomisationPreferences.getAccentColorHex(context)) }
     var fontFamilyOverride by remember { mutableStateOf(CustomisationPreferences.getFontFamilyOverride(context)) }
     var appearanceOverride by remember { mutableStateOf(CustomisationPreferences.getAppearanceOverride(context)) }
+
+    var fontSizeScale by remember { mutableStateOf(AccessibilityPreferences.getFontSizeScale(context)) }
+    var boldText by remember { mutableStateOf(AccessibilityPreferences.getBoldText(context)) }
+    var increaseContrast by remember { mutableStateOf(AccessibilityPreferences.getIncreaseContrast(context)) }
+    var underlineLinks by remember { mutableStateOf(AccessibilityPreferences.getUnderlineLinks(context)) }
 
     legalDocument?.let { documentType ->
         LegalDocumentDialog(documentType = documentType, onDismiss = { legalDocument = null })
@@ -148,6 +155,75 @@ fun SettingsDialog(
                             }
                             context.startActivity(intent)
                         },
+                    )
+
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+                    SectionHeader("Accessibility")
+                    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
+                        Text("Text Size", style = MaterialTheme.typography.bodyLarge)
+                        Slider(
+                            value = fontSizeScale,
+                            onValueChange = {
+                                fontSizeScale = it
+                                AccessibilityPreferences.setFontSizeScale(context, it)
+                            },
+                            valueRange = 0.8f..1.5f,
+                            steps = 6,
+                        )
+                    }
+                    SettingsRow(
+                        title = "Bold Text",
+                        trailing = {
+                            Switch(
+                                checked = boldText,
+                                onCheckedChange = {
+                                    boldText = it
+                                    AccessibilityPreferences.setBoldText(context, it)
+                                },
+                            )
+                        },
+                    )
+                    SettingsRow(
+                        title = "Increase Contrast",
+                        trailing = {
+                            Switch(
+                                checked = increaseContrast,
+                                onCheckedChange = {
+                                    increaseContrast = it
+                                    AccessibilityPreferences.setIncreaseContrast(context, it)
+                                },
+                            )
+                        },
+                    )
+                    SettingsRow(
+                        title = "Underline Links",
+                        trailing = {
+                            Switch(
+                                checked = underlineLinks,
+                                onCheckedChange = {
+                                    underlineLinks = it
+                                    AccessibilityPreferences.setUnderlineLinks(context, it)
+                                },
+                            )
+                        },
+                    )
+                    SettingsRow(
+                        title = "Reset to Defaults",
+                        titleColor = MaterialTheme.colorScheme.error,
+                        onClick = {
+                            fontSizeScale = 1.0f
+                            boldText = false
+                            increaseContrast = false
+                            underlineLinks = true
+                            AccessibilityPreferences.resetToDefaults(context)
+                        },
+                    )
+                    Text(
+                        "These apply on top of your device's own font size and accessibility settings, and are always free.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     )
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
