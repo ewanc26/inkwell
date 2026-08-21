@@ -21,6 +21,7 @@ struct BrowseDocumentsView: View {
     @State private var store = ReaderFeedStore.shared
 
     @State private var showAbout = false
+    @State private var showNotifications = false
     @State private var path = NavigationPath()
 
     var body: some View {
@@ -39,11 +40,19 @@ struct BrowseDocumentsView: View {
                 }
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
+                        Button("Notifications", systemImage: "bell") {
+                            showNotifications = true
+                        }
+                    }
+                    ToolbarItem(placement: .topBarTrailing) {
                         Button("Refresh", systemImage: "arrow.clockwise") {
                             Task { await store.loadData(loginStateManager: loginStateManager, force: true) }
                         }
                         .disabled(store.followingState.isLoading || store.isLoadingYours)
                     }
+                }
+                .sheet(isPresented: $showNotifications) {
+                    NotificationsView(onOpenDocument: { uri in path.append(uri) })
                 }
                 .accountToolbar(showAbout: $showAbout)
                 .task {

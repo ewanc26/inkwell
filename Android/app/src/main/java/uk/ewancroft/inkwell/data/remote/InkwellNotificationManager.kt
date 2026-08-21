@@ -166,6 +166,14 @@ class InkwellNotificationManager @Inject constructor(
         prefs.edit().putInt(UNREAD_COUNT_KEY, 0).apply()
     }
 
+    /** Notifications for the in-app notification list, newest first. */
+    fun getNotifications(): List<InkwellNotification> = loadNotifications()
+
+    /** Mirrors iOS `NotificationManager.clearAll()`. */
+    fun clearAll() {
+        prefs.edit().remove(NOTIFICATIONS_KEY).putInt(UNREAD_COUNT_KEY, 0).apply()
+    }
+
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(

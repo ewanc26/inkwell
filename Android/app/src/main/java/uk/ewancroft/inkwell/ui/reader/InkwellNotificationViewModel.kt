@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import uk.ewancroft.inkwell.data.remote.InkwellNotification
 import uk.ewancroft.inkwell.data.remote.InkwellNotificationManager
 import javax.inject.Inject
 
@@ -20,20 +21,37 @@ class InkwellNotificationViewModel @Inject constructor(
     /** Mirrors iOS's `Tab("Read", ...).badge(notificationManager.unreadCount)`. */
     val unreadCount: StateFlow<Int> = _unreadCount.asStateFlow()
 
+    private val _notifications = MutableStateFlow(notificationManager.getNotifications())
+
+    /** Backs the in-app notification list -- mirrors iOS `NotificationManager.notifications`. */
+    val notifications: StateFlow<List<InkwellNotification>> = _notifications.asStateFlow()
+
     fun schedulePeriodicPoll() {
         viewModelScope.launch {
             notificationManager.schedulePeriodicPoll()
         }
     }
 
-    /** Re-reads the persisted count -- call when the Reader tab becomes visible again,
-     *  since a background poll updates it out from under any already-collected state. */
+    /** Re-reads persisted state -- call when the notification list or badge becomes
+     *  visible again, since a background poll updates it out from under any
+     *  already-collected state. */
     fun refreshUnreadCount() {
         _unreadCount.value = notificationManager.getUnreadCount()
     }
 
+    fun refreshNotifications() {
+        _notifications.value = notificationManager.getNotifications()
+    }
+
     fun markAllAsRead() {
         notificationManager.markAllAsRead()
+        refreshUnreadCount()
+    }
+
+    /** Mirrors iOS `NotificationManager.clearAll()`. */
+    fun clearAll() {
+        notificationManager.clearAll()
+        refreshNotifications()
         refreshUnreadCount()
     }
 }
