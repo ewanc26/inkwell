@@ -25,6 +25,14 @@
       ],
       "versions": [
         {
+        "version": "2.1.1",
+        "buildVersion": "54",
+        "date": "2026-08-21",
+        "localizedDescription": "Rewrites the in-app Privacy Policy and Terms of Service. Corrects stale and inaccurate claims (the app version, Android notification support, and how iOS Keychain items behave in device backups), discloses every third-party service the app contacts, and brings both documents in line with the UK GDPR and UK consumer law.",
+        "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.1.1.ipa",
+        "size": 11467232
+      },
+      {
           "version": "2.1.0",
           "buildVersion": "53",
           "date": "2026-08-21",
