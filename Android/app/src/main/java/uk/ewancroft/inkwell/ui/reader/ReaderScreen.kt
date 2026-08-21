@@ -4,9 +4,11 @@ import android.net.Uri
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import uk.ewancroft.inkwell.ui.components.InkwellMark
+import uk.ewancroft.inkwell.ui.components.NotificationsDialog
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,6 +37,9 @@ fun ReaderScreen(
 
     var showCredits by remember { mutableStateOf(false) }
     var showTipPrompt by remember { mutableStateOf(false) }
+    var showNotifications by remember { mutableStateOf(false) }
+    val notifications by notificationViewModel.notifications.collectAsStateWithLifecycle()
+    val unreadCount by notificationViewModel.unreadCount.collectAsStateWithLifecycle()
 
     val appContext = androidx.compose.ui.platform.LocalContext.current
     val appVersion = remember { uk.ewancroft.inkwell.util.appVersionString(appContext) }
@@ -94,6 +99,18 @@ fun ReaderScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = {
+                        notificationViewModel.refreshNotifications()
+                        showNotifications = true
+                    }) {
+                        if (unreadCount > 0) {
+                            BadgedBox(badge = { Badge { Text("$unreadCount") } }) {
+                                Icon(Icons.Outlined.Notifications, contentDescription = "Notifications")
+                            }
+                        } else {
+                            Icon(Icons.Outlined.Notifications, contentDescription = "Notifications")
+                        }
+                    }
                     IconButton(onClick = { showCredits = true }) {
                         Icon(Icons.Outlined.Info, contentDescription = "About")
                     }
@@ -171,6 +188,15 @@ fun ReaderScreen(
             appVersion = appVersion,
             onSignOut = onSignOut,
             onDismiss = { showCredits = false },
+        )
+    }
+
+    if (showNotifications) {
+        NotificationsDialog(
+            notifications = notifications,
+            onOpenDocument = { uri -> onNavigateToPost(uri, null, null, null, null) },
+            onClearAll = { notificationViewModel.clearAll() },
+            onDismiss = { showNotifications = false },
         )
     }
 
