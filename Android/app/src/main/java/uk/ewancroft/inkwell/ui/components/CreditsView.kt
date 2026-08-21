@@ -10,6 +10,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Feedback
@@ -38,15 +39,21 @@ import uk.ewancroft.inkwell.ui.feedback.FeedbackDialog
 @Composable
 fun CreditsView(
     appVersion: String,
-    onSignOut: () -> Unit,
+    onSignOut: () -> Unit = {},
     onDismiss: () -> Unit,
+    isAuthenticated: Boolean = true,
 ) {
     val context = LocalContext.current
     var showFeedback by remember { mutableStateOf(false) }
+    var showSupport by remember { mutableStateOf(false) }
     var supporters by remember { mutableStateOf<List<BlueskyProfile>>(emptyList()) }
 
     if (showFeedback) {
         FeedbackDialog(onDismiss = { showFeedback = false })
+    }
+
+    if (showSupport) {
+        SupportDialog(onDismiss = { showSupport = false })
     }
 
     LaunchedEffect(Unit) {
@@ -138,6 +145,7 @@ fun CreditsView(
 
                 // Support
                 SectionHeader("Support")
+                SupportRow(onClick = { showSupport = true })
                 Row(
                     modifier = Modifier.fillMaxWidth().clickable { showFeedback = true }.padding(vertical = 6.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -158,9 +166,6 @@ fun CreditsView(
                         )
                     }
                 }
-                SupportRow(url = "https://ewancroft.uk", openUrl = ::openUrl)
-                CreditRow(title = "Ko-fi", detail = "Buy me a tea", url = "https://ko-fi.com/ewancroft", openUrl = ::openUrl)
-                CreditRow(title = "GitHub Sponsors", detail = "Sponsor development work", url = "https://github.com/sponsors/ewanc26", openUrl = ::openUrl)
                 CreditRow(title = "Source on GitHub", detail = "ewanc26/inkwell", url = "https://github.com/ewanc26/inkwell", openUrl = ::openUrl)
                 CreditRow(title = "Ewan Croft", detail = "Developer — support links on ewancroft.uk", url = "https://ewancroft.uk", openUrl = ::openUrl)
 
@@ -191,21 +196,23 @@ fun CreditsView(
                     modifier = Modifier.fillMaxWidth(),
                 )
 
-                Spacer(Modifier.height(24.dp))
-                HorizontalDivider()
-                Spacer(Modifier.height(16.dp))
+                if (isAuthenticated) {
+                    Spacer(Modifier.height(24.dp))
+                    HorizontalDivider()
+                    Spacer(Modifier.height(16.dp))
 
-                // Sign Out
-                TextButton(
-                    onClick = {
-                        onDismiss()
-                        onSignOut()
-                    },
-                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
-                ) {
-                    Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null, Modifier.size(18.dp))
-                    Spacer(Modifier.width(6.dp))
-                    Text("Sign Out")
+                    // Sign Out
+                    TextButton(
+                        onClick = {
+                            onDismiss()
+                            onSignOut()
+                        },
+                        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null, Modifier.size(18.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text("Sign Out")
+                    }
                 }
 
                 Spacer(Modifier.height(16.dp))
@@ -293,10 +300,15 @@ private fun SupporterRow(supporter: BlueskyProfile, openUrl: (String) -> Unit) {
     }
 }
 
+/**
+ * Opens [SupportDialog] — the tip jar and non-monetary support options,
+ * which iOS reaches the same way via a `SupportView` navigation link
+ * rather than listing Ko-fi and Sponsors inline here.
+ */
 @Composable
-private fun SupportRow(url: String, openUrl: (String) -> Unit) {
+private fun SupportRow(onClick: () -> Unit) {
     Row(
-        modifier = Modifier.fillMaxWidth().clickable { openUrl(url) }.padding(vertical = 6.dp),
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
@@ -310,9 +322,9 @@ private fun SupportRow(url: String, openUrl: (String) -> Unit) {
             Text("Support Inkwell", style = MaterialTheme.typography.bodyMedium)
         }
         Icon(
-            Icons.AutoMirrored.Filled.OpenInNew,
+            Icons.Filled.ChevronRight,
             contentDescription = null,
-            Modifier.size(16.dp),
+            Modifier.size(20.dp),
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }

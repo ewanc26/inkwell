@@ -24,11 +24,14 @@ enum SupportersList {
 
 // MARK: - API Response
 
-private struct BSkyListItem: Decodable, Sendable {
+// Internal rather than private so `BSkyListModelsTests` can decode a
+// captured getList payload directly, mirroring Android's
+// `BlueskyListModelsTest`.
+struct BSkyListItem: Decodable, Sendable {
     let subject: BSkyActorProfile
 }
 
-private struct GetListResponse: Decodable, Sendable {
+struct GetListResponse: Decodable, Sendable {
     let items: [BSkyListItem]
     let cursor: String?
 }
@@ -56,7 +59,7 @@ enum BSkyListFetcher {
         var cursor: String?
 
         repeat {
-            var components = URLComponents(string: "\(baseURL)/xrpc/\(sharedXrpcGraphGetList())")
+            var components = URLComponents(string: "\(baseURL)\(sharedXrpcGraphGetList())")
             var queryItems = [
                 URLQueryItem(name: "list", value: listUri),
                 URLQueryItem(name: "limit", value: String(pageLimit)),

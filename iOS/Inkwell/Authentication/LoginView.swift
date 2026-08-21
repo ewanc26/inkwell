@@ -14,6 +14,7 @@ struct LoginView: View {
 
     @State private var handle = ""
     @State private var isSigningIn = false
+    @State private var isShowingCredits = false
 
     private enum Field: Hashable {
         case handle
@@ -33,6 +34,7 @@ struct LoginView: View {
                 onboardingSection
                 formSection
                 oauthNote
+                aboutButton
                 Spacer(minLength: 24)
             }
             .padding(.horizontal, 24)
@@ -45,6 +47,9 @@ struct LoginView: View {
         .scrollBounceBehavior(.basedOnSize)
         .scrollDismissesKeyboard(.interactively)
         .background(Color(uiColor: .systemBackground))
+        .sheet(isPresented: $isShowingCredits) {
+            CreditsView()
+        }
     }
 
     // MARK: - Sections
@@ -197,6 +202,15 @@ struct LoginView: View {
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: 400)
+    }
+
+    private var aboutButton: some View {
+        Button("About Inkwell") {
+            isShowingCredits = true
+        }
+        .font(.footnote)
+        .buttonStyle(.plain)
+        .foregroundStyle(.secondary)
     }
 
     // MARK: - Actions

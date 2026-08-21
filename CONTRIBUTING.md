@@ -62,7 +62,7 @@ xcodebuild -project Inkwell.xcodeproj -scheme Inkwell \
   -skip-testing:InkwellUITests build test
 ```
 
-`InkwellTests/StandardSiteTests.swift` is the only unit test source — nine tests covering the Inkwell NSID namespace, AT-URI rejection of malformed values, association/canonical URLs, verification endpoint paths, wire keys, search v2 decoding, notification JSON, and tolerant record pages. `InkwellUITests` has no source files and fails to load its bundle if run, hence the skip. This target does not exercise the shared core.
+There are two unit test sources: `InkwellTests/StandardSiteTests.swift` (nine tests covering the Inkwell NSID namespace, AT-URI rejection of malformed values, association/canonical URLs, verification endpoint paths, wire keys, search v2 decoding, notification JSON, and tolerant record pages) and `InkwellTests/BSkyListModelsTests.swift` (three covering `app.bsky.graph.getList` decoding and the supporters-list AT-URI). `InkwellUITests` has no source files and fails to load its bundle if run, hence the skip. This target does not exercise the shared core.
 
 ### Android
 

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
+import uk.ewancroft.inkwell.ui.components.CreditsView
 import uk.ewancroft.inkwell.ui.components.InkwellMark
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -19,6 +20,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import uk.ewancroft.inkwell.util.appVersionString
 
 @Composable
 fun LoginScreen(
@@ -29,6 +31,16 @@ fun LoginScreen(
 
     var handle by remember { mutableStateOf("") }
     var isSigningIn by remember { mutableStateOf(false) }
+    var showCredits by remember { mutableStateOf(false) }
+    val appVersion = remember { appVersionString(context) }
+
+    if (showCredits) {
+        CreditsView(
+            appVersion = appVersion,
+            onDismiss = { showCredits = false },
+            isAuthenticated = false,
+        )
+    }
 
     LaunchedEffect(Unit) {
         viewModel.authUrl.collect { url ->
@@ -137,6 +149,12 @@ fun LoginScreen(
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             modifier = Modifier.fillMaxWidth(),
         )
+
+        Spacer(Modifier.height(16.dp))
+
+        TextButton(onClick = { showCredits = true }) {
+            Text("About Inkwell")
+        }
     }
 }
 

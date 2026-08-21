@@ -99,7 +99,7 @@ Note that `./gradlew test` does **not** include these. The KMP `jvm()` target ex
 
 ### iOS
 
-`iOS/InkwellTests/StandardSiteTests.swift` holds nine tests covering the Inkwell NSID namespace, AT-URI rejection of malformed values, publication/document association and canonical URLs, verification endpoint paths, standard.site wire keys, search v2 decoding, notification JSON round-tripping, and tolerant decoding of malformed records.
+`iOS/InkwellTests/StandardSiteTests.swift` holds nine tests covering the Inkwell NSID namespace, AT-URI rejection of malformed values, publication/document association and canonical URLs, verification endpoint paths, standard.site wire keys, search v2 decoding, notification JSON round-tripping, and tolerant decoding of malformed records. `iOS/InkwellTests/BSkyListModelsTests.swift` adds three more over `app.bsky.graph.getList` decoding and the supporters-list AT-URI, mirroring Android's `BlueskyListModelsTest`.
 
 ```bash
 xcodebuild -project iOS/Inkwell.xcodeproj -scheme Inkwell \
