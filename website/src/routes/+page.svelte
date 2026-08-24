@@ -454,10 +454,15 @@
     <details class="faq-item">
       <summary>Is Android ready?</summary>
       <p>
-        It's still labelled experimental, but it's close behind iOS: reading,
-        discovery, writing in any Standard.site format, comments, verification,
-        and background notifications all work. iOS remains the primary,
-        more polished implementation.
+        Yes, for normal use. Android now covers the core Inkwell experience:
+        reading and discovery, publishing and editing across the supported
+        Standard.site formats, comments and interactions, subscriptions and
+        recommendations, verification, notifications, settings, and
+        accessibility and customisation controls. It is still labelled
+        experimental because its Android-specific automated coverage is
+        comparatively thin and a few platform gaps remain, including feed-card
+        verification for documents whose publication is identified by an AT URI.
+        iOS remains the primary, more polished implementation.
       </p>
     </details>
     <details class="faq-item">
@@ -477,12 +482,13 @@
 <section class="site-container py-12">
   <h2 class="section-title">Availability</h2>
   <div class="callout">
-    <h3>iOS first, Android close behind</h3>
+    <h3>iOS primary, Android usable today</h3>
     <p class="text-pretty">
-      Inkwell&rsquo;s iOS app is the primary implementation. The Android app is
-      still labelled experimental, but reading, discovery, writing across
-      every Standard.site format, comments, verification, and background
-      notifications are all implemented and usable today.
+      Inkwell&rsquo;s iOS app remains the primary and more polished implementation,
+      but Android now covers the core reading, discovery, writing, interaction,
+      verification, notification, settings, and accessibility flows. Android is
+      still labelled experimental while its platform-specific testing and the
+      remaining edge cases catch up.
     </p>
   </div>
 </section>
