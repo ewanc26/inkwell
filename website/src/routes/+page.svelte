@@ -8,7 +8,13 @@
 
 <script lang="ts">
   import { reveal } from "$lib/motion";
-  import { SITE, ALTSTORE_SOURCE_LINK, FDROID_REPO_LINK } from "$lib/config";
+  import {
+    SITE,
+    ALTSTORE_SOURCE_LINK,
+    FDROID_REPO_LINK,
+    APP_STORE_PLACEHOLDER_LINK,
+    PLAY_STORE_PLACEHOLDER_LINK,
+  } from "$lib/config";
   import {
     BookOpen,
     Compass,
@@ -126,49 +132,71 @@
     Get Inkwell
   </h2>
   <p class="mb-12 max-w-[42rem] text-lg leading-relaxed text-pretty">
-    No App Store, no Play Store — Inkwell installs straight from its own
-    hosted sources, so updates ship the moment they&rsquo;re built.
+    Free direct installs are available now through AltStore Classic and F-Droid.
+    £5 App Store and Google Play builds are planned; the store links below are
+    placeholders until those listings go live.
   </p>
 
   <div class="feature-grid">
     <div class="feature-card reveal" use:reveal={0}>
       <div class="feature-icon"><Apple class="h-5 w-5" /></div>
-      <h3>iOS, via AltStore</h3>
+      <h3>iOS</h3>
       <p>
-        Inkwell ships through its own AltStore source rather than the App
-        Store. Add the source once and AltStore keeps the app updated
-        over the air.
+        Install Inkwell free through its self-hosted AltStore Classic source.
+        A £5 App Store build is planned as an optional mainstream install route.
       </p>
-      <a href={ALTSTORE_SOURCE_LINK} class="btn btn-primary active-press">
-        <Download class="h-4 w-4" />
-        Add AltStore source
-      </a>
+      <div class="flex flex-wrap gap-3">
+        <a href={ALTSTORE_SOURCE_LINK} class="btn btn-primary active-press">
+          <Download class="h-4 w-4" />
+          Add AltStore source
+        </a>
+        <a
+          href={APP_STORE_PLACEHOLDER_LINK}
+          class="btn btn-outline active-press"
+          aria-label="App Store listing placeholder — planned £5 build"
+        >
+          <Apple class="h-4 w-4" />
+          App Store — planned £5
+        </a>
+      </div>
       <p class="mt-3 text-sm text-muted">
         This source works with
         <a href="https://altstore.io" class="text-accent underline">AltStore Classic</a> —
         the free, worldwide sideloading AltStore (requires a computer for the
-        first install, apps refresh every 7 days). It will
-        <em>not</em> work in AltStore PAL, which only installs Apple-notarized
-        marketplace apps.
+        first install, apps refresh every 7 days). The App Store button currently
+        points at a placeholder listing URL and will be replaced when the paid
+        listing exists.
       </p>
     </div>
 
     <div class="feature-card reveal" use:reveal={0}>
       <div class="feature-icon"><Smartphone class="h-5 w-5" /></div>
-      <h3>Android, via F-Droid</h3>
+      <h3>Android</h3>
       <p>
-        The experimental Android port is built with Jetpack Compose and
-        Material 3. Add this self-hosted repo in F-Droid, Droid-ify, or
-        Obtainium to install it and receive updates.
+        Install the experimental Android build free from Inkwell&rsquo;s self-hosted
+        F-Droid repository. A £5 Google Play build is planned as an optional
+        mainstream install route.
       </p>
-      <a href={FDROID_REPO_LINK} class="btn btn-primary active-press">
-        <Download class="h-4 w-4" />
-        Add F-Droid repo
-      </a>
+      <div class="flex flex-wrap gap-3">
+        <a href={FDROID_REPO_LINK} class="btn btn-primary active-press">
+          <Download class="h-4 w-4" />
+          Add F-Droid repo
+        </a>
+        <a
+          href={PLAY_STORE_PLACEHOLDER_LINK}
+          class="btn btn-outline active-press"
+          aria-label="Google Play listing placeholder — planned £5 build"
+        >
+          <Smartphone class="h-4 w-4" />
+          Google Play — planned £5
+        </a>
+      </div>
       <p class="mt-3 text-sm text-muted">
         Or open
         <a href="/fdroid/repo" class="text-accent underline">inkwell.ewancroft.uk/fdroid/repo</a>
-        directly to browse it or scan its QR code. Source on
+        directly to browse it or scan its QR code. The Google Play button uses
+        the expected package URL as a placeholder until the listing is live.
+        Source on
         <a href="https://github.com/ewanc26/inkwell" class="text-accent underline"
           >GitHub</a
         >.
@@ -426,11 +454,11 @@
       <summary>Is Inkwell in the App Store or Play Store?</summary>
       <p>
         Not yet. Inkwell installs from its own self-hosted AltStore source
-        (iOS) or F-Droid repository (Android) — see the
-        <a href="/#download">download section</a> above for both. Getting
-        into the App Store and Play Store is a genuine goal, not a
-        deliberate choice to stay off them — it's held back by the
-        developer account fees, not by anything about how Inkwell works.
+        (iOS) or F-Droid repository (Android). The
+        <a href="/#download">download section</a> includes the planned £5
+        App Store and Google Play routes too, but those buttons currently use
+        placeholder listing URLs until the real store pages exist. AltStore
+        Classic and F-Droid remain the free install routes.
       </p>
     </details>
     <details class="faq-item">

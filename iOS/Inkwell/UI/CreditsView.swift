@@ -140,8 +140,7 @@ struct CreditsView: View {
                 } header: {
                     Text("Support")
                 }
-                
-                // MARK: - New Legal Section
+
                 Section {
                     NavigationLink(destination: LegalDocumentView(documentType: .privacyPolicy)) {
                         Text("Privacy Policy")
@@ -149,8 +148,11 @@ struct CreditsView: View {
                     NavigationLink(destination: LegalDocumentView(documentType: .termsOfService)) {
                         Text("Terms of Service")
                     }
-                    Text("AGPL 3.0 License")
-                        .foregroundStyle(.secondary)
+                    creditRow(
+                        title: "AGPL-3.0 with App Store Exception",
+                        detail: "Open-source licence and store-distribution permission",
+                        url: "https://github.com/ewanc26/inkwell/blob/main/APP_STORE_EXCEPTION.md"
+                    )
                 } header: {
                     Text("Legal")
                 }
