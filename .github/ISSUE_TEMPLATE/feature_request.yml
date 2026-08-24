@@ -4,15 +4,17 @@ title: "[Feature] "
 labels: ["enhancement"]
 body:
   - type: dropdown
-    id: platform
+    id: area
     attributes:
-      label: Platform
-      description: Which client should this apply to?
+      label: Area
+      description: Which part of the project should this apply to?
       options:
         - iOS
         - Android
         - Website
-        - All
+        - Shared (KMP)
+        - Tooling / CI
+        - Other
     validations:
       required: true
   - type: textarea
