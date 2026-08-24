@@ -16,5 +16,9 @@ object XrpcEndpoints {
     const val ACTOR_GET_PROFILE = "/xrpc/app.bsky.actor.getProfile"
     const val FEED_GET_POSTS = "/xrpc/app.bsky.feed.getPosts"
     const val GRAPH_GET_LIST = "/xrpc/app.bsky.graph.getList"
+    const val GRAPH_MUTE_ACTOR = "/xrpc/app.bsky.graph.muteActor"
+    const val GRAPH_UNMUTE_ACTOR = "/xrpc/app.bsky.graph.unmuteActor"
+    const val GRAPH_GET_MUTES = "/xrpc/app.bsky.graph.getMutes"
+    const val GRAPH_GET_BLOCKS = "/xrpc/app.bsky.graph.getBlocks"
     const val MICROCOSM_GET_BACKLINKS = "/xrpc/blue.microcosm.links.getBacklinks"
 }

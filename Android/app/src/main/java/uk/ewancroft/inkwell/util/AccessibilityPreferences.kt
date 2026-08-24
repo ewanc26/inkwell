@@ -15,6 +15,7 @@ object AccessibilityPreferences {
     private const val BOLD_TEXT_KEY = "bold_text"
     private const val INCREASE_CONTRAST_KEY = "increase_contrast"
     private const val UNDERLINE_LINKS_KEY = "underline_links"
+    private const val HAPTICS_ENABLED_KEY = "haptics_enabled"
 
     private fun prefs(context: Context) = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
@@ -48,12 +49,20 @@ object AccessibilityPreferences {
         prefs(context).edit().putBoolean(UNDERLINE_LINKS_KEY, enabled).apply()
     }
 
+    /** Mirrors iOS's HapticsSettings, which also defaults to true. */
+    fun getHapticsEnabled(context: Context): Boolean = prefs(context).getBoolean(HAPTICS_ENABLED_KEY, true)
+
+    fun setHapticsEnabled(context: Context, enabled: Boolean) {
+        prefs(context).edit().putBoolean(HAPTICS_ENABLED_KEY, enabled).apply()
+    }
+
     fun resetToDefaults(context: Context) {
         prefs(context).edit()
             .putFloat(FONT_SIZE_SCALE_KEY, 1.0f)
             .putBoolean(BOLD_TEXT_KEY, false)
             .putBoolean(INCREASE_CONTRAST_KEY, false)
             .putBoolean(UNDERLINE_LINKS_KEY, true)
+            .putBoolean(HAPTICS_ENABLED_KEY, true)
             .apply()
     }
 }

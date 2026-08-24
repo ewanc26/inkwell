@@ -44,6 +44,9 @@ struct ReadView: View {
     @State var isSubmittingRecommend = false
     @State var actionMessage: String?
 
+    // Local read/bookmark tracking — see ArticleStateStore.swift.
+    @State var articleState = ArticleStateStore.shared
+
     // Comment state
     @State var comments: [CommentEntry] = []
     @State var newCommentText = ""
@@ -73,6 +76,9 @@ struct ReadView: View {
         }
         return document.site
     }
+
+    /// The stable identifier local read/bookmark state is keyed on.
+    var articleID: String? { documentURI ?? resolvedDocumentURI }
 
     var body: some View {
         ScrollView {
@@ -385,6 +391,7 @@ struct ReadView: View {
         // set in type below, so repeating it would just be noise.
         .navigationTitle(publication?.name ?? document.title)
         .navigationBarTitleDisplayMode(.inline)
+        .inAppLinkHandling()
         .toolbar {
             if let url = document.canonicalURL(publication: publication) {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -402,6 +409,9 @@ struct ReadView: View {
         }
         .task(id: documentURI) {
             await loadActionState()
+        }
+        .task(id: articleID) {
+            markAsReadIfNeeded()
         }
     }
 }

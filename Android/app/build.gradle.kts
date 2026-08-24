@@ -132,6 +132,7 @@ dependencies {
 
     implementation(libs.browser)
     implementation(libs.security.crypto)
+    implementation(libs.core.ktx)
 
     // Dagger 2.57+ unshaded kotlin-metadata-jvm; add explicit version for Kotlin 2.3.0 support
     ksp("org.jetbrains.kotlin:kotlin-metadata-jvm:2.3.0")

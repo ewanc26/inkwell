@@ -259,7 +259,7 @@ final class ReaderFeedStore {
                     authorProfile: ownProfile
                 )
             }
-            yours.sort(by: ReaderFeedItem.newestFirst)
+            yours.sort(by: ReaderFeedItem.comparator(for: ReaderSortSettings.shared.sortOrder))
         } catch {
             yoursError = error.localizedDescription
         }
@@ -270,7 +270,7 @@ final class ReaderFeedStore {
     private func deduplicated(_ items: [ReaderFeedItem]) -> [ReaderFeedItem] {
         var seen = Set<String>()
         return items
-            .sorted(by: ReaderFeedItem.newestFirst)
+            .sorted(by: ReaderFeedItem.comparator(for: ReaderSortSettings.shared.sortOrder))
             .filter { seen.insert($0.id).inserted }
     }
 }
@@ -284,5 +284,16 @@ struct ReaderFeedItem: Identifiable {
 
     nonisolated static func newestFirst(_ lhs: Self, _ rhs: Self) -> Bool {
         lhs.document.record.publishedAt > rhs.document.record.publishedAt
+    }
+
+    nonisolated static func oldestFirst(_ lhs: Self, _ rhs: Self) -> Bool {
+        lhs.document.record.publishedAt < rhs.document.record.publishedAt
+    }
+
+    nonisolated static func comparator(for sortOrder: ReaderSortOrder) -> (Self, Self) -> Bool {
+        switch sortOrder {
+        case .newestFirst: newestFirst
+        case .oldestFirst: oldestFirst
+        }
     }
 }

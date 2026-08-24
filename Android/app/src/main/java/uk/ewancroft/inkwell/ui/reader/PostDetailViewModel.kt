@@ -1,9 +1,11 @@
 package uk.ewancroft.inkwell.ui.reader
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,12 +39,14 @@ import uk.ewancroft.inkwell.data.repository.deleteSubscription
 import uk.ewancroft.inkwell.data.repository.fetchComments
 import uk.ewancroft.inkwell.data.repository.fetchRecommends
 import uk.ewancroft.inkwell.data.repository.fetchSubscriptions
+import uk.ewancroft.inkwell.util.ArticleStatePreferences
 import javax.inject.Inject
 
 @HiltViewModel
 class PostDetailViewModel @Inject constructor(
     internal val pdsRepository: PdsRepository,
     private val constellationClient: ConstellationClient,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
@@ -123,7 +127,9 @@ class PostDetailViewModel @Inject constructor(
                     lostContent = parseResult.lost,
                     publicationUri = pubUri,
                     documentTheme = docTheme,
+                    isBookmarked = ArticleStatePreferences.isBookmarked(context, uri),
                 )
+                ArticleStatePreferences.markAsRead(context, uri, title ?: "")
 
                 if (pubUri != null) {
                     verify(documentURI = uri, site = site!!, title = title, path = path, publishedAt = publishedAt)
@@ -324,6 +330,14 @@ class PostDetailViewModel @Inject constructor(
 
     fun dismissSubscriptionError() {
         _uiState.value = _uiState.value.copy(subscriptionError = null)
+    }
+
+    fun toggleBookmark() {
+        val state = _uiState.value
+        if (state.uri.isBlank()) return
+        val newValue = !state.isBookmarked
+        ArticleStatePreferences.setBookmarked(context, state.uri, state.title ?: "", newValue)
+        _uiState.value = _uiState.value.copy(isBookmarked = newValue)
     }
 
     private fun loadPublicationTheme(publicationUri: String) {

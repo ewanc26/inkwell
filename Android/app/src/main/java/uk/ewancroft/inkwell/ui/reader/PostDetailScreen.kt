@@ -91,7 +91,7 @@ fun PostDetailScreen(
                             )
                         }
                         IconButton(onClick = {
-                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(canonicalUrl)))
+                            uk.ewancroft.inkwell.util.LinkPreferences.openContentUrl(context, canonicalUrl)
                         }) {
                             Icon(
                                 Icons.AutoMirrored.Outlined.OpenInNew,
@@ -116,6 +116,7 @@ fun PostDetailScreen(
                 readerTheme = readerTheme,
                 onToggleSubscription = { viewModel.toggleSubscription() },
                 onToggleRecommend = { viewModel.toggleRecommend() },
+                onToggleBookmark = { viewModel.toggleBookmark() },
                 previousUri = uiState.previousUri,
                 previousTitle = uiState.previousTitle,
                 nextUri = uiState.nextUri,
