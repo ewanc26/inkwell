@@ -20,7 +20,7 @@ Temporary Items
 *.icloud
 
 # ── iOS / Xcode ─────────────────────────────────────────────────────
-iOS/Inkwell.xcodeproj/project.xcworkspace/xcuserdata/ewan.xcuserdatad/UserInterfaceState.xcuserstate
+iOS/Inkwell.xcodeproj/**/xcuserdata/
 iOS/.letta/
 iOS/build/
 iOS/DerivedData/
@@ -36,7 +36,6 @@ iOS/*.xccheckout
 iOS/*.moved-aside
 iOS/*.pbxuser
 !iOS/Inkwell.xcodeproj/
-iOS/Inkwell.xcodeproj/xcuserdata/
 iOS/.swiftpm/
 Packages/
 Package.resolved
