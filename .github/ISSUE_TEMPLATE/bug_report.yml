@@ -4,15 +4,17 @@ title: "[Bug] "
 labels: ["bug"]
 body:
   - type: dropdown
-    id: platform
+    id: area
     attributes:
-      label: Platform
-      description: Which client is affected?
+      label: Area
+      description: Which part of the project is affected?
       options:
         - iOS
         - Android
         - Website
-        - All
+        - Shared (KMP)
+        - Tooling / CI
+        - Other
     validations:
       required: true
   - type: textarea
