@@ -434,12 +434,51 @@
       </p>
     </details>
     <details class="faq-item">
+      <summary>Do I need a Bluesky account?</summary>
+      <p>
+        No. Inkwell needs an AT Protocol account and a PDS, not specifically
+        an account hosted by Bluesky. A Bluesky-hosted account works, but so
+        does an account on another compatible PDS or one you self-host. You
+        sign in with your AT Protocol handle through OAuth.
+      </p>
+    </details>
+    <details class="faq-item">
+      <summary>Which publishing formats does Inkwell support?</summary>
+      <p>
+        Inkwell reads and publishes Markpub Markdown, Leaflet, pckt, and
+        Offprint content. It renders those formats natively and keeps portable
+        <code>textContent</code> available as a fallback when a client does not
+        understand the richer body format. See <a href="/features">Features</a>
+        for the format-by-format detail.
+      </p>
+    </details>
+    <details class="faq-item">
+      <summary>Can I edit documents I already published?</summary>
+      <p>
+        Yes. Inkwell can open existing documents for editing and publish an
+        updated revision back to your repository. If you choose to convert a
+        document between formats, the editor reports content that cannot
+        round-trip cleanly before you publish the conversion.
+      </p>
+    </details>
+    <details class="faq-item">
       <summary>What happens to my writing if Inkwell shuts down?</summary>
       <p>
         Nothing happens to it — your documents are AT Protocol records in
         your own repository on your PDS, not data stored by Inkwell. Any
         client that speaks the Standard.site record schemas can read or
         edit them, with or without Inkwell.
+      </p>
+    </details>
+    <details class="faq-item">
+      <summary>Does Inkwell store my writing or account on its own servers?</summary>
+      <p>
+        No. Inkwell reads and writes your content directly on your PDS and has
+        no intermediary database of your documents. Your OAuth session and
+        DPoP key are stored on your device in the platform's secure storage;
+        the app contains no analytics or tracking SDK. See
+        <a href="/security">Security</a> and <a href="/privacy">Privacy</a>
+        for the full detail.
       </p>
     </details>
     <details class="faq-item">
@@ -452,12 +491,44 @@
       </p>
     </details>
     <details class="faq-item">
+      <summary>How do notifications work?</summary>
+      <p>
+        Inkwell does not send your subscriptions to a push-notification
+        service. The app periodically checks the publications you follow and
+        creates local notifications on your device when it finds new
+        documents. You can turn the OS banners off without losing the in-app
+        notification history.
+      </p>
+    </details>
+    <details class="faq-item">
+      <summary>Can I use the same account on iOS and Android?</summary>
+      <p>
+        Yes. Sign in to the same AT Protocol account and both apps read the
+        same repository-backed publications, documents, subscriptions, and
+        recommendations from your PDS. Device-local preferences such as
+        appearance, accessibility, and notification settings are configured
+        separately on each device.
+      </p>
+    </details>
+    <details class="faq-item">
+      <summary>What versions of iOS and Android are supported?</summary>
+      <p>
+        The iOS app supports iOS 18 and later. The Android app supports
+        Android 8.0 (API 26) and later, and currently targets Android API 36.
+      </p>
+    </details>
+    <details class="faq-item">
       <summary>Is Android ready?</summary>
       <p>
-        It's still labelled experimental, but it's close behind iOS: reading,
-        discovery, writing in any Standard.site format, comments, verification,
-        and background notifications all work. iOS remains the primary,
-        more polished implementation.
+        Yes, for normal use. Android now covers the core Inkwell experience:
+        reading and discovery, publishing and editing across the supported
+        Standard.site formats, comments and interactions, subscriptions and
+        recommendations, verification, notifications, settings, and
+        accessibility and customisation controls. It is still labelled
+        experimental because its Android-specific automated coverage is
+        comparatively thin and a few platform gaps remain, including feed-card
+        verification for documents whose publication is identified by an AT URI.
+        iOS remains the primary, more polished implementation.
       </p>
     </details>
     <details class="faq-item">
@@ -477,12 +548,13 @@
 <section class="site-container py-12">
   <h2 class="section-title">Availability</h2>
   <div class="callout">
-    <h3>iOS first, Android close behind</h3>
+    <h3>iOS primary, Android usable today</h3>
     <p class="text-pretty">
-      Inkwell&rsquo;s iOS app is the primary implementation. The Android app is
-      still labelled experimental, but reading, discovery, writing across
-      every Standard.site format, comments, verification, and background
-      notifications are all implemented and usable today.
+      Inkwell&rsquo;s iOS app remains the primary and more polished implementation,
+      but Android now covers the core reading, discovery, writing, interaction,
+      verification, notification, settings, and accessibility flows. Android is
+      still labelled experimental while its platform-specific testing and the
+      remaining edge cases catch up.
     </p>
   </div>
 </section>
