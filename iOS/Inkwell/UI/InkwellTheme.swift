@@ -57,37 +57,45 @@ enum InkwellMotion {
 /// and SwiftUI's `sensoryFeedback` (for declarative use).
 enum InkwellHaptics {
 
+    private static var isEnabled: Bool { HapticsSettings.shared.enabled }
+
     /// Light tap — button presses, cell selection, toggle switches.
     /// The most common haptic. Subtle, like a pen touching paper.
     @MainActor static func light() {
+        guard isEnabled else { return }
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
     }
 
     /// Medium press — publish button, confirmations, destructive warnings.
     /// Noticeable but not alarming.
     @MainActor static func medium() {
+        guard isEnabled else { return }
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
     }
 
     /// Success — subscription confirmed, post published, comment posted.
     /// A warm pulse that says "well done."
     @MainActor static func success() {
+        guard isEnabled else { return }
         UINotificationFeedbackGenerator().notificationOccurred(.success)
     }
 
     /// Warning — verification failed, something needs attention.
     @MainActor static func warning() {
+        guard isEnabled else { return }
         UINotificationFeedbackGenerator().notificationOccurred(.warning)
     }
 
     /// Error — publish failed, network error, authentication failure.
     @MainActor static func error() {
+        guard isEnabled else { return }
         UINotificationFeedbackGenerator().notificationOccurred(.error)
     }
 
     /// Selection change — tab switches, picker value changes.
     /// A subtle tick, like a fountain pen's click.
     @MainActor static func selection() {
+        guard isEnabled else { return }
         UISelectionFeedbackGenerator().selectionChanged()
     }
 }
@@ -103,7 +111,7 @@ struct ConditionalHaptic<T: Equatable>: ViewModifier {
     let trigger: T
 
     func body(content: Content) -> some View {
-        if active {
+        if active && HapticsSettings.shared.enabled {
             content.sensoryFeedback(.success, trigger: trigger)
         } else {
             content
@@ -124,7 +132,7 @@ extension View {
     /// confirmations.
     func inkwellCelebrate<V: Equatable>(value: V) -> some View {
         self
-            .sensoryFeedback(.success, trigger: value)
+            .sensoryFeedback(.success, trigger: value, condition: { _, _ in HapticsSettings.shared.enabled })
             .animation(InkwellMotion.celebrate, value: value)
     }
 

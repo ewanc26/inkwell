@@ -83,6 +83,20 @@ extension ReadView {
             }
             .disabled(isSubmittingRecommend)
         }
+
+        if let articleID {
+            let isBookmarked = articleState.isBookmarked(articleID)
+            ReaderActionPill(
+                icon: isBookmarked ? "bookmark.fill" : "bookmark",
+                label: isBookmarked ? "Bookmarked" : "Bookmark",
+                isActive: isBookmarked,
+                isLoading: false,
+                tint: accentColor,
+                activeForeground: theme.accentForeground
+            ) {
+                toggleBookmark(articleID: articleID)
+            }
+        }
     }
 
     // MARK: - Action State
@@ -218,6 +232,21 @@ extension ReadView {
         }
 
         self.isLoading = false
+    }
+
+    // MARK: - Local Read / Bookmark State
+
+    func markAsReadIfNeeded() {
+        guard let articleID else { return }
+        articleState.markAsRead(articleID, title: document.title)
+    }
+
+    func toggleBookmark(articleID: String) {
+        articleState.setBookmarked(
+            articleID,
+            title: document.title,
+            bookmarked: !articleState.isBookmarked(articleID)
+        )
     }
 
     func verifySource() async {

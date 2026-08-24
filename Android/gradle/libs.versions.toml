@@ -25,6 +25,7 @@ hilt-navigation-compose = "1.2.0"
 
 browser = "1.8.0"
 security-crypto = "1.1.0-alpha06"
+core-ktx = "1.13.1"
 
 work = "2.9.1"
 hilt-work = "1.2.0"
@@ -72,6 +73,7 @@ atproto-compose-material3 = { module = "io.github.kikin81.atproto:compose-materi
 
 browser = { group = "androidx.browser", name = "browser", version.ref = "browser" }
 security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "security-crypto" }
+core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
 
 work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "work" }
 hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "hilt-work" }

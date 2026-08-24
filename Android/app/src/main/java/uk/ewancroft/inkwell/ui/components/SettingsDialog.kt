@@ -45,9 +45,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.content.FileProvider
 import uk.ewancroft.inkwell.shared.theme.SharedReaderTheme
+import uk.ewancroft.inkwell.ui.moderation.MutedBlockedDialog
 import uk.ewancroft.inkwell.util.AccessibilityPreferences
+import uk.ewancroft.inkwell.util.ArticleStatePreferences
 import uk.ewancroft.inkwell.util.CustomisationPreferences
+import uk.ewancroft.inkwell.util.ImageCacheManager
+import uk.ewancroft.inkwell.util.LinkPreferences
+import uk.ewancroft.inkwell.util.ReaderPreferences
+import uk.ewancroft.inkwell.util.rememberInkwellHaptics
+import java.io.File
 
 /**
  * The app's actual settings surface: notifications, legal, and about, in
@@ -68,7 +76,9 @@ fun SettingsDialog(
     var legalDocument by remember { mutableStateOf<LegalDocumentType?>(null) }
     var showAbout by remember { mutableStateOf(false) }
     var isConfirmingSignOut by remember { mutableStateOf(false) }
+    var showMutedBlocked by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val haptics = rememberInkwellHaptics()
 
     var accentColorHex by remember { mutableStateOf(CustomisationPreferences.getAccentColorHex(context)) }
     var fontFamilyOverride by remember { mutableStateOf(CustomisationPreferences.getFontFamilyOverride(context)) }
@@ -81,10 +91,17 @@ fun SettingsDialog(
         }
     }
 
+    var sortOrder by remember { mutableStateOf(ReaderPreferences.getSortOrder(context)) }
+
     var fontSizeScale by remember { mutableStateOf(AccessibilityPreferences.getFontSizeScale(context)) }
     var boldText by remember { mutableStateOf(AccessibilityPreferences.getBoldText(context)) }
     var increaseContrast by remember { mutableStateOf(AccessibilityPreferences.getIncreaseContrast(context)) }
     var underlineLinks by remember { mutableStateOf(AccessibilityPreferences.getUnderlineLinks(context)) }
+    var hapticsEnabled by remember { mutableStateOf(AccessibilityPreferences.getHapticsEnabled(context)) }
+
+    var openLinksInApp by remember { mutableStateOf(LinkPreferences.getOpenLinksInApp(context)) }
+
+    var cacheSizeBytes by remember { mutableStateOf(ImageCacheManager.currentSizeBytes(context)) }
 
     legalDocument?.let { documentType ->
         LegalDocumentDialog(documentType = documentType, onDismiss = { legalDocument = null })
@@ -92,6 +109,10 @@ fun SettingsDialog(
 
     if (showAbout) {
         CreditsView(appVersion = appVersion, onSignOut = onSignOut, onDismiss = { showAbout = false })
+    }
+
+    if (showMutedBlocked) {
+        MutedBlockedDialog(onDismiss = { showMutedBlocked = false })
     }
 
     if (isConfirmingSignOut) {
@@ -102,6 +123,7 @@ fun SettingsDialog(
             confirmButton = {
                 TextButton(onClick = {
                     isConfirmingSignOut = false
+                    haptics.medium()
                     onSignOut()
                 }) {
                     Text("Sign Out")
@@ -191,6 +213,42 @@ fun SettingsDialog(
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
+                    SectionHeader("Reader")
+                    Text(
+                        "Sort Order",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                    )
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        FilterChip(
+                            selected = sortOrder == ReaderPreferences.SortOrder.NEWEST_FIRST,
+                            onClick = {
+                                sortOrder = ReaderPreferences.SortOrder.NEWEST_FIRST
+                                ReaderPreferences.setSortOrder(context, ReaderPreferences.SortOrder.NEWEST_FIRST)
+                            },
+                            label = { Text("Newest First") },
+                        )
+                        FilterChip(
+                            selected = sortOrder == ReaderPreferences.SortOrder.OLDEST_FIRST,
+                            onClick = {
+                                sortOrder = ReaderPreferences.SortOrder.OLDEST_FIRST
+                                ReaderPreferences.setSortOrder(context, ReaderPreferences.SortOrder.OLDEST_FIRST)
+                            },
+                            label = { Text("Oldest First") },
+                        )
+                    }
+                    Text(
+                        "Controls the order documents appear in your reader feed.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    )
+
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
                     SectionHeader("Accessibility")
                     Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
                         Text("Text Size", style = MaterialTheme.typography.bodyLarge)
@@ -241,6 +299,18 @@ fun SettingsDialog(
                         },
                     )
                     SettingsRow(
+                        title = "Haptics",
+                        trailing = {
+                            Switch(
+                                checked = hapticsEnabled,
+                                onCheckedChange = {
+                                    hapticsEnabled = it
+                                    AccessibilityPreferences.setHapticsEnabled(context, it)
+                                },
+                            )
+                        },
+                    )
+                    SettingsRow(
                         title = "Reset to Defaults",
                         titleColor = MaterialTheme.colorScheme.error,
                         onClick = {
@@ -248,7 +318,9 @@ fun SettingsDialog(
                             boldText = false
                             increaseContrast = false
                             underlineLinks = true
+                            hapticsEnabled = true
                             AccessibilityPreferences.resetToDefaults(context)
+                            haptics.light()
                         },
                     )
                     Text(
@@ -361,6 +433,66 @@ fun SettingsDialog(
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
+                    SectionHeader("Storage")
+                    SettingsRow(title = "Image Cache", trailing = { Text(formatCacheSize(cacheSizeBytes)) })
+                    SettingsRow(
+                        title = "Clear Cache",
+                        titleColor = MaterialTheme.colorScheme.error,
+                        onClick = {
+                            ImageCacheManager.clear(context)
+                            cacheSizeBytes = ImageCacheManager.currentSizeBytes(context)
+                        },
+                    )
+
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+                    SectionHeader("Data")
+                    SettingsRow(
+                        title = "Export Data",
+                        onClick = {
+                            val exportsDir = File(context.cacheDir, "exports").apply { mkdirs() }
+                            val file = File(exportsDir, "inkwell-reading-data.json")
+                            file.writeText(ArticleStatePreferences.exportJson(context))
+                            val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+                            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                type = "application/json"
+                                putExtra(Intent.EXTRA_STREAM, uri)
+                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            }
+                            context.startActivity(Intent.createChooser(shareIntent, "Export Reading Data"))
+                        },
+                    )
+                    Text(
+                        "Exports your locally tracked read and bookmarked articles as a JSON file. This never leaves your device unless you choose to share it.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    )
+
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+                    SectionHeader("Links")
+                    SettingsRow(
+                        title = "Open Links In-App",
+                        trailing = {
+                            Switch(
+                                checked = openLinksInApp,
+                                onCheckedChange = {
+                                    openLinksInApp = it
+                                    LinkPreferences.setOpenLinksInApp(context, it)
+                                },
+                            )
+                        },
+                    )
+                    Text(
+                        "Article and post links open in an in-app browser instead of leaving Inkwell. This doesn't affect sign-in or the links above, which always open in your default browser.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    )
+
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
                     SectionHeader("Legal")
                     SettingsRow(title = "Privacy Policy", onClick = { legalDocument = LegalDocumentType.PrivacyPolicy })
                     SettingsRow(title = "Terms of Service", onClick = { legalDocument = LegalDocumentType.TermsOfService })
@@ -374,9 +506,19 @@ fun SettingsDialog(
 
                     SectionHeader("Account")
                     SettingsRow(
+                        title = "Muted & Blocked",
+                        onClick = {
+                            haptics.light()
+                            showMutedBlocked = true
+                        },
+                    )
+                    SettingsRow(
                         title = "Sign Out",
                         titleColor = MaterialTheme.colorScheme.error,
-                        onClick = { isConfirmingSignOut = true },
+                        onClick = {
+                            haptics.light()
+                            isConfirmingSignOut = true
+                        },
                     )
 
                     Text(
@@ -389,6 +531,11 @@ fun SettingsDialog(
             }
         }
     }
+}
+
+private fun formatCacheSize(bytes: Long): String {
+    val mb = bytes / (1024.0 * 1024.0)
+    return if (mb < 0.1) "Empty" else "%.1f MB".format(mb)
 }
 
 @Composable
