@@ -434,6 +434,34 @@
       </p>
     </details>
     <details class="faq-item">
+      <summary>Do I need a Bluesky account?</summary>
+      <p>
+        No. Inkwell needs an AT Protocol account and a PDS, not specifically
+        an account hosted by Bluesky. A Bluesky-hosted account works, but so
+        does an account on another compatible PDS or one you self-host. You
+        sign in with your AT Protocol handle through OAuth.
+      </p>
+    </details>
+    <details class="faq-item">
+      <summary>Which publishing formats does Inkwell support?</summary>
+      <p>
+        Inkwell reads and publishes Markpub Markdown, Leaflet, pckt, and
+        Offprint content. It renders those formats natively and keeps portable
+        <code>textContent</code> available as a fallback when a client does not
+        understand the richer body format. See <a href="/features">Features</a>
+        for the format-by-format detail.
+      </p>
+    </details>
+    <details class="faq-item">
+      <summary>Can I edit documents I already published?</summary>
+      <p>
+        Yes. Inkwell can open existing documents for editing and publish an
+        updated revision back to your repository. If you choose to convert a
+        document between formats, the editor reports content that cannot
+        round-trip cleanly before you publish the conversion.
+      </p>
+    </details>
+    <details class="faq-item">
       <summary>What happens to my writing if Inkwell shuts down?</summary>
       <p>
         Nothing happens to it — your documents are AT Protocol records in
@@ -443,12 +471,50 @@
       </p>
     </details>
     <details class="faq-item">
+      <summary>Does Inkwell store my writing or account on its own servers?</summary>
+      <p>
+        No. Inkwell reads and writes your content directly on your PDS and has
+        no intermediary database of your documents. Your OAuth session and
+        DPoP key are stored on your device in the platform's secure storage;
+        the app contains no analytics or tracking SDK. See
+        <a href="/security">Security</a> and <a href="/privacy">Privacy</a>
+        for the full detail.
+      </p>
+    </details>
+    <details class="faq-item">
       <summary>Do I need to know AT Protocol to use this?</summary>
       <p>
         No. You'll need an AT Protocol account and a PDS to sign in with —
         Inkwell doesn't create one for you — but from there it works like
         any reading and writing app. See <a href="/about">About</a> if
         you'd like the background.
+      </p>
+    </details>
+    <details class="faq-item">
+      <summary>How do notifications work?</summary>
+      <p>
+        Inkwell does not send your subscriptions to a push-notification
+        service. The app periodically checks the publications you follow and
+        creates local notifications on your device when it finds new
+        documents. You can turn the OS banners off without losing the in-app
+        notification history.
+      </p>
+    </details>
+    <details class="faq-item">
+      <summary>Can I use the same account on iOS and Android?</summary>
+      <p>
+        Yes. Sign in to the same AT Protocol account and both apps read the
+        same repository-backed publications, documents, subscriptions, and
+        recommendations from your PDS. Device-local preferences such as
+        appearance, accessibility, and notification settings are configured
+        separately on each device.
+      </p>
+    </details>
+    <details class="faq-item">
+      <summary>What versions of iOS and Android are supported?</summary>
+      <p>
+        The iOS app supports iOS 18 and later. The Android app supports
+        Android 8.0 (API 26) and later, and currently targets Android API 36.
       </p>
     </details>
     <details class="faq-item">
