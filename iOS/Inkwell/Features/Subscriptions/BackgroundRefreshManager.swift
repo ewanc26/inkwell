@@ -96,7 +96,20 @@ final class InkwellAppDelegate: NSObject, UIApplicationDelegate {
         BackgroundRefreshManager.shared.register()
         UNUserNotificationCenter.current().delegate = NotificationDelegate.shared
         configureNavigationBar()
+        configureImageCache()
         return true
+    }
+
+    /// AsyncImage rides on URLSession's shared URLCache, which defaults to a
+    /// small (~ a few MB) memory cache backed by an unbounded-feeling disk
+    /// cache. Set explicit bounds so "cache size" is a real, controllable
+    /// thing rather than an OS black box.
+    private func configureImageCache() {
+        URLCache.shared = URLCache(
+            memoryCapacity: 20 * 1024 * 1024,
+            diskCapacity: 150 * 1024 * 1024,
+            diskPath: "inkwell_image_cache"
+        )
     }
 
     /// Match IceCubesApp's navigation bar setup: translucent bar,

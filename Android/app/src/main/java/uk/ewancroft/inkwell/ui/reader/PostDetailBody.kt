@@ -5,17 +5,20 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
+import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.HourglassEmpty
 import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,6 +29,7 @@ import coil.compose.AsyncImage
 import uk.ewancroft.inkwell.shared.verification.VerificationResult
 import uk.ewancroft.inkwell.data.model.common.StrongRef
 import uk.ewancroft.inkwell.util.formatPublishedDate
+import uk.ewancroft.inkwell.util.rememberInkwellHaptics
 
 @Composable
 internal fun PostDetailContent(
@@ -33,6 +37,7 @@ internal fun PostDetailContent(
     readerTheme: ReaderTheme,
     onToggleSubscription: () -> Unit,
     onToggleRecommend: () -> Unit,
+    onToggleBookmark: () -> Unit,
     previousUri: String?,
     previousTitle: String?,
     nextUri: String?,
@@ -158,6 +163,7 @@ internal fun PostDetailContent(
                 SubscribeRow(uiState = uiState, onToggleSubscription = onToggleSubscription)
             }
             RecommendRow(uiState = uiState, onToggleRecommend = onToggleRecommend)
+            BookmarkRow(uiState = uiState, onToggleBookmark = onToggleBookmark)
         }
 
         item {
@@ -325,6 +331,10 @@ private fun RecommendRow(uiState: PostDetailUiState, onToggleRecommend: () -> Un
 
 @Composable
 private fun SubscribeRow(uiState: PostDetailUiState, onToggleSubscription: () -> Unit) {
+    val haptics = rememberInkwellHaptics()
+    LaunchedEffect(uiState.isSubscribed) {
+        if (uiState.isSubscribed) haptics.success()
+    }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -339,7 +349,10 @@ private fun SubscribeRow(uiState: PostDetailUiState, onToggleSubscription: () ->
         } else {
             IconToggleButton(
                 checked = uiState.isSubscribed,
-                onCheckedChange = { onToggleSubscription() },
+                onCheckedChange = {
+                    haptics.light()
+                    onToggleSubscription()
+                },
             ) {
                 Icon(
                     if (uiState.isSubscribed) Icons.Filled.Notifications else Icons.Outlined.Notifications,
@@ -363,6 +376,31 @@ private fun SubscribeRow(uiState: PostDetailUiState, onToggleSubscription: () ->
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
+    }
+}
+
+@Composable
+private fun BookmarkRow(uiState: PostDetailUiState, onToggleBookmark: () -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        IconToggleButton(
+            checked = uiState.isBookmarked,
+            onCheckedChange = { onToggleBookmark() },
+        ) {
+            Icon(
+                if (uiState.isBookmarked) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                contentDescription = if (uiState.isBookmarked) "Remove bookmark" else "Bookmark",
+                tint = if (uiState.isBookmarked) MaterialTheme.colorScheme.primary
+                       else MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Text(
+            if (uiState.isBookmarked) "Bookmarked" else "Bookmark this post",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 

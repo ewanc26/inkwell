@@ -27,6 +27,15 @@ struct SettingsView: View {
     @State private var showCustomisationTipPrompt = false
 
     @State private var accessibility = AccessibilitySettings.shared
+    @State private var haptics = HapticsSettings.shared
+    @State private var linkPreferences = LinkPreferences.shared
+
+    @State private var readerSort = ReaderSortSettings.shared
+
+    @State private var cacheSizeBytes = URLCache.shared.currentDiskUsage
+
+    @State private var articleState = ArticleStateStore.shared
+    @State private var exportFileURL: URL?
 
     var body: some View {
         NavigationStack {
@@ -57,6 +66,17 @@ struct SettingsView: View {
                 }
 
                 Section {
+                    Picker("Sort Order", selection: $readerSort.sortOrder) {
+                        Text("Newest First").tag(ReaderSortOrder.newestFirst)
+                        Text("Oldest First").tag(ReaderSortOrder.oldestFirst)
+                    }
+                } header: {
+                    Text("Reader")
+                } footer: {
+                    Text("Controls the order documents appear in your reader feed.")
+                }
+
+                Section {
                     VStack(alignment: .leading) {
                         Text("Text Size")
                         Slider(value: $accessibility.fontSizeScale, in: 0.8...1.5, step: 0.1) {
@@ -70,8 +90,10 @@ struct SettingsView: View {
                     Toggle("Bold Text", isOn: $accessibility.boldText)
                     Toggle("Increase Contrast", isOn: $accessibility.increaseContrast)
                     Toggle("Underline Links", isOn: $accessibility.underlineLinks)
+                    Toggle("Haptics", isOn: $haptics.enabled)
                     Button("Reset to Defaults", role: .destructive) {
                         accessibility.resetToDefaults()
+                        haptics.enabled = true
                     }
                 } header: {
                     Text("Accessibility")
@@ -124,6 +146,36 @@ struct SettingsView: View {
                     Text("Customisation")
                 } footer: {
                     Text("Overrides apply everywhere, including publications that set their own theme. Free — if you find it useful, a tip (About → Support) helps keep Inkwell going.")
+                }
+
+                Section {
+                    Toggle("Open Links In-App", isOn: $linkPreferences.openLinksInApp)
+                } footer: {
+                    Text("Article and post links open in an in-app browser instead of leaving Inkwell. This doesn't affect sign-in or the links above, which always open in your default browser.")
+                }
+
+                Section {
+                    LabeledContent("Image Cache", value: formattedCacheSize)
+                    Button("Clear Cache", role: .destructive) {
+                        URLCache.shared.removeAllCachedResponses()
+                        cacheSizeBytes = URLCache.shared.currentDiskUsage
+                    }
+                } header: {
+                    Text("Storage")
+                }
+
+                Section {
+                    if let exportFileURL {
+                        ShareLink(item: exportFileURL) {
+                            Label("Export Data", systemImage: "square.and.arrow.up")
+                        }
+                    } else {
+                        Button("Export Data") { prepareExport() }
+                    }
+                } header: {
+                    Text("Data")
+                } footer: {
+                    Text("Exports your locally tracked read and bookmarked articles as a JSON file. This never leaves your device unless you choose to share it.")
                 }
 
                 Section("Legal") {
@@ -190,6 +242,21 @@ struct SettingsView: View {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"
         return "\(version) (\(build))"
+    }
+
+    private var formattedCacheSize: String {
+        ByteCountFormatter.string(fromByteCount: Int64(cacheSizeBytes), countStyle: .file)
+    }
+
+    private func prepareExport() {
+        guard let data = articleState.exportJSON() else { return }
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("inkwell-reading-data.json")
+        do {
+            try data.write(to: url, options: .atomic)
+            exportFileURL = url
+        } catch {
+            print("[SettingsView] prepareExport failed: \(error)")
+        }
     }
 }
 

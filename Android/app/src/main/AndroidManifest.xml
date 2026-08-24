@@ -68,5 +68,18 @@
                 <data android:scheme="uk.ewancroft.inkwell" />
             </intent-filter>
         </activity>
+
+        <!-- Grants temporary read access to the exported reading-data JSON
+             file (Settings -> Export Data) to whatever app the user shares
+             it to, without exposing the app's full storage. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 </manifest>

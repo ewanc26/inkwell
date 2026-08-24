@@ -33,6 +33,7 @@ import okhttp3.Request
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
 import uk.ewancroft.inkwell.ui.reader.MarkdownRendererView
+import uk.ewancroft.inkwell.util.rememberInkwellHaptics
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,6 +73,13 @@ fun WriterScreen(
 
     val context = androidx.compose.ui.platform.LocalContext.current
     val appVersion = remember { uk.ewancroft.inkwell.util.appVersionString(context) }
+    val haptics = rememberInkwellHaptics()
+    LaunchedEffect(uiState.publishSuccess) {
+        if (uiState.publishSuccess != null) haptics.success()
+    }
+    LaunchedEffect(uiState.publishError) {
+        if (uiState.publishError != null) haptics.error()
+    }
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
@@ -404,7 +412,10 @@ fun WriterScreen(
             }
 
             Button(
-                onClick = { viewModel.publish() },
+                onClick = {
+                    haptics.medium()
+                    viewModel.publish()
+                },
                 enabled = uiState.title.isNotBlank() && uiState.selectedPublication != null && uiState.verifiedPublicationUri != null && !uiState.isPublishing && !uiState.isVerifyingPublication,
                 modifier = Modifier.fillMaxWidth()
             ) {

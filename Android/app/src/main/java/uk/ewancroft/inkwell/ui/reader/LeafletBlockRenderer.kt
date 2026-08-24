@@ -357,12 +357,7 @@ fun ButtonBlock(block: LeafletBlock) {
     val context = androidx.compose.ui.platform.LocalContext.current
     if (url != null) {
         OutlinedButton(
-            onClick = {
-                try {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                    context.startActivity(intent)
-                } catch (_: Exception) {}
-            },
+            onClick = { uk.ewancroft.inkwell.util.LinkPreferences.openContentUrl(context, url) },
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text(text, color = MaterialTheme.colorScheme.primary)
@@ -491,8 +486,5 @@ fun UnknownBlock(block: LeafletBlock) {
 }
 
 private fun openUrl(context: android.content.Context, url: String) {
-    try {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-        context.startActivity(intent)
-    } catch (_: Exception) {}
+    uk.ewancroft.inkwell.util.LinkPreferences.openContentUrl(context, url)
 }
