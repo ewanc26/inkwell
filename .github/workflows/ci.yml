@@ -128,7 +128,6 @@ jobs:
             -project Inkwell.xcodeproj \
             -scheme Inkwell \
             -destination "platform=iOS Simulator,name=${{ steps.destination.outputs.name }}" \
-            -skip-testing:InkwellUITests \
             $action
 
   android:
@@ -148,7 +147,7 @@ jobs:
 
       - name: Build, lint, and test
         working-directory: Android
-        run: ./gradlew clean assembleDebug lint test
+        run: ./gradlew clean assembleDebug lint test :shared:jvmTest
 
   website:
     name: Website check + build
@@ -182,6 +181,10 @@ jobs:
 
       - name: Check the served AltStore manifest matches the working copy
         run: diff iOS/altstore/source.json website/static/altstore/source.json
+
+      - name: Check the served F-Droid repo matches the release repo
+        working-directory: website
+        run: diff -r Android/fdroid-repo/repo website/static/fdroid/repo
 
       - name: Build
         working-directory: website

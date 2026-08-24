@@ -21,20 +21,12 @@
 			remoteGlobalIDString = 40FF21B52FE4CA3100B4A027;
 			remoteInfo = Inkwell;
 		};
-		40FF21D22FE4CA3300B4A027 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 40FF21AE2FE4CA3100B4A027 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 40FF21B52FE4CA3100B4A027;
-			remoteInfo = Inkwell;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		40FA13512FE4DB4B0016CC0D /* ../shared/InkwellShared.xcframework */ = {isa = PBXFileReference; explicitFileType = wrapper.xcframework; path = ../shared/InkwellShared.xcframework; sourceTree = SOURCE_ROOT; };
 		40FF21B62FE4CA3100B4A027 /* Inkwell.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Inkwell.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		40FF21C72FE4CA3300B4A027 /* InkwellTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = InkwellTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		40FF21D12FE4CA3300B4A027 /* InkwellUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = InkwellUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -61,11 +53,6 @@
 			path = InkwellTests;
 			sourceTree = "<group>";
 		};
-		40FF21D42FE4CA3300B4A027 /* InkwellUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = InkwellUITests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,13 +68,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		40FF21C42FE4CA3300B4A027 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		40FF21CE2FE4CA3300B4A027 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -110,7 +90,6 @@
 			children = (
 				40FF21B82FE4CA3100B4A027 /* Inkwell */,
 				40FF21CA2FE4CA3300B4A027 /* InkwellTests */,
-				40FF21D42FE4CA3300B4A027 /* InkwellUITests */,
 				40FF21B72FE4CA3100B4A027 /* Products */,
 				408CDFD23034224900DB7469 /* Recovered References */,
 			);
@@ -121,7 +100,6 @@
 			children = (
 				40FF21B62FE4CA3100B4A027 /* Inkwell.app */,
 				40FF21C72FE4CA3300B4A027 /* InkwellTests.xctest */,
-				40FF21D12FE4CA3300B4A027 /* InkwellUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -177,29 +155,6 @@
 			productReference = 40FF21C72FE4CA3300B4A027 /* InkwellTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		40FF21D02FE4CA3300B4A027 /* InkwellUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 40FF21E22FE4CA3300B4A027 /* Build configuration list for PBXNativeTarget "InkwellUITests" */;
-			buildPhases = (
-				40FF21CD2FE4CA3300B4A027 /* Sources */,
-				40FF21CE2FE4CA3300B4A027 /* Frameworks */,
-				40FF21CF2FE4CA3300B4A027 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				40FF21D32FE4CA3300B4A027 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				40FF21D42FE4CA3300B4A027 /* InkwellUITests */,
-			);
-			name = InkwellUITests;
-			packageProductDependencies = (
-			);
-			productName = InkwellUITests;
-			productReference = 40FF21D12FE4CA3300B4A027 /* InkwellUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -214,10 +169,6 @@
 						CreatedOnToolsVersion = 26.5;
 					};
 					40FF21C62FE4CA3300B4A027 = {
-						CreatedOnToolsVersion = 26.5;
-						TestTargetID = 40FF21B52FE4CA3100B4A027;
-					};
-					40FF21D02FE4CA3300B4A027 = {
 						CreatedOnToolsVersion = 26.5;
 						TestTargetID = 40FF21B52FE4CA3100B4A027;
 					};
@@ -244,7 +195,6 @@
 			targets = (
 				40FF21B52FE4CA3100B4A027 /* Inkwell */,
 				40FF21C62FE4CA3300B4A027 /* InkwellTests */,
-				40FF21D02FE4CA3300B4A027 /* InkwellUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -258,13 +208,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		40FF21C52FE4CA3300B4A027 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		40FF21CF2FE4CA3300B4A027 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -288,13 +231,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		40FF21CD2FE4CA3300B4A027 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -302,11 +238,6 @@
 			isa = PBXTargetDependency;
 			target = 40FF21B52FE4CA3100B4A027 /* Inkwell */;
 			targetProxy = 40FF21C82FE4CA3300B4A027 /* PBXContainerItemProxy */;
-		};
-		40FF21D32FE4CA3300B4A027 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 40FF21B52FE4CA3100B4A027 /* Inkwell */;
-			targetProxy = 40FF21D22FE4CA3300B4A027 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -556,44 +487,6 @@
 			};
 			name = Release;
 		};
-		40FF21E32FE4CA3300B4A027 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = uk.ewancroft.InkwellUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = Inkwell;
-			};
-			name = Debug;
-		};
-		40FF21E42FE4CA3300B4A027 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = uk.ewancroft.InkwellUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = Inkwell;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -620,15 +513,6 @@
 			buildConfigurations = (
 				40FF21E02FE4CA3300B4A027 /* Debug */,
 				40FF21E12FE4CA3300B4A027 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		40FF21E22FE4CA3300B4A027 /* Build configuration list for PBXNativeTarget "InkwellUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				40FF21E32FE4CA3300B4A027 /* Debug */,
-				40FF21E42FE4CA3300B4A027 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
