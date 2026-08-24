@@ -39,10 +39,12 @@ This Gradle root also owns the shared KMP module (`:shared`, mapped to `../share
 
 Self-hosted signed F-Droid repo is maintained in `fdroid-repo/`. The official F-Droid submission recipe is in `fdroid/`.
 
+Google Play is a planned additional distribution channel. The AGPL-3.0 [App Store Distribution Exception](../APP_STORE_EXCEPTION.md) permits otherwise compliant Play Store distribution while keeping the source and F-Droid route available under the AGPL.
+
 ## AI-assisted contributions
 
 AI tools may be used when contributing. Add `Co-authored-by:` trailers crediting AI agents when they materially contributed — attribution should be honest and accurate.
 
 ## Licence
 
-AGPL 3.0 — see `../LICENSE`
+AGPL-3.0 with the [App Store Distribution Exception](../APP_STORE_EXCEPTION.md) — see `../LICENSE` for the base licence.

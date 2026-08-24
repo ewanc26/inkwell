@@ -12,4 +12,4 @@ Verifies publications and documents against their claimed domain via Standard.si
 
 Authentication is OAuth-based with your AT Protocol handle — no app password required. Silent session restoration on relaunch.
 
-Inkwell is free, with no ads, tracking, or in-app purchases. All code is AGPL-3.0.
+Inkwell is free, with no ads, tracking, or in-app purchases. All code is AGPL-3.0 with an App Store Distribution Exception that permits otherwise compliant app-store distribution while preserving the AGPL's source and copyleft requirements.

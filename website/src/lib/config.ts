@@ -39,8 +39,8 @@ export const NAV_LINKS = [
 ] as const;
 
 // ── Install sources ──────────────────────────────────────────────
-// AltStore and F-Droid are self-hosted (static/altstore, static/fdroid) —
-// there is no App Store or Play Store listing. Keep these in sync with
+// AltStore and F-Droid are the live, self-hosted install routes
+// (static/altstore, static/fdroid). Keep these in sync with
 // static/altstore/source.json and static/fdroid/repo/index.html.
 
 export const ALTSTORE_SOURCE_LINK =
@@ -48,3 +48,12 @@ export const ALTSTORE_SOURCE_LINK =
 
 export const FDROID_REPO_LINK =
   "https://fdroid.link/#https://inkwell.ewancroft.uk/fdroid/repo?fingerprint=6369CC624D896E379DF35A1AB0C8C7372639C55299750576A6D1048C0E26A2EA";
+
+// PLACEHOLDERS: the App Store and Google Play listings do not exist yet.
+// Replace these values with the real listing URLs when the paid £5 store
+// builds launch; until then, all user-facing copy must mark them as planned.
+export const APP_STORE_PLACEHOLDER_LINK =
+  "https://apps.apple.com/app/inkwell/id0000000000";
+
+export const PLAY_STORE_PLACEHOLDER_LINK =
+  "https://play.google.com/store/apps/details?id=uk.ewancroft.inkwell";

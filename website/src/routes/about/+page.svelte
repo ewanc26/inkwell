@@ -62,8 +62,13 @@
   <h2>Who builds it</h2>
   <p>
     Inkwell is free and open-source software, licensed under the
-    <a href="https://www.gnu.org/licenses/agpl-3.0.en.html">AGPL-3.0</a>.
-    The source, issues, and releases are all on
+    <a href="https://www.gnu.org/licenses/agpl-3.0.en.html">AGPL-3.0</a>
+    with an
+    <a href="https://github.com/ewanc26/inkwell/blob/main/APP_STORE_EXCEPTION.md"
+      >App Store Distribution Exception</a
+    >. The exception is a narrow additional permission for app-store
+    distribution; it does not remove the AGPL's source-availability or
+    copyleft requirements. The source, issues, and releases are all on
     <a href="https://github.com/ewanc26/inkwell">GitHub</a>. If Inkwell is
     useful to you, you can support its development through
     <a href="https://ko-fi.com/ewancroft">Ko-fi</a> or
@@ -84,6 +89,14 @@
     F-Droid repository. See <a href="/features">Features</a> for what
     each platform actually does today.
   </p>
+  <p>
+    The longer-term plan is to add the Apple App Store and Google Play as
+    optional mainstream distribution routes for a flat £5 purchase. Those
+    builds are intended to be the same open-source app, not a premium
+    edition: AltStore Classic on iOS and F-Droid on Android will remain
+    free alternatives, with the source continuing to be available under
+    the AGPL-3.0.
+  </p>
 </section>
 
 <section class="site-container py-12">
@@ -91,7 +104,8 @@
     <h2>Open source</h2>
     <p>
       Read the code, file an issue, or open a pull request. Contributions
-      are welcome under the AGPL-3.0.
+      are welcome under the AGPL-3.0 with Inkwell's App Store Distribution
+      Exception.
     </p>
     <a href="https://github.com/ewanc26/inkwell">
       View the repository <ArrowRight class="h-3 w-3" />

@@ -133,6 +133,12 @@ If you discover a committed secret, treat it as compromised and rotate it immedi
 - To publish a new version, build a signed release APK, copy it into `Android/fdroid-repo/repo/`, update `metadata/uk.ewancroft.inkwell.yml`, then run `fdroid update --clean` from that directory.
 - Copy the regenerated `repo/` into the website's `static/fdroid/` for deployment.
 
+### Mainstream app stores
+
+- The App Store and Google Play are planned distribution channels, not current ones. Do not change current availability copy until a listing actually exists.
+- Any future store build must remain the same open-source application: the [App Store Distribution Exception](APP_STORE_EXCEPTION.md) permits store distribution, but the AGPL-3.0 source-availability and copyleft requirements still apply.
+- Existing free distribution through AltStore Classic and F-Droid is intended to remain available alongside any paid mainstream-store build.
+
 ### Website
 
 - Install-source URLs are defined in `website/src/lib/config.ts`. Keep them in sync with `static/altstore/source.json` and `static/fdroid/repo/`.
@@ -159,6 +165,12 @@ iOS is the primary implementation. Android is experimental and materially incomp
 - Preserve native accessibility, Dynamic Type, dark/light behavior, reduced motion, safe-area behavior, and platform-appropriate mark/wordmark coordinates.
 - Target WCAG 2.1 AA for the website.
 - Test with TalkBack (Android) and VoiceOver (iOS) for new or changed screens.
+
+## Licence of contributions
+
+Inkwell is licensed under AGPL-3.0 with the [App Store Distribution Exception](APP_STORE_EXCEPTION.md). By submitting a contribution to this repository, you agree to license that contribution under the same terms: AGPL-3.0 together with the App Store Distribution Exception, unless an alternative is explicitly agreed in writing before the contribution is merged.
+
+You must have the right to submit the contribution. Do not include code, assets, or other material under terms that are incompatible with Inkwell's licence or that you are not authorised to redistribute.
 
 ## AI-assisted contributions
 

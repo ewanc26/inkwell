@@ -136,4 +136,8 @@ AI tools may be used when contributing. Add `Co-authored-by:` trailers crediting
 
 ## Licence
 
-AGPL 3.0 — see `LICENSE`
+Inkwell is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0) with an [App Store Distribution Exception](APP_STORE_EXCEPTION.md) granted as additional permission under AGPL section 7. See `LICENSE` for the unchanged AGPL-3.0 text and `APP_STORE_EXCEPTION.md` for the additional permission.
+
+The exception allows otherwise AGPL-compliant builds to be distributed through the Apple App Store, Google Play, and comparable stores whose terms would otherwise conflict with the AGPL. It does not remove the AGPL's source-availability or copyleft requirements.
+
+Inkwell is not currently distributed through the App Store or Google Play. The existing free AltStore Classic and F-Droid distribution channels remain available, including if paid mainstream-store builds are introduced later.
