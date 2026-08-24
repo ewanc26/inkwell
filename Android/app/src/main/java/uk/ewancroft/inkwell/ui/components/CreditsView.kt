@@ -199,11 +199,11 @@ fun CreditsView(
                     modifier = Modifier.fillMaxWidth().clickable { showTerms = true },
                 )
                 Spacer(Modifier.height(8.dp))
-                Text(
-                    "AGPL 3.0 License",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.fillMaxWidth(),
+                CreditRow(
+                    title = "AGPL-3.0 with App Store Exception",
+                    detail = "Open-source licence and store-distribution permission",
+                    url = "https://github.com/ewanc26/inkwell/blob/main/APP_STORE_EXCEPTION.md",
+                    openUrl = ::openUrl,
                 )
 
                 if (isAuthenticated) {
