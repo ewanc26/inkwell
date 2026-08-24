@@ -128,7 +128,6 @@ jobs:
             -project Inkwell.xcodeproj \
             -scheme Inkwell \
             -destination "platform=iOS Simulator,name=${{ steps.destination.outputs.name }}" \
-            -skip-testing:InkwellUITests \
             $action
 
   android:
