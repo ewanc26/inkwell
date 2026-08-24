@@ -72,6 +72,7 @@ struct DiscoverView: View {
                 placeholder
             }
             .navigationTitle("Discover")
+            .inAppLinkHandling()
             .searchable(text: $query, prompt: "Publications and articles")
             .textInputAutocapitalization(.never)
             .autocorrectionDisabled()

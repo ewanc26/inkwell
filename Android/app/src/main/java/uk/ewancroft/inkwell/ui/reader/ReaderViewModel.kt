@@ -1,9 +1,11 @@
 package uk.ewancroft.inkwell.ui.reader
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,6 +23,7 @@ import uk.ewancroft.inkwell.data.remote.StandardSiteVerifier
 import uk.ewancroft.inkwell.shared.verification.VerificationResult
 import uk.ewancroft.inkwell.data.repository.PdsRepository
 import uk.ewancroft.inkwell.data.repository.getProfile
+import uk.ewancroft.inkwell.util.ReaderPreferences
 import uk.ewancroft.inkwell.util.formatPublishedDate
 import javax.inject.Inject
 
@@ -54,6 +57,7 @@ data class ReaderUiState(
 @HiltViewModel
 class ReaderViewModel @Inject constructor(
     private val pdsRepository: PdsRepository,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ReaderUiState())
@@ -61,6 +65,12 @@ class ReaderViewModel @Inject constructor(
 
     /** Per-publication-DID cursors for the next page of documents. */
     private val followingCursors = mutableMapOf<String, String>()
+
+    private fun sortedByPreference(posts: List<PostItem>): List<PostItem> =
+        when (ReaderPreferences.getSortOrder(context)) {
+            ReaderPreferences.SortOrder.NEWEST_FIRST -> posts.sortedByDescending { it.publishedAt }
+            ReaderPreferences.SortOrder.OLDEST_FIRST -> posts.sortedBy { it.publishedAt }
+        }
 
     init {
         loadData()
@@ -152,9 +162,7 @@ class ReaderViewModel @Inject constructor(
                         Log.w("ReaderViewModel", "Failed to fetch documents for DID $did", e)
                     }
                 }
-                val merged = (state.followingPosts + posts)
-                    .distinctBy { it.uri }
-                    .sortedByDescending { it.publishedAt }
+                val merged = sortedByPreference((state.followingPosts + posts).distinctBy { it.uri })
                 _uiState.value = _uiState.value.copy(
                     followingPosts = merged,
                     isLoadingMoreFollowing = false,
@@ -230,7 +238,7 @@ class ReaderViewModel @Inject constructor(
             }
 
             _uiState.value = _uiState.value.copy(
-                followingPosts = posts.distinctBy { it.uri }.sortedByDescending { it.publishedAt },
+                followingPosts = sortedByPreference(posts.distinctBy { it.uri }),
                 isLoadingFollowing = false,
                 hasMoreFollowing = followingCursors.isNotEmpty(),
             )
@@ -278,7 +286,7 @@ class ReaderViewModel @Inject constructor(
             }
 
             _uiState.value = _uiState.value.copy(
-                yoursPosts = posts.sortedByDescending { it.publishedAt },
+                yoursPosts = sortedByPreference(posts),
                 isLoadingYours = false
             )
             val verifiedYours = verifyPosts(_uiState.value.yoursPosts)

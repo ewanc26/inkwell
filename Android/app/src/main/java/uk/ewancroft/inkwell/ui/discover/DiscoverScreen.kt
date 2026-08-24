@@ -294,8 +294,5 @@ private fun SearchResultRow(
 }
 
 private fun openWebUrl(context: android.content.Context, url: String) {
-    try {
-        val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, Uri.parse(url))
-        context.startActivity(intent)
-    } catch (_: Exception) {}
+    uk.ewancroft.inkwell.util.LinkPreferences.openContentUrl(context, url)
 }
