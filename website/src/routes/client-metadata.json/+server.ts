@@ -20,7 +20,7 @@ export function GET() {
     application_type: "native",
     redirect_uris: ["uk.ewancroft.inkwell:/callback"],
     scope:
-      "atproto repo:site.standard.publication repo:site.standard.document repo:site.standard.graph.subscription repo:site.standard.graph.recommend repo:app.userinput.discussion blob:*/* " +
+      "atproto repo:site.standard.publication repo:site.standard.document repo:site.standard.graph.subscription repo:site.standard.graph.recommend repo:app.userinput.discussion repo:uk.ewancroft.inkwell.user blob:*/* " +
       "repo:app.bsky.graph.block?action=create&action=delete " +
       "rpc:app.bsky.graph.muteActor?aud=did:web:api.bsky.app%23bsky_appview " +
       "rpc:app.bsky.graph.unmuteActor?aud=did:web:api.bsky.app%23bsky_appview " +
