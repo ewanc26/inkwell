@@ -24,7 +24,7 @@ object OAuthModule {
     private const val SCOPE =
         "atproto blob:*/* repo:site.standard.publication repo:site.standard.document " +
             "repo:site.standard.graph.subscription repo:site.standard.graph.recommend " +
-            "repo:app.userinput.discussion " +
+            "repo:app.userinput.discussion repo:uk.ewancroft.inkwell.user " +
             "repo:app.bsky.graph.block?action=create&action=delete " +
             "rpc:app.bsky.graph.muteActor?aud=did:web:api.bsky.app%23bsky_appview " +
             "rpc:app.bsky.graph.unmuteActor?aud=did:web:api.bsky.app%23bsky_appview " +

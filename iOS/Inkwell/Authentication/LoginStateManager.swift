@@ -83,6 +83,7 @@ final class LoginStateManager {
     ///   subscriptions, recommends) for full CRUD.
     /// - `blob:*/*` for downloading media blobs via `sync.getBlob`.
     /// - `app.userinput.discussion` for in-app feedback.
+    /// - `uk.ewancroft.inkwell.user` for the Inkwell-user declaration record.
     /// - Bluesky personal moderation RPCs plus create/delete access to
     ///   `app.bsky.graph.block`, matching the moderation UI on both platforms.
     var appCredentials: AppCredentials {
@@ -97,6 +98,7 @@ final class LoginStateManager {
                 sharedOAuthScopeRepoSubscription(),
                 sharedOAuthScopeRepoRecommend(),
                 sharedOAuthScopeRepoUserInputDiscussion(),
+                "repo:uk.ewancroft.inkwell.user",
                 "repo:app.bsky.graph.block?action=create&action=delete",
                 "rpc:app.bsky.graph.muteActor?aud=did:web:api.bsky.app%23bsky_appview",
                 "rpc:app.bsky.graph.unmuteActor?aud=did:web:api.bsky.app%23bsky_appview",
