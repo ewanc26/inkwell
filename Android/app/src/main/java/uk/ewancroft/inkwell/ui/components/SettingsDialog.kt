@@ -70,6 +70,9 @@ fun SettingsDialog(
     appVersion: String,
     notificationsEnabled: Boolean,
     onNotificationsEnabledChange: (Boolean) -> Unit,
+    userLexiconEnabled: Boolean,
+    userLexiconBusy: Boolean,
+    onUserLexiconEnabledChange: (Boolean) -> Unit,
     onSignOut: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -505,6 +508,22 @@ fun SettingsDialog(
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
                     SectionHeader("Account")
+                    SettingsRow(
+                        title = "Declare me as an Inkwell user",
+                        trailing = {
+                            Switch(
+                                checked = userLexiconEnabled,
+                                enabled = !userLexiconBusy,
+                                onCheckedChange = onUserLexiconEnabledChange,
+                            )
+                        },
+                    )
+                    Text(
+                        "Publishes a small record (uk.ewancroft.inkwell.user) to your own PDS declaring you use Inkwell. The website reads these via Constellation to show a \"people using Inkwell\" carousel. Turn it off to delete the record.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    )
                     SettingsRow(
                         title = "Muted & Blocked",
                         onClick = {

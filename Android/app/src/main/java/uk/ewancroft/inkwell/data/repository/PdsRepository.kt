@@ -21,6 +21,7 @@ import uk.ewancroft.inkwell.TestingConfig
 import uk.ewancroft.inkwell.TestingModeException
 import uk.ewancroft.inkwell.shared.AtUri
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
+import uk.ewancroft.inkwell.shared.model.UserLexicon
 import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
 import uk.ewancroft.inkwell.shared.policy.RecordListPolicy
 import java.net.URLEncoder
@@ -127,6 +128,62 @@ class PdsRepository @Inject constructor(
             inputSerializer = JsonObject.serializer(),
             responseSerializer = JsonObject.serializer(),
         )
+    }
+
+    suspend fun createUserLexicon(user: Boolean = true): JsonObject {
+        if (TestingConfig.enabled) {
+            TestingConfig.report("Create ${CollectionNsids.USER} record")
+            throw TestingModeException("Create ${CollectionNsids.USER} record")
+        }
+        val session = sessionStore.load() ?: throw Exception("Not authenticated")
+        val authClient = atOAuth.createClient()
+        return authClient.procedure(
+            nsid = "com.atproto.repo.createRecord",
+            params = Unit,
+            paramsSerializer = Unit.serializer(),
+            input = buildJsonObject {
+                put("repo", session.did)
+                put("collection", CollectionNsids.USER)
+                put("record", buildJsonObject {
+                    put("user", user)
+                    put("app", UserLexicon.CANONICAL_APP_URI)
+                })
+            },
+            inputSerializer = JsonObject.serializer(),
+            responseSerializer = JsonObject.serializer(),
+        )
+    }
+
+    /**
+     * Returns the record key of the signed-in user's `uk.ewancroft.inkwell.user`
+     * record, or null if none exists.
+     */
+    suspend fun getUserLexiconRkey(): String? {
+        val session = sessionStore.load() ?: return null
+        val did = session.did ?: return null
+        val response = listRecords(
+            did = did,
+            collection = CollectionNsids.USER,
+            limit = 1,
+        )
+        val records = response["records"]?.jsonArray ?: return null
+        return records.firstOrNull()
+            ?.jsonObject
+            ?.get("uri")
+            ?.jsonPrimitive
+            ?.content
+            ?.let { AtUri.parse(it)?.recordKey }
+    }
+
+    /** Deletes the signed-in user's Inkwell-user record, if one exists. */
+    suspend fun deleteUserLexicon() {
+        if (TestingConfig.enabled) {
+            TestingConfig.report("Delete ${CollectionNsids.USER} record")
+            throw TestingModeException("Delete ${CollectionNsids.USER} record")
+        }
+        val session = sessionStore.load() ?: return
+        val rkey = getUserLexiconRkey() ?: return
+        deleteRecord(CollectionNsids.USER, rkey)
     }
 
     suspend fun updateRecord(
