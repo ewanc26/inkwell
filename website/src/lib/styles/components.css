@@ -427,6 +427,65 @@
     text-align: left;
   }
 
+  /* ── Inkwell-user carousel ─────────────────────────────── */
+
+  .user-carousel {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-md);
+  }
+
+  .user-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-sm);
+    padding: var(--space-lg);
+    border-radius: var(--radius-lg);
+    background-color: var(--surface-raised);
+    border: 1px solid var(--surface-color);
+    transition:
+      background-color var(--duration-fast) var(--ease-out-quart),
+      border-color var(--duration-fast) var(--ease-out-quart),
+      transform var(--duration-fast) var(--ease-out-quart);
+  }
+
+  .user-card:hover {
+    background-color: var(--surface-sunken);
+    border-color: var(--color-background-300);
+    transform: translateY(-2px);
+  }
+
+  .user-avatar {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: var(--color-background-200);
+  }
+
+  .user-displayname {
+    font-weight: 700;
+    line-height: 1.3;
+    font-size: var(--text-md);
+  }
+
+  .user-handle {
+    font-size: var(--text-sm);
+    color: var(--color-text-700);
+    word-break: break-all;
+  }
+
+  .user-empty {
+    max-width: 42rem;
+    padding: var(--space-lg);
+    border-radius: var(--radius-lg);
+    border: 1px dashed var(--surface-color);
+    color: var(--color-text-700);
+    line-height: 1.65;
+  }
+
   .callout h2 {
     font-size: var(--text-lg);
     font-weight: 800;
