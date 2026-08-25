@@ -36,11 +36,11 @@ export const load: PageServerLoad = async () => {
       `${CONSTELLATION}/xrpc/blue.microcosm.links.getBacklinks` +
         `?subject=${encodeURIComponent(APP_URI)}` +
         `&source=${encodeURIComponent(BACKLINK_SOURCE)}` +
-        `&limit=100`
+        `&limit=100`,
     )) as { records?: Array<{ did?: string }> };
 
     const dids = Array.from(
-      new Set((backlinks.records ?? []).map((r) => r.did).filter(Boolean))
+      new Set((backlinks.records ?? []).map((r) => r.did).filter(Boolean)),
     ).slice(0, MAX_USERS) as string[];
 
     const resolved = await Promise.all(
@@ -49,10 +49,10 @@ export const load: PageServerLoad = async () => {
           try {
             const [mini, profile] = await Promise.all([
               fetchJson(
-                `${SLINGSHOT}/xrpc/com.bad-example.identity.resolveMiniDoc?identifier=${encodeURIComponent(did)}`
+                `${SLINGSHOT}/xrpc/com.bad-example.identity.resolveMiniDoc?identifier=${encodeURIComponent(did)}`,
               ) as Promise<{ handle?: string } | null>,
               fetchJson(
-                `${BSKY}/xrpc/app.bsky.actor.getProfile?actor=${encodeURIComponent(did)}`
+                `${BSKY}/xrpc/app.bsky.actor.getProfile?actor=${encodeURIComponent(did)}`,
               ) as Promise<{ handle?: string; displayName?: string; avatar?: string } | null>,
             ]);
             const handle =
@@ -65,8 +65,8 @@ export const load: PageServerLoad = async () => {
           } catch {
             return null;
           }
-        }
-      )
+        },
+      ),
     );
     users = resolved.filter((u): u is InkwellUser => u !== null);
   } catch {
