@@ -50,6 +50,7 @@ jobs:
               - 'shared/**'
             website:
               - 'website/**'
+              - '.github/workflows/ci.yml'
 
   ios:
     name: iOS build + test
@@ -183,7 +184,6 @@ jobs:
         run: diff iOS/altstore/source.json website/static/altstore/source.json
 
       - name: Check the served F-Droid repo matches the release repo
-        working-directory: website
         run: diff -r Android/fdroid-repo/repo website/static/fdroid/repo
 
       - name: Build
