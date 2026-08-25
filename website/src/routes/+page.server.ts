@@ -1,12 +1,5 @@
 import type { PageServerLoad } from "./$types";
 
-// ── Inkwell-user carousel data ─────────────────────────────────────────────
-// Enumerates accounts that have published a `uk.ewancroft.inkwell.user` record
-// by querying Constellation backlinks to the canonical Inkwell app URI, then
-// resolves each DID to a verified handle (Slingshot) and an avatar / display
-// name (Bluesky AppView). Cached per instance for a short window so we don't
-// hammer the third-party services on every request.
-
 const CONSTELLATION = "https://constellation.microcosm.blue";
 const SLINGSHOT = "https://slingshot.microcosm.blue";
 const BSKY = "https://public.api.bsky.app";
