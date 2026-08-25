@@ -554,9 +554,8 @@
         recommendations, verification, notifications, settings, and
         accessibility and customisation controls. It is still labelled
         experimental because its Android-specific automated coverage is
-        comparatively thin and a few platform gaps remain, including feed-card
-        verification for documents whose publication is identified by an AT URI.
-        iOS remains the primary, more polished implementation.
+        comparatively thin and iOS remains the primary, more polished
+        implementation.
       </p>
     </details>
     <details class="faq-item">
