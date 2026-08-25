@@ -98,7 +98,7 @@ final class LoginStateManager {
                 sharedOAuthScopeRepoSubscription(),
                 sharedOAuthScopeRepoRecommend(),
                 sharedOAuthScopeRepoUserInputDiscussion(),
-                sharedOAuthScopeRepoUser(),
+                "repo:uk.ewancroft.inkwell.user",
                 "repo:app.bsky.graph.block?action=create&action=delete",
                 "rpc:app.bsky.graph.muteActor?aud=did:web:api.bsky.app%23bsky_appview",
                 "rpc:app.bsky.graph.unmuteActor?aud=did:web:api.bsky.app%23bsky_appview",

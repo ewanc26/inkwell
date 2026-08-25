@@ -39,7 +39,7 @@
           "date": "2026-08-25",
           "localizedDescription": "Inkwell 2.4.0 release - adds Inkwell-user declaration record (uk.ewancroft.inkwell.user) with Constellation backlinks for the \"users already using Inkwell\" carousel, OAuth scope for record writes, and website integration.",
           "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.4.0.ipa",
-          "size": 12000000,
+          "size": 11956522,
           "buildVersion": "58"
         },
         {
