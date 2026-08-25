@@ -18,12 +18,15 @@ extension LoginStateManager {
     ///   - method: The HTTP method.
     ///   - body: Optional JSON-encoded request body.
     ///   - queryItems: Optional URL query parameters.
+    ///   - proxy: Optional AT Protocol service proxy identifier for RPCs whose
+    ///     audience is a service such as the Bluesky AppView.
     /// - Returns: The response data.
     func authenticatedData(
         path: String,
         method: String = "GET",
         body: Data? = nil,
-        queryItems: [URLQueryItem]? = nil
+        queryItems: [URLQueryItem]? = nil,
+        proxy: String? = nil
     ) async throws -> Data {
         guard let authenticator, let pdsURL = resolvedPDSURL else {
             throw LoginError.notAuthenticated
@@ -45,6 +48,9 @@ extension LoginStateManager {
         if let body {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.httpBody = body
+        }
+        if let proxy {
+            request.setValue(proxy, forHTTPHeaderField: "atproto-proxy")
         }
         request.setValue("application/json", forHTTPHeaderField: "Accept")
 

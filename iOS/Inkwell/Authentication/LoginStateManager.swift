@@ -82,6 +82,9 @@ final class LoginStateManager {
     /// - Four `site.standard.*` collections (publications, documents,
     ///   subscriptions, recommends) for full CRUD.
     /// - `blob:*/*` for downloading media blobs via `sync.getBlob`.
+    /// - `app.userinput.discussion` for in-app feedback.
+    /// - Bluesky personal moderation RPCs plus create/delete access to
+    ///   `app.bsky.graph.block`, matching the moderation UI on both platforms.
     var appCredentials: AppCredentials {
         AppCredentials(
             clientId: "https://inkwell.ewancroft.uk/client-metadata.json",
@@ -93,7 +96,12 @@ final class LoginStateManager {
                 sharedOAuthScopeRepoDocument(),
                 sharedOAuthScopeRepoSubscription(),
                 sharedOAuthScopeRepoRecommend(),
-                sharedOAuthScopeRepoUserInputDiscussion()
+                sharedOAuthScopeRepoUserInputDiscussion(),
+                "repo:app.bsky.graph.block?action=create&action=delete",
+                "rpc:app.bsky.graph.muteActor?aud=did:web:api.bsky.app%23bsky_appview",
+                "rpc:app.bsky.graph.unmuteActor?aud=did:web:api.bsky.app%23bsky_appview",
+                "rpc:app.bsky.graph.getMutes?aud=did:web:api.bsky.app%23bsky_appview",
+                "rpc:app.bsky.graph.getBlocks?aud=did:web:api.bsky.app%23bsky_appview"
             ],
             callbackURL: URL(string: "uk.ewancroft.inkwell:/callback")!
         )
