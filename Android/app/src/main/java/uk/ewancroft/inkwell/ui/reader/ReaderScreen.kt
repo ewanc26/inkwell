@@ -31,6 +31,7 @@ import uk.ewancroft.inkwell.util.TipPromptManager
 fun ReaderScreen(
     viewModel: ReaderViewModel = hiltViewModel(),
     notificationViewModel: InkwellNotificationViewModel = hiltViewModel(),
+    userLexiconViewModel: UserLexiconViewModel = hiltViewModel(),
     onNavigateToPost: (String, String?, String?, String?, String?) -> Unit = { _, _, _, _, _ -> },
     onSignOut: () -> Unit = {},
 ) {
@@ -44,6 +45,8 @@ fun ReaderScreen(
     val notifications by notificationViewModel.notifications.collectAsStateWithLifecycle()
     val unreadCount by notificationViewModel.unreadCount.collectAsStateWithLifecycle()
     val notificationsEnabled by notificationViewModel.notificationsEnabled.collectAsStateWithLifecycle()
+    val userLexiconEnabled by userLexiconViewModel.isInkwellUser.collectAsStateWithLifecycle()
+    val userLexiconBusy by userLexiconViewModel.isBusy.collectAsStateWithLifecycle()
 
     val appContext = androidx.compose.ui.platform.LocalContext.current
     val appVersion = remember { uk.ewancroft.inkwell.util.appVersionString(appContext) }
@@ -198,6 +201,10 @@ fun ReaderScreen(
         )
     }
 
+    LaunchedEffect(showSettings) {
+        if (showSettings) userLexiconViewModel.load()
+    }
+
     if (showNotifications) {
         NotificationsDialog(
             notifications = notifications,
@@ -212,6 +219,9 @@ fun ReaderScreen(
             appVersion = appVersion,
             notificationsEnabled = notificationsEnabled,
             onNotificationsEnabledChange = { notificationViewModel.setNotificationsEnabled(it) },
+            userLexiconEnabled = userLexiconEnabled,
+            userLexiconBusy = userLexiconBusy,
+            onUserLexiconEnabledChange = { userLexiconViewModel.setInkwellUser(it) },
             onSignOut = onSignOut,
             onDismiss = { showSettings = false },
         )
