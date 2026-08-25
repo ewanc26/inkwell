@@ -9,4 +9,5 @@ object CollectionNsids {
     const val LEAFLET_POLL_DEFINITION = "pub.leaflet.poll.definition"
     const val LEAFLET_POLL_VOTE = "pub.leaflet.poll.vote"
     const val GRAPH_BLOCK = "app.bsky.graph.block"
+    const val USER = "uk.ewancroft.inkwell.user"
 }
