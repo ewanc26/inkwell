@@ -15,6 +15,9 @@
     APP_STORE_PLACEHOLDER_LINK,
     PLAY_STORE_PLACEHOLDER_LINK,
   } from "$lib/config";
+  import type { PageData } from "./$types";
+
+  let data: any = {};
   import {
     BookOpen,
     Compass,
@@ -584,6 +587,50 @@
       remaining edge cases catch up.
     </p>
   </div>
+</section>
+
+<!-- Users already using Inkwell -->
+<section class="site-container py-12">
+  <h2 class="section-title">Users already using Inkwell</h2>
+  <p class="mb-6 max-w-[42rem] text-lg leading-relaxed text-pretty">
+    Inkwell users across the network. This carousel is generated from
+    Constellation backlinks to the <code>uk.ewancroft.inkwell.user</code>
+    lexicon record, resolving DIDs to Bluesky avatars and handle aliases via
+    Slingshot.
+  </p>
+
+  {#if data.users.length > 0}
+    <div class="user-carousel">
+      {#each data.users as user (user.handle)}
+        <div class="user-card reveal">
+          {#if user.avatar}
+            <img
+              class="user-avatar"
+              src={user.avatar}
+              alt="{user.handle} avatar"
+              loading="lazy"
+              width="56"
+              height="56"
+            />
+          {:else}
+            <div class="user-avatar" aria-hidden="true"></div>
+          {/if}
+          {#if user.displayName}
+            <div class="user-displayname">{user.displayName}</div>
+          {/if}
+          <div class="user-handle">@{user.handle}</div>
+        </div>
+      {/each}
+    </div>
+  {:else}
+    <div class="user-empty">
+      No one has declared themselves an Inkwell user yet. Flip
+      <strong>Declare me as an Inkwell user</strong> in the app's Settings and
+      you'll show up here — the record lives in your own PDS, and the list is
+      built entirely from public Constellation backlinks.
+    </div>
+
+  {/if}
 </section>
 
 <!-- Final CTA -->
