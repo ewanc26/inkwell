@@ -24,6 +24,8 @@ import java.time.Instant
 // app.bsky.graph.getBlocks used to enrich the resulting DIDs with a
 // handle/display name for the management UI.
 
+private const val BLUESKY_APPVIEW_PROXY = "did:web:api.bsky.app#bsky_appview"
+
 data class ModeratedActor(val did: String, val handle: String, val displayName: String? = null)
 
 data class BlockedActorEntry(val actor: ModeratedActor, val rkey: String)
@@ -55,7 +57,8 @@ suspend fun PdsRepository.muteActor(did: String) {
         paramsSerializer = Unit.serializer(),
         input = ActorInput(did),
         inputSerializer = ActorInput.serializer(),
-        responseSerializer = JsonObject.serializer(),
+        responseSerializer = Unit.serializer(),
+        proxy = BLUESKY_APPVIEW_PROXY,
     )
 }
 
@@ -73,7 +76,8 @@ suspend fun PdsRepository.unmuteActor(did: String) {
         paramsSerializer = Unit.serializer(),
         input = ActorInput(did),
         inputSerializer = ActorInput.serializer(),
-        responseSerializer = JsonObject.serializer(),
+        responseSerializer = Unit.serializer(),
+        proxy = BLUESKY_APPVIEW_PROXY,
     )
 }
 
@@ -89,6 +93,7 @@ suspend fun PdsRepository.fetchMutedActors(): List<ModeratedActor> {
             params = ListParams(cursor = cursor),
             paramsSerializer = ListParams.serializer(),
             responseSerializer = JsonObject.serializer(),
+            proxy = BLUESKY_APPVIEW_PROXY,
         )
         val mutes = response["mutes"]?.jsonArray.orEmpty()
         mutes.forEach { parseActor(it.jsonObject)?.let(all::add) }
@@ -138,6 +143,7 @@ suspend fun PdsRepository.fetchBlockedActors(did: String): List<BlockedActorEntr
             params = ListParams(cursor = cursor),
             paramsSerializer = ListParams.serializer(),
             responseSerializer = JsonObject.serializer(),
+            proxy = BLUESKY_APPVIEW_PROXY,
         )
         val blocks = response["blocks"]?.jsonArray.orEmpty()
         blocks.forEach { parseActor(it.jsonObject)?.let { actor -> actorsByDid[actor.did] = actor } }
