@@ -44,6 +44,9 @@ struct SettingsView: View {
                     if let handle = loginStateManager.currentHandle {
                         LabeledContent("Handle", value: "@\(handle)")
                     }
+                    NavigationLink("Muted & Blocked") {
+                        MutedBlockedView(loginStateManager: loginStateManager)
+                    }
                     Button("Sign Out", role: .destructive) {
                         isConfirmingSignOut = true
                     }
