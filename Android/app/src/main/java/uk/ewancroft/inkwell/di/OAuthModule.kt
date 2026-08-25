@@ -11,6 +11,7 @@ import io.github.kikin81.atproto.oauth.OAuthSessionStore
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import uk.ewancroft.inkwell.data.auth.AndroidOAuthSessionStore
+import uk.ewancroft.inkwell.shared.oauth.OAuthScopes
 import javax.inject.Singleton
 
 @Module
@@ -24,7 +25,8 @@ object OAuthModule {
     private const val SCOPE =
         "atproto blob:*/* repo:site.standard.publication repo:site.standard.document " +
             "repo:site.standard.graph.subscription repo:site.standard.graph.recommend " +
-            "repo:app.userinput.discussion repo:uk.ewancroft.inkwell.user " +
+            "repo:app.userinput.discussion " +
+            OAuthScopes.REPO_USER +
             "repo:app.bsky.graph.block?action=create&action=delete " +
             "rpc:app.bsky.graph.muteActor?aud=did:web:api.bsky.app%23bsky_appview " +
             "rpc:app.bsky.graph.unmuteActor?aud=did:web:api.bsky.app%23bsky_appview " +
