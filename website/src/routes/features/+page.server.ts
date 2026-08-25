@@ -51,29 +51,31 @@ export const load: PageServerLoad = async () => {
     ).slice(0, MAX_USERS) as string[];
 
     const resolved = await Promise.all(
-      dids.map(
-        async (did): Promise<InkwellUser | null> => {
-          try {
-            const [mini, profile] = await Promise.all([
-              fetchJson(
-                `${SLINGSHOT}/xrpc/com.bad-example.identity.resolveMiniDoc?identifier=${encodeURIComponent(did)}`,
-              ) as Promise<{ handle?: string } | null>,
-              fetchJson(
-                `${BSKY}/xrpc/app.bsky.actor.getProfile?actor=${encodeURIComponent(did)}`,
-              ) as Promise<{ handle?: string; displayName?: string; avatar?: string } | null>,
-            ]);
-            const handle =
-              mini?.handle ?? profile?.handle ?? did.replace(/^did:plc:/, "");
-            return {
-              handle,
-              displayName: profile?.displayName ?? null,
-              avatar: profile?.avatar ?? null,
-            };
-          } catch {
-            return null;
-          }
-        },
-      ),
+      dids.map(async (did): Promise<InkwellUser | null> => {
+        try {
+          const [mini, profile] = await Promise.all([
+            fetchJson(
+              `${SLINGSHOT}/xrpc/com.bad-example.identity.resolveMiniDoc?identifier=${encodeURIComponent(did)}`,
+            ) as Promise<{ handle?: string } | null>,
+            fetchJson(
+              `${BSKY}/xrpc/app.bsky.actor.getProfile?actor=${encodeURIComponent(did)}`,
+            ) as Promise<{
+              handle?: string;
+              displayName?: string;
+              avatar?: string;
+            } | null>,
+          ]);
+          const handle =
+            mini?.handle ?? profile?.handle ?? did.replace(/^did:plc:/, "");
+          return {
+            handle,
+            displayName: profile?.displayName ?? null,
+            avatar: profile?.avatar ?? null,
+          };
+        } catch {
+          return null;
+        }
+      }),
     );
     users = resolved.filter((u): u is InkwellUser => u !== null);
   } catch {
