@@ -5,9 +5,7 @@
   "website": "https://inkwell.ewancroft.uk",
   "iconURL": "https://inkwell.ewancroft.uk/altstore/icon.png",
   "tintColor": "#a6e3a1",
-  "featuredApps": [
-    "uk.ewancroft.Inkwell"
-  ],
+  "featuredApps": ["uk.ewancroft.Inkwell"],
   "apps": [
     {
       "name": "Inkwell",
