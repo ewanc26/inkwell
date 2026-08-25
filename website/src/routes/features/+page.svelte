@@ -8,6 +8,9 @@
 <script lang="ts">
   import { reveal } from "$lib/motion";
   import { SITE } from "$lib/config";
+  import type { PageData } from "./$types";
+
+  let { data }: { data: PageData } = $props();
   import {
     BookOpen,
     Compass,
@@ -114,9 +117,9 @@
       </p>
     </div>
 
-    <div class="feature-card reveal" use:reveal={1}>
+<div class="feature-card reveal" use:reveal={1}>
       <div class="feature-icon"><Palette class="h-5 w-5" /></div>
-      <h3>Accessibility &amp; appearance</h3>
+      <h3>Accessibility & appearance</h3>
       <p>
         Text size, bold text, an increase-contrast mode that snaps
         foreground to pure black or white against the current background,
@@ -128,22 +131,51 @@
         change a setting, and never again after that.
       </p>
     </div>
-
-    <div class="feature-card reveal" use:reveal={1}>
-      <div class="feature-icon"><Apple class="h-5 w-5" /></div>
-      <h3>iOS &amp; Android</h3>
-      <p>
-        The primary app is a SwiftUI client for iOS, built to respect
-        Dynamic Type, accessibility, and system theme. There's also a
-        Jetpack Compose port for Android, built on the same shared Kotlin
-        Multiplatform core so record handling, markdown parsing, and
-        verification logic stay consistent across platforms. It's still
-        labelled experimental, but reading, discovery, writing, comments,
-        and verification all work — see the
-        <Smartphone class="inline h-4 w-4" aria-hidden="true" /> note below.
-      </p>
-    </div>
   </div>
+</section>
+
+<section class="site-container py-12">
+  <h2 class="section-title">Users already using Inkwell</h2>
+  <p class="mb-6 max-w-[42rem] text-lg leading-relaxed text-pretty">
+    Inkwell users across the network. This carousel is generated from
+    Constellation backlinks to the <code>uk.ewancroft.inkwell.user</code>
+    lexicon record, resolving DIDs to Bluesky avatars and handle aliases via
+    Slingshot.
+  </p>
+
+  {#if data.users.length > 0}
+    <div class="user-carousel">
+      {#each data.users as user (user.handle)}
+        <div class="user-card reveal">
+          {#if user.avatar}
+            <img
+              class="user-avatar"
+              src={user.avatar}
+              alt="{user.handle} avatar"
+              loading="lazy"
+              width="56"
+              height="56"
+            />
+          {:else}
+            <div class="user-avatar" aria-hidden="true"></div>
+          {/if}
+          {#if user.displayName}
+            <div class="user-displayname">{user.displayName}</div>
+          {/if}
+          <div class="user-handle">@{user.handle}</div>
+        </div>
+      {/each}
+    </div>
+  {:else}
+    <div class="user-empty">
+      No one has declared themselves an Inkwell user yet. Flip
+      <strong>Declare me as an Inkwell user</strong> in the app's Settings and
+      you'll show up here — the record lives in your own PDS, and the list is
+      built entirely from public Constellation backlinks.
+    </div>
+  {/if}
+
+  <a href="/#download" class="section-link">Get Inkwell for either platform</a>
 </section>
 
 <section class="site-container py-12">
