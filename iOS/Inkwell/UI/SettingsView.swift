@@ -22,6 +22,9 @@ struct SettingsView: View {
     @State private var legalDocument: LegalDocumentType?
     @State private var showAbout = false
 
+    @State private var inkwellUserToggle = false
+    @State private var loadedUserLexiconValue: Bool? = nil
+
     @State private var customisation = CustomisationSettings.shared
     @State private var accentColor: Color?
     @State private var showCustomisationTipPrompt = false
@@ -43,6 +46,28 @@ struct SettingsView: View {
                 Section("Account") {
                     if let handle = loginStateManager.currentHandle {
                         LabeledContent("Handle", value: "@\(handle)")
+                    }
+                    if loginStateManager.currentHandle != nil {
+                        Toggle("Declare me as an Inkwell user", isOn: $inkwellUserToggle)
+                            .disabled(loadedUserLexiconValue == nil)
+                            .task {
+                                let value = await loginStateManager.fetchUserLexicon()
+                                loadedUserLexiconValue = value
+                                inkwellUserToggle = value
+                            }
+                            .onChange(of: inkwellUserToggle) { _, newValue in
+                                guard let loaded = loadedUserLexiconValue, newValue != loaded else {
+                                    return
+                                }
+                                loadedUserLexiconValue = newValue
+                                Task {
+                                    if newValue {
+                                        try? await loginStateManager.createUserLexicon(user: true)
+                                    } else {
+                                        try? await loginStateManager.deleteUserLexicon()
+                                    }
+                                }
+                            }
                     }
                     NavigationLink("Muted & Blocked") {
                         MutedBlockedView(loginStateManager: loginStateManager)

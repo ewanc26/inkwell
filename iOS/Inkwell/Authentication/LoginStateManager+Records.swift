@@ -7,6 +7,14 @@ import Foundation
 import OSLog
 import ATProtoKit
 
+/// NSID and canonical app URI for the Inkwell-user lexicon. Declared locally
+/// (rather than via the shared `UserLexicon` object) so this file compiles
+/// against the checked-in `InkwellShared.xcframework`; the xcframework is
+/// rebuilt from `shared/` at the next release, after which these can switch
+/// to the shared constants.
+private let userLexiconNSID = "uk.ewancroft.inkwell.user"
+private let userLexiconAppURI = "https://inkwell.ewancroft.uk"
+
 extension LoginStateManager {
     // MARK: - Record CRUD
 
@@ -130,6 +138,66 @@ extension LoginStateManager {
         )
 
         return try JSONDecoder().decode(ComAtprotoLexicon.Repository.StrongReference.self, from: data)
+    }
+
+    /// Creates a UserLexicon record declaring the account as an Inkwell user.
+    func createUserLexicon(user: Bool = true) async throws {
+        if TestingMode.isEnabled {
+            TestingModeNotice.shared.report("Create \(userLexiconNSID) record")
+            throw LoginError.testingMode
+        }
+        guard let did = currentDID else {
+            throw LoginError.notAuthenticated
+        }
+
+        let record: [String: Any] = [
+            "repo": did,
+            "collection": userLexiconNSID,
+            "record": [
+                "user": user,
+                "app": userLexiconAppURI,
+            ],
+            "validate": false,
+        ]
+
+        let bodyData = try JSONSerialization.data(withJSONObject: record)
+
+        _ = try await authenticatedData(
+            path: sharedXrpcRepoCreateRecord(),
+            method: "POST",
+            body: bodyData
+        )
+    }
+
+    /// Deletes the signed-in user's UserLexicon record, if one exists.
+    func deleteUserLexicon() async throws {
+        if TestingMode.isEnabled {
+            TestingModeNotice.shared.report("Delete \(userLexiconNSID) record")
+            throw LoginError.testingMode
+        }
+        guard currentDID != nil else {
+            throw LoginError.notAuthenticated
+        }
+        guard let rkey = try? await userLexiconRecordKey() else { return }
+        try await deleteRecord(collection: userLexiconNSID, recordKey: rkey)
+    }
+
+    /// Returns true if the signed-in user currently has a UserLexicon record.
+    func fetchUserLexicon() async -> Bool {
+        (try? await userLexiconRecordKey()) != nil
+    }
+
+    /// Returns the record key of the signed-in user's UserLexicon record, or
+    /// nil if none exists.
+    private func userLexiconRecordKey() async throws -> String? {
+        guard let did = currentDID else { return nil }
+        let (records, _) = try await listRecordsPage(
+            from: did,
+            collection: userLexiconNSID,
+            limit: 1
+        )
+        guard let uri = records.first?.uri else { return nil }
+        return parseAtUri(uri)?.recordKey
     }
 
     /// Fetches and decodes a single record from a repository.
