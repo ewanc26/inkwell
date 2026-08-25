@@ -1,4 +1,4 @@
-import type { PageServerLoad } from './$types';
+import type { PageServerLoad } from "./$types";
 
 // ── Inkwell-user carousel data ─────────────────────────────────────────────
 // Enumerates accounts that have published a `uk.ewancroft.inkwell.user` record
@@ -7,11 +7,11 @@ import type { PageServerLoad } from './$types';
 // name (Bluesky AppView). Cached per instance for a short window so we don't
 // hammer the third-party services on every request.
 
-const CONSTELLATION = 'https://constellation.microcosm.blue';
-const SLINGSHOT = 'https://slingshot.microcosm.blue';
-const BSKY = 'https://public.api.bsky.app';
-const APP_URI = 'https://inkwell.ewancroft.uk';
-const BACKLINK_SOURCE = 'uk.ewancroft.inkwell.user:app';
+const CONSTELLATION = "https://constellation.microcosm.blue";
+const SLINGSHOT = "https://slingshot.microcosm.blue";
+const BSKY = "https://public.api.bsky.app";
+const APP_URI = "https://inkwell.ewancroft.uk";
+const BACKLINK_SOURCE = "uk.ewancroft.inkwell.user:app";
 const MAX_USERS = 48;
 const CACHE_TTL_MS = 10 * 60 * 1000;
 
@@ -27,7 +27,7 @@ type Cache = { at: number; users: InkwellUser[] };
 let cache: Cache | null = null;
 
 async function fetchJson(url: string): Promise<unknown> {
-  const res = await fetch(url, { headers: { Accept: 'application/json' } });
+  const res = await fetch(url, { headers: { Accept: "application/json" } });
   if (!res.ok) throw new Error(`Request failed: ${res.status}`);
   return res.json();
 }
@@ -63,7 +63,7 @@ export const load: PageServerLoad = async () => {
               ) as Promise<{ handle?: string; displayName?: string; avatar?: string } | null>,
             ]);
             const handle =
-              mini?.handle ?? profile?.handle ?? did.replace(/^did:plc:/, '');
+              mini?.handle ?? profile?.handle ?? did.replace(/^did:plc:/, "");
             return {
               handle,
               displayName: profile?.displayName ?? null,
