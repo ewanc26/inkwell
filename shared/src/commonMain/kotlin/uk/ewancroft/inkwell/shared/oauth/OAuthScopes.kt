@@ -11,4 +11,6 @@ object OAuthScopes {
     const val REPO_RECOMMEND = "repo:site.standard.graph.recommend"
     const val AUTH_FULL = "site.standard.authFull"
     const val AUTH_SOCIAL = "site.standard.authSocial"
+    /** Scope for the Inkwell-user declaration record write. */
+    const val REPO_USER = "repo:uk.ewancroft.inkwell.user"
 }

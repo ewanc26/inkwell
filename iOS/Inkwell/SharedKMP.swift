@@ -382,6 +382,7 @@ func sharedOAuthScopeRepoDocument() -> String { OAuthScopes.shared.REPO_DOCUMENT
 func sharedOAuthScopeRepoSubscription() -> String { OAuthScopes.shared.REPO_SUBSCRIPTION }
 func sharedOAuthScopeRepoRecommend() -> String { OAuthScopes.shared.REPO_RECOMMEND }
 func sharedOAuthScopeRepoUserInputDiscussion() -> String { OAuthScopes.shared.REPO_USERINPUT_DISCUSSION }
+func sharedOAuthScopeRepoUser() -> String { OAuthScopes.shared.REPO_USER }
 func sharedOAuthScopeAuthFull() -> String { OAuthScopes.shared.AUTH_FULL }
 func sharedOAuthScopeAuthSocial() -> String { OAuthScopes.shared.AUTH_SOCIAL }
 
