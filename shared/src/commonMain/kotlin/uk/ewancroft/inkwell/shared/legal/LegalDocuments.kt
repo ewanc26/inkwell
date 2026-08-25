@@ -18,7 +18,7 @@ object LegalDocuments {
     val privacyMarkdown: String = """
         |**Version 2.0 — Effective Date: 21 August 2026**
         |
-        |Inkwell is a decentralised client for the Standard.site ecosystem on the AT Protocol. Your data belongs to you. This policy applies to Inkwell for iOS (version 2.3.0, build 56, distributed via AltStore), Inkwell for Android (version 2.3.0, distributed via a self-hosted F-Droid repository), and the website at inkwell.ewancroft.uk.
+        |Inkwell is a decentralised client for the Standard.site ecosystem on the AT Protocol. Your data belongs to you. This policy applies to Inkwell for iOS (version 2.4.0, build 57, distributed via AltStore), Inkwell for Android (version 2.4.0, distributed via a self-hosted F-Droid repository), and the website at inkwell.ewancroft.uk.
         |
         |## 1. Who is responsible for your data
         |
@@ -120,7 +120,7 @@ object LegalDocuments {
     val termsMarkdown: String = """
         |**Version 2.0 — Effective Date: 21 August 2026**
         |
-        |By downloading or using Inkwell (the “App”), you agree to these terms. Inkwell is provided for iOS (version 2.3.0, build 56) via AltStore and for Android (version 2.3.0) via a self-hosted F-Droid repository. It is not distributed through the Apple App Store or Google Play.
+        |By downloading or using Inkwell (the “App”), you agree to these terms. Inkwell is provided for iOS (version 2.4.0, build 57) via AltStore and for Android (version 2.4.0) via a self-hosted F-Droid repository. It is not distributed through the Apple App Store or Google Play.
         |
         |The App is published by Ewan Croft, an individual developer based in the United Kingdom (“the developer”), contactable at [contact@ewancroft.uk](mailto:contact@ewancroft.uk).
         |
