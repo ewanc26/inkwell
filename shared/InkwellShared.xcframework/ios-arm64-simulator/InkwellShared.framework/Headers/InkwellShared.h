@@ -1110,6 +1110,7 @@ __attribute__((swift_name("CollectionNsids")))
 + (instancetype)collectionNsids __attribute__((swift_name("init()")));
 @property (class, readonly, getter=shared) InkwellSharedCollectionNsids *shared __attribute__((swift_name("shared")));
 @property (readonly) NSString *DOCUMENT __attribute__((swift_name("DOCUMENT")));
+@property (readonly) NSString *GRAPH_BLOCK __attribute__((swift_name("GRAPH_BLOCK")));
 @property (readonly) NSString *GRAPH_RECOMMEND __attribute__((swift_name("GRAPH_RECOMMEND")));
 @property (readonly) NSString *GRAPH_SUBSCRIPTION __attribute__((swift_name("GRAPH_SUBSCRIPTION")));
 @property (readonly) NSString *LEAFLET_COMMENT __attribute__((swift_name("LEAFLET_COMMENT")));
@@ -2887,7 +2888,11 @@ __attribute__((swift_name("XrpcEndpoints")))
 @property (readonly) NSString *ACTOR_GET_PROFILE __attribute__((swift_name("ACTOR_GET_PROFILE")));
 @property (readonly) NSString *CONSTELLATION_API __attribute__((swift_name("CONSTELLATION_API")));
 @property (readonly) NSString *FEED_GET_POSTS __attribute__((swift_name("FEED_GET_POSTS")));
+@property (readonly) NSString *GRAPH_GET_BLOCKS __attribute__((swift_name("GRAPH_GET_BLOCKS")));
 @property (readonly) NSString *GRAPH_GET_LIST __attribute__((swift_name("GRAPH_GET_LIST")));
+@property (readonly) NSString *GRAPH_GET_MUTES __attribute__((swift_name("GRAPH_GET_MUTES")));
+@property (readonly) NSString *GRAPH_MUTE_ACTOR __attribute__((swift_name("GRAPH_MUTE_ACTOR")));
+@property (readonly) NSString *GRAPH_UNMUTE_ACTOR __attribute__((swift_name("GRAPH_UNMUTE_ACTOR")));
 @property (readonly) NSString *IDENTITY_RESOLVE_HANDLE __attribute__((swift_name("IDENTITY_RESOLVE_HANDLE")));
 @property (readonly) NSString *MICROCOSM_GET_BACKLINKS __attribute__((swift_name("MICROCOSM_GET_BACKLINKS")));
 @property (readonly) NSString *PUBLIC_BSKY_API __attribute__((swift_name("PUBLIC_BSKY_API")));
