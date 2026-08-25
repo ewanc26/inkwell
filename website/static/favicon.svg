@@ -1,26 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
-  <!-- Inkwell favicon: serif I letterform + ink drop.
-       Colours are hardcoded — as a favicon / <img> src, CSS custom
-       properties (var()) and currentColor from the page don't resolve.
-       The inline SVG in +layout.svelte handles theme adaptation. -->
-
-  <!-- Top bar -->
-  <rect x="108" y="64" width="296" height="44" rx="16" fill="#1a1a2e" />
-
-  <!-- Vertical stroke -->
-  <rect x="189" y="108" width="134" height="290" fill="#1a1a2e" />
-
-  <!-- Bottom bar -->
-  <rect x="108" y="398" width="296" height="44" rx="16" fill="#1a1a2e" />
-
-  <!-- Ink drop: brand green -->
-  <circle cx="256" cy="468" r="20" fill="#139500" />
-
-  <!-- Dark mode override: lighten the letterform, brighten the ink drop -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 952 952">
   <style>
+    .ink { fill: #111111; }
     @media (prefers-color-scheme: dark) {
-      rect { fill: #e8e6f0; }
-      circle { fill: #2db84d; }
+      .ink { fill: #f5f5f5; }
     }
   </style>
+
+  <g transform="translate(276 0)">
+    <rect class="ink" x="40" y="40" width="320" height="80" rx="16"/>
+    <rect class="ink" x="125" y="120" width="150" height="640"/>
+    <rect class="ink" x="40" y="760" width="320" height="80" rx="16"/>
+    <circle cx="200" cy="880" r="32" fill="#139500"/>
+  </g>
 </svg>
