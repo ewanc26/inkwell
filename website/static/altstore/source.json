@@ -5,7 +5,9 @@
   "website": "https://inkwell.ewancroft.uk",
   "iconURL": "https://inkwell.ewancroft.uk/altstore/icon.png",
   "tintColor": "#a6e3a1",
-  "featuredApps": ["uk.ewancroft.Inkwell"],
+  "featuredApps": [
+    "uk.ewancroft.Inkwell"
+  ],
   "apps": [
     {
       "name": "Inkwell",
@@ -24,6 +26,14 @@
         "https://inkwell.ewancroft.uk/screenshots/ios/reader-5.5.png"
       ],
       "versions": [
+        {
+          "version": "2.3.0",
+          "date": "2026-08-25",
+          "localizedDescription": "Adds reader sort order (newest/oldest first) that persists across relaunches, in-app link handling so article and post links open in an embedded browser instead of leaving Inkwell (toggle off to restore the system browser; sign-in links always stay external), a Haptics toggle under Accessibility, Storage settings showing the image cache size with a Clear Cache button (the URL cache is now bounded at 150 MB), and article read/bookmark tracking with an Export Data button that produces a shareable JSON. Mute/block management ships on Android in this release and will follow on iOS.",
+          "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.3.0.ipa",
+          "size": 11914595,
+          "buildVersion": "56"
+        },
         {
           "version": "2.2.0",
           "buildVersion": "55",
@@ -84,7 +94,10 @@
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
-      }
+      },
+      "version": "2.3.0",
+      "buildVersion": "56",
+      "versionDate": "2026-08-25"
     }
   ],
   "news": []
