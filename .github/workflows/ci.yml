@@ -176,12 +176,9 @@ jobs:
         working-directory: website
         run: pnpm check
 
-      - name: Show canonical Prettier diff
+      - name: Format check
         working-directory: website
-        run: |
-          pnpm exec prettier --write src/routes/+page.server.ts src/routes/features/+page.server.ts
-          git diff -- src/routes/+page.server.ts src/routes/features/+page.server.ts
-          exit 1
+        run: pnpm exec prettier --check --ignore-unknown .
 
       - name: Check the served AltStore manifest matches the working copy
         run: diff iOS/altstore/source.json website/static/altstore/source.json
