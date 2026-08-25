@@ -1,0 +1,27 @@
+{
+  "lexicon": 1,
+  "id": "uk.ewancroft.inkwell.user",
+  "description": "Declares that an account uses Inkwell, the native reader and writer for the Standard.site publishing ecosystem on AT Protocol.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A self-attesting record indicating the account holder uses Inkwell. The `app` field links to the canonical Inkwell app/website URI so the network-wide set of Inkwell users can be discovered via Constellation backlinks.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["user", "app"],
+        "properties": {
+          "user": {
+            "type": "boolean",
+            "description": "True when the account holder uses Inkwell. A missing or false value indicates the account does not currently declare Inkwell usage."
+          },
+          "app": {
+            "type": "string",
+            "format": "uri",
+            "description": "The canonical Inkwell app/website URI this record links to (https://inkwell.ewancroft.uk). Used as the Constellation backlink subject so all Inkwell-user records can be enumerated."
+          }
+        }
+      }
+    }
+  }
+}
