@@ -39,6 +39,8 @@ import uk.ewancroft.inkwell.data.repository.deleteSubscription
 import uk.ewancroft.inkwell.data.repository.fetchComments
 import uk.ewancroft.inkwell.data.repository.fetchRecommends
 import uk.ewancroft.inkwell.data.repository.fetchSubscriptions
+import uk.ewancroft.inkwell.data.repository.submitReportForAccount
+import uk.ewancroft.inkwell.data.repository.submitReportForRecord
 import uk.ewancroft.inkwell.util.ArticleStatePreferences
 import javax.inject.Inject
 
@@ -461,6 +463,39 @@ class PostDetailViewModel @Inject constructor(
 
     fun dismissCommentError() {
         _uiState.value = _uiState.value.copy(commentError = null)
+    }
+
+    fun submitReport(reasonType: String, reason: String?, isAccountReport: Boolean) {
+        val state = _uiState.value
+        if (state.uri.isBlank()) return
+
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(reportError = null)
+            try {
+                if (isAccountReport) {
+                    val did = AtUri.parse(state.uri)?.did ?: return@launch
+                    pdsRepository.submitReportForAccount(
+                        did = did,
+                        reasonType = reasonType,
+                        reason = reason,
+                    )
+                } else {
+                    pdsRepository.submitReportForRecord(
+                        uri = state.uri,
+                        reasonType = reasonType,
+                        reason = reason,
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    reportError = e.message ?: "Failed to submit report",
+                )
+            }
+        }
+    }
+
+    fun dismissReportError() {
+        _uiState.value = _uiState.value.copy(reportError = null)
     }
 
     data class PollData(

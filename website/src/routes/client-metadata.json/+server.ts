@@ -25,7 +25,8 @@ export function GET() {
       "rpc:app.bsky.graph.muteActor?aud=did:web:api.bsky.app%23bsky_appview " +
       "rpc:app.bsky.graph.unmuteActor?aud=did:web:api.bsky.app%23bsky_appview " +
       "rpc:app.bsky.graph.getMutes?aud=did:web:api.bsky.app%23bsky_appview " +
-      "rpc:app.bsky.graph.getBlocks?aud=did:web:api.bsky.app%23bsky_appview",
+      "rpc:app.bsky.graph.getBlocks?aud=did:web:api.bsky.app%23bsky_appview " +
+      "rpc:com.atproto.moderation.createReport?aud=did:web:api.bsky.app%23bsky_appview",
     grant_types: ["authorization_code", "refresh_token"],
     dpop_bound_access_tokens: true,
     token_endpoint_auth_method: "none",

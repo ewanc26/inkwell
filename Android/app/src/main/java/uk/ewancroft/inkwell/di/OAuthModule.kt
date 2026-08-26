@@ -31,7 +31,8 @@ object OAuthModule {
             "rpc:app.bsky.graph.muteActor?aud=did:web:api.bsky.app%23bsky_appview " +
             "rpc:app.bsky.graph.unmuteActor?aud=did:web:api.bsky.app%23bsky_appview " +
             "rpc:app.bsky.graph.getMutes?aud=did:web:api.bsky.app%23bsky_appview " +
-            "rpc:app.bsky.graph.getBlocks?aud=did:web:api.bsky.app%23bsky_appview"
+            "rpc:app.bsky.graph.getBlocks?aud=did:web:api.bsky.app%23bsky_appview " +
+            "rpc:com.atproto.moderation.createReport?aud=did:web:api.bsky.app%23bsky_appview"
 
     @Provides
     @Singleton

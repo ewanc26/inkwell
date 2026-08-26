@@ -13,6 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import uk.ewancroft.inkwell.shared.text.StringUtils
+import uk.ewancroft.inkwell.ui.moderation.ReportDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,6 +40,7 @@ fun PostDetailScreen(
     val isDarkTheme = uk.ewancroft.inkwell.ui.theme.LocalForceDarkTheme.current
         ?: androidx.compose.foundation.isSystemInDarkTheme()
     val context = androidx.compose.ui.platform.LocalContext.current
+    var showReportDialog by remember { mutableStateOf(false) }
     val readerTheme = remember(uiState.documentTheme, uiState.publicationTheme, uiState.basicTheme, isDarkTheme) {
         ReaderTheme.resolve(
             documentTheme = uiState.documentTheme,
@@ -98,6 +102,12 @@ fun PostDetailScreen(
                                 contentDescription = "Open in browser",
                             )
                         }
+                    }
+                    IconButton(onClick = { showReportDialog = true }) {
+                        Icon(
+                            Icons.Outlined.Report,
+                            contentDescription = "Report",
+                        )
                     }
                 },
             )
@@ -169,6 +179,30 @@ fun PostDetailScreen(
             }
         ) {
             Text(uiState.commentError!!)
+        }
+    }
+
+    if (showReportDialog) {
+        ReportDialog(
+            subjectURI = uri,
+            onDismiss = { showReportDialog = false },
+            onSubmit = { reason, comment ->
+                showReportDialog = false
+                viewModel.submitReport(reason, comment, isAccountReport = false)
+            },
+        )
+    }
+
+    if (uiState.reportError != null) {
+        Snackbar(
+            modifier = Modifier.padding(16.dp),
+            action = {
+                TextButton(onClick = { viewModel.dismissReportError() }) {
+                    Text("Dismiss")
+                }
+            }
+        ) {
+            Text(uiState.reportError!!)
         }
     }
 }

@@ -157,3 +157,56 @@ suspend fun PdsRepository.fetchBlockedActors(did: String): List<BlockedActorEntr
         BlockedActorEntry(actor, rkey)
     }
 }
+
+suspend fun PdsRepository.submitReport(
+    reasonType: String,
+    reason: String?,
+    subject: JsonObject,
+) {
+    if (TestingConfig.enabled) {
+        TestingConfig.report("Submit report")
+        throw TestingModeException("Submit report")
+    }
+    sessionStore.load() ?: throw Exception("Not authenticated")
+    val authClient = atOAuth.createClient()
+    val input = buildJsonObject {
+        put("reasonType", reasonType)
+        if (reason != null) put("reason", reason)
+        put("subject", subject)
+    }
+    authClient.procedure(
+        nsid = "com.atproto.moderation.createReport",
+        params = Unit,
+        paramsSerializer = Unit.serializer(),
+        input = input,
+        inputSerializer = JsonObject.serializer(),
+        responseSerializer = JsonObject.serializer(),
+        proxy = BLUESKY_APPVIEW_PROXY,
+    )
+}
+
+suspend fun PdsRepository.submitReportForRecord(
+    uri: String,
+    cid: String? = null,
+    reasonType: String,
+    reason: String? = null,
+) {
+    val subject = buildJsonObject {
+        put("\$type", "com.atproto.repo.strongRef")
+        put("uri", uri)
+        if (cid != null) put("cid", cid)
+    }
+    submitReport(reasonType = reasonType, reason = reason, subject = subject)
+}
+
+suspend fun PdsRepository.submitReportForAccount(
+    did: String,
+    reasonType: String,
+    reason: String? = null,
+) {
+    val subject = buildJsonObject {
+        put("\$type", "com.atproto.admin.defs#repoRef")
+        put("did", did)
+    }
+    submitReport(reasonType = reasonType, reason = reason, subject = subject)
+}

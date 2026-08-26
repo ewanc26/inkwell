@@ -20,5 +20,6 @@ object XrpcEndpoints {
     const val GRAPH_UNMUTE_ACTOR = "/xrpc/app.bsky.graph.unmuteActor"
     const val GRAPH_GET_MUTES = "/xrpc/app.bsky.graph.getMutes"
     const val GRAPH_GET_BLOCKS = "/xrpc/app.bsky.graph.getBlocks"
+    const val MODERATION_CREATE_REPORT = "/xrpc/com.atproto.moderation.createReport"
     const val MICROCOSM_GET_BACKLINKS = "/xrpc/blue.microcosm.links.getBacklinks"
 }

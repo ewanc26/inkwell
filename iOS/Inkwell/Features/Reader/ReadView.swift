@@ -54,6 +54,8 @@ struct ReadView: View {
     @State var isLoadingComments = false
     @State var replyToComment: CommentEntry? = nil
 
+    @State private var showingReportSheet = false
+
     // Resolves Leaflet's rich theme (light/dark palettes, fonts, page
     // width) first, falling back to standard.site's basicTheme, then
     // system defaults — see ReaderTheme.swift. A document-level theme
@@ -400,6 +402,25 @@ struct ReadView: View {
                     }
                 }
             }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    showingReportSheet = true
+                } label: {
+                    Label("Report", systemImage: "exclamationmark.triangle")
+                }
+            }
+        }
+        .sheet(isPresented: $showingReportSheet) {
+            ReportSheet(
+                subjectDID: authorDID,
+                subjectURI: documentURI ?? resolvedDocumentURI,
+                onSubmit: {
+                    actionMessage = "Report submitted."
+                },
+                onError: { message in
+                    actionMessage = "Report failed: \(message)"
+                }
+            )
         }
         .task {
             await loadContent()
