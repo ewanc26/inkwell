@@ -158,6 +158,70 @@ extension LoginStateManager {
         }
     }
 
+    // MARK: - Reporting
+
+    func submitReport(
+        reasonType: ComAtprotoLexicon.Moderation.ReasonTypeDefinition,
+        reason: String?,
+        subject: [String: Any]
+    ) async throws {
+        if TestingMode.isEnabled {
+            TestingModeNotice.shared.report("Submit report")
+            throw LoginError.testingMode
+        }
+
+        var bodyDict: [String: Any] = [
+            "reasonType": reasonType.rawValue,
+            "subject": subject,
+        ]
+        if let reason {
+            bodyDict["reason"] = reason
+        }
+        let body = try JSONSerialization.data(withJSONObject: bodyDict)
+        _ = try await authenticatedData(
+            path: sharedXrpcModerationCreateReport(),
+            method: "POST",
+            body: body,
+            proxy: blueskyAppViewProxy
+        )
+    }
+
+    func submitReportForRecord(
+        uri: String,
+        cid: String? = nil,
+        reasonType: ComAtprotoLexicon.Moderation.ReasonTypeDefinition,
+        reason: String? = nil
+    ) async throws {
+        var subject: [String: Any] = [
+            "$type": "com.atproto.repo.strongRef",
+            "uri": uri,
+        ]
+        if let cid {
+            subject["cid"] = cid
+        }
+        try await submitReport(
+            reasonType: reasonType,
+            reason: reason,
+            subject: subject
+        )
+    }
+
+    func submitReportForAccount(
+        did: String,
+        reasonType: ComAtprotoLexicon.Moderation.ReasonTypeDefinition,
+        reason: String? = nil
+    ) async throws {
+        let subject: [String: Any] = [
+            "$type": "com.atproto.admin.defs#repoRef",
+            "did": did,
+        ]
+        try await submitReport(
+            reasonType: reasonType,
+            reason: reason,
+            subject: subject
+        )
+    }
+
     private func fetchGraphActors(path: String, list: GraphActorList) async throws -> [ModeratedActor] {
         var all: [ModeratedActor] = []
         var cursor: String?

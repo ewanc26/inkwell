@@ -26,7 +26,7 @@ AI tools may be used when contributing. Add `Co-authored-by:` trailers crediting
 - `app/src/main/java/uk/ewancroft/inkwell/data/auth` stores the OAuth session, `app/src/main/java/uk/ewancroft/inkwell/data/repository/PdsRepository.kt` performs public/authenticated XRPC, `app/src/main/java/uk/ewancroft/inkwell/data/model` defines Standard.site/Leaflet/pckt/Offprint shapes, and `app/src/main/java/uk/ewancroft/inkwell/data/remote/ConstellationClient.kt` delegates pagination/deduplication to shared KMP.
 - `app/src/main/java/uk/ewancroft/inkwell/data/remote/BSkyPostFetcher.kt` fetches Bluesky posts from the public API for embed rendering.
 - Hilt modules construct OAuth/network services. ViewModels own `StateFlow`; Compose screens and `NavGraph` own UI/navigation. `InkwellNotificationManager.kt` and `InkwellNotificationWorker.kt` implement WorkManager-based background notification polling. `app/src/main/java/uk/ewancroft/inkwell/data/remote/StandardSiteVerifier.kt` delegates URL construction and link scanning to shared KMP; networking and caching remain native.
-- Target facts: compile/target SDK 36, minimum SDK 26, Java/Kotlin JVM 17, release minification enabled, app ID `uk.ewancroft.inkwell`, debug ID suffix `.debug`, version `2.3.0`, versionCode `10`.
+- Target facts: compile/target SDK 36, minimum SDK 26, Java/Kotlin JVM 17, release minification enabled, app ID `uk.ewancroft.inkwell`, debug ID suffix `.debug`, version `2.4.0`, versionCode `11`.
 
 ## Current Capability Gaps
 

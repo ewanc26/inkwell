@@ -6,7 +6,7 @@
 #import <Foundation/NSString.h>
 #import <Foundation/NSValue.h>
 
-@class FacetConverter, InkwellSharedAtUri, InkwellSharedAtUriCompanion, InkwellSharedBasicTheme, InkwellSharedBlobRef, InkwellSharedBlockLossLabels, InkwellSharedBlueskyEmbedTypes, InkwellSharedByteSlice, InkwellSharedCdnUrls, InkwellSharedCollectionNsids, InkwellSharedColorValue, InkwellSharedConstellationBacklink, InkwellSharedConstellationPagination, InkwellSharedConstellationResponse, InkwellSharedConstellationSourcePaths, InkwellSharedContentFormatDetector, InkwellSharedContentFormatDispatcher, InkwellSharedDocumentLinkScanner, InkwellSharedDocumentPreferences, InkwellSharedFacetDefinition, InkwellSharedFacetSchema, InkwellSharedHandleUtils, InkwellSharedInlineMarkdownScanner, InkwellSharedInlineSegment, InkwellSharedInlineSegmentBold, InkwellSharedInlineSegmentCode, InkwellSharedInlineSegmentItalic, InkwellSharedInlineSegmentLink, InkwellSharedInlineSegmentPlain, InkwellSharedInlineSegmentStrike, InkwellSharedJsonMapBridge, InkwellSharedKotlinArray<T>, InkwellSharedKotlinEnum<E>, InkwellSharedKotlinEnumCompanion, InkwellSharedKotlinException, InkwellSharedKotlinIllegalStateException, InkwellSharedKotlinIntIterator, InkwellSharedKotlinIntProgression, InkwellSharedKotlinIntProgressionCompanion, InkwellSharedKotlinIntRange, InkwellSharedKotlinIntRangeCompanion, InkwellSharedKotlinNothing, InkwellSharedKotlinPair<__covariant A, __covariant B>, InkwellSharedKotlinRuntimeException, InkwellSharedKotlinThrowable, InkwellSharedKotlinx_serialization_coreSerialKind, InkwellSharedKotlinx_serialization_coreSerializersModule, InkwellSharedKotlinx_serialization_jsonJsonElement, InkwellSharedKotlinx_serialization_jsonJsonElementCompanion, InkwellSharedLeafletContentConverter, InkwellSharedLeafletFacet, InkwellSharedLeafletFacetFeature, InkwellSharedLeafletTypes, InkwellSharedLegacyPalette, InkwellSharedLegalDocuments, InkwellSharedMarkdownBlock, InkwellSharedMarkdownBlockBlockquote, InkwellSharedMarkdownBlockCode, InkwellSharedMarkdownBlockHeading, InkwellSharedMarkdownBlockHorizontalRule, InkwellSharedMarkdownBlockImage, InkwellSharedMarkdownBlockMath, InkwellSharedMarkdownBlockOrderedList, InkwellSharedMarkdownBlockParagraph, InkwellSharedMarkdownBlockTaskList, InkwellSharedMarkdownBlockUnorderedList, InkwellSharedMarkdownListItem, InkwellSharedMarkdownParser, InkwellSharedMarkdownSerializer, InkwellSharedMarkpubContentConverter, InkwellSharedMarkpubTypes, InkwellSharedNotificationPolicy, InkwellSharedNotificationStyleNone, InkwellSharedNotificationStyleSingle, InkwellSharedNotificationStyleSummary, InkwellSharedNumberFormat, InkwellSharedOAuthScopes, InkwellSharedOffprintContentConverter, InkwellSharedOffprintTypes, InkwellSharedPcktContentConverter, InkwellSharedPcktTypes, InkwellSharedPublicationMatcher, InkwellSharedPublicationPreferences, InkwellSharedPublicationTheme, InkwellSharedRecordListPolicy, InkwellSharedRgbColor, InkwellSharedRgbaColor, InkwellSharedSearchBackendUrl, InkwellSharedSearchResultClassifier, InkwellSharedSharedConvertResult, InkwellSharedSharedDocumentRecord, InkwellSharedSharedGraphRecommend, InkwellSharedSharedGraphSubscription, InkwellSharedSharedLeafletComment, InkwellSharedSharedLeafletCommentReplyRef, InkwellSharedSharedPublicationRecord, InkwellSharedSharedReaderTheme, InkwellSharedSharedReaderThemeCompanion, InkwellSharedSharedReaderThemeFontFamily, InkwellSharedSharedWriteResult, InkwellSharedStringUtils, InkwellSharedStrongRef, InkwellSharedSupportersList, InkwellSharedTipPromptPolicy, InkwellSharedUrlUtils, InkwellSharedUserInputLexicon, InkwellSharedUtf8Offsets, InkwellSharedVerificationFailure, InkwellSharedVerificationFailureDocumentLinkMissing, InkwellSharedVerificationFailureEndpointUnreachable, InkwellSharedVerificationFailureInvalidDocumentURL, InkwellSharedVerificationFailureInvalidPublicationURL, InkwellSharedVerificationFailureMalformedResponse, InkwellSharedVerificationFailureMismatchedURI, InkwellSharedVerificationFailureUnexpected, InkwellSharedVerificationResult, InkwellSharedVerificationResultFailed, InkwellSharedVerificationResultVerified, InkwellSharedVerificationUrls, InkwellSharedXrpcEndpoints, RichTextFacet, RichTextFeature;
+@class FacetConverter, InkwellSharedAtUri, InkwellSharedAtUriCompanion, InkwellSharedBasicTheme, InkwellSharedBlobRef, InkwellSharedBlockLossLabels, InkwellSharedBlueskyEmbedTypes, InkwellSharedByteSlice, InkwellSharedCdnUrls, InkwellSharedCollectionNsids, InkwellSharedColorValue, InkwellSharedConstellationBacklink, InkwellSharedConstellationPagination, InkwellSharedConstellationResponse, InkwellSharedConstellationSourcePaths, InkwellSharedContentFormatDetector, InkwellSharedContentFormatDispatcher, InkwellSharedDocumentLinkScanner, InkwellSharedDocumentPreferences, InkwellSharedFacetDefinition, InkwellSharedFacetSchema, InkwellSharedHandleUtils, InkwellSharedInlineMarkdownScanner, InkwellSharedInlineSegment, InkwellSharedInlineSegmentBold, InkwellSharedInlineSegmentCode, InkwellSharedInlineSegmentItalic, InkwellSharedInlineSegmentLink, InkwellSharedInlineSegmentPlain, InkwellSharedInlineSegmentStrike, InkwellSharedJsonMapBridge, InkwellSharedKotlinArray<T>, InkwellSharedKotlinEnum<E>, InkwellSharedKotlinEnumCompanion, InkwellSharedKotlinException, InkwellSharedKotlinIllegalStateException, InkwellSharedKotlinIntIterator, InkwellSharedKotlinIntProgression, InkwellSharedKotlinIntProgressionCompanion, InkwellSharedKotlinIntRange, InkwellSharedKotlinIntRangeCompanion, InkwellSharedKotlinNothing, InkwellSharedKotlinPair<__covariant A, __covariant B>, InkwellSharedKotlinRuntimeException, InkwellSharedKotlinThrowable, InkwellSharedKotlinx_serialization_coreSerialKind, InkwellSharedKotlinx_serialization_coreSerializersModule, InkwellSharedKotlinx_serialization_jsonJsonElement, InkwellSharedKotlinx_serialization_jsonJsonElementCompanion, InkwellSharedLeafletContentConverter, InkwellSharedLeafletFacet, InkwellSharedLeafletFacetFeature, InkwellSharedLeafletTypes, InkwellSharedLegacyPalette, InkwellSharedLegalDocuments, InkwellSharedMarkdownBlock, InkwellSharedMarkdownBlockBlockquote, InkwellSharedMarkdownBlockCode, InkwellSharedMarkdownBlockHeading, InkwellSharedMarkdownBlockHorizontalRule, InkwellSharedMarkdownBlockImage, InkwellSharedMarkdownBlockMath, InkwellSharedMarkdownBlockOrderedList, InkwellSharedMarkdownBlockParagraph, InkwellSharedMarkdownBlockTaskList, InkwellSharedMarkdownBlockUnorderedList, InkwellSharedMarkdownListItem, InkwellSharedMarkdownParser, InkwellSharedMarkdownSerializer, InkwellSharedMarkpubContentConverter, InkwellSharedMarkpubTypes, InkwellSharedNotificationPolicy, InkwellSharedNotificationStyleNone, InkwellSharedNotificationStyleSingle, InkwellSharedNotificationStyleSummary, InkwellSharedNumberFormat, InkwellSharedOAuthScopes, InkwellSharedOffprintContentConverter, InkwellSharedOffprintTypes, InkwellSharedPcktContentConverter, InkwellSharedPcktTypes, InkwellSharedPublicationMatcher, InkwellSharedPublicationPreferences, InkwellSharedPublicationTheme, InkwellSharedRecordListPolicy, InkwellSharedRgbColor, InkwellSharedRgbaColor, InkwellSharedSearchBackendUrl, InkwellSharedSearchResultClassifier, InkwellSharedSharedConvertResult, InkwellSharedSharedDocumentRecord, InkwellSharedSharedGraphRecommend, InkwellSharedSharedGraphSubscription, InkwellSharedSharedLeafletComment, InkwellSharedSharedLeafletCommentReplyRef, InkwellSharedSharedPublicationRecord, InkwellSharedSharedReaderTheme, InkwellSharedSharedReaderThemeCompanion, InkwellSharedSharedReaderThemeFontFamily, InkwellSharedSharedWriteResult, InkwellSharedStringUtils, InkwellSharedStrongRef, InkwellSharedSupportersList, InkwellSharedTipPromptPolicy, InkwellSharedUrlUtils, InkwellSharedUserInputLexicon, InkwellSharedUserLexicon, InkwellSharedUserLexiconRecord, InkwellSharedUserLexiconUtils, InkwellSharedUtf8Offsets, InkwellSharedVerificationFailure, InkwellSharedVerificationFailureDocumentLinkMissing, InkwellSharedVerificationFailureEndpointUnreachable, InkwellSharedVerificationFailureInvalidDocumentURL, InkwellSharedVerificationFailureInvalidPublicationURL, InkwellSharedVerificationFailureMalformedResponse, InkwellSharedVerificationFailureMismatchedURI, InkwellSharedVerificationFailureUnexpected, InkwellSharedVerificationResult, InkwellSharedVerificationResultFailed, InkwellSharedVerificationResultVerified, InkwellSharedVerificationUrls, InkwellSharedXrpcEndpoints, RichTextFacet, RichTextFeature;
 
 @protocol InkwellSharedKotlinAnnotation, InkwellSharedKotlinClosedRange, InkwellSharedKotlinComparable, InkwellSharedKotlinFunction, InkwellSharedKotlinIterable, InkwellSharedKotlinIterator, InkwellSharedKotlinKAnnotatedElement, InkwellSharedKotlinKClass, InkwellSharedKotlinKClassifier, InkwellSharedKotlinKDeclarationContainer, InkwellSharedKotlinOpenEndRange, InkwellSharedKotlinSuspendFunction2, InkwellSharedKotlinx_serialization_coreCompositeDecoder, InkwellSharedKotlinx_serialization_coreCompositeEncoder, InkwellSharedKotlinx_serialization_coreDecoder, InkwellSharedKotlinx_serialization_coreDeserializationStrategy, InkwellSharedKotlinx_serialization_coreEncoder, InkwellSharedKotlinx_serialization_coreKSerializer, InkwellSharedKotlinx_serialization_coreSerialDescriptor, InkwellSharedKotlinx_serialization_coreSerializationStrategy, InkwellSharedKotlinx_serialization_coreSerializersModuleCollector, InkwellSharedNotificationStyle;
 
@@ -1117,6 +1117,7 @@ __attribute__((swift_name("CollectionNsids")))
 @property (readonly) NSString *LEAFLET_POLL_DEFINITION __attribute__((swift_name("LEAFLET_POLL_DEFINITION")));
 @property (readonly) NSString *LEAFLET_POLL_VOTE __attribute__((swift_name("LEAFLET_POLL_VOTE")));
 @property (readonly) NSString *PUBLICATION __attribute__((swift_name("PUBLICATION")));
+@property (readonly) NSString *USER __attribute__((swift_name("USER")));
 @end
 
 
@@ -2254,6 +2255,82 @@ __attribute__((swift_name("StrongRef")))
 @property (readonly) NSString *uri __attribute__((swift_name("uri")));
 @end
 
+
+/**
+ * Lexicon declaring that an account uses Inkwell.
+ *
+ * Record type: `uk.ewancroft.inkwell.user`
+ *
+ * Fields:
+ *  - `user`: Boolean — true when the account holder uses Inkwell.
+ *  - `app`: String (uri) — the canonical Inkwell app/website URI the record
+ *    links to. Constellation indexes this link, so the network-wide set of
+ *    Inkwell users can be enumerated by querying backlinks to [CANONICAL_APP_URI]
+ *    with source [BACKLINK_SOURCE].
+ *
+ * The lexicon definition lives at `lexicons/uk.ewancroft.inkwell.user.json`.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("UserLexicon")))
+@interface InkwellSharedUserLexicon : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Lexicon declaring that an account uses Inkwell.
+ *
+ * Record type: `uk.ewancroft.inkwell.user`
+ *
+ * Fields:
+ *  - `user`: Boolean — true when the account holder uses Inkwell.
+ *  - `app`: String (uri) — the canonical Inkwell app/website URI the record
+ *    links to. Constellation indexes this link, so the network-wide set of
+ *    Inkwell users can be enumerated by querying backlinks to [CANONICAL_APP_URI]
+ *    with source [BACKLINK_SOURCE].
+ *
+ * The lexicon definition lives at `lexicons/uk.ewancroft.inkwell.user.json`.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)userLexicon __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedUserLexicon *shared __attribute__((swift_name("shared")));
+
+/** Constellation backlink source path for enumerating Inkwell-user records. */
+@property (readonly) NSString *BACKLINK_SOURCE __attribute__((swift_name("BACKLINK_SOURCE")));
+@property (readonly) NSString *CANONICAL_APP_URI __attribute__((swift_name("CANONICAL_APP_URI")));
+@property (readonly) NSString *NSID __attribute__((swift_name("NSID")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("UserLexiconRecord")))
+@interface InkwellSharedUserLexiconRecord : InkwellSharedBase
+- (instancetype)initWithUser:(BOOL)user app:(NSString *)app type:(NSString *)type __attribute__((swift_name("init(user:app:type:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedUserLexiconRecord *)doCopyUser:(BOOL)user app:(NSString *)app type:(NSString *)type __attribute__((swift_name("doCopy(user:app:type:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString *app __attribute__((swift_name("app")));
+@property (readonly) NSString *type __attribute__((swift_name("type")));
+@property (readonly) BOOL user __attribute__((swift_name("user")));
+@end
+
+
+/** Utility functions for [UserLexiconRecord]. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("UserLexiconUtils")))
+@interface InkwellSharedUserLexiconUtils : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/** Utility functions for [UserLexiconRecord]. */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)userLexiconUtils __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedUserLexiconUtils *shared __attribute__((swift_name("shared")));
+
+/** Creates an Inkwell-user declaration for the signed-in account. */
+- (InkwellSharedUserLexiconRecord *)createForUserUser:(BOOL)user __attribute__((swift_name("createForUser(user:)")));
+
+/** Returns true if the given `$type` string represents a UserLexicon record. */
+- (BOOL)isUserLexiconTypeType:(NSString * _Nullable)type __attribute__((swift_name("isUserLexiconType(type:)")));
+@end
+
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("OAuthScopes")))
 @interface InkwellSharedOAuthScopes : InkwellSharedBase
@@ -2265,10 +2342,16 @@ __attribute__((swift_name("OAuthScopes")))
 @property (readonly) NSString *AUTH_FULL __attribute__((swift_name("AUTH_FULL")));
 @property (readonly) NSString *AUTH_SOCIAL __attribute__((swift_name("AUTH_SOCIAL")));
 @property (readonly) NSString *BLOB_ALL __attribute__((swift_name("BLOB_ALL")));
+
+/** Scope for moderation RPCs (report, etc.) proxied through the Bluesky AppView. */
+@property (readonly) NSString *MODERATION __attribute__((swift_name("MODERATION")));
 @property (readonly) NSString *REPO_DOCUMENT __attribute__((swift_name("REPO_DOCUMENT")));
 @property (readonly) NSString *REPO_PUBLICATION __attribute__((swift_name("REPO_PUBLICATION")));
 @property (readonly) NSString *REPO_RECOMMEND __attribute__((swift_name("REPO_RECOMMEND")));
 @property (readonly) NSString *REPO_SUBSCRIPTION __attribute__((swift_name("REPO_SUBSCRIPTION")));
+
+/** Scope for the Inkwell-user declaration record write. */
+@property (readonly) NSString *REPO_USER __attribute__((swift_name("REPO_USER")));
 
 /** Needed to post feedback to Inkwell's userinput.app board. */
 @property (readonly) NSString *REPO_USERINPUT_DISCUSSION __attribute__((swift_name("REPO_USERINPUT_DISCUSSION")));
@@ -2895,6 +2978,7 @@ __attribute__((swift_name("XrpcEndpoints")))
 @property (readonly) NSString *GRAPH_UNMUTE_ACTOR __attribute__((swift_name("GRAPH_UNMUTE_ACTOR")));
 @property (readonly) NSString *IDENTITY_RESOLVE_HANDLE __attribute__((swift_name("IDENTITY_RESOLVE_HANDLE")));
 @property (readonly) NSString *MICROCOSM_GET_BACKLINKS __attribute__((swift_name("MICROCOSM_GET_BACKLINKS")));
+@property (readonly) NSString *MODERATION_CREATE_REPORT __attribute__((swift_name("MODERATION_CREATE_REPORT")));
 @property (readonly) NSString *PUBLIC_BSKY_API __attribute__((swift_name("PUBLIC_BSKY_API")));
 @property (readonly) NSString *REPO_CREATE_RECORD __attribute__((swift_name("REPO_CREATE_RECORD")));
 @property (readonly) NSString *REPO_DELETE_RECORD __attribute__((swift_name("REPO_DELETE_RECORD")));
