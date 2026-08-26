@@ -103,11 +103,8 @@ fun PostDetailScreen(
                             )
                         }
                     }
-                    IconButton(onClick = { showReportDialog = true }) {
-                        Icon(
-                            Icons.Outlined.Report,
-                            contentDescription = "Report",
-                        )
+                    TextButton(onClick = { showReportDialog = true }) {
+                        Text("Report")
                     }
                 },
             )
