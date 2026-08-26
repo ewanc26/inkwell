@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import uk.ewancroft.inkwell.ui.components.CreditsView
+import uk.ewancroft.inkwell.data.model.common.SearchActorResult
 import uk.ewancroft.inkwell.data.model.common.SearchResult
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -129,27 +130,45 @@ fun DiscoverScreen(
                         contentPadding = PaddingValues(16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
+                        if (uiState.actors.isNotEmpty()) {
+                            item {
+                                Text("Users", style = MaterialTheme.typography.titleSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Spacer(Modifier.height(4.dp))
+                            }
+                            items(uiState.actors, key = { it.did }) { actor ->
+                                ActorSearchRow(
+                                    actor = actor,
+                                    onClick = {
+                                        val profileUrl = "https://bsky.app/profile/${actor.handle}"
+                                        uk.ewancroft.inkwell.util.LinkPreferences.openContentUrl(context, profileUrl)
+                                    },
+                                )
+                            }
+                        }
+
                         if (uiState.results.isNotEmpty()) {
                             item {
+                                Spacer(Modifier.height(12.dp))
                                 Text("Documents", style = MaterialTheme.typography.titleSmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 Spacer(Modifier.height(4.dp))
                             }
-                        }
-                        items(uiState.results, key = { it.uri }) { result ->
-                            SearchResultRow(
-                                result = result,
-                                isSubscribed = uiState.subscriptions.containsKey(result.uri),
-                                isSubscriptionPending = result.uri in uiState.pendingSubscriptions,
-                                onToggleSubscription = { viewModel.toggleSubscription(result) },
-                                onClick = {
-                                    if (result.isStandardSiteDocument) {
-                                        onNavigateToPost(result.uri, null, null, null, null)
-                                    } else {
-                                        openWebUrl(context, result.uri)
-                                    }
-                                },
-                            )
+                            items(uiState.results, key = { it.uri }) { result ->
+                                SearchResultRow(
+                                    result = result,
+                                    isSubscribed = uiState.subscriptions.containsKey(result.uri),
+                                    isSubscriptionPending = result.uri in uiState.pendingSubscriptions,
+                                    onToggleSubscription = { viewModel.toggleSubscription(result) },
+                                    onClick = {
+                                        if (result.isStandardSiteDocument) {
+                                            onNavigateToPost(result.uri, null, null, null, null)
+                                        } else {
+                                            openWebUrl(context, result.uri)
+                                        }
+                                    },
+                                )
+                            }
                         }
                     }
                 }
@@ -270,6 +289,53 @@ private fun SearchResultRow(
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.55f),
                     modifier = Modifier.size(16.dp),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ActorSearchRow(
+    actor: SearchActorResult,
+    onClick: () -> Unit,
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp).fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            if (actor.avatar != null) {
+                AsyncImage(
+                    model = actor.avatar,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(MaterialTheme.shapes.small),
+                    contentScale = ContentScale.Crop,
+                )
+            }
+
+            Column(Modifier.weight(1f)) {
+                Text(
+                    actor.displayName ?: actor.handle,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    "@${actor.handle}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }

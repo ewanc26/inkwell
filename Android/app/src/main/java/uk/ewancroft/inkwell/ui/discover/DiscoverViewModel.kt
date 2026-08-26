@@ -14,6 +14,8 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import uk.ewancroft.inkwell.data.model.common.SearchActorResponse
+import uk.ewancroft.inkwell.data.model.common.SearchActorResult
 import uk.ewancroft.inkwell.data.model.common.SearchResponse
 import uk.ewancroft.inkwell.data.model.common.SearchResult
 import uk.ewancroft.inkwell.data.repository.PdsRepository
@@ -28,6 +30,7 @@ import javax.inject.Inject
 data class DiscoverUiState(
     val query: String = "",
     val results: List<SearchResult> = emptyList(),
+    val actors: List<SearchActorResult> = emptyList(),
     val isSearching: Boolean = false,
     val error: String? = null,
     // publicationUri -> subscription record key, for publications the
@@ -68,18 +71,30 @@ class DiscoverViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSearching = true, error = null)
             try {
-                val url = "${SearchBackendUrl.BASE}/search?q=${
+                val searchUrl = "${SearchBackendUrl.BASE}/search?q=${
                     java.net.URLEncoder.encode(query, "UTF-8")
                 }&mode=keyword&limit=40&format=v2"
-                val body = withContext(Dispatchers.IO) {
-                    val request = Request.Builder().url(url).get().build()
-                    client.newCall(request).execute().use { it.body!!.string() }
+                val actorsUrl = "${SearchBackendUrl.PUBLIC_APPVIEW}/xrpc/app.bsky.actor.searchActorsTypeahead?q=${
+                    java.net.URLEncoder.encode(query, "UTF-8")
+                }&limit=10"
+
+                val (searchBody, actorsBody) = withContext(Dispatchers.IO) {
+                    val searchRequest = Request.Builder().url(searchUrl).get().build()
+                    val actorsRequest = Request.Builder().url(actorsUrl).get().build()
+                    client.newCall(searchRequest).execute().use { it.body!!.string() } to
+                        client.newCall(actorsRequest).execute().use { it.body!!.string() }
                 }
+
                 val searchResponse = withContext(Dispatchers.IO) {
-                    json.decodeFromString<SearchResponse>(body)
+                    json.decodeFromString<SearchResponse>(searchBody)
                 }
+                val actorResponse = withContext(Dispatchers.IO) {
+                    json.decodeFromString<SearchActorResponse>(actorsBody)
+                }
+
                 _uiState.value = _uiState.value.copy(
                     results = searchResponse.results,
+                    actors = actorResponse.actors,
                     isSearching = false
                 )
             } catch (e: Exception) {

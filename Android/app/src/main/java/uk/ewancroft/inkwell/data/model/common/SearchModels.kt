@@ -28,8 +28,21 @@ data class SearchResult(
 }
 
 @Serializable
+data class SearchActorResult(
+    val did: String,
+    val handle: String,
+    val displayName: String? = null,
+    val avatar: String? = null,
+)
+
+@Serializable
+data class SearchActorResponse(
+    val actors: List<SearchActorResult> = emptyList(),
+)
+
+@Serializable
 data class SearchResponse(
-    val results: List<SearchResult>,
+    val results: List<SearchResult> = emptyList(),
     val total: Int? = null,
-    val hasMore: Boolean = false
+    val hasMore: Boolean = false,
 )

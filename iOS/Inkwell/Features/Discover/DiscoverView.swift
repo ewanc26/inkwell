@@ -17,6 +17,7 @@ struct DiscoverView: View {
 
     @State private var query = ""
     @State private var results: [ReaderSearchResult] = []
+    @State private var actors: [ReaderSearchActorResult] = []
     @State private var isSearching = false
     @State private var errorMessage: String?
     @State private var showAbout = false
@@ -24,6 +25,14 @@ struct DiscoverView: View {
     var body: some View {
         NavigationStack {
             List {
+                if !actors.isEmpty {
+                    Section("Users") {
+                        ForEach(actors) { actor in
+                            ActorSearchRow(actor: actor)
+                        }
+                    }
+                }
+
                 if !results.isEmpty {
                     Section("Documents") {
                         ForEach(results) { result in
@@ -78,10 +87,10 @@ struct DiscoverView: View {
     /// list. Nothing is drawn once there are results to show.
     @ViewBuilder
     private var placeholder: some View {
-        if isSearching && results.isEmpty {
+        if isSearching && results.isEmpty && actors.isEmpty {
             ProgressView("Searching the Standard.site network…")
                 .controlSize(.large)
-        } else if results.isEmpty {
+        } else if results.isEmpty && actors.isEmpty {
             ContentUnavailableView(
                 "Search the Open Web",
                 systemImage: "text.magnifyingglass",
@@ -98,7 +107,12 @@ struct DiscoverView: View {
         defer { isSearching = false }
 
         do {
-            results = try await StandardReaderAPI.shared.search(query: trimmed).results
+            async let documents = StandardReaderAPI.shared.search(query: trimmed).results
+            async let actors = StandardReaderAPI.shared.searchActors(query: trimmed)
+            let combinedResults = try await documents
+            let actorResponse = try await actors
+            results = combinedResults
+            self.actors = actorResponse.actors
         } catch {
             errorMessage = "Search is unavailable: \(error.localizedDescription)"
         }
