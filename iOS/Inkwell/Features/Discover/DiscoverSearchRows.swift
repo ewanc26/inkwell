@@ -48,6 +48,32 @@ struct SearchResultThumbnail: View {
     }
 }
 
+struct ActorSearchRow: View {
+    let actor: ReaderSearchActorResult
+
+    var body: some View {
+        HStack(spacing: 12) {
+            SearchResultThumbnail(
+                urlString: actor.avatar,
+                placeholderSystemImage: "person.circle",
+                size: 44
+            )
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(actor.displayName ?? actor.handle)
+                    .font(.headline)
+                    .lineLimit(2)
+                Text("@\(actor.handle)")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(.vertical, 4)
+    }
+}
+
 struct DocumentSearchRow: View {
     let result: ReaderSearchResult
 

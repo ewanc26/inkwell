@@ -56,6 +56,19 @@ struct ReaderSearchResult: Identifiable, Codable, Equatable, Hashable {
     }
 }
 
+struct ReaderSearchActorResult: Identifiable, Codable, Equatable, Hashable {
+    let did: String
+    let handle: String
+    let displayName: String?
+    let avatar: String?
+
+    var id: String { did }
+}
+
+struct ReaderSearchActorResponse: Decodable {
+    let actors: [ReaderSearchActorResult]
+}
+
 struct ReaderSearchResponse: Decodable {
     let results: [ReaderSearchResult]
     let total: Int?
@@ -98,6 +111,26 @@ final class StandardReaderAPI {
             URLQueryItem(name: "limit", value: String(max(1, min(limit, 100)))),
             URLQueryItem(name: "format", value: "v2")
         ])
+    }
+
+    func searchActors(query: String, limit: Int = 10) async throws -> ReaderSearchActorResponse {
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            return ReaderSearchActorResponse(actors: [])
+        }
+        let url = URL(string: "https://public.api.bsky.app/xrpc/app.bsky.actor.searchActorsTypeahead")!
+        var components = URLComponents(url: url, resolvingAgainstBaseURL: false)!
+        components.queryItems = [
+            URLQueryItem(name: "q", value: trimmed),
+            URLQueryItem(name: "limit", value: String(max(1, min(limit, 100))))
+        ]
+
+        let (data, response) = try await session.data(from: components.url!)
+        guard let http = response as? HTTPURLResponse,
+              (200...299).contains(http.statusCode) else {
+            throw URLError(.badServerResponse)
+        }
+        return try JSONDecoder().decode(ReaderSearchActorResponse.self, from: data)
     }
 
     private func request(_ path: String, queryItems: [URLQueryItem]) async throws -> ReaderSearchResponse {
