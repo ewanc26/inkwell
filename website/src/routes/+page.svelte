@@ -17,7 +17,7 @@
   } from "$lib/config";
   import type { PageData } from "./$types";
 
-  let data: any = {};
+  let { data }: { data: PageData } = $props();
   import {
     BookOpen,
     Compass,
