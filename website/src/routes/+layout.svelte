@@ -84,20 +84,23 @@
     <a href="/" class="nav-brand" aria-label="{SITE.title}, home">
       <!--
         Inline SVG: currentColor & var(--color-accent) resolve because it
-        lives in the page DOM, unlike an <img> src. The capsule shapes and
-        ink-drop circle are the app icon's defining forms.
+        lives in the page DOM, unlike an <img> src. The mark uses the same
+        centred 952x952 geometry as the favicon so its proportions stay
+        consistent everywhere.
       -->
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 512 512"
+        viewBox="0 0 952 952"
         fill="none"
         class="nav-logo"
         aria-hidden="true"
       >
-        <rect x="108" y="64" width="296" height="44" rx="16" fill="currentColor" />
-        <rect x="189" y="108" width="134" height="290" fill="currentColor" />
-        <rect x="108" y="398" width="296" height="44" rx="16" fill="currentColor" />
-        <circle cx="256" cy="468" r="20" fill="var(--color-accent, #64BB44)" />
+        <g transform="translate(276 0)">
+          <rect x="40" y="40" width="320" height="80" rx="16" fill="currentColor" />
+          <rect x="125" y="120" width="150" height="640" fill="currentColor" />
+          <rect x="40" y="760" width="320" height="80" rx="16" fill="currentColor" />
+          <circle cx="200" cy="880" r="32" fill="var(--color-accent, #64BB44)" />
+        </g>
       </svg>
       {SITE.title}
     </a>
