@@ -19,6 +19,18 @@ Guidance for agents working on Inkwell, a native reader and writer for the Stand
 - **Android** (`uk.ewancroft.inkwell`): Kotlin/Compose client, version `2.3.0` versionCode `10`. OAuth complete. Reader, Discover, Writer functional. Reader publication theming (Leaflet rich theme, legacy palette, basicTheme cascade). Leaflet blocks with rich-text facets. Markpub markdown rendering with headings, lists, code blocks, blockquotes, images, task lists, horizontal rules, and inline formatting. pckt/Offprint block arrays converted to markdown with facet-aware inline formatting via shared KMP. Bluesky post embeds with live fetching and author/image/link/quote rendering. Standard.site post embeds with document fetch and cover image. Comments, subscriptions, recommends, and interactions (likes/reposts/replies) implemented. WorkManager background notification polling. Verification URL/link-scan logic delegated to shared KMP; Constellation pagination/deduplication delegated to shared KMP. Writer: formatting toolbar, live preview toggle, loss reporting banner, and document editing. F-Droid self-hosted repo with fastlane screenshots.
 - **Website** (`inkwell.ewancroft.uk`): SvelteKit/Vercel marketing, legal, and OAuth-metadata site. Hosts live `/client-metadata.json`, AltStore `source.json`, F-Droid repo index, and web-optimized screenshots for both platforms.
 
+## Roadmap
+
+Public kanban board: https://github.com/users/ewanc26/projects/3
+
+Use the kanban board to track work across columns: **Backlog** → **Todo** →
+**In Progress** → **Done**. When picking up a task, move it to **In
+Progress**; when finished and released, move it to **Done**. Add new items
+for upcoming work with `gh project item-create 3 --owner ewanc26 --title
+"..." --body "..."`. Link related PRs or issues with `gh project item-add 3
+--owner ewanc26 --url <url>`. View in browser with `gh project view 3
+--owner ewanc26 --web`.
+
 ## Commits
 
 Conventional commits, scoped by area:
