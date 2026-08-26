@@ -69,7 +69,7 @@ class SearchModelsTest {
     @Test
     fun `publication result is flagged`() {
         val body = """
-            [{"type":"publication","uri":"at://did:plc:abc123/app.bsky.graph.list/pub",
+            [{"type":"publication","uri":"at://did:plc:abc123/site.standard.publication/pub",
               "did":"did:plc:abc123","title":"My Publication"}]
         """.trimIndent()
 

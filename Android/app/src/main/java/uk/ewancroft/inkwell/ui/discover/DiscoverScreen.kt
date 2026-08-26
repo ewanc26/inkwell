@@ -54,7 +54,7 @@ fun DiscoverScreen(
                 value = uiState.query,
                 onValueChange = { viewModel.onQueryChanged(it) },
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
-                placeholder = { Text("Search publications and articles") },
+                placeholder = { Text("Search articles and documents") },
                 singleLine = true,
                 trailingIcon = {
                     if (uiState.query.isNotBlank()) {
@@ -125,48 +125,31 @@ fun DiscoverScreen(
                     }
                 }
                 else -> {
-                    val documents = uiState.results.filter { !it.isPublication }
-                    val publications = uiState.results.filter { it.isPublication }
-
                     LazyColumn(
                         contentPadding = PaddingValues(16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        if (documents.isNotEmpty()) {
+                        if (uiState.results.isNotEmpty()) {
                             item {
                                 Text("Documents", style = MaterialTheme.typography.titleSmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 Spacer(Modifier.height(4.dp))
                             }
-                            items(documents, key = { it.uri }) { result ->
-                                SearchResultRow(
-                                    result = result,
-                                    onClick = {
-                                        if (result.isStandardSiteDocument) {
-                                            onNavigateToPost(result.uri, null, null, null, null)
-                                        } else {
-                                            openWebUrl(context, result.uri)
-                                        }
-                                    },
-                                )
-                            }
                         }
-
-                        if (publications.isNotEmpty()) {
-                            item {
-                                Spacer(Modifier.height(12.dp))
-                                Text("Publications", style = MaterialTheme.typography.titleSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                Spacer(Modifier.height(4.dp))
-                            }
-                            items(publications, key = { it.uri }) { result ->
-                                SearchResultRow(
-                                    result = result,
-                                    isSubscribed = uiState.subscriptions.containsKey(result.uri),
-                                    isSubscriptionPending = result.uri in uiState.pendingSubscriptions,
-                                    onToggleSubscription = { viewModel.toggleSubscription(result) },
-                                )
-                            }
+                        items(uiState.results, key = { it.uri }) { result ->
+                            SearchResultRow(
+                                result = result,
+                                isSubscribed = uiState.subscriptions.containsKey(result.uri),
+                                isSubscriptionPending = result.uri in uiState.pendingSubscriptions,
+                                onToggleSubscription = { viewModel.toggleSubscription(result) },
+                                onClick = {
+                                    if (result.isStandardSiteDocument) {
+                                        onNavigateToPost(result.uri, null, null, null, null)
+                                    } else {
+                                        openWebUrl(context, result.uri)
+                                    }
+                                },
+                            )
                         }
                     }
                 }
