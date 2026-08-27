@@ -23,8 +23,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import uk.ewancroft.inkwell.ui.components.CreditsView
+import uk.ewancroft.inkwell.ui.offline.OfflineStatusBanner
+import uk.ewancroft.inkwell.ui.offline.rememberNetworkAvailable
 import uk.ewancroft.inkwell.data.model.common.SearchActorResult
 import uk.ewancroft.inkwell.data.model.common.SearchResult
 import uk.ewancroft.inkwell.data.model.common.PublicationResult
@@ -36,8 +39,9 @@ fun DiscoverScreen(
     onSignOut: () -> Unit = {},
     onNavigateToPost: (String, String?, String?, String?, String?) -> Unit = { _, _, _, _, _ -> },
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showCredits by remember { mutableStateOf(false) }
+    val isNetworkAvailable = rememberNetworkAvailable()
 
     val context = androidx.compose.ui.platform.LocalContext.current
     val appVersion = remember { uk.ewancroft.inkwell.util.appVersionString(context) }
@@ -55,6 +59,9 @@ fun DiscoverScreen(
         }
     ) { padding ->
         Column(Modifier.padding(padding).fillMaxSize()) {
+            if (!isNetworkAvailable) {
+                OfflineStatusBanner()
+            }
             OutlinedTextField(
                 value = uiState.query,
                 onValueChange = { viewModel.onQueryChanged(it) },

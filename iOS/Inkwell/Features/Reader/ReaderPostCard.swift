@@ -95,6 +95,10 @@ struct ReaderPostCard: View {
 
                 HStack(spacing: 6) {
                     Text(formattedDate)
+                    if item.isCached {
+                        Label("Cached", systemImage: "archivebox")
+                            .labelStyle(.titleAndIcon)
+                    }
                     if let publicationName = publication?.name {
                         Text("·")
                         Text(publicationName)
@@ -144,6 +148,10 @@ struct ReaderPostCard: View {
 
         if let publicationName = publication?.name, !publicationName.isEmpty {
             parts.append("Published in \(publicationName)")
+        }
+
+        if item.isCached {
+            parts.append("Available offline")
         }
 
         parts.append("Published \(formattedDate)")
