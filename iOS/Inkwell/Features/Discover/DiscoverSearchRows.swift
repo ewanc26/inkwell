@@ -115,11 +115,8 @@ struct DocumentSearchRow: View {
     }
 }
 
-struct PublicationSearchRow: View {
-    let publication: ReaderSearchResult
-    let isSubscribed: Bool
-    let canSubscribe: Bool
-    let onSubscribe: () -> Void
+struct PublicationDiscoveryRow: View {
+    let publication: PublicationResult
 
     var body: some View {
         HStack(spacing: 12) {
@@ -130,61 +127,22 @@ struct PublicationSearchRow: View {
             )
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(publication.title)
+                Text(publication.name)
                     .font(.headline)
-                    .lineLimit(2)
-                if let snippet = publication.snippet, !snippet.isEmpty {
-                    Text(snippet)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(2)
-                }
-                if publication.platform != nil || publication.basePath != nil {
-                    Text([publication.platform, publication.basePath].compactMap { $0 }.joined(separator: " · "))
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
-                        .lineLimit(1)
-                        .truncationMode(.middle)
-                }
+                    .lineLimit(1)
+                Text(publication.domain)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
-            subscribeButton
-        }
-        .padding(.vertical, 4)
-    }
-
-    /// A real system button rather than a symbol on a hand-drawn tinted
-    /// circle: `.borderedProminent` when subscribed and `.bordered` when
-    /// not gives the same filled/outlined read, but with the system's own
-    /// contrast handling, disabled appearance, and press feedback.
-    private var subscribeButton: some View {
-        Button(action: onSubscribe) {
-            Image(systemName: isSubscribed ? "bell.fill" : "bell")
-                .symbolEffect(.bounce, value: isSubscribed)
+            Image(systemName: "arrow.up.forward")
+                .font(.footnote)
+                .foregroundStyle(.tertiary)
                 .accessibilityHidden(true)
         }
-        .modifier(ProminentBorderedWhen(isProminent: isSubscribed))
-        .buttonBorderShape(.circle)
-        .disabled(!canSubscribe)
-        .accessibilityLabel(isSubscribed ? "Unsubscribe" : "Subscribe")
-        .accessibilityAddTraits(isSubscribed ? [.isSelected] : [])
-        .animation(InkwellMotion.micro, value: isSubscribed)
-    }
-}
-
-/// Switches a button between the bordered and prominent-bordered system
-/// styles. The two are distinct types, so the choice can't be made with a
-/// ternary inside `.buttonStyle(_:)` — it has to branch at the view level.
-struct ProminentBorderedWhen: ViewModifier {
-    let isProminent: Bool
-
-    @ViewBuilder
-    func body(content: Content) -> some View {
-        if isProminent {
-            content.buttonStyle(.borderedProminent)
-        } else {
-            content.buttonStyle(.bordered)
-        }
+        .padding(.vertical, 4)
     }
 }

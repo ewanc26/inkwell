@@ -8,10 +8,9 @@
 //  metadata; Inkwell always fetches the authoritative record from the
 //  author's own PDS before rendering or subscribing to anything.
 //
-//  Two search entry points exist: `search(query:)` for the Discover tab's
-//  keyword search, and `search(for:)` which accepts a broader term and
-//  shares the same backend — internally both hit the same `/search`
-//  endpoint with the same `keyword` mode.
+//  Keyword search is exposed through `search(query:)`, `search(query:mode:)`
+//  (which lets the Discover tab request the backend's `publications` mode),
+//  and `search(for:)` — all hitting the same `/search` endpoint.
 //
 
 import Foundation
@@ -69,6 +68,37 @@ struct ReaderSearchActorResponse: Decodable {
     let actors: [ReaderSearchActorResult]
 }
 
+/// A distinct publication (site) derived from search results. The
+/// leaflet-search-backend indexes documents, not publications, so a
+/// publication is reconstructed by grouping results that share an author DID
+/// and `basePath` (the publication's origin domain).
+struct PublicationResult: Identifiable, Hashable {
+    let name: String
+    let domain: String
+    let url: URL?
+    let did: String
+    let coverImage: String?
+
+    var id: String { domain }
+
+    /// Collapses document search results into distinct publications: results
+    /// from the same author DID and `basePath` are one publication.
+    static func aggregate(_ results: [ReaderSearchResult]) -> [PublicationResult] {
+        let grouped = Dictionary(grouping: results) { "\($0.did)|\($0.basePath ?? "")" }
+        return grouped.compactMap { (_, items) in
+            guard let domain = items.first?.basePath, !domain.isEmpty else { return nil }
+            let first = items.first!
+            return PublicationResult(
+                name: domain,
+                domain: domain,
+                url: URL(string: "https://\(domain)"),
+                did: first.did,
+                coverImage: items.compactMap { $0.coverImage }.first
+            )
+        }.sorted { $0.name < $1.name }
+    }
+}
+
 struct ReaderSearchResponse: Decodable {
     let results: [ReaderSearchResult]
     let total: Int?
@@ -92,6 +122,19 @@ final class StandardReaderAPI {
         try await request("search", queryItems: [
             URLQueryItem(name: "q", value: query),
             URLQueryItem(name: "mode", value: "keyword"),
+            URLQueryItem(name: "limit", value: String(max(1, min(limit, 100)))),
+            URLQueryItem(name: "format", value: "v2")
+        ])
+    }
+
+    /// Keyword search that allows an explicit backend `mode` (e.g.
+    /// `"publications"`). The leaflet-search-backend indexes documents rather
+    /// than publications, so the Publications scope aggregates the returned
+    /// documents into distinct publications on the client.
+    func search(query: String, mode: String, limit: Int = 40) async throws -> ReaderSearchResponse {
+        try await request("search", queryItems: [
+            URLQueryItem(name: "q", value: query),
+            URLQueryItem(name: "mode", value: mode),
             URLQueryItem(name: "limit", value: String(max(1, min(limit, 100)))),
             URLQueryItem(name: "format", value: "v2")
         ])
