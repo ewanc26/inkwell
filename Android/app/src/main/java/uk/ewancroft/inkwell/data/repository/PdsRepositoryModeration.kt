@@ -13,6 +13,9 @@ import uk.ewancroft.inkwell.TestingConfig
 import uk.ewancroft.inkwell.TestingModeException
 import uk.ewancroft.inkwell.shared.AtUri
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
+import uk.ewancroft.inkwell.shared.moderation.ReportReasonType
+import uk.ewancroft.inkwell.shared.moderation.ReportSubmission
+import uk.ewancroft.inkwell.shared.moderation.ReportSubjectKind
 import java.time.Instant
 
 // ── Graph: Mutes & Blocks (app.bsky.graph.*) ────────────────────────────
@@ -159,19 +162,51 @@ suspend fun PdsRepository.fetchBlockedActors(did: String): List<BlockedActorEntr
 }
 
 suspend fun PdsRepository.submitReport(
-    reasonType: String,
+    subject: String,
+    recordCid: String?,
+    reasonType: ReportReasonType,
     reason: String?,
-    subject: JsonObject,
 ) {
     if (TestingConfig.enabled) {
         TestingConfig.report("Submit report")
         throw TestingModeException("Submit report")
     }
+
+    val resolvedRecordCid = if (AtUri.parse(subject) != null) {
+        recordCid ?: getRecord(subject)["cid"]?.jsonPrimitive?.contentOrNull
+            ?: throw IllegalStateException("Could not resolve this post's current record CID.")
+    } else {
+        null
+    }
+    sendReport(
+        ReportSubmission(
+            subject = subject,
+            reasonType = reasonType,
+            reason = reason,
+            recordCid = resolvedRecordCid,
+        )
+    )
+}
+
+private suspend fun PdsRepository.sendReport(report: ReportSubmission) {
     sessionStore.load() ?: throw Exception("Not authenticated")
     val authClient = atOAuth.createClient()
+    val subject = buildJsonObject {
+        when (report.subjectKind) {
+            ReportSubjectKind.Account -> {
+                put("\$type", "com.atproto.admin.defs#repoRef")
+                put("did", report.subject)
+            }
+            ReportSubjectKind.Record -> {
+                put("\$type", "com.atproto.repo.strongRef")
+                put("uri", report.subject)
+                put("cid", checkNotNull(report.recordCid))
+            }
+        }
+    }
     val input = buildJsonObject {
-        put("reasonType", reasonType)
-        if (reason != null) put("reason", reason)
+        put("reasonType", report.reasonType.wireValue)
+        report.normalizedReason?.let { put("reason", it) }
         put("subject", subject)
     }
     authClient.procedure(
@@ -183,30 +218,4 @@ suspend fun PdsRepository.submitReport(
         responseSerializer = JsonObject.serializer(),
         proxy = BLUESKY_APPVIEW_PROXY,
     )
-}
-
-suspend fun PdsRepository.submitReportForRecord(
-    uri: String,
-    cid: String? = null,
-    reasonType: String,
-    reason: String? = null,
-) {
-    val subject = buildJsonObject {
-        put("\$type", "com.atproto.repo.strongRef")
-        put("uri", uri)
-        if (cid != null) put("cid", cid)
-    }
-    submitReport(reasonType = reasonType, reason = reason, subject = subject)
-}
-
-suspend fun PdsRepository.submitReportForAccount(
-    did: String,
-    reasonType: String,
-    reason: String? = null,
-) {
-    val subject = buildJsonObject {
-        put("\$type", "com.atproto.admin.defs#repoRef")
-        put("did", did)
-    }
-    submitReport(reasonType = reasonType, reason = reason, subject = subject)
 }

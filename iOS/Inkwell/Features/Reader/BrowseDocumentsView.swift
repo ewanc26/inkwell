@@ -128,6 +128,7 @@ struct BrowseDocumentsView: View {
                                 document: item.document.record,
                                 publication: item.publication?.record,
                                 documentURI: item.document.uri,
+                                documentCID: item.document.cid,
                                 authorDID: item.document.authorDID,
                                 previousItem: index > 0 ? store.followingState.items[index - 1] : nil,
                                 nextItem: index < store.followingState.items.count - 1 ? store.followingState.items[index + 1] : nil
@@ -233,6 +234,7 @@ struct BrowseDocumentsView: View {
                                 document: item.document.record,
                                 publication: item.publication?.record,
                                 documentURI: item.document.uri,
+                                documentCID: item.document.cid,
                                 authorDID: item.document.authorDID,
                                 previousItem: index > 0 ? store.yours[index - 1] : nil,
                                 nextItem: index < store.yours.count - 1 ? store.yours[index + 1] : nil

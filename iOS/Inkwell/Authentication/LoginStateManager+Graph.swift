@@ -8,6 +8,7 @@
 
 import Foundation
 import ATProtoKit
+import InkwellShared
 
 private let blueskyAppViewProxy = "did:web:api.bsky.app#bsky_appview"
 
@@ -161,20 +162,58 @@ extension LoginStateManager {
     // MARK: - Reporting
 
     func submitReport(
-        reasonType: ComAtprotoLexicon.Moderation.ReasonTypeDefinition,
-        reason: String?,
-        subject: [String: Any]
+        subject: String,
+        recordCID: String?,
+        reasonType: ReportReasonType,
+        reason: String?
     ) async throws {
         if TestingMode.isEnabled {
             TestingModeNotice.shared.report("Submit report")
             throw LoginError.testingMode
         }
 
+        let resolvedRecordCID: String?
+        if subject.hasPrefix("at://") {
+            if let recordCID {
+                resolvedRecordCID = recordCID
+            } else {
+                resolvedRecordCID = try await fetchDocument(uri: subject).cid
+            }
+        } else {
+            resolvedRecordCID = nil
+        }
+        let report = ReportSubmission(
+            subject: subject,
+            reasonType: reasonType,
+            reason: reason,
+            recordCid: resolvedRecordCID
+        )
+
+        let reportSubject: [String: Any]
+        switch report.subjectKind {
+        case .account:
+            reportSubject = [
+                "$type": "com.atproto.admin.defs#repoRef",
+                "did": report.subject,
+            ]
+        case .record:
+            guard let cid = report.recordCid else {
+                throw LoginError.invalidURI
+            }
+            reportSubject = [
+                "$type": "com.atproto.repo.strongRef",
+                "uri": report.subject,
+                "cid": cid,
+            ]
+        default:
+            throw LoginError.invalidURI
+        }
+
         var bodyDict: [String: Any] = [
-            "reasonType": reasonType.rawValue,
-            "subject": subject,
+            "reasonType": report.reasonType.wireValue,
+            "subject": reportSubject,
         ]
-        if let reason {
+        if let reason = report.normalizedReason {
             bodyDict["reason"] = reason
         }
         let body = try JSONSerialization.data(withJSONObject: bodyDict)
@@ -183,42 +222,6 @@ extension LoginStateManager {
             method: "POST",
             body: body,
             proxy: blueskyAppViewProxy
-        )
-    }
-
-    func submitReportForRecord(
-        uri: String,
-        cid: String? = nil,
-        reasonType: ComAtprotoLexicon.Moderation.ReasonTypeDefinition,
-        reason: String? = nil
-    ) async throws {
-        var subject: [String: Any] = [
-            "$type": "com.atproto.repo.strongRef",
-            "uri": uri,
-        ]
-        if let cid {
-            subject["cid"] = cid
-        }
-        try await submitReport(
-            reasonType: reasonType,
-            reason: reason,
-            subject: subject
-        )
-    }
-
-    func submitReportForAccount(
-        did: String,
-        reasonType: ComAtprotoLexicon.Moderation.ReasonTypeDefinition,
-        reason: String? = nil
-    ) async throws {
-        let subject: [String: Any] = [
-            "$type": "com.atproto.admin.defs#repoRef",
-            "did": did,
-        ]
-        try await submitReport(
-            reasonType: reasonType,
-            reason: reason,
-            subject: subject
         )
     }
 

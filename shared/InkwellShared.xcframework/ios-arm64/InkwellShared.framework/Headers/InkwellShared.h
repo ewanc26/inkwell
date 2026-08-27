@@ -6,7 +6,7 @@
 #import <Foundation/NSString.h>
 #import <Foundation/NSValue.h>
 
-@class FacetConverter, InkwellSharedAtUri, InkwellSharedAtUriCompanion, InkwellSharedBasicTheme, InkwellSharedBlobRef, InkwellSharedBlockLossLabels, InkwellSharedBlueskyEmbedTypes, InkwellSharedByteSlice, InkwellSharedCachedFeedItem, InkwellSharedCachedFeedItemCompanion, InkwellSharedCdnUrls, InkwellSharedCollectionNsids, InkwellSharedColorValue, InkwellSharedConstellationBacklink, InkwellSharedConstellationPagination, InkwellSharedConstellationResponse, InkwellSharedConstellationSourcePaths, InkwellSharedContentFormatDetector, InkwellSharedContentFormatDispatcher, InkwellSharedDocumentLinkScanner, InkwellSharedDocumentPreferences, InkwellSharedFacetDefinition, InkwellSharedFacetSchema, InkwellSharedFeedCacheIosCompanion, InkwellSharedHandleUtils, InkwellSharedInlineMarkdownScanner, InkwellSharedInlineSegment, InkwellSharedInlineSegmentBold, InkwellSharedInlineSegmentCode, InkwellSharedInlineSegmentItalic, InkwellSharedInlineSegmentLink, InkwellSharedInlineSegmentPlain, InkwellSharedInlineSegmentStrike, InkwellSharedJetstreamConfig, InkwellSharedJetstreamEvent, InkwellSharedJetstreamEventCompanion, InkwellSharedJetstreamPayload, InkwellSharedJetstreamPayloadCompanion, InkwellSharedJsonMapBridge, InkwellSharedKotlinArray<T>, InkwellSharedKotlinEnum<E>, InkwellSharedKotlinEnumCompanion, InkwellSharedKotlinException, InkwellSharedKotlinIllegalStateException, InkwellSharedKotlinIntIterator, InkwellSharedKotlinIntProgression, InkwellSharedKotlinIntProgressionCompanion, InkwellSharedKotlinIntRange, InkwellSharedKotlinIntRangeCompanion, InkwellSharedKotlinNothing, InkwellSharedKotlinPair<__covariant A, __covariant B>, InkwellSharedKotlinRuntimeException, InkwellSharedKotlinThrowable, InkwellSharedKotlinx_serialization_coreSerialKind, InkwellSharedKotlinx_serialization_coreSerializersModule, InkwellSharedKotlinx_serialization_jsonJsonElement, InkwellSharedKotlinx_serialization_jsonJsonElementCompanion, InkwellSharedLeafletContentConverter, InkwellSharedLeafletFacet, InkwellSharedLeafletFacetFeature, InkwellSharedLeafletTypes, InkwellSharedLegacyPalette, InkwellSharedLegalDocuments, InkwellSharedMarkdownBlock, InkwellSharedMarkdownBlockBlockquote, InkwellSharedMarkdownBlockCode, InkwellSharedMarkdownBlockHeading, InkwellSharedMarkdownBlockHorizontalRule, InkwellSharedMarkdownBlockImage, InkwellSharedMarkdownBlockMath, InkwellSharedMarkdownBlockOrderedList, InkwellSharedMarkdownBlockParagraph, InkwellSharedMarkdownBlockTaskList, InkwellSharedMarkdownBlockUnorderedList, InkwellSharedMarkdownListItem, InkwellSharedMarkdownParser, InkwellSharedMarkdownSerializer, InkwellSharedMarkpubContentConverter, InkwellSharedMarkpubTypes, InkwellSharedNotificationPolicy, InkwellSharedNotificationStyleNone, InkwellSharedNotificationStyleSingle, InkwellSharedNotificationStyleSummary, InkwellSharedNumberFormat, InkwellSharedOAuthScopes, InkwellSharedOffprintContentConverter, InkwellSharedOffprintTypes, InkwellSharedPcktContentConverter, InkwellSharedPcktTypes, InkwellSharedPublicationMatcher, InkwellSharedPublicationPreferences, InkwellSharedPublicationTheme, InkwellSharedRecordListPolicy, InkwellSharedRgbColor, InkwellSharedRgbaColor, InkwellSharedSearchBackendUrl, InkwellSharedSearchResultClassifier, InkwellSharedSharedConvertResult, InkwellSharedSharedDocumentRecord, InkwellSharedSharedGraphRecommend, InkwellSharedSharedGraphSubscription, InkwellSharedSharedLeafletComment, InkwellSharedSharedLeafletCommentReplyRef, InkwellSharedSharedPublicationRecord, InkwellSharedSharedReaderTheme, InkwellSharedSharedReaderThemeCompanion, InkwellSharedSharedReaderThemeFontFamily, InkwellSharedSharedWriteResult, InkwellSharedStringUtils, InkwellSharedStrongRef, InkwellSharedSupportersList, InkwellSharedTipPromptPolicy, InkwellSharedUrlUtils, InkwellSharedUserInputLexicon, InkwellSharedUserLexicon, InkwellSharedUserLexiconRecord, InkwellSharedUserLexiconUtils, InkwellSharedUtf8Offsets, InkwellSharedVerificationFailure, InkwellSharedVerificationFailureDocumentLinkMissing, InkwellSharedVerificationFailureEndpointUnreachable, InkwellSharedVerificationFailureInvalidDocumentURL, InkwellSharedVerificationFailureInvalidPublicationURL, InkwellSharedVerificationFailureMalformedResponse, InkwellSharedVerificationFailureMismatchedURI, InkwellSharedVerificationFailureUnexpected, InkwellSharedVerificationResult, InkwellSharedVerificationResultFailed, InkwellSharedVerificationResultVerified, InkwellSharedVerificationUrls, InkwellSharedXrpcEndpoints, RichTextFacet, RichTextFeature;
+@class FacetConverter, InkwellSharedAtUri, InkwellSharedAtUriCompanion, InkwellSharedBasicTheme, InkwellSharedBlobRef, InkwellSharedBlockLossLabels, InkwellSharedBlueskyEmbedTypes, InkwellSharedByteSlice, InkwellSharedCachedFeedItem, InkwellSharedCachedFeedItemCompanion, InkwellSharedCdnUrls, InkwellSharedCollectionNsids, InkwellSharedColorValue, InkwellSharedConstellationBacklink, InkwellSharedConstellationPagination, InkwellSharedConstellationResponse, InkwellSharedConstellationSourcePaths, InkwellSharedContentFormatDetector, InkwellSharedContentFormatDispatcher, InkwellSharedDocumentLinkScanner, InkwellSharedDocumentPreferences, InkwellSharedFacetDefinition, InkwellSharedFacetSchema, InkwellSharedFeedCacheIosCompanion, InkwellSharedHandleUtils, InkwellSharedInlineMarkdownScanner, InkwellSharedInlineSegment, InkwellSharedInlineSegmentBold, InkwellSharedInlineSegmentCode, InkwellSharedInlineSegmentItalic, InkwellSharedInlineSegmentLink, InkwellSharedInlineSegmentPlain, InkwellSharedInlineSegmentStrike, InkwellSharedJetstreamConfig, InkwellSharedJetstreamEvent, InkwellSharedJetstreamEventCompanion, InkwellSharedJetstreamPayload, InkwellSharedJetstreamPayloadCompanion, InkwellSharedJsonMapBridge, InkwellSharedKotlinArray<T>, InkwellSharedKotlinEnum<E>, InkwellSharedKotlinEnumCompanion, InkwellSharedKotlinException, InkwellSharedKotlinIllegalStateException, InkwellSharedKotlinIntIterator, InkwellSharedKotlinIntProgression, InkwellSharedKotlinIntProgressionCompanion, InkwellSharedKotlinIntRange, InkwellSharedKotlinIntRangeCompanion, InkwellSharedKotlinNothing, InkwellSharedKotlinPair<__covariant A, __covariant B>, InkwellSharedKotlinRuntimeException, InkwellSharedKotlinThrowable, InkwellSharedKotlinx_serialization_coreSerialKind, InkwellSharedKotlinx_serialization_coreSerializersModule, InkwellSharedKotlinx_serialization_jsonJsonElement, InkwellSharedKotlinx_serialization_jsonJsonElementCompanion, InkwellSharedLeafletContentConverter, InkwellSharedLeafletFacet, InkwellSharedLeafletFacetFeature, InkwellSharedLeafletTypes, InkwellSharedLegacyPalette, InkwellSharedLegalDocuments, InkwellSharedMarkdownBlock, InkwellSharedMarkdownBlockBlockquote, InkwellSharedMarkdownBlockCode, InkwellSharedMarkdownBlockHeading, InkwellSharedMarkdownBlockHorizontalRule, InkwellSharedMarkdownBlockImage, InkwellSharedMarkdownBlockMath, InkwellSharedMarkdownBlockOrderedList, InkwellSharedMarkdownBlockParagraph, InkwellSharedMarkdownBlockTaskList, InkwellSharedMarkdownBlockUnorderedList, InkwellSharedMarkdownListItem, InkwellSharedMarkdownParser, InkwellSharedMarkdownSerializer, InkwellSharedMarkpubContentConverter, InkwellSharedMarkpubTypes, InkwellSharedNotificationPolicy, InkwellSharedNotificationStyleNone, InkwellSharedNotificationStyleSingle, InkwellSharedNotificationStyleSummary, InkwellSharedNumberFormat, InkwellSharedOAuthScopes, InkwellSharedOffprintContentConverter, InkwellSharedOffprintTypes, InkwellSharedPcktContentConverter, InkwellSharedPcktTypes, InkwellSharedPublicationMatcher, InkwellSharedPublicationPreferences, InkwellSharedPublicationTheme, InkwellSharedRecordListPolicy, InkwellSharedReportReasonType, InkwellSharedReportSubjectKind, InkwellSharedReportSubmission, InkwellSharedReportSubmissionCompanion, InkwellSharedRgbColor, InkwellSharedRgbaColor, InkwellSharedSearchBackendUrl, InkwellSharedSearchResultClassifier, InkwellSharedSharedConvertResult, InkwellSharedSharedDocumentRecord, InkwellSharedSharedGraphRecommend, InkwellSharedSharedGraphSubscription, InkwellSharedSharedLeafletComment, InkwellSharedSharedLeafletCommentReplyRef, InkwellSharedSharedPublicationRecord, InkwellSharedSharedReaderTheme, InkwellSharedSharedReaderThemeCompanion, InkwellSharedSharedReaderThemeFontFamily, InkwellSharedSharedWriteResult, InkwellSharedStringUtils, InkwellSharedStrongRef, InkwellSharedSupportersList, InkwellSharedTipPromptPolicy, InkwellSharedUrlUtils, InkwellSharedUserInputLexicon, InkwellSharedUserLexicon, InkwellSharedUserLexiconRecord, InkwellSharedUserLexiconUtils, InkwellSharedUtf8Offsets, InkwellSharedVerificationFailure, InkwellSharedVerificationFailureDocumentLinkMissing, InkwellSharedVerificationFailureEndpointUnreachable, InkwellSharedVerificationFailureInvalidDocumentURL, InkwellSharedVerificationFailureInvalidPublicationURL, InkwellSharedVerificationFailureMalformedResponse, InkwellSharedVerificationFailureMismatchedURI, InkwellSharedVerificationFailureUnexpected, InkwellSharedVerificationResult, InkwellSharedVerificationResultFailed, InkwellSharedVerificationResultVerified, InkwellSharedVerificationUrls, InkwellSharedXrpcEndpoints, RichTextFacet, RichTextFeature;
 
 @protocol InkwellSharedFeedCache, InkwellSharedJetstreamClient, InkwellSharedKotlinAnnotation, InkwellSharedKotlinClosedRange, InkwellSharedKotlinComparable, InkwellSharedKotlinFunction, InkwellSharedKotlinIterable, InkwellSharedKotlinIterator, InkwellSharedKotlinKAnnotatedElement, InkwellSharedKotlinKClass, InkwellSharedKotlinKClassifier, InkwellSharedKotlinKDeclarationContainer, InkwellSharedKotlinOpenEndRange, InkwellSharedKotlinSuspendFunction2, InkwellSharedKotlinx_coroutines_coreFlow, InkwellSharedKotlinx_coroutines_coreFlowCollector, InkwellSharedKotlinx_serialization_coreCompositeDecoder, InkwellSharedKotlinx_serialization_coreCompositeEncoder, InkwellSharedKotlinx_serialization_coreDecoder, InkwellSharedKotlinx_serialization_coreDeserializationStrategy, InkwellSharedKotlinx_serialization_coreEncoder, InkwellSharedKotlinx_serialization_coreKSerializer, InkwellSharedKotlinx_serialization_coreSerialDescriptor, InkwellSharedKotlinx_serialization_coreSerializationStrategy, InkwellSharedKotlinx_serialization_coreSerializersModuleCollector, InkwellSharedNotificationStyle;
 
@@ -2911,6 +2911,143 @@ __attribute__((swift_name("UserLexiconUtils")))
 - (BOOL)isUserLexiconTypeType:(NSString * _Nullable)type __attribute__((swift_name("isUserLexiconType(type:)")));
 @end
 
+__attribute__((swift_name("KotlinComparable")))
+@protocol InkwellSharedKotlinComparable
+@required
+- (int32_t)compareToOther:(id _Nullable)other __attribute__((swift_name("compareTo(other:)")));
+@end
+
+__attribute__((swift_name("KotlinEnum")))
+@interface InkwellSharedKotlinEnum<E> : InkwellSharedBase <InkwellSharedKotlinComparable>
+- (instancetype)initWithName:(NSString *)name ordinal:(int32_t)ordinal __attribute__((swift_name("init(name:ordinal:)"))) __attribute__((objc_designated_initializer));
+@property (class, readonly, getter=companion) InkwellSharedKotlinEnumCompanion *companion __attribute__((swift_name("companion")));
+- (int32_t)compareToOther:(E)other __attribute__((swift_name("compareTo(other:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString *name __attribute__((swift_name("name")));
+@property (readonly) int32_t ordinal __attribute__((swift_name("ordinal")));
+@end
+
+
+/**
+ * The standard report categories supported by
+ * `com.atproto.moderation.createReport`.
+ *
+ * The wire values are fully-qualified lexicon tokens. Keeping them here
+ * prevents platform clients from drifting to abbreviated or display-only
+ * values when submitting a report.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("ReportReasonType")))
+@interface InkwellSharedReportReasonType : InkwellSharedKotlinEnum<InkwellSharedReportReasonType *>
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * The standard report categories supported by
+ * `com.atproto.moderation.createReport`.
+ *
+ * The wire values are fully-qualified lexicon tokens. Keeping them here
+ * prevents platform clients from drifting to abbreviated or display-only
+ * values when submitting a report.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
+- (instancetype)initWithName:(NSString *)name ordinal:(int32_t)ordinal __attribute__((swift_name("init(name:ordinal:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+@property (class, readonly) InkwellSharedReportReasonType *spam __attribute__((swift_name("spam")));
+@property (class, readonly) InkwellSharedReportReasonType *violation __attribute__((swift_name("violation")));
+@property (class, readonly) InkwellSharedReportReasonType *misleading __attribute__((swift_name("misleading")));
+@property (class, readonly) InkwellSharedReportReasonType *sexual __attribute__((swift_name("sexual")));
+@property (class, readonly) InkwellSharedReportReasonType *rude __attribute__((swift_name("rude")));
+@property (class, readonly) InkwellSharedReportReasonType *other __attribute__((swift_name("other")));
++ (InkwellSharedKotlinArray<InkwellSharedReportReasonType *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<InkwellSharedReportReasonType *> *entries __attribute__((swift_name("entries")));
+@property (readonly) NSString *displayName __attribute__((swift_name("displayName")));
+@property (readonly) NSString *wireValue __attribute__((swift_name("wireValue")));
+@end
+
+
+/** The AT Protocol subject union variant used by a [ReportSubmission]. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("ReportSubjectKind")))
+@interface InkwellSharedReportSubjectKind : InkwellSharedKotlinEnum<InkwellSharedReportSubjectKind *>
++ (instancetype)alloc __attribute__((unavailable));
+
+/** The AT Protocol subject union variant used by a [ReportSubmission]. */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
+- (instancetype)initWithName:(NSString *)name ordinal:(int32_t)ordinal __attribute__((swift_name("init(name:ordinal:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+@property (class, readonly) InkwellSharedReportSubjectKind *account __attribute__((swift_name("account")));
+@property (class, readonly) InkwellSharedReportSubjectKind *record __attribute__((swift_name("record")));
++ (InkwellSharedKotlinArray<InkwellSharedReportSubjectKind *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<InkwellSharedReportSubjectKind *> *entries __attribute__((swift_name("entries")));
+@end
+
+
+/**
+ * Platform-neutral input for `com.atproto.moderation.createReport`.
+ *
+ * OAuth authentication and JSON transport remain platform-specific because
+ * each app owns its own OAuth session. The subject, reason type, and text
+ * normalization are common business rules and live here.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("ReportSubmission")))
+@interface InkwellSharedReportSubmission : InkwellSharedBase
+- (instancetype)initWithSubject:(NSString *)subject reasonType:(InkwellSharedReportReasonType *)reasonType reason:(NSString * _Nullable)reason recordCid:(NSString * _Nullable)recordCid __attribute__((swift_name("init(subject:reasonType:reason:recordCid:)"))) __attribute__((objc_designated_initializer));
+@property (class, readonly, getter=companion) InkwellSharedReportSubmissionCompanion *companion __attribute__((swift_name("companion")));
+- (InkwellSharedReportSubmission *)doCopySubject:(NSString *)subject reasonType:(InkwellSharedReportReasonType *)reasonType reason:(NSString * _Nullable)reason recordCid:(NSString * _Nullable)recordCid __attribute__((swift_name("doCopy(subject:reasonType:reason:recordCid:)")));
+
+/**
+ * Platform-neutral input for `com.atproto.moderation.createReport`.
+ *
+ * OAuth authentication and JSON transport remain platform-specific because
+ * each app owns its own OAuth session. The subject, reason type, and text
+ * normalization are common business rules and live here.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Platform-neutral input for `com.atproto.moderation.createReport`.
+ *
+ * OAuth authentication and JSON transport remain platform-specific because
+ * each app owns its own OAuth session. The subject, reason type, and text
+ * normalization are common business rules and live here.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Platform-neutral input for `com.atproto.moderation.createReport`.
+ *
+ * OAuth authentication and JSON transport remain platform-specific because
+ * each app owns its own OAuth session. The subject, reason type, and text
+ * normalization are common business rules and live here.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+
+/** Optional report text trimmed for the JSON request; blank text is omitted. */
+@property (readonly) NSString * _Nullable normalizedReason __attribute__((swift_name("normalizedReason")));
+@property (readonly) NSString * _Nullable reason __attribute__((swift_name("reason")));
+@property (readonly) InkwellSharedReportReasonType *reasonType __attribute__((swift_name("reasonType")));
+
+/** Required content fingerprint when [subject] names an AT-URI record. */
+@property (readonly) NSString * _Nullable recordCid __attribute__((swift_name("recordCid")));
+@property (readonly) NSString *subject __attribute__((swift_name("subject")));
+
+/** Whether [subject] represents a repository account or an AT-URI record. */
+@property (readonly) InkwellSharedReportSubjectKind *subjectKind __attribute__((swift_name("subjectKind")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("ReportSubmission.Companion")))
+@interface InkwellSharedReportSubmissionCompanion : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedReportSubmissionCompanion *shared __attribute__((swift_name("shared")));
+
+/** `createReport.reason` permits up to 20,000 code units. */
+@property (readonly) int32_t MAX_REASON_LENGTH __attribute__((swift_name("MAX_REASON_LENGTH")));
+@end
+
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("OAuthScopes")))
 @interface InkwellSharedOAuthScopes : InkwellSharedBase
@@ -3323,24 +3460,6 @@ __attribute__((swift_name("SharedReaderTheme.Companion")))
 - (InkwellSharedSharedReaderTheme *)resolveRichBackgroundColor:(InkwellSharedInt * _Nullable)richBackgroundColor richPageBackgroundColor:(InkwellSharedInt * _Nullable)richPageBackgroundColor richPrimaryColor:(InkwellSharedInt * _Nullable)richPrimaryColor richAccentBackgroundColor:(InkwellSharedInt * _Nullable)richAccentBackgroundColor richAccentTextColor:(InkwellSharedInt * _Nullable)richAccentTextColor richPageWidth:(InkwellSharedInt * _Nullable)richPageWidth richShowPageBackground:(InkwellSharedBoolean * _Nullable)richShowPageBackground richHeadingFont:(NSString * _Nullable)richHeadingFont richBodyFont:(NSString * _Nullable)richBodyFont richSharedFont:(NSString * _Nullable)richSharedFont paletteBackground:(NSString * _Nullable)paletteBackground paletteText:(NSString * _Nullable)paletteText paletteLink:(NSString * _Nullable)paletteLink paletteAccent:(NSString * _Nullable)paletteAccent paletteSurfaceHover:(NSString * _Nullable)paletteSurfaceHover basicBackground:(NSString * _Nullable)basicBackground basicForeground:(NSString * _Nullable)basicForeground basicAccent:(NSString * _Nullable)basicAccent basicAccentForeground:(NSString * _Nullable)basicAccentForeground overrideAccentRgb:(InkwellSharedInt * _Nullable)overrideAccentRgb overrideFontFamily:(InkwellSharedSharedReaderThemeFontFamily * _Nullable)overrideFontFamily increaseContrast:(BOOL)increaseContrast __attribute__((swift_name("resolve(richBackgroundColor:richPageBackgroundColor:richPrimaryColor:richAccentBackgroundColor:richAccentTextColor:richPageWidth:richShowPageBackground:richHeadingFont:richBodyFont:richSharedFont:paletteBackground:paletteText:paletteLink:paletteAccent:paletteSurfaceHover:basicBackground:basicForeground:basicAccent:basicAccentForeground:overrideAccentRgb:overrideFontFamily:increaseContrast:)")));
 @end
 
-__attribute__((swift_name("KotlinComparable")))
-@protocol InkwellSharedKotlinComparable
-@required
-- (int32_t)compareToOther:(id _Nullable)other __attribute__((swift_name("compareTo(other:)")));
-@end
-
-__attribute__((swift_name("KotlinEnum")))
-@interface InkwellSharedKotlinEnum<E> : InkwellSharedBase <InkwellSharedKotlinComparable>
-- (instancetype)initWithName:(NSString *)name ordinal:(int32_t)ordinal __attribute__((swift_name("init(name:ordinal:)"))) __attribute__((objc_designated_initializer));
-@property (class, readonly, getter=companion) InkwellSharedKotlinEnumCompanion *companion __attribute__((swift_name("companion")));
-- (int32_t)compareToOther:(E)other __attribute__((swift_name("compareTo(other:)")));
-- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
-- (NSUInteger)hash __attribute__((swift_name("hash()")));
-- (NSString *)description __attribute__((swift_name("description()")));
-@property (readonly) NSString *name __attribute__((swift_name("name")));
-@property (readonly) int32_t ordinal __attribute__((swift_name("ordinal")));
-@end
-
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("SharedReaderTheme.FontFamily")))
 @interface InkwellSharedSharedReaderThemeFontFamily : InkwellSharedKotlinEnum<InkwellSharedSharedReaderThemeFontFamily *>
@@ -3736,6 +3855,27 @@ __attribute__((swift_name("Kotlinx_coroutines_coreFlow")))
 - (void)collectCollector:(id<InkwellSharedKotlinx_coroutines_coreFlowCollector>)collector completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("collect(collector:completionHandler:)")));
 @end
 
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("KotlinEnumCompanion")))
+@interface InkwellSharedKotlinEnumCompanion : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedKotlinEnumCompanion *shared __attribute__((swift_name("shared")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("KotlinArray")))
+@interface InkwellSharedKotlinArray<T> : InkwellSharedBase
++ (instancetype)arrayWithSize:(int32_t)size init:(T _Nullable (^)(InkwellSharedInt *))init __attribute__((swift_name("init(size:init:)")));
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
+- (T _Nullable)getIndex:(int32_t)index __attribute__((swift_name("get(index:)")));
+- (id<InkwellSharedKotlinIterator>)iterator __attribute__((swift_name("iterator()")));
+- (void)setIndex:(int32_t)index value:(T _Nullable)value __attribute__((swift_name("set(index:value:)")));
+@property (readonly) int32_t size __attribute__((swift_name("size")));
+@end
+
 __attribute__((swift_name("KotlinIterable")))
 @protocol InkwellSharedKotlinIterable
 @required
@@ -3797,27 +3937,6 @@ __attribute__((swift_name("KotlinIntRange")))
 @property (readonly) InkwellSharedInt *endExclusive __attribute__((swift_name("endExclusive"))) __attribute__((deprecated("Can throw an exception when it's impossible to represent the value with Int type, for example, when the range includes MAX_VALUE. It's recommended to use 'endInclusive' property that doesn't throw.")));
 @property (readonly) InkwellSharedInt *endInclusive __attribute__((swift_name("endInclusive")));
 @property (readonly) InkwellSharedInt *start __attribute__((swift_name("start")));
-@end
-
-__attribute__((objc_subclassing_restricted))
-__attribute__((swift_name("KotlinEnumCompanion")))
-@interface InkwellSharedKotlinEnumCompanion : InkwellSharedBase
-+ (instancetype)alloc __attribute__((unavailable));
-+ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
-+ (instancetype)companion __attribute__((swift_name("init()")));
-@property (class, readonly, getter=shared) InkwellSharedKotlinEnumCompanion *shared __attribute__((swift_name("shared")));
-@end
-
-__attribute__((objc_subclassing_restricted))
-__attribute__((swift_name("KotlinArray")))
-@interface InkwellSharedKotlinArray<T> : InkwellSharedBase
-+ (instancetype)arrayWithSize:(int32_t)size init:(T _Nullable (^)(InkwellSharedInt *))init __attribute__((swift_name("init(size:init:)")));
-+ (instancetype)alloc __attribute__((unavailable));
-+ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
-- (T _Nullable)getIndex:(int32_t)index __attribute__((swift_name("get(index:)")));
-- (id<InkwellSharedKotlinIterator>)iterator __attribute__((swift_name("iterator()")));
-- (void)setIndex:(int32_t)index value:(T _Nullable)value __attribute__((swift_name("set(index:value:)")));
-@property (readonly) int32_t size __attribute__((swift_name("size")));
 @end
 
 __attribute__((swift_name("Kotlinx_serialization_coreEncoder")))

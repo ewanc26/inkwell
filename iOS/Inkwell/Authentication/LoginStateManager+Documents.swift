@@ -35,7 +35,7 @@ extension LoginStateManager {
         let decoded = records.compactMap { record in
             record.value
                 .flatMap { $0.getRecord(ofType: SiteStandardLexicon.DocumentRecord.self) }
-                .map { DocumentEntry(uri: record.uri, authorDID: did, record: $0) }
+                .map { DocumentEntry(uri: record.uri, cid: record.cid, authorDID: did, record: $0) }
         }
         logger.info("[fetchDocumentsEntry] \(records.count) raw → \(decoded.count) decoded DocumentEntry")
         if decoded.isEmpty && !records.isEmpty {
@@ -59,14 +59,14 @@ extension LoginStateManager {
               parsed.collection == SiteStandardLexicon.DocumentRecord.type else {
             throw LoginError.invalidURI
         }
-        let (recordURI, _, value) = try await getRepositoryRecord(
+        let (recordURI, cid, value) = try await getRepositoryRecord(
             from: parsed.did, collection: parsed.collection, recordKey: parsed.recordKey,
             forceUnauthenticated: true
         )
         guard let document = value?.getRecord(ofType: SiteStandardLexicon.DocumentRecord.self) else {
             throw LoginError.unexpectedRecordType
         }
-        return DocumentEntry(uri: recordURI, authorDID: parsed.did, record: document)
+        return DocumentEntry(uri: recordURI, cid: cid, authorDID: parsed.did, record: document)
     }
 
     /// Creates and publishes a new document record.

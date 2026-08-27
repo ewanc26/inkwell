@@ -25,46 +25,39 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import uk.ewancroft.inkwell.shared.moderation.ReportReasonType
 
 @Composable
 fun ReportDialog(
-    subjectDID: String? = null,
-    subjectURI: String? = null,
+    subject: String,
     onDismiss: () -> Unit,
-    onSubmit: (String, String?) -> Unit,
+    onSubmit: (ReportReasonType, String?) -> Unit,
 ) {
-    var selectedReason by remember { mutableStateOf("reasonSpam") }
+    var selectedReason by remember { mutableStateOf(ReportReasonType.Spam) }
     var comment by remember { mutableStateOf("") }
     var isSubmitting by remember { mutableStateOf(false) }
 
-    val reasons = listOf(
-        "reasonSpam" to "Spam",
-        "reasonViolation" to "Violation",
-        "reasonMisleading" to "Misleading",
-        "reasonSexual" to "Sexual content",
-        "reasonRude" to "Rude or harassing",
-        "reasonOther" to "Other",
-    )
+    val reasons = ReportReasonType.entries
 
     AlertDialog(
         onDismissRequest = { if (!isSubmitting) onDismiss() },
-        title = { Text(if (subjectDID != null) "Report Account" else "Report Post") },
+        title = { Text(if (subject.startsWith("did:")) "Report Account" else "Report Post") },
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.verticalScroll(rememberScrollState()),
             ) {
                 Text("Reason", style = MaterialTheme.typography.titleSmall)
-                reasons.forEach { (value, label) ->
+                reasons.forEach { reason ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth(),
                     ) {
                         RadioButton(
-                            selected = selectedReason == value,
-                            onClick = { selectedReason = value },
+                            selected = selectedReason == reason,
+                            onClick = { selectedReason = reason },
                         )
-                        Text(label, modifier = Modifier.padding(start = 8.dp))
+                        Text(reason.displayName, modifier = Modifier.padding(start = 8.dp))
                     }
                 }
 

@@ -182,7 +182,7 @@ final class ReaderFeedStore {
                                           let doc = value.getRecord(ofType: SiteStandardLexicon.DocumentRecord.self),
                                           doc.site == pubURI else { return nil }
                                     return ReaderFeedItem(
-                                        document: DocumentEntry(uri: record.uri, authorDID: pubDID, record: doc),
+                                        document: DocumentEntry(uri: record.uri, cid: record.cid, authorDID: pubDID, record: doc),
                                         publication: pubEntry,
                                         authorProfile: profile
                                     )
@@ -456,7 +456,7 @@ final class ReaderFeedStore {
                             return nil
                         }
                         return ReaderFeedItem(
-                            document: DocumentEntry(uri: record.uri, authorDID: did, record: doc),
+                            document: DocumentEntry(uri: record.uri, cid: record.cid, authorDID: did, record: doc),
                             publication: existingPublications[doc.site],
                             authorProfile: profile
                         )

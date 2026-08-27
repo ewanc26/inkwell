@@ -4,35 +4,35 @@
 //
 
 import SwiftUI
-import ATProtoKit
+import InkwellShared
 
 struct ReportSheet: View {
     @Environment(LoginStateManager.self) private var loginStateManager
     @Environment(\.dismiss) private var dismiss
 
-    let subjectDID: String?
-    let subjectURI: String?
+    let subject: String
+    let recordCID: String?
     let onSubmit: () -> Void
     let onError: (String) -> Void
 
-    @State private var selectedReason: ComAtprotoLexicon.Moderation.ReasonTypeDefinition = .spam
+    @State private var selectedReason: ReportReasonType = .spam
     @State private var comment = ""
     @State private var isSubmitting = false
 
-    private var reasons: [ComAtprotoLexicon.Moderation.ReasonTypeDefinition] {
+    private var reasons: [ReportReasonType] {
         [.spam, .violation, .misleading, .sexual, .rude, .other]
     }
 
     private var title: String {
-        subjectDID != nil ? "Report Account" : "Report Post"
+        subject.hasPrefix("did:") ? "Report Account" : "Report Post"
     }
 
     var body: some View {
         NavigationStack {
             Form {
                 Picker("Reason", selection: $selectedReason) {
-                    ForEach(reasons, id: \.self) { reason in
-                        Text(reasonLabel(reason)).tag(reason)
+                    ForEach(reasons, id: \.wireValue) { reason in
+                        Text(reason.displayName).tag(reason)
                     }
                 }
                 .pickerStyle(.menu)
@@ -60,36 +60,17 @@ struct ReportSheet: View {
         }
     }
 
-    private func reasonLabel(_ reason: ComAtprotoLexicon.Moderation.ReasonTypeDefinition) -> String {
-        switch reason {
-        case .spam: return "Spam"
-        case .violation: return "Violation"
-        case .misleading: return "Misleading"
-        case .sexual: return "Sexual content"
-        case .rude: return "Rude or harassing"
-        case .other: return "Other"
-        case .appeal: return "Appeal"
-        }
-    }
-
     private func submit() async {
         isSubmitting = true
         defer { isSubmitting = false }
 
         do {
-            if let did = subjectDID {
-                try await loginStateManager.submitReportForAccount(
-                    did: did,
-                    reasonType: selectedReason,
-                    reason: comment.isEmpty ? nil : comment
-                )
-            } else if let uri = subjectURI {
-                try await loginStateManager.submitReportForRecord(
-                    uri: uri,
-                    reasonType: selectedReason,
-                    reason: comment.isEmpty ? nil : comment
-                )
-            }
+            try await loginStateManager.submitReport(
+                subject: subject,
+                recordCID: recordCID,
+                reasonType: selectedReason,
+                reason: comment
+            )
             dismiss()
             onSubmit()
         } catch {

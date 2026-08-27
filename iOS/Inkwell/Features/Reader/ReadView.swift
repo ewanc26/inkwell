@@ -14,6 +14,13 @@ import SwiftUI
 import ATProtoKit
 import WebKit
 
+private struct ReportTarget: Identifiable {
+    let subject: String
+    let recordCID: String?
+
+    var id: String { subject }
+}
+
 struct ReadView: View {
     @Environment(LoginStateManager.self) var loginStateManager
     @Environment(\.colorScheme) var colorScheme
@@ -21,6 +28,7 @@ struct ReadView: View {
     let document: SiteStandardLexicon.DocumentRecord
     let publication: SiteStandardLexicon.PublicationRecord?
     var documentURI: String? = nil
+    var documentCID: String? = nil
     var authorDID: String? = nil
 
     // Prev/Next navigation (from the feed that pushed this view).
@@ -54,7 +62,7 @@ struct ReadView: View {
     @State var isLoadingComments = false
     @State var replyToComment: CommentEntry? = nil
 
-    @State private var showingReportSheet = false
+    @State private var reportTarget: ReportTarget?
 
     // Resolves Leaflet's rich theme (light/dark palettes, fonts, page
     // width) first, falling back to standard.site's basicTheme, then
@@ -272,6 +280,7 @@ struct ReadView: View {
                                 document: prev.document.record,
                                 publication: prev.publication?.record,
                                 documentURI: prev.document.uri,
+                                documentCID: prev.document.cid,
                                 authorDID: prev.document.authorDID
                             )
                         } label: {
@@ -289,6 +298,7 @@ struct ReadView: View {
                                 document: next.document.record,
                                 publication: next.publication?.record,
                                 documentURI: next.document.uri,
+                                documentCID: next.document.cid,
                                 authorDID: next.document.authorDID
                             )
                         } label: {
@@ -392,18 +402,33 @@ struct ReadView: View {
                     }
                 }
             }
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    showingReportSheet = true
-                } label: {
-                    Label("Report", systemImage: "exclamationmark.triangle")
+            if (documentURI ?? resolvedDocumentURI) != nil || authorDID != nil {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        if let uri = documentURI ?? resolvedDocumentURI {
+                            Button {
+                                reportTarget = ReportTarget(subject: uri, recordCID: documentCID)
+                            } label: {
+                                Label("Report Post", systemImage: "doc.text")
+                            }
+                        }
+                        if let authorDID, !authorDID.isEmpty {
+                            Button {
+                                reportTarget = ReportTarget(subject: authorDID, recordCID: nil)
+                            } label: {
+                                Label("Report Account", systemImage: "person")
+                            }
+                        }
+                    } label: {
+                        Label("Report", systemImage: "exclamationmark.triangle")
+                    }
                 }
             }
         }
-        .sheet(isPresented: $showingReportSheet) {
+        .sheet(item: $reportTarget) { target in
             ReportSheet(
-                subjectDID: authorDID,
-                subjectURI: documentURI ?? resolvedDocumentURI,
+                subject: target.subject,
+                recordCID: target.recordCID,
                 onSubmit: {
                     actionMessage = "Report submitted."
                 },

@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.ErrorOutline
+import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.Report
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material3.*
@@ -24,6 +26,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import uk.ewancroft.inkwell.shared.text.StringUtils
 import uk.ewancroft.inkwell.ui.moderation.ReportDialog
 
+private data class PostReportTarget(
+    val subject: String,
+    val recordCid: String? = null,
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostDetailScreen(
@@ -40,7 +47,8 @@ fun PostDetailScreen(
     val isDarkTheme = uk.ewancroft.inkwell.ui.theme.LocalForceDarkTheme.current
         ?: androidx.compose.foundation.isSystemInDarkTheme()
     val context = androidx.compose.ui.platform.LocalContext.current
-    var showReportDialog by remember { mutableStateOf(false) }
+    var reportTarget by remember { mutableStateOf<PostReportTarget?>(null) }
+    var showMoreMenu by remember { mutableStateOf(false) }
     val readerTheme = remember(uiState.documentTheme, uiState.publicationTheme, uiState.basicTheme, isDarkTheme) {
         ReaderTheme.resolve(
             documentTheme = uiState.documentTheme,
@@ -103,8 +111,37 @@ fun PostDetailScreen(
                             )
                         }
                     }
-                    TextButton(onClick = { showReportDialog = true }) {
-                        Text("Report")
+                    Box {
+                        IconButton(onClick = { showMoreMenu = true }) {
+                            Icon(Icons.Outlined.MoreVert, contentDescription = "More options")
+                        }
+                        DropdownMenu(
+                            expanded = showMoreMenu,
+                            onDismissRequest = { showMoreMenu = false },
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Report post") },
+                                onClick = {
+                                    showMoreMenu = false
+                                    reportTarget = PostReportTarget(uri, uiState.recordCid)
+                                },
+                                leadingIcon = {
+                                    Icon(Icons.Outlined.Report, contentDescription = null)
+                                },
+                            )
+                            uiState.authorDid?.takeIf(String::isNotBlank)?.let { authorDid ->
+                                DropdownMenuItem(
+                                    text = { Text("Report account") },
+                                    onClick = {
+                                        showMoreMenu = false
+                                        reportTarget = PostReportTarget(authorDid)
+                                    },
+                                    leadingIcon = {
+                                        Icon(Icons.Outlined.Report, contentDescription = null)
+                                    },
+                                )
+                            }
+                        }
                     }
                 },
             )
@@ -179,13 +216,18 @@ fun PostDetailScreen(
         }
     }
 
-    if (showReportDialog) {
+    reportTarget?.let { target ->
         ReportDialog(
-            subjectURI = uri,
-            onDismiss = { showReportDialog = false },
+            subject = target.subject,
+            onDismiss = { reportTarget = null },
             onSubmit = { reason, comment ->
-                showReportDialog = false
-                viewModel.submitReport(reason, comment, isAccountReport = false)
+                reportTarget = null
+                viewModel.submitReport(
+                    subject = target.subject,
+                    recordCid = target.recordCid,
+                    reasonType = reason,
+                    reason = comment,
+                )
             },
         )
     }

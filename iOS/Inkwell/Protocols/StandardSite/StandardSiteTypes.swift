@@ -32,6 +32,8 @@ struct PublicationEntry: Identifiable, Equatable, Hashable {
 struct DocumentEntry: Identifiable, Equatable, Hashable {
     /// The AT-URI of the document record.
     let uri: String
+    /// The current content-addressed version of the document record.
+    let cid: String?
     /// The DID of the repo that contains this document.
     let authorDID: String
     /// The decoded document record.
