@@ -6,9 +6,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
@@ -21,7 +24,12 @@ import uk.ewancroft.inkwell.data.remote.StandardSiteVerifier
 import uk.ewancroft.inkwell.data.repository.PdsRepository
 import uk.ewancroft.inkwell.data.repository.getProfile
 import uk.ewancroft.inkwell.shared.AtUri
+import uk.ewancroft.inkwell.shared.feed.CachedFeedItem
+import uk.ewancroft.inkwell.shared.feed.createFeedCache
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
+import uk.ewancroft.inkwell.shared.jetstream.JetstreamConfig
+import uk.ewancroft.inkwell.shared.jetstream.createJetstreamClient
+import uk.ewancroft.inkwell.shared.toCachedFeedItem
 import uk.ewancroft.inkwell.shared.verification.VerificationResult
 import uk.ewancroft.inkwell.util.ReaderPreferences
 import uk.ewancroft.inkwell.util.formatPublishedDate
@@ -76,6 +84,12 @@ class ReaderViewModel @Inject constructor(
 
     /** Resolved publication records keyed by their AT-URI. */
     private val publicationResolutionCache = mutableMapOf<String, CachedPublicationResolution>()
+
+    // ── Jetstream + Cache ──────────────────────────────────────────────
+
+    private val jetstreamClient = createJetstreamClient()
+    private val feedCache = createFeedCache(context.cacheDir.absolutePath)
+    private var jetstreamJob: kotlinx.coroutines.Job? = null
 
     private fun sortedByPreference(posts: List<PostItem>): List<PostItem> =
         when (ReaderPreferences.getSortOrder(context)) {
@@ -165,8 +179,15 @@ class ReaderViewModel @Inject constructor(
         viewModelScope.launch {
             val session = pdsRepository.getSession()
             if (session != null) {
-                loadFollowingFeed(session)
-                loadYoursFeed(session)
+                // Run both feeds concurrently — they make independent
+                // network calls to the user's PDS and their results are
+                // merged into the UI state separately.
+                coroutineScope {
+                    val following = async { loadFollowingFeed(session) }
+                    val yours = async { loadYoursFeed(session) }
+                    following.await()
+                    yours.await()
+                }
             }
         }
     }
@@ -240,6 +261,16 @@ class ReaderViewModel @Inject constructor(
 
     private suspend fun loadFollowingFeed(session: uk.ewancroft.inkwell.data.repository.UserSessionInfo) {
         _uiState.value = _uiState.value.copy(isLoadingFollowing = true, error = null)
+
+        // 1. Show cached data immediately (if available).
+        val cached = runCatching { feedCache.load(limit = 200) }.getOrNull().orEmpty()
+        if (cached.isNotEmpty()) {
+            _uiState.value = _uiState.value.copy(
+                followingPosts = sortedByPreference(cached.map { it.toPostItem() }),
+                isLoadingFollowing = false,
+            )
+        }
+
         try {
             val subscriptionsResponse = pdsRepository.listRecords(
                 did = session.did,
@@ -306,12 +337,76 @@ class ReaderViewModel @Inject constructor(
             )
             val verifiedFollowing = verifyPosts(_uiState.value.followingPosts)
             _uiState.value = _uiState.value.copy(followingPosts = verifiedFollowing)
+
+            // 3. Cache the results for next launch.
+            val cachedItems = posts.map { it.toCachedFeedItem() }
+            feedCache.save(cachedItems)
+
+            // 4. Connect to Jetstream for live updates.
+            startJetstreamSubscription(dids = didToProfile.keys.toList())
+
         } catch (e: Exception) {
             _uiState.value = _uiState.value.copy(
                 isLoadingFollowing = false,
                 error = e.message
             )
         }
+    }
+
+    // ── Jetstream Live Updates ──────────────────────────────────────────
+
+    private fun startJetstreamSubscription(dids: List<String>) {
+        jetstreamJob?.cancel()
+        if (dids.isEmpty()) return
+
+        val config = JetstreamConfig(
+            collections = listOf("site.standard.document"),
+            dids = dids
+        )
+
+        jetstreamJob = viewModelScope.launch {
+            jetstreamClient.connect(config)
+                .catch { e ->
+                    Log.w("ReaderViewModel", "Jetstream connection error", e)
+                }
+                .collect { payload ->
+                    if (payload.collection != "site.standard.document") return@collect
+
+                    // Parse the event into a CachedFeedItem.
+                    val cachedItem = payload.toCachedFeedItem()
+
+                    if (cachedItem != null) {
+                        // Convert to PostItem and merge into UI state.
+                        val newItem = cachedItem.toPostItem()
+                        val currentPosts = _uiState.value.followingPosts
+                        if (currentPosts.none { it.uri == newItem.uri }) {
+                            val merged = sortedByPreference((currentPosts + newItem).distinctBy { it.uri })
+                            _uiState.value = _uiState.value.copy(followingPosts = merged)
+                        }
+                        // Persist to cache.
+                        feedCache.upsert(listOf(cachedItem))
+                    } else if (payload.operation == "delete") {
+                        // Handle deletes by removing the item from the feed.
+                        val deletedUri = "at://${payload.did}/${payload.collection}/${payload.rkey}"
+                        val currentPosts = _uiState.value.followingPosts
+                        _uiState.value = _uiState.value.copy(
+                            followingPosts = currentPosts.filter { it.uri != deletedUri }
+                        )
+                        feedCache.remove(deletedUri)
+                    }
+                }
+        }
+    }
+
+    private fun stopJetstream() {
+        jetstreamJob?.cancel()
+        jetstreamJob = null
+        viewModelScope.launch { jetstreamClient.disconnect() }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        stopJetstream()
     }
 
     private suspend fun loadYoursFeed(session: uk.ewancroft.inkwell.data.repository.UserSessionInfo) {
@@ -360,5 +455,42 @@ class ReaderViewModel @Inject constructor(
                 error = e.message
             )
         }
+    }
+
+    // ── CachedFeedItem ↔ PostItem Conversion ────────────────────────────
+
+    private fun CachedFeedItem.toPostItem(): PostItem {
+        return PostItem(
+            uri = uri,
+            title = title,
+            description = description,
+            publicationName = publicationName ?: authorDisplayName,
+            publishedAt = publishedAt,
+            coverUrl = coverImageUrl,
+            site = site,
+            path = path,
+            authorDisplayName = authorDisplayName,
+            authorAvatar = authorAvatar,
+        )
+    }
+
+    private fun PostItem.toCachedFeedItem(): CachedFeedItem {
+        return CachedFeedItem(
+            uri = uri,
+            authorDID = AtUri.parse(uri)?.did ?: "",
+            site = site,
+            title = title,
+            publishedAt = publishedAt,
+            path = path,
+            description = description,
+            textContent = null,
+            coverImageUrl = coverUrl,
+            publicationUri = null,
+            publicationName = publicationName,
+            publicationUrl = null,
+            authorDisplayName = authorDisplayName,
+            authorAvatar = authorAvatar,
+            cachedAt = System.currentTimeMillis(),
+        )
     }
 }

@@ -31,6 +31,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -123,25 +126,33 @@ private suspend fun fetchStandardSitePost(uri: String): StandardSitePostData? {
         val publishedAt = value["publishedAt"]?.jsonPrimitive?.contentOrNull
         val coverImage = value["coverImage"]?.jsonObject?.get("\$link")?.jsonPrimitive?.contentOrNull
 
-        // Best-effort publication fetch for context
-        var publicationName: String? = null
+        // Best-effort publication fetch for context — kick off concurrently
+        // so the document data and publication name arrive together instead
+        // of waiting for two sequential PDS round-trips.
         val siteUri = value["site"]?.jsonPrimitive?.contentOrNull
+        var publicationDeferred: kotlinx.coroutines.Deferred<String?>? = null
         if (siteUri != null && siteUri.startsWith("at://")) {
             val pubParsed = AtUri.parse(siteUri)
             if (pubParsed != null) {
-                val pubUrl = "${XrpcEndpoints.PUBLIC_BSKY_API}${XrpcEndpoints.REPO_GET_RECORD}?repo=${pubParsed.did}&collection=${pubParsed.collection}&rkey=${pubParsed.recordKey}"
-                val pubRequest = okhttp3.Request.Builder().url(pubUrl).build()
-                val pubResponse = client.newCall(pubRequest).execute()
-                if (pubResponse.isSuccessful) {
-                    val pubBody = pubResponse.body?.string()
-                    if (pubBody != null) {
-                        val pubJson = kotlinx.serialization.json.Json.parseToJsonElement(pubBody).jsonObject
-                        val pubValue = pubJson["value"]?.jsonObject
-                        publicationName = pubValue?.get("name")?.jsonPrimitive?.contentOrNull
-                    }
+                publicationDeferred = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).async {
+                    try {
+                        val pubUrl = "${XrpcEndpoints.PUBLIC_BSKY_API}${XrpcEndpoints.REPO_GET_RECORD}?repo=${pubParsed.did}&collection=${pubParsed.collection}&rkey=${pubParsed.recordKey}"
+                        val pubRequest = okhttp3.Request.Builder().url(pubUrl).build()
+                        val pubResponse = client.newCall(pubRequest).execute()
+                        if (pubResponse.isSuccessful) {
+                            val pubBody = pubResponse.body?.string()
+                            if (pubBody != null) {
+                                val pubJson = kotlinx.serialization.json.Json.parseToJsonElement(pubBody).jsonObject
+                                val pubValue = pubJson["value"]?.jsonObject
+                                pubValue?.get("name")?.jsonPrimitive?.contentOrNull
+                            } else null
+                        } else null
+                    } catch (_: Exception) { null }
                 }
             }
         }
+
+        val publicationName = publicationDeferred?.await()
 
         StandardSitePostData(
             title = title,
