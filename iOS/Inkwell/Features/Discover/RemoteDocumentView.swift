@@ -39,10 +39,25 @@ struct RemoteDocumentView: View {
 
     private func load() async {
         do {
-            let document = try await loginStateManager.fetchDocument(uri: documentURI)
-            self.document = document
-            if parseAtUri(document.record.site)?.collection == SiteStandardLexicon.PublicationRecord.type {
-                publication = try? await loginStateManager.fetchPublication(uri: document.record.site)
+            // Parse the AT-URI once to determine the collection type
+            // before making any network requests.
+            guard let parsed = parseAtUri(documentURI) else {
+                throw LoginError.invalidURI
+            }
+
+            // If the document points at a publication record, fetch both
+            // the document and publication concurrently instead of
+            // sequentially — two PDS round-trips in parallel rather than
+            // one after the other.
+            let isPublication = parsed.collection == SiteStandardLexicon.PublicationRecord.type
+
+            if isPublication {
+                async let docTask = loginStateManager.fetchDocument(uri: documentURI)
+                async let pubTask = loginStateManager.fetchPublication(uri: documentURI)
+                self.document = try await docTask
+                self.publication = try? await pubTask
+            } else {
+                self.document = try await loginStateManager.fetchDocument(uri: documentURI)
             }
         } catch {
             errorMessage = error.localizedDescription
