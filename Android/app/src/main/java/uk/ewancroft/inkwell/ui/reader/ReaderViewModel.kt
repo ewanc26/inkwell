@@ -26,10 +26,10 @@ import uk.ewancroft.inkwell.data.repository.getProfile
 import uk.ewancroft.inkwell.shared.AtUri
 import uk.ewancroft.inkwell.shared.feed.CachedFeedItem
 import uk.ewancroft.inkwell.shared.feed.createFeedCache
+import uk.ewancroft.inkwell.shared.feed.toCachedFeedItem
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 import uk.ewancroft.inkwell.shared.jetstream.JetstreamConfig
 import uk.ewancroft.inkwell.shared.jetstream.createJetstreamClient
-import uk.ewancroft.inkwell.shared.toCachedFeedItem
 import uk.ewancroft.inkwell.shared.verification.VerificationResult
 import uk.ewancroft.inkwell.util.ReaderPreferences
 import uk.ewancroft.inkwell.util.formatPublishedDate

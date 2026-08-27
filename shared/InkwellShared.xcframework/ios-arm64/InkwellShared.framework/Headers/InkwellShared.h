@@ -6,9 +6,9 @@
 #import <Foundation/NSString.h>
 #import <Foundation/NSValue.h>
 
-@class FacetConverter, InkwellSharedAtUri, InkwellSharedAtUriCompanion, InkwellSharedBasicTheme, InkwellSharedBlobRef, InkwellSharedBlockLossLabels, InkwellSharedBlueskyEmbedTypes, InkwellSharedByteSlice, InkwellSharedCdnUrls, InkwellSharedCollectionNsids, InkwellSharedColorValue, InkwellSharedConstellationBacklink, InkwellSharedConstellationPagination, InkwellSharedConstellationResponse, InkwellSharedConstellationSourcePaths, InkwellSharedContentFormatDetector, InkwellSharedContentFormatDispatcher, InkwellSharedDocumentLinkScanner, InkwellSharedDocumentPreferences, InkwellSharedFacetDefinition, InkwellSharedFacetSchema, InkwellSharedHandleUtils, InkwellSharedInlineMarkdownScanner, InkwellSharedInlineSegment, InkwellSharedInlineSegmentBold, InkwellSharedInlineSegmentCode, InkwellSharedInlineSegmentItalic, InkwellSharedInlineSegmentLink, InkwellSharedInlineSegmentPlain, InkwellSharedInlineSegmentStrike, InkwellSharedJsonMapBridge, InkwellSharedKotlinArray<T>, InkwellSharedKotlinEnum<E>, InkwellSharedKotlinEnumCompanion, InkwellSharedKotlinException, InkwellSharedKotlinIllegalStateException, InkwellSharedKotlinIntIterator, InkwellSharedKotlinIntProgression, InkwellSharedKotlinIntProgressionCompanion, InkwellSharedKotlinIntRange, InkwellSharedKotlinIntRangeCompanion, InkwellSharedKotlinNothing, InkwellSharedKotlinPair<__covariant A, __covariant B>, InkwellSharedKotlinRuntimeException, InkwellSharedKotlinThrowable, InkwellSharedKotlinx_serialization_coreSerialKind, InkwellSharedKotlinx_serialization_coreSerializersModule, InkwellSharedKotlinx_serialization_jsonJsonElement, InkwellSharedKotlinx_serialization_jsonJsonElementCompanion, InkwellSharedLeafletContentConverter, InkwellSharedLeafletFacet, InkwellSharedLeafletFacetFeature, InkwellSharedLeafletTypes, InkwellSharedLegacyPalette, InkwellSharedLegalDocuments, InkwellSharedMarkdownBlock, InkwellSharedMarkdownBlockBlockquote, InkwellSharedMarkdownBlockCode, InkwellSharedMarkdownBlockHeading, InkwellSharedMarkdownBlockHorizontalRule, InkwellSharedMarkdownBlockImage, InkwellSharedMarkdownBlockMath, InkwellSharedMarkdownBlockOrderedList, InkwellSharedMarkdownBlockParagraph, InkwellSharedMarkdownBlockTaskList, InkwellSharedMarkdownBlockUnorderedList, InkwellSharedMarkdownListItem, InkwellSharedMarkdownParser, InkwellSharedMarkdownSerializer, InkwellSharedMarkpubContentConverter, InkwellSharedMarkpubTypes, InkwellSharedNotificationPolicy, InkwellSharedNotificationStyleNone, InkwellSharedNotificationStyleSingle, InkwellSharedNotificationStyleSummary, InkwellSharedNumberFormat, InkwellSharedOAuthScopes, InkwellSharedOffprintContentConverter, InkwellSharedOffprintTypes, InkwellSharedPcktContentConverter, InkwellSharedPcktTypes, InkwellSharedPublicationMatcher, InkwellSharedPublicationPreferences, InkwellSharedPublicationTheme, InkwellSharedRecordListPolicy, InkwellSharedRgbColor, InkwellSharedRgbaColor, InkwellSharedSearchBackendUrl, InkwellSharedSearchResultClassifier, InkwellSharedSharedConvertResult, InkwellSharedSharedDocumentRecord, InkwellSharedSharedGraphRecommend, InkwellSharedSharedGraphSubscription, InkwellSharedSharedLeafletComment, InkwellSharedSharedLeafletCommentReplyRef, InkwellSharedSharedPublicationRecord, InkwellSharedSharedReaderTheme, InkwellSharedSharedReaderThemeCompanion, InkwellSharedSharedReaderThemeFontFamily, InkwellSharedSharedWriteResult, InkwellSharedStringUtils, InkwellSharedStrongRef, InkwellSharedSupportersList, InkwellSharedTipPromptPolicy, InkwellSharedUrlUtils, InkwellSharedUserInputLexicon, InkwellSharedUserLexicon, InkwellSharedUserLexiconRecord, InkwellSharedUserLexiconUtils, InkwellSharedUtf8Offsets, InkwellSharedVerificationFailure, InkwellSharedVerificationFailureDocumentLinkMissing, InkwellSharedVerificationFailureEndpointUnreachable, InkwellSharedVerificationFailureInvalidDocumentURL, InkwellSharedVerificationFailureInvalidPublicationURL, InkwellSharedVerificationFailureMalformedResponse, InkwellSharedVerificationFailureMismatchedURI, InkwellSharedVerificationFailureUnexpected, InkwellSharedVerificationResult, InkwellSharedVerificationResultFailed, InkwellSharedVerificationResultVerified, InkwellSharedVerificationUrls, InkwellSharedXrpcEndpoints, RichTextFacet, RichTextFeature;
+@class FacetConverter, InkwellSharedAtUri, InkwellSharedAtUriCompanion, InkwellSharedBasicTheme, InkwellSharedBlobRef, InkwellSharedBlockLossLabels, InkwellSharedBlueskyEmbedTypes, InkwellSharedByteSlice, InkwellSharedCachedFeedItem, InkwellSharedCachedFeedItemCompanion, InkwellSharedCdnUrls, InkwellSharedCollectionNsids, InkwellSharedColorValue, InkwellSharedConstellationBacklink, InkwellSharedConstellationPagination, InkwellSharedConstellationResponse, InkwellSharedConstellationSourcePaths, InkwellSharedContentFormatDetector, InkwellSharedContentFormatDispatcher, InkwellSharedDocumentLinkScanner, InkwellSharedDocumentPreferences, InkwellSharedFacetDefinition, InkwellSharedFacetSchema, InkwellSharedFeedCacheIosCompanion, InkwellSharedHandleUtils, InkwellSharedInlineMarkdownScanner, InkwellSharedInlineSegment, InkwellSharedInlineSegmentBold, InkwellSharedInlineSegmentCode, InkwellSharedInlineSegmentItalic, InkwellSharedInlineSegmentLink, InkwellSharedInlineSegmentPlain, InkwellSharedInlineSegmentStrike, InkwellSharedJetstreamConfig, InkwellSharedJetstreamEvent, InkwellSharedJetstreamEventCompanion, InkwellSharedJetstreamPayload, InkwellSharedJetstreamPayloadCompanion, InkwellSharedJsonMapBridge, InkwellSharedKotlinArray<T>, InkwellSharedKotlinEnum<E>, InkwellSharedKotlinEnumCompanion, InkwellSharedKotlinException, InkwellSharedKotlinIllegalStateException, InkwellSharedKotlinIntIterator, InkwellSharedKotlinIntProgression, InkwellSharedKotlinIntProgressionCompanion, InkwellSharedKotlinIntRange, InkwellSharedKotlinIntRangeCompanion, InkwellSharedKotlinNothing, InkwellSharedKotlinPair<__covariant A, __covariant B>, InkwellSharedKotlinRuntimeException, InkwellSharedKotlinThrowable, InkwellSharedKotlinx_serialization_coreSerialKind, InkwellSharedKotlinx_serialization_coreSerializersModule, InkwellSharedKotlinx_serialization_jsonJsonElement, InkwellSharedKotlinx_serialization_jsonJsonElementCompanion, InkwellSharedLeafletContentConverter, InkwellSharedLeafletFacet, InkwellSharedLeafletFacetFeature, InkwellSharedLeafletTypes, InkwellSharedLegacyPalette, InkwellSharedLegalDocuments, InkwellSharedMarkdownBlock, InkwellSharedMarkdownBlockBlockquote, InkwellSharedMarkdownBlockCode, InkwellSharedMarkdownBlockHeading, InkwellSharedMarkdownBlockHorizontalRule, InkwellSharedMarkdownBlockImage, InkwellSharedMarkdownBlockMath, InkwellSharedMarkdownBlockOrderedList, InkwellSharedMarkdownBlockParagraph, InkwellSharedMarkdownBlockTaskList, InkwellSharedMarkdownBlockUnorderedList, InkwellSharedMarkdownListItem, InkwellSharedMarkdownParser, InkwellSharedMarkdownSerializer, InkwellSharedMarkpubContentConverter, InkwellSharedMarkpubTypes, InkwellSharedNotificationPolicy, InkwellSharedNotificationStyleNone, InkwellSharedNotificationStyleSingle, InkwellSharedNotificationStyleSummary, InkwellSharedNumberFormat, InkwellSharedOAuthScopes, InkwellSharedOffprintContentConverter, InkwellSharedOffprintTypes, InkwellSharedPcktContentConverter, InkwellSharedPcktTypes, InkwellSharedPublicationMatcher, InkwellSharedPublicationPreferences, InkwellSharedPublicationTheme, InkwellSharedRecordListPolicy, InkwellSharedRgbColor, InkwellSharedRgbaColor, InkwellSharedSearchBackendUrl, InkwellSharedSearchResultClassifier, InkwellSharedSharedConvertResult, InkwellSharedSharedDocumentRecord, InkwellSharedSharedGraphRecommend, InkwellSharedSharedGraphSubscription, InkwellSharedSharedLeafletComment, InkwellSharedSharedLeafletCommentReplyRef, InkwellSharedSharedPublicationRecord, InkwellSharedSharedReaderTheme, InkwellSharedSharedReaderThemeCompanion, InkwellSharedSharedReaderThemeFontFamily, InkwellSharedSharedWriteResult, InkwellSharedStringUtils, InkwellSharedStrongRef, InkwellSharedSupportersList, InkwellSharedTipPromptPolicy, InkwellSharedUrlUtils, InkwellSharedUserInputLexicon, InkwellSharedUserLexicon, InkwellSharedUserLexiconRecord, InkwellSharedUserLexiconUtils, InkwellSharedUtf8Offsets, InkwellSharedVerificationFailure, InkwellSharedVerificationFailureDocumentLinkMissing, InkwellSharedVerificationFailureEndpointUnreachable, InkwellSharedVerificationFailureInvalidDocumentURL, InkwellSharedVerificationFailureInvalidPublicationURL, InkwellSharedVerificationFailureMalformedResponse, InkwellSharedVerificationFailureMismatchedURI, InkwellSharedVerificationFailureUnexpected, InkwellSharedVerificationResult, InkwellSharedVerificationResultFailed, InkwellSharedVerificationResultVerified, InkwellSharedVerificationUrls, InkwellSharedXrpcEndpoints, RichTextFacet, RichTextFeature;
 
-@protocol InkwellSharedKotlinAnnotation, InkwellSharedKotlinClosedRange, InkwellSharedKotlinComparable, InkwellSharedKotlinFunction, InkwellSharedKotlinIterable, InkwellSharedKotlinIterator, InkwellSharedKotlinKAnnotatedElement, InkwellSharedKotlinKClass, InkwellSharedKotlinKClassifier, InkwellSharedKotlinKDeclarationContainer, InkwellSharedKotlinOpenEndRange, InkwellSharedKotlinSuspendFunction2, InkwellSharedKotlinx_serialization_coreCompositeDecoder, InkwellSharedKotlinx_serialization_coreCompositeEncoder, InkwellSharedKotlinx_serialization_coreDecoder, InkwellSharedKotlinx_serialization_coreDeserializationStrategy, InkwellSharedKotlinx_serialization_coreEncoder, InkwellSharedKotlinx_serialization_coreKSerializer, InkwellSharedKotlinx_serialization_coreSerialDescriptor, InkwellSharedKotlinx_serialization_coreSerializationStrategy, InkwellSharedKotlinx_serialization_coreSerializersModuleCollector, InkwellSharedNotificationStyle;
+@protocol InkwellSharedFeedCache, InkwellSharedJetstreamClient, InkwellSharedKotlinAnnotation, InkwellSharedKotlinClosedRange, InkwellSharedKotlinComparable, InkwellSharedKotlinFunction, InkwellSharedKotlinIterable, InkwellSharedKotlinIterator, InkwellSharedKotlinKAnnotatedElement, InkwellSharedKotlinKClass, InkwellSharedKotlinKClassifier, InkwellSharedKotlinKDeclarationContainer, InkwellSharedKotlinOpenEndRange, InkwellSharedKotlinSuspendFunction2, InkwellSharedKotlinx_coroutines_coreFlow, InkwellSharedKotlinx_coroutines_coreFlowCollector, InkwellSharedKotlinx_serialization_coreCompositeDecoder, InkwellSharedKotlinx_serialization_coreCompositeEncoder, InkwellSharedKotlinx_serialization_coreDecoder, InkwellSharedKotlinx_serialization_coreDeserializationStrategy, InkwellSharedKotlinx_serialization_coreEncoder, InkwellSharedKotlinx_serialization_coreKSerializer, InkwellSharedKotlinx_serialization_coreSerialDescriptor, InkwellSharedKotlinx_serialization_coreSerializationStrategy, InkwellSharedKotlinx_serialization_coreSerializersModuleCollector, InkwellSharedNotificationStyle;
 
 NS_ASSUME_NONNULL_BEGIN
 #pragma clang diagnostic push
@@ -830,6 +830,13 @@ __attribute__((swift_name("SearchBackendUrl")))
 + (instancetype)searchBackendUrl __attribute__((swift_name("init()")));
 @property (class, readonly, getter=shared) InkwellSharedSearchBackendUrl *shared __attribute__((swift_name("shared")));
 @property (readonly) NSString *BASE __attribute__((swift_name("BASE")));
+
+/** Returns keyword-indexed documents/articles. */
+@property (readonly) NSString *KEYWORD_MODE __attribute__((swift_name("KEYWORD_MODE")));
+
+/** Returns `type=publication` records only. */
+@property (readonly) NSString *PUBLICATIONS_MODE __attribute__((swift_name("PUBLICATIONS_MODE")));
+@property (readonly) NSString *PUBLIC_APPVIEW __attribute__((swift_name("PUBLIC_APPVIEW")));
 @end
 
 
@@ -1046,6 +1053,272 @@ __attribute__((objc_subclassing_restricted))
 
 
 /**
+ * A feed item persisted in the local cache.
+ *
+ * This is the serialisation boundary between the shared KMP layer and
+ * the platform-specific storage backends.  Both iOS and Android read
+ * and write lists of these objects as JSON.
+ *
+ * Fields are intentionally denormalised — publication name / URL and
+ * author display-name / avatar are snapshot copies taken at cache time
+ * so the feed can render immediately without a secondary profile or
+ * publication lookup.
+ *
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("CachedFeedItem")))
+@interface InkwellSharedCachedFeedItem : InkwellSharedBase
+- (instancetype)initWithUri:(NSString *)uri authorDID:(NSString *)authorDID site:(NSString *)site title:(NSString *)title publishedAt:(NSString *)publishedAt path:(NSString * _Nullable)path description:(NSString * _Nullable)description textContent:(NSString * _Nullable)textContent coverImageUrl:(NSString * _Nullable)coverImageUrl publicationUri:(NSString * _Nullable)publicationUri publicationName:(NSString * _Nullable)publicationName publicationUrl:(NSString * _Nullable)publicationUrl authorDisplayName:(NSString * _Nullable)authorDisplayName authorAvatar:(NSString * _Nullable)authorAvatar cachedAt:(int64_t)cachedAt __attribute__((swift_name("init(uri:authorDID:site:title:publishedAt:path:description:textContent:coverImageUrl:publicationUri:publicationName:publicationUrl:authorDisplayName:authorAvatar:cachedAt:)"))) __attribute__((objc_designated_initializer));
+@property (class, readonly, getter=companion) InkwellSharedCachedFeedItemCompanion *companion __attribute__((swift_name("companion")));
+- (InkwellSharedCachedFeedItem *)doCopyUri:(NSString *)uri authorDID:(NSString *)authorDID site:(NSString *)site title:(NSString *)title publishedAt:(NSString *)publishedAt path:(NSString * _Nullable)path description:(NSString * _Nullable)description textContent:(NSString * _Nullable)textContent coverImageUrl:(NSString * _Nullable)coverImageUrl publicationUri:(NSString * _Nullable)publicationUri publicationName:(NSString * _Nullable)publicationName publicationUrl:(NSString * _Nullable)publicationUrl authorDisplayName:(NSString * _Nullable)authorDisplayName authorAvatar:(NSString * _Nullable)authorAvatar cachedAt:(int64_t)cachedAt __attribute__((swift_name("doCopy(uri:authorDID:site:title:publishedAt:path:description:textContent:coverImageUrl:publicationUri:publicationName:publicationUrl:authorDisplayName:authorAvatar:cachedAt:)")));
+
+/**
+ * A feed item persisted in the local cache.
+ *
+ * This is the serialisation boundary between the shared KMP layer and
+ * the platform-specific storage backends.  Both iOS and Android read
+ * and write lists of these objects as JSON.
+ *
+ * Fields are intentionally denormalised — publication name / URL and
+ * author display-name / avatar are snapshot copies taken at cache time
+ * so the feed can render immediately without a secondary profile or
+ * publication lookup.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * A feed item persisted in the local cache.
+ *
+ * This is the serialisation boundary between the shared KMP layer and
+ * the platform-specific storage backends.  Both iOS and Android read
+ * and write lists of these objects as JSON.
+ *
+ * Fields are intentionally denormalised — publication name / URL and
+ * author display-name / avatar are snapshot copies taken at cache time
+ * so the feed can render immediately without a secondary profile or
+ * publication lookup.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * A feed item persisted in the local cache.
+ *
+ * This is the serialisation boundary between the shared KMP layer and
+ * the platform-specific storage backends.  Both iOS and Android read
+ * and write lists of these objects as JSON.
+ *
+ * Fields are intentionally denormalised — publication name / URL and
+ * author display-name / avatar are snapshot copies taken at cache time
+ * so the feed can render immediately without a secondary profile or
+ * publication lookup.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+
+/** Snapshot of the author's avatar URL. */
+@property (readonly) NSString * _Nullable authorAvatar __attribute__((swift_name("authorAvatar")));
+
+/** DID of the publication / author that owns the document. */
+@property (readonly) NSString *authorDID __attribute__((swift_name("authorDID")));
+
+/** Snapshot of the author's display name. */
+@property (readonly) NSString * _Nullable authorDisplayName __attribute__((swift_name("authorDisplayName")));
+
+/** Epoch-millis timestamp of when this item was written to cache. */
+@property (readonly) int64_t cachedAt __attribute__((swift_name("cachedAt")));
+@property (readonly) NSString * _Nullable coverImageUrl __attribute__((swift_name("coverImageUrl")));
+@property (readonly) NSString * _Nullable description_ __attribute__((swift_name("description_")));
+@property (readonly) NSString * _Nullable path __attribute__((swift_name("path")));
+
+/** Human-readable publication name (snapshot). */
+@property (readonly) NSString * _Nullable publicationName __attribute__((swift_name("publicationName")));
+
+/** AT URI of the publication record. */
+@property (readonly) NSString * _Nullable publicationUri __attribute__((swift_name("publicationUri")));
+
+/** Canonical website URL of the publication (snapshot). */
+@property (readonly) NSString * _Nullable publicationUrl __attribute__((swift_name("publicationUrl")));
+
+/** ISO-8601 timestamp of when the document was published. */
+@property (readonly) NSString *publishedAt __attribute__((swift_name("publishedAt")));
+
+/** AT URI of the `site.standard.publication` this doc belongs to. */
+@property (readonly) NSString *site __attribute__((swift_name("site")));
+@property (readonly) NSString * _Nullable textContent __attribute__((swift_name("textContent")));
+@property (readonly) NSString *title __attribute__((swift_name("title")));
+
+/** AT URI of the `site.standard.document` record. */
+@property (readonly) NSString *uri __attribute__((swift_name("uri")));
+@end
+
+
+/**
+ * A feed item persisted in the local cache.
+ *
+ * This is the serialisation boundary between the shared KMP layer and
+ * the platform-specific storage backends.  Both iOS and Android read
+ * and write lists of these objects as JSON.
+ *
+ * Fields are intentionally denormalised — publication name / URL and
+ * author display-name / avatar are snapshot copies taken at cache time
+ * so the feed can render immediately without a secondary profile or
+ * publication lookup.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("CachedFeedItem.Companion")))
+@interface InkwellSharedCachedFeedItemCompanion : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * A feed item persisted in the local cache.
+ *
+ * This is the serialisation boundary between the shared KMP layer and
+ * the platform-specific storage backends.  Both iOS and Android read
+ * and write lists of these objects as JSON.
+ *
+ * Fields are intentionally denormalised — publication name / URL and
+ * author display-name / avatar are snapshot copies taken at cache time
+ * so the feed can render immediately without a secondary profile or
+ * publication lookup.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedCachedFeedItemCompanion *shared __attribute__((swift_name("shared")));
+
+/**
+ * A feed item persisted in the local cache.
+ *
+ * This is the serialisation boundary between the shared KMP layer and
+ * the platform-specific storage backends.  Both iOS and Android read
+ * and write lists of these objects as JSON.
+ *
+ * Fields are intentionally denormalised — publication name / URL and
+ * author display-name / avatar are snapshot copies taken at cache time
+ * so the feed can render immediately without a secondary profile or
+ * publication lookup.
+ */
+- (id<InkwellSharedKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end
+
+
+/**
+ * Platform-agnostic interface for a local feed-item cache.
+ *
+ * The cache stores [CachedFeedItem] objects serialized as JSON.  The
+ * actual storage backend is platform-specific:
+ * - **Android**: writes to the app's internal cache directory as a
+ *   JSON file.
+ * - **iOS**: writes to the app's caches directory as a JSON file.
+ *
+ * Both backends are constructed via expect/actual factories that
+ * receive the platform directory path at creation time.
+ */
+__attribute__((swift_name("FeedCache")))
+@protocol InkwellSharedFeedCache
+@required
+
+/**
+ * Discard all cached data.
+ *
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)clearWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("clear(completionHandler:)")));
+
+/**
+ * Load up to [limit] cached items, most recently cached first.
+ *
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)loadLimit:(int32_t)limit completionHandler:(void (^)(NSArray<InkwellSharedCachedFeedItem *> * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("load(limit:completionHandler:)")));
+
+/**
+ * Remove a single item by its AT URI.
+ *
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)removeUri:(NSString *)uri completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("remove(uri:completionHandler:)")));
+
+/**
+ * Replace the entire cache contents with [items].
+ * Previous entries are discarded.
+ *
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)saveItems:(NSArray<InkwellSharedCachedFeedItem *> *)items completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("save(items:completionHandler:)")));
+
+/**
+ * Append or update items in the cache.  Existing items with the
+ * same [CachedFeedItem.uri] are replaced; new items are appended.
+ *
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)upsertItems:(NSArray<InkwellSharedCachedFeedItem *> *)items completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("upsert(items:completionHandler:)")));
+@end
+
+
+/**
+ * iOS implementation of [FeedCache] backed by a JSON file.
+ *
+ * All reads and writes are serialised by a [Mutex] so concurrent
+ * coroutine callers never corrupt the file.
+ *
+ * @param cacheDirPath Absolute path to the caches directory (typically
+ *   `NSFileManager.defaultManager.cacheDirectoryPath`).
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("FeedCacheIos")))
+@interface InkwellSharedFeedCacheIos : InkwellSharedBase <InkwellSharedFeedCache>
+- (instancetype)initWithCacheDirPath:(NSString *)cacheDirPath __attribute__((swift_name("init(cacheDirPath:)"))) __attribute__((objc_designated_initializer));
+@property (class, readonly, getter=companion) InkwellSharedFeedCacheIosCompanion *companion __attribute__((swift_name("companion")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)clearWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("clear(completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)loadLimit:(int32_t)limit completionHandler:(void (^)(NSArray<InkwellSharedCachedFeedItem *> * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("load(limit:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)removeUri:(NSString *)uri completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("remove(uri:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)saveItems:(NSArray<InkwellSharedCachedFeedItem *> *)items completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("save(items:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)upsertItems:(NSArray<InkwellSharedCachedFeedItem *> *)items completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("upsert(items:completionHandler:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("FeedCacheIos.Companion")))
+@interface InkwellSharedFeedCacheIosCompanion : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedFeedCacheIosCompanion *shared __attribute__((swift_name("shared")));
+@end
+
+
+/**
  * Constants for submitting in-app feedback to userinput.app
  * (https://userinput.app), a federated feedback board built on AT Protocol.
  *
@@ -1118,6 +1391,313 @@ __attribute__((swift_name("CollectionNsids")))
 @property (readonly) NSString *LEAFLET_POLL_VOTE __attribute__((swift_name("LEAFLET_POLL_VOTE")));
 @property (readonly) NSString *PUBLICATION __attribute__((swift_name("PUBLICATION")));
 @property (readonly) NSString *USER __attribute__((swift_name("USER")));
+@end
+
+
+/**
+ * Platform-agnostic interface for a Jetstream WebSocket client.
+ *
+ * The actual implementation lives in `androidMain` (Ktor + OkHttp) and
+ * `iosMain` (Ktor + Darwin).  commonMain holds only the interface and
+ * the `JetstreamConfig` / `JetstreamPayload` models so business logic
+ * can consume the stream without importing a platform engine.
+ */
+__attribute__((swift_name("JetstreamClient")))
+@protocol InkwellSharedJetstreamClient
+@required
+
+/**
+ * Opens a WebSocket connection to Jetstream and returns a cold
+ * [Flow] of commit payloads.  The flow completes when the
+ * connection is closed by the server or cancelled by the caller.
+ *
+ * Only `commit` events with `operation == "create"` or
+ * `operation == "update"` are emitted — deletes are mapped to a
+ * sentinel with `operation == "delete"` so callers can evict stale
+ * entries from their cache.
+ */
+- (id<InkwellSharedKotlinx_coroutines_coreFlow>)connectConfig:(InkwellSharedJetstreamConfig *)config __attribute__((swift_name("connect(config:)")));
+
+/** Gracefully close the current connection, if any.
+ *
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)disconnectWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("disconnect(completionHandler:)")));
+
+/** `true` while a WebSocket session is open. */
+@property (readonly) BOOL isConnected __attribute__((swift_name("isConnected")));
+@end
+
+
+/**
+ * iOS implementation of [JetstreamClient] using Ktor + Darwin.
+ *
+ * Each call to [connect] opens a new WebSocket session and returns a
+ * cold [Flow] that emits [JetstreamPayload] objects.  The session is
+ * closed when the flow is cancelled or the server disconnects.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("JetstreamClientIos")))
+@interface InkwellSharedJetstreamClientIos : InkwellSharedBase <InkwellSharedJetstreamClient>
+
+/**
+ * iOS implementation of [JetstreamClient] using Ktor + Darwin.
+ *
+ * Each call to [connect] opens a new WebSocket session and returns a
+ * cold [Flow] that emits [JetstreamPayload] objects.  The session is
+ * closed when the flow is cancelled or the server disconnects.
+ */
+- (instancetype)init __attribute__((swift_name("init()"))) __attribute__((objc_designated_initializer));
+
+/**
+ * iOS implementation of [JetstreamClient] using Ktor + Darwin.
+ *
+ * Each call to [connect] opens a new WebSocket session and returns a
+ * cold [Flow] that emits [JetstreamPayload] objects.  The session is
+ * closed when the flow is cancelled or the server disconnects.
+ */
++ (instancetype)new __attribute__((availability(swift, unavailable, message="use object initializers instead")));
+- (id<InkwellSharedKotlinx_coroutines_coreFlow>)connectConfig:(InkwellSharedJetstreamConfig *)config __attribute__((swift_name("connect(config:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)disconnectWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("disconnect(completionHandler:)")));
+@property (readonly) BOOL isConnected __attribute__((swift_name("isConnected")));
+@end
+
+
+/**
+ * Configuration for a Jetstream WebSocket subscription.
+ *
+ * @param collections AT Protocol collection NSIDs to filter on
+ *   (e.g. `site.standard.document`).
+ * @param dids DIDs to restrict the stream to.  When non-empty only
+ *   records owned by these DIDs are delivered.
+ * @param cursor Optional sequence number to resume from after a
+ *   disconnect.  When `null` the stream starts from the current tip.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("JetstreamConfig")))
+@interface InkwellSharedJetstreamConfig : InkwellSharedBase
+- (instancetype)initWithCollections:(NSArray<NSString *> *)collections dids:(NSArray<NSString *> *)dids cursor:(InkwellSharedLong * _Nullable)cursor __attribute__((swift_name("init(collections:dids:cursor:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedJetstreamConfig *)doCopyCollections:(NSArray<NSString *> *)collections dids:(NSArray<NSString *> *)dids cursor:(InkwellSharedLong * _Nullable)cursor __attribute__((swift_name("doCopy(collections:dids:cursor:)")));
+
+/**
+ * Configuration for a Jetstream WebSocket subscription.
+ *
+ * @param collections AT Protocol collection NSIDs to filter on
+ *   (e.g. `site.standard.document`).
+ * @param dids DIDs to restrict the stream to.  When non-empty only
+ *   records owned by these DIDs are delivered.
+ * @param cursor Optional sequence number to resume from after a
+ *   disconnect.  When `null` the stream starts from the current tip.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Configuration for a Jetstream WebSocket subscription.
+ *
+ * @param collections AT Protocol collection NSIDs to filter on
+ *   (e.g. `site.standard.document`).
+ * @param dids DIDs to restrict the stream to.  When non-empty only
+ *   records owned by these DIDs are delivered.
+ * @param cursor Optional sequence number to resume from after a
+ *   disconnect.  When `null` the stream starts from the current tip.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Configuration for a Jetstream WebSocket subscription.
+ *
+ * @param collections AT Protocol collection NSIDs to filter on
+ *   (e.g. `site.standard.document`).
+ * @param dids DIDs to restrict the stream to.  When non-empty only
+ *   records owned by these DIDs are delivered.
+ * @param cursor Optional sequence number to resume from after a
+ *   disconnect.  When `null` the stream starts from the current tip.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSArray<NSString *> *collections __attribute__((swift_name("collections")));
+@property (readonly) InkwellSharedLong * _Nullable cursor __attribute__((swift_name("cursor")));
+@property (readonly) NSArray<NSString *> *dids __attribute__((swift_name("dids")));
+@end
+
+
+/**
+ * Top-level envelope received from the Jetstream WebSocket.
+ *
+ * Mirrors the wire format documented at
+ * https://bsky.network/docs/jetstream/ — a `$type`-tagged envelope
+ * carrying a `payload` that is one of commit / identity / account / sync.
+ *
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("JetstreamEvent")))
+@interface InkwellSharedJetstreamEvent : InkwellSharedBase
+- (instancetype)initWithType:(NSString *)type payload:(InkwellSharedJetstreamPayload *)payload __attribute__((swift_name("init(type:payload:)"))) __attribute__((objc_designated_initializer));
+@property (class, readonly, getter=companion) InkwellSharedJetstreamEventCompanion *companion __attribute__((swift_name("companion")));
+- (InkwellSharedJetstreamEvent *)doCopyType:(NSString *)type payload:(InkwellSharedJetstreamPayload *)payload __attribute__((swift_name("doCopy(type:payload:)")));
+
+/**
+ * Top-level envelope received from the Jetstream WebSocket.
+ *
+ * Mirrors the wire format documented at
+ * https://bsky.network/docs/jetstream/ — a `$type`-tagged envelope
+ * carrying a `payload` that is one of commit / identity / account / sync.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Top-level envelope received from the Jetstream WebSocket.
+ *
+ * Mirrors the wire format documented at
+ * https://bsky.network/docs/jetstream/ — a `$type`-tagged envelope
+ * carrying a `payload` that is one of commit / identity / account / sync.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Top-level envelope received from the Jetstream WebSocket.
+ *
+ * Mirrors the wire format documented at
+ * https://bsky.network/docs/jetstream/ — a `$type`-tagged envelope
+ * carrying a `payload` that is one of commit / identity / account / sync.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) InkwellSharedJetstreamPayload *payload __attribute__((swift_name("payload")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="$type")
+*/
+@property (readonly) NSString *type __attribute__((swift_name("type")));
+@end
+
+
+/**
+ * Top-level envelope received from the Jetstream WebSocket.
+ *
+ * Mirrors the wire format documented at
+ * https://bsky.network/docs/jetstream/ — a `$type`-tagged envelope
+ * carrying a `payload` that is one of commit / identity / account / sync.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("JetstreamEvent.Companion")))
+@interface InkwellSharedJetstreamEventCompanion : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Top-level envelope received from the Jetstream WebSocket.
+ *
+ * Mirrors the wire format documented at
+ * https://bsky.network/docs/jetstream/ — a `$type`-tagged envelope
+ * carrying a `payload` that is one of commit / identity / account / sync.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedJetstreamEventCompanion *shared __attribute__((swift_name("shared")));
+
+/**
+ * Top-level envelope received from the Jetstream WebSocket.
+ *
+ * Mirrors the wire format documented at
+ * https://bsky.network/docs/jetstream/ — a `$type`-tagged envelope
+ * carrying a `payload` that is one of commit / identity / account / sync.
+ */
+- (id<InkwellSharedKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end
+
+
+/**
+ * The payload of a Jetstream event.  For `commit` events the `record`
+ * field carries the decoded AT Protocol record as a raw JSON object so
+ * callers can extract the fields they need without a shared schema for
+ * every possible collection.
+ *
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("JetstreamPayload")))
+@interface InkwellSharedJetstreamPayload : InkwellSharedBase
+- (instancetype)initWithType:(NSString *)type did:(NSString *)did seq:(int64_t)seq time:(NSString *)time operation:(NSString *)operation collection:(NSString *)collection rkey:(NSString *)rkey cid:(NSString * _Nullable)cid record:(NSDictionary<NSString *, InkwellSharedKotlinx_serialization_jsonJsonElement *> * _Nullable)record cursor:(InkwellSharedLong * _Nullable)cursor __attribute__((swift_name("init(type:did:seq:time:operation:collection:rkey:cid:record:cursor:)"))) __attribute__((objc_designated_initializer));
+@property (class, readonly, getter=companion) InkwellSharedJetstreamPayloadCompanion *companion __attribute__((swift_name("companion")));
+- (InkwellSharedJetstreamPayload *)doCopyType:(NSString *)type did:(NSString *)did seq:(int64_t)seq time:(NSString *)time operation:(NSString *)operation collection:(NSString *)collection rkey:(NSString *)rkey cid:(NSString * _Nullable)cid record:(NSDictionary<NSString *, InkwellSharedKotlinx_serialization_jsonJsonElement *> * _Nullable)record cursor:(InkwellSharedLong * _Nullable)cursor __attribute__((swift_name("doCopy(type:did:seq:time:operation:collection:rkey:cid:record:cursor:)")));
+
+/**
+ * The payload of a Jetstream event.  For `commit` events the `record`
+ * field carries the decoded AT Protocol record as a raw JSON object so
+ * callers can extract the fields they need without a shared schema for
+ * every possible collection.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * The payload of a Jetstream event.  For `commit` events the `record`
+ * field carries the decoded AT Protocol record as a raw JSON object so
+ * callers can extract the fields they need without a shared schema for
+ * every possible collection.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * The payload of a Jetstream event.  For `commit` events the `record`
+ * field carries the decoded AT Protocol record as a raw JSON object so
+ * callers can extract the fields they need without a shared schema for
+ * every possible collection.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString * _Nullable cid __attribute__((swift_name("cid")));
+@property (readonly) NSString *collection __attribute__((swift_name("collection")));
+@property (readonly) InkwellSharedLong * _Nullable cursor __attribute__((swift_name("cursor")));
+@property (readonly) NSString *did __attribute__((swift_name("did")));
+@property (readonly) NSString *operation __attribute__((swift_name("operation")));
+@property (readonly) NSDictionary<NSString *, InkwellSharedKotlinx_serialization_jsonJsonElement *> * _Nullable record __attribute__((swift_name("record")));
+@property (readonly) NSString *rkey __attribute__((swift_name("rkey")));
+@property (readonly) int64_t seq __attribute__((swift_name("seq")));
+@property (readonly) NSString *time __attribute__((swift_name("time")));
+
+/**
+ * @note annotations
+ *   kotlinx.serialization.SerialName(value="$type")
+*/
+@property (readonly) NSString *type __attribute__((swift_name("type")));
+@end
+
+
+/**
+ * The payload of a Jetstream event.  For `commit` events the `record`
+ * field carries the decoded AT Protocol record as a raw JSON object so
+ * callers can extract the fields they need without a shared schema for
+ * every possible collection.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("JetstreamPayload.Companion")))
+@interface InkwellSharedJetstreamPayloadCompanion : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * The payload of a Jetstream event.  For `commit` events the `record`
+ * field carries the decoded AT Protocol record as a raw JSON object so
+ * callers can extract the fields they need without a shared schema for
+ * every possible collection.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedJetstreamPayloadCompanion *shared __attribute__((swift_name("shared")));
+
+/**
+ * The payload of a Jetstream event.  For `commit` events the `record`
+ * field carries the decoded AT Protocol record as a raw JSON object so
+ * callers can extract the fields they need without a shared schema for
+ * every possible collection.
+ */
+- (id<InkwellSharedKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
 
@@ -2990,6 +3570,40 @@ __attribute__((swift_name("XrpcEndpoints")))
 @property (readonly) NSString *SYNC_GET_BLOB __attribute__((swift_name("SYNC_GET_BLOB")));
 @end
 
+@interface InkwellSharedJetstreamPayload (Extensions)
+
+/**
+ * Parses a Jetstream commit payload (for `site.standard.document`
+ * records) into a [CachedFeedItem] suitable for cache storage.
+ *
+ * Returns `null` if the payload is not a document commit or if
+ * required fields are missing.
+ */
+- (InkwellSharedCachedFeedItem * _Nullable)toCachedFeedItem __attribute__((swift_name("toCachedFeedItem()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("CreateFeedCache_iosKt")))
+@interface InkwellSharedCreateFeedCache_iosKt : InkwellSharedBase
+
+/**
+ * iOS factory — creates a [FeedCache] backed by a JSON file.
+ *
+ * @param cacheDirPath Absolute path to the app's caches directory.
+ */
++ (id<InkwellSharedFeedCache>)createFeedCacheCacheDirPath:(NSString *)cacheDirPath __attribute__((swift_name("createFeedCache(cacheDirPath:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("CreateJetstreamClient_iosKt")))
+@interface InkwellSharedCreateJetstreamClient_iosKt : InkwellSharedBase
+
+/**
+ * iOS factory — creates a [JetstreamClient] backed by Ktor + Darwin.
+ */
++ (id<InkwellSharedJetstreamClient>)createJetstreamClient __attribute__((swift_name("createJetstreamClient()")));
+@end
+
 __attribute__((swift_name("Kotlinx_serialization_coreSerializationStrategy")))
 @protocol InkwellSharedKotlinx_serialization_coreSerializationStrategy
 @required
@@ -3106,6 +3720,17 @@ __attribute__((swift_name("KotlinPair")))
 - (NSString *)toString __attribute__((swift_name("toString()")));
 @property (readonly) A _Nullable first __attribute__((swift_name("first")));
 @property (readonly) B _Nullable second __attribute__((swift_name("second")));
+@end
+
+__attribute__((swift_name("Kotlinx_coroutines_coreFlow")))
+@protocol InkwellSharedKotlinx_coroutines_coreFlow
+@required
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)collectCollector:(id<InkwellSharedKotlinx_coroutines_coreFlowCollector>)collector completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("collect(collector:completionHandler:)")));
 @end
 
 __attribute__((swift_name("KotlinIterable")))
@@ -3233,66 +3858,16 @@ __attribute__((swift_name("Kotlinx_serialization_coreEncoder")))
 __attribute__((swift_name("Kotlinx_serialization_coreSerialDescriptor")))
 @protocol InkwellSharedKotlinx_serialization_coreSerialDescriptor
 @required
-
-/**
- * @note annotations
- *   kotlinx.serialization.ExperimentalSerializationApi
-*/
 - (NSArray<id<InkwellSharedKotlinAnnotation>> *)getElementAnnotationsIndex:(int32_t)index __attribute__((swift_name("getElementAnnotations(index:)")));
-
-/**
- * @note annotations
- *   kotlinx.serialization.ExperimentalSerializationApi
-*/
 - (id<InkwellSharedKotlinx_serialization_coreSerialDescriptor>)getElementDescriptorIndex:(int32_t)index __attribute__((swift_name("getElementDescriptor(index:)")));
-
-/**
- * @note annotations
- *   kotlinx.serialization.ExperimentalSerializationApi
-*/
 - (int32_t)getElementIndexName:(NSString *)name __attribute__((swift_name("getElementIndex(name:)")));
-
-/**
- * @note annotations
- *   kotlinx.serialization.ExperimentalSerializationApi
-*/
 - (NSString *)getElementNameIndex:(int32_t)index __attribute__((swift_name("getElementName(index:)")));
-
-/**
- * @note annotations
- *   kotlinx.serialization.ExperimentalSerializationApi
-*/
 - (BOOL)isElementOptionalIndex:(int32_t)index __attribute__((swift_name("isElementOptional(index:)")));
-
-/**
- * @note annotations
- *   kotlinx.serialization.ExperimentalSerializationApi
-*/
 @property (readonly) NSArray<id<InkwellSharedKotlinAnnotation>> *annotations __attribute__((swift_name("annotations")));
-
-/**
- * @note annotations
- *   kotlinx.serialization.ExperimentalSerializationApi
-*/
 @property (readonly) int32_t elementsCount __attribute__((swift_name("elementsCount")));
 @property (readonly) BOOL isInline __attribute__((swift_name("isInline")));
-
-/**
- * @note annotations
- *   kotlinx.serialization.ExperimentalSerializationApi
-*/
 @property (readonly) BOOL isNullable __attribute__((swift_name("isNullable")));
-
-/**
- * @note annotations
- *   kotlinx.serialization.ExperimentalSerializationApi
-*/
 @property (readonly) InkwellSharedKotlinx_serialization_coreSerialKind *kind __attribute__((swift_name("kind")));
-
-/**
- * @note annotations
- *   kotlinx.serialization.ExperimentalSerializationApi
-*/
 @property (readonly) NSString *serialName __attribute__((swift_name("serialName")));
 @end
 
@@ -3341,6 +3916,17 @@ __attribute__((swift_name("Kotlinx_serialization_jsonJsonElement.Companion")))
 + (instancetype)companion __attribute__((swift_name("init()")));
 @property (class, readonly, getter=shared) InkwellSharedKotlinx_serialization_jsonJsonElementCompanion *shared __attribute__((swift_name("shared")));
 - (id<InkwellSharedKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end
+
+__attribute__((swift_name("Kotlinx_coroutines_coreFlowCollector")))
+@protocol InkwellSharedKotlinx_coroutines_coreFlowCollector
+@required
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)emitValue:(id _Nullable)value completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("emit(value:completionHandler:)")));
 @end
 
 __attribute__((swift_name("KotlinIterator")))
@@ -3441,11 +4027,6 @@ __attribute__((swift_name("KotlinAnnotation")))
 @required
 @end
 
-
-/**
- * @note annotations
- *   kotlinx.serialization.ExperimentalSerializationApi
-*/
 __attribute__((swift_name("Kotlinx_serialization_coreSerialKind")))
 @interface InkwellSharedKotlinx_serialization_coreSerialKind : InkwellSharedBase
 - (NSUInteger)hash __attribute__((swift_name("hash()")));

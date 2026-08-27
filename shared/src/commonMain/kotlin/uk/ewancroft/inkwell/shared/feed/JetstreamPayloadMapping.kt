@@ -30,7 +30,7 @@ fun JetstreamPayload.toCachedFeedItem(): CachedFeedItem? {
         description = record["description"]?.jsonPrimitive?.contentOrNull,
         textContent = record["textContent"]?.jsonPrimitive?.contentOrNull,
         coverImageUrl = extractCoverImageUrl(record),
-        cachedAt =System.currentTimeMillis()
+        cachedAt = currentTimeMillis()
     )
 }
 
