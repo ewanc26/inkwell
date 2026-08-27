@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import uk.ewancroft.inkwell.shared.text.StringUtils
 import uk.ewancroft.inkwell.ui.moderation.ReportDialog
 
@@ -45,7 +46,8 @@ fun PostDetailScreen(
     onNavigateToProfile: (String) -> Unit = {},
     viewModel: PostDetailViewModel = hiltViewModel(),
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
     val isDarkTheme = uk.ewancroft.inkwell.ui.theme.LocalForceDarkTheme.current
         ?: androidx.compose.foundation.isSystemInDarkTheme()
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -71,7 +73,24 @@ fun PostDetailScreen(
         viewModel.setPreviousNext(previousUri, previousTitle, nextUri, nextTitle)
     }
 
+    LaunchedEffect(uiState.subscriptionError) {
+        uiState.subscriptionError?.let { snackbarHostState.showSnackbar(it); viewModel.dismissSubscriptionError() }
+    }
+    LaunchedEffect(uiState.recommendError) {
+        uiState.recommendError?.let { snackbarHostState.showSnackbar(it); viewModel.dismissRecommendError() }
+    }
+    LaunchedEffect(uiState.commentError) {
+        uiState.commentError?.let { snackbarHostState.showSnackbar(it); viewModel.dismissCommentError() }
+    }
+    LaunchedEffect(uiState.reportError) {
+        uiState.reportError?.let { snackbarHostState.showSnackbar(it); viewModel.dismissReportError() }
+    }
+    LaunchedEffect(uiState.reportConfirmation) {
+        uiState.reportConfirmation?.let { snackbarHostState.showSnackbar(it); viewModel.dismissReportConfirmation() }
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {
@@ -191,45 +210,6 @@ fun PostDetailScreen(
         }
     }
 
-    if (uiState.subscriptionError != null) {
-        Snackbar(
-            modifier = Modifier.padding(16.dp),
-            action = {
-                TextButton(onClick = { viewModel.dismissSubscriptionError() }) {
-                    Text("Dismiss")
-                }
-            }
-        ) {
-            Text(uiState.subscriptionError!!)
-        }
-    }
-
-    if (uiState.recommendError != null) {
-        Snackbar(
-            modifier = Modifier.padding(16.dp),
-            action = {
-                TextButton(onClick = { viewModel.dismissRecommendError() }) {
-                    Text("Dismiss")
-                }
-            }
-        ) {
-            Text(uiState.recommendError!!)
-        }
-    }
-
-    if (uiState.commentError != null) {
-        Snackbar(
-            modifier = Modifier.padding(16.dp),
-            action = {
-                TextButton(onClick = { viewModel.dismissCommentError() }) {
-                    Text("Dismiss")
-                }
-            }
-        ) {
-            Text(uiState.commentError!!)
-        }
-    }
-
     reportTarget?.let { target ->
         ReportDialog(
             subject = target.subject,
@@ -246,31 +226,6 @@ fun PostDetailScreen(
         )
     }
 
-    if (uiState.reportError != null) {
-        Snackbar(
-            modifier = Modifier.padding(16.dp),
-            action = {
-                TextButton(onClick = { viewModel.dismissReportError() }) {
-                    Text("Dismiss")
-                }
-            }
-        ) {
-            Text(uiState.reportError!!)
-        }
-    }
-
-    if (uiState.reportConfirmation != null) {
-        Snackbar(
-            modifier = Modifier.padding(16.dp),
-            action = {
-                TextButton(onClick = { viewModel.dismissReportConfirmation() }) {
-                    Text("Dismiss")
-                }
-            }
-        ) {
-            Text(uiState.reportConfirmation!!)
-        }
-    }
 }
 
 @Composable
