@@ -17,6 +17,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
 import uk.ewancroft.inkwell.data.model.atproto.BasicTheme
 import uk.ewancroft.inkwell.data.model.atproto.DocumentRecord
@@ -42,7 +43,13 @@ import uk.ewancroft.inkwell.data.repository.fetchRecommends
 import uk.ewancroft.inkwell.data.repository.fetchSubscriptions
 import uk.ewancroft.inkwell.data.repository.submitReport
 import uk.ewancroft.inkwell.shared.moderation.ReportReasonType
+import uk.ewancroft.inkwell.shared.moderation.ContentFilterDecision
+import uk.ewancroft.inkwell.shared.moderation.ContentFilterEngine
+import uk.ewancroft.inkwell.shared.moderation.FilterableContent
+import uk.ewancroft.inkwell.shared.moderation.ModerationLabel
+import uk.ewancroft.inkwell.shared.moderation.ModerationPolicy
 import uk.ewancroft.inkwell.util.ArticleStatePreferences
+import uk.ewancroft.inkwell.util.ModerationPreferences
 import javax.inject.Inject
 
 @HiltViewModel
@@ -104,6 +111,30 @@ class PostDetailViewModel @Inject constructor(
                     ?: value["coverImage"]?.jsonObject?.get("\$link")?.jsonPrimitive?.contentOrNull
 
                 val textContent = value["textContent"]?.jsonPrimitive?.contentOrNull
+                val moderationLabels = value["labels"]?.jsonObject?.get("values")?.jsonArray
+                    ?.mapNotNull { it.jsonObject["val"]?.jsonPrimitive?.contentOrNull }
+                    .orEmpty()
+                val moderationDecision = ContentFilterEngine.evaluate(
+                    FilterableContent(
+                        title = title,
+                        description = description,
+                        textContent = textContent,
+                        labels = moderationLabels.map { ModerationLabel(it) },
+                    ),
+                    ModerationPolicy(
+                        hiddenLabels = ModerationPreferences.hiddenLabels(context),
+                        hiddenKeywords = ModerationPreferences.hiddenKeywords(context),
+                    ),
+                )
+                if (moderationDecision is ContentFilterDecision.Hide) {
+                    if (_uiState.value.uri == uri) {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            loadError = "This article is hidden by your content filters.",
+                        )
+                    }
+                    return@launch
+                }
                 val contentObj = value["content"]?.jsonObject
                 val parseResult = parseContent(contentObj, textContent, parsed.did, uri)
 

@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import ATProtoKit
 
 struct RemoteDocumentView: View {
     @Environment(LoginStateManager.self) private var loginStateManager
@@ -55,10 +56,33 @@ struct RemoteDocumentView: View {
             if isPublication {
                 async let docTask = loginStateManager.fetchDocument(uri: documentURI)
                 async let pubTask = loginStateManager.fetchPublication(uri: documentURI)
-                self.document = try await docTask
-                self.publication = try? await pubTask
+                let fetchedDocument = try await docTask
+                let fetchedPublication = try? await pubTask
+                let labels = (fetchedDocument.record.labels?.values.map(\.value) ?? []) +
+                    (fetchedPublication?.record.labels?.values.map(\.value) ?? [])
+                if shouldHideContent(
+                    title: fetchedDocument.record.title,
+                    description: fetchedDocument.record.description,
+                    textContent: fetchedDocument.record.textContent,
+                    labels: labels
+                ) {
+                    errorMessage = "This article is hidden by your content filters."
+                } else {
+                    self.document = fetchedDocument
+                    self.publication = fetchedPublication
+                }
             } else {
-                self.document = try await loginStateManager.fetchDocument(uri: documentURI)
+                let fetchedDocument = try await loginStateManager.fetchDocument(uri: documentURI)
+                if shouldHideContent(
+                    title: fetchedDocument.record.title,
+                    description: fetchedDocument.record.description,
+                    textContent: fetchedDocument.record.textContent,
+                    labels: fetchedDocument.record.labels?.values.map(\.value) ?? []
+                ) {
+                    errorMessage = "This article is hidden by your content filters."
+                } else {
+                    self.document = fetchedDocument
+                }
             }
         } catch {
             errorMessage = error.localizedDescription
