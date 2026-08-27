@@ -22,6 +22,10 @@ private struct FeedReportTarget: Identifiable {
     var id: String { subject }
 }
 
+private struct ReaderProfileRoute: Hashable {
+    let did: String
+}
+
 struct BrowseDocumentsView: View {
     @Environment(LoginStateManager.self) private var loginStateManager
     @State private var notificationManager = NotificationManager.shared
@@ -46,6 +50,9 @@ struct BrowseDocumentsView: View {
                 .navigationTitle("Reader")
                 .navigationDestination(for: String.self) { documentURI in
                     RemoteDocumentView(documentURI: documentURI)
+                }
+                .navigationDestination(for: ReaderProfileRoute.self) { route in
+                    ProfileView(did: route.did)
                 }
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
@@ -293,6 +300,15 @@ struct BrowseDocumentsView: View {
 
     private func reportMenu(for item: ReaderFeedItem) -> some View {
         Menu {
+            if !item.document.authorDID.isEmpty {
+                Button {
+                    path.append(ReaderProfileRoute(did: item.document.authorDID))
+                } label: {
+                    Label("View Profile", systemImage: "person.circle")
+                }
+
+                Divider()
+            }
             Button {
                 reportTarget = FeedReportTarget(
                     subject: item.document.uri,
@@ -301,10 +317,12 @@ struct BrowseDocumentsView: View {
             } label: {
                 Label("Report Post", systemImage: "doc.text")
             }
-            Button {
-                reportTarget = FeedReportTarget(subject: item.document.authorDID, recordCID: nil)
-            } label: {
-                Label("Report Account", systemImage: "person")
+            if !item.document.authorDID.isEmpty {
+                Button {
+                    reportTarget = FeedReportTarget(subject: item.document.authorDID, recordCID: nil)
+                } label: {
+                    Label("Report Account", systemImage: "person")
+                }
             }
         } label: {
             Image(systemName: "ellipsis")

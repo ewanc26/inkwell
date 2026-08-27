@@ -18,6 +18,7 @@ import uk.ewancroft.inkwell.ui.auth.LoginScreen
 import uk.ewancroft.inkwell.ui.reader.ReaderScreen
 import uk.ewancroft.inkwell.ui.reader.PostDetailScreen
 import uk.ewancroft.inkwell.ui.reader.InkwellNotificationViewModel
+import uk.ewancroft.inkwell.ui.profile.ProfileScreen
 import uk.ewancroft.inkwell.ui.writer.WriterScreen
 import uk.ewancroft.inkwell.ui.discover.DiscoverScreen
 import java.net.URLDecoder
@@ -78,6 +79,13 @@ fun InkwellNavHost(
         }
     }
 
+    fun navigateToProfile(did: String) {
+        val encoded = URLEncoder.encode(did, StandardCharsets.UTF_8.name())
+        navController.navigate("profile/$encoded") {
+            launchSingleTop = true
+        }
+    }
+
     Scaffold(
         bottomBar = {
             if (showBottomBar) {
@@ -128,6 +136,7 @@ fun InkwellNavHost(
                     onNavigateToPost = { uri, prevUri, prevTitle, nextUri, nextTitle ->
                         navigateToPost(uri, prevUri, prevTitle, nextUri, nextTitle)
                     },
+                    onNavigateToProfile = ::navigateToProfile,
                     onSignOut = onSignOut,
                 )
             }
@@ -175,6 +184,16 @@ fun InkwellNavHost(
                     onNavigateToPost = { target, pUri, pTitle, nUri, nTitle ->
                         navigateToPost(target, pUri, pTitle, nUri, nTitle)
                     },
+                    onNavigateToProfile = ::navigateToProfile,
+                )
+            }
+
+            composable("profile/{did}") { backStackEntry ->
+                val encoded = backStackEntry.arguments?.getString("did") ?: return@composable
+                val did = URLDecoder.decode(encoded, StandardCharsets.UTF_8.name())
+                ProfileScreen(
+                    did = did,
+                    onBack = { navController.popBackStack() },
                 )
             }
         }

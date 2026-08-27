@@ -39,6 +39,7 @@ fun ReaderScreen(
     notificationViewModel: InkwellNotificationViewModel = hiltViewModel(),
     userLexiconViewModel: UserLexiconViewModel = hiltViewModel(),
     onNavigateToPost: (String, String?, String?, String?, String?) -> Unit = { _, _, _, _, _ -> },
+    onNavigateToProfile: (String) -> Unit = {},
     onSignOut: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -167,6 +168,7 @@ fun ReaderScreen(
                             next?.uri, next?.title
                         )
                     },
+                    onViewProfile = { post -> onNavigateToProfile(post.authorDid) },
                     onReportPost = { post ->
                         reportTarget = ReaderReportTarget(post.uri, post.recordCid)
                     },
@@ -188,6 +190,7 @@ fun ReaderScreen(
                             next?.uri, next?.title
                         )
                     },
+                    onViewProfile = { post -> onNavigateToProfile(post.authorDid) },
                     onReportPost = { post ->
                         reportTarget = ReaderReportTarget(post.uri, post.recordCid)
                     },

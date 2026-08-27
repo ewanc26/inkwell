@@ -29,6 +29,7 @@ internal fun FeedContent(
     hasMore: Boolean = false,
     onLoadMore: () -> Unit = {},
     onPostClick: (Int, PostItem) -> Unit = { _, _ -> },
+    onViewProfile: (PostItem) -> Unit = {},
     onReportPost: (PostItem) -> Unit = {},
     onReportAccount: (PostItem) -> Unit = {},
 ) {
@@ -89,6 +90,11 @@ internal fun FeedContent(
                     publicationTheme = post.publicationTheme,
                     publicationBasicTheme = post.publicationBasicTheme,
                     onClick = { onPostClick(index, post) },
+                    onViewProfile = if (post.authorDid.isNotBlank()) {
+                        { onViewProfile(post) }
+                    } else {
+                        null
+                    },
                     onReportPost = { onReportPost(post) },
                     onReportAccount = if (post.authorDid.isNotBlank()) {
                         { onReportAccount(post) }

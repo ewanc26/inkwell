@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Report
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -67,6 +68,7 @@ fun PostCard(
     publicationTheme: PublicationTheme? = null,
     publicationBasicTheme: BasicTheme? = null,
     onClick: () -> Unit = {},
+    onViewProfile: (() -> Unit)? = null,
     onReportPost: (() -> Unit)? = null,
     onReportAccount: (() -> Unit)? = null,
 ) {
@@ -95,8 +97,8 @@ fun PostCard(
         publicationName?.takeIf(String::isNotBlank)?.let { add("Published in $it") }
         add("Published $date")
     }.joinToString(separator = ". ")
-    val hasReportActions = onReportPost != null || onReportAccount != null
-    var reportMenuExpanded by remember { mutableStateOf(false) }
+    val hasOverflowActions = onViewProfile != null || onReportPost != null || onReportAccount != null
+    var overflowMenuExpanded by remember { mutableStateOf(false) }
     Box(modifier = Modifier.fillMaxWidth()) {
         Card(
             modifier = Modifier
@@ -140,7 +142,7 @@ fun PostCard(
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(min = if (hasReportActions) 40.dp else 0.dp),
+                            .heightIn(min = if (hasOverflowActions) 40.dp else 0.dp),
                     ) {
                         if (authorAvatar != null) {
                             AsyncImage(
@@ -159,7 +161,7 @@ fun PostCard(
                                 color = secondaryForeground,
                             )
                         }
-                        if (hasReportActions) {
+                        if (hasOverflowActions) {
                             Spacer(Modifier.weight(1f))
                             Spacer(Modifier.width(56.dp))
                         }
@@ -226,14 +228,14 @@ fun PostCard(
                 }
             }
         }
-        if (hasReportActions) {
+        if (hasOverflowActions) {
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(8.dp),
             ) {
                 IconButton(
-                    onClick = { reportMenuExpanded = true },
+                    onClick = { overflowMenuExpanded = true },
                     modifier = Modifier.size(48.dp),
                 ) {
                     Icon(
@@ -243,14 +245,26 @@ fun PostCard(
                     )
                 }
                 DropdownMenu(
-                    expanded = reportMenuExpanded,
-                    onDismissRequest = { reportMenuExpanded = false },
+                    expanded = overflowMenuExpanded,
+                    onDismissRequest = { overflowMenuExpanded = false },
                 ) {
+                    onViewProfile?.let { viewProfile ->
+                        DropdownMenuItem(
+                            text = { Text("View profile") },
+                            onClick = {
+                                overflowMenuExpanded = false
+                                viewProfile()
+                            },
+                            leadingIcon = {
+                                Icon(Icons.Outlined.Person, contentDescription = null)
+                            },
+                        )
+                    }
                     onReportPost?.let { reportPost ->
                         DropdownMenuItem(
                             text = { Text("Report post") },
                             onClick = {
-                                reportMenuExpanded = false
+                                overflowMenuExpanded = false
                                 reportPost()
                             },
                             leadingIcon = {
@@ -262,7 +276,7 @@ fun PostCard(
                         DropdownMenuItem(
                             text = { Text("Report account") },
                             onClick = {
-                                reportMenuExpanded = false
+                                overflowMenuExpanded = false
                                 reportAccount()
                             },
                             leadingIcon = {

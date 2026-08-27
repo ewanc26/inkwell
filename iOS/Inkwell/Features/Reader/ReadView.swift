@@ -402,6 +402,15 @@ struct ReadView: View {
                     }
                 }
             }
+            if let authorDID, !authorDID.isEmpty {
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink {
+                        ProfileView(did: authorDID)
+                    } label: {
+                        Label("View Profile", systemImage: "person.circle")
+                    }
+                }
+            }
             if (documentURI ?? resolvedDocumentURI) != nil || authorDID != nil {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
