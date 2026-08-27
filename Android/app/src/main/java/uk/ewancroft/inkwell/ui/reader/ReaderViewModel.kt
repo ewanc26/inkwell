@@ -41,6 +41,9 @@ import uk.ewancroft.inkwell.shared.moderation.ContentFilterEngine
 import uk.ewancroft.inkwell.shared.moderation.FilterableContent
 import uk.ewancroft.inkwell.shared.moderation.ModerationLabel
 import uk.ewancroft.inkwell.shared.moderation.ModerationPolicy
+import uk.ewancroft.inkwell.shared.offline.CachedOfflineRecord
+import uk.ewancroft.inkwell.shared.offline.OfflineCacheKind
+import uk.ewancroft.inkwell.shared.offline.createOfflineContentCache
 import uk.ewancroft.inkwell.shared.verification.VerificationResult
 import uk.ewancroft.inkwell.util.ReaderPreferences
 import uk.ewancroft.inkwell.util.ModerationPreferences
@@ -123,6 +126,7 @@ class ReaderViewModel @Inject constructor(
 
     private val jetstreamClient = createJetstreamClient()
     private val feedCache = createFeedCache(context.cacheDir.absolutePath)
+    private val offlineContentCache = createOfflineContentCache(context.cacheDir.absolutePath)
     private var jetstreamJob: kotlinx.coroutines.Job? = null
     private val revealedPostUris = mutableSetOf<String>()
 
@@ -242,11 +246,30 @@ class ReaderViewModel @Inject constructor(
             publicationResolutionCache.remove(site)
         }
 
+        val cachedPublication = cachedPublications(setOf(site))[site]
         val publication = runCatching {
             val record = pdsRepository.getRecord(site)
             val value = record["value"]?.jsonObject ?: return@runCatching null
-            json.decodeFromJsonElement<PublicationRecord>(value)
-        }.getOrNull() ?: return null
+            val resolved = json.decodeFromJsonElement<PublicationRecord>(value)
+            val authorDid = AtUri.parse(site)?.did
+            if (authorDid != null) {
+                val now = System.currentTimeMillis()
+                runCatching {
+                    offlineContentCache.upsert(
+                        CachedOfflineRecord(
+                            uri = site,
+                            kind = OfflineCacheKind.Publication,
+                            authorDid = authorDid,
+                            cid = record["cid"]?.jsonPrimitive?.contentOrNull,
+                            recordJson = value.toString(),
+                            cachedAtMillis = now,
+                            lastAccessedAtMillis = now,
+                        ),
+                    )
+                }
+            }
+            resolved
+        }.getOrNull() ?: cachedPublication ?: return null
 
         publicationResolutionCache[site] = CachedPublicationResolution(
             publication = publication,
@@ -260,6 +283,10 @@ class ReaderViewModel @Inject constructor(
         val publication = runCatching {
             withTimeout(PUBLICATION_TIMEOUT_MS) { resolvePublication(site) }
         }.getOrNull() ?: return this
+        return withPublicationDetails(publication)
+    }
+
+    private fun PostItem.withPublicationDetails(publication: PublicationRecord): PostItem {
         return copy(
             publicationName = publication.name.ifBlank { publicationName },
             publicationTheme = publication.theme,
@@ -268,6 +295,20 @@ class ReaderViewModel @Inject constructor(
                 ModerationLabel(value = it.value, source = it.source)
             },
         )
+    }
+
+    private suspend fun cachedPublications(sites: Set<String>): Map<String, PublicationRecord> {
+        if (sites.isEmpty()) return emptyMap()
+        val records = runCatching { offlineContentCache.loadAll() }.getOrNull().orEmpty()
+        return records.mapNotNull { cached ->
+            if (cached.kind != OfflineCacheKind.Publication || cached.uri !in sites) return@mapNotNull null
+            val publication = runCatching {
+                val decoded = json.parseToJsonElement(cached.recordJson).jsonObject
+                val value = decoded["value"]?.jsonObject ?: decoded
+                json.decodeFromJsonElement<PublicationRecord>(value)
+            }.getOrNull() ?: return@mapNotNull null
+            cached.uri to publication
+        }.toMap()
     }
 
     private suspend fun verifyPosts(posts: List<PostItem>): List<PostItem> {
@@ -406,8 +447,16 @@ class ReaderViewModel @Inject constructor(
         // 1. Show cached data immediately (if available).
         val cached = runCatching { feedCache.load(limit = 200) }.getOrNull().orEmpty()
         if (cached.isNotEmpty()) {
+            val cachedPosts = cached.map { it.toPostItem() }
+            val cachedPublications = cachedPublications(
+                cachedPosts.map { it.site }.filter(::isPublicationAtUri).toSet(),
+            )
             _uiState.value = _uiState.value.copy(
-                followingPosts = sortedByPreference(cached.map { it.toPostItem() }),
+                followingPosts = sortedByPreference(cachedPosts.map { post ->
+                    cachedPublications[post.site]?.let { publication ->
+                        post.withPublicationDetails(publication)
+                    } ?: post
+                }),
                 isLoadingFollowing = false,
             )
         }
@@ -655,7 +704,7 @@ class ReaderViewModel @Inject constructor(
             description = description,
             textContent = textContent,
             coverImageUrl = coverUrl,
-            publicationUri = null,
+            publicationUri = site.takeIf(::isPublicationAtUri),
             publicationName = publicationName,
             publicationUrl = null,
             authorDisplayName = authorDisplayName,

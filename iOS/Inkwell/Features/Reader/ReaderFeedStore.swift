@@ -139,7 +139,13 @@ final class ReaderFeedStore {
 
         // 1. Show cached data immediately (if available).
         if !force, let cached = try? await feedCache.load(limit: 200), !cached.isEmpty {
-            followingState.items = cached.compactMap { $0.toReaderFeedItem() }
+            let publicationURIs = Set(cached.compactMap(publicationURI(for:)))
+            let cachedPublications = await OfflineContentStore.shared.publications(uris: publicationURIs)
+            followingState.items = cached.compactMap { item in
+                item.toReaderFeedItem(
+                    publication: publicationURI(for: item).flatMap { cachedPublications[$0] }
+                )
+            }
             followingState.items = deduplicated(followingState.items)
             followingState.isLoading = false
             followingState.hasLoaded = true
@@ -221,6 +227,9 @@ final class ReaderFeedStore {
                 }
                 for await result in group {
                     guard !result.items.isEmpty else { continue }
+                    if let publication = result.items.compactMap(\.publication).first {
+                        await OfflineContentStore.shared.cache(publication: publication)
+                    }
                     followingState.items.append(contentsOf: result.items)
                     if let cursor = result.cursor {
                         followingState.cursors[result.did] = cursor
@@ -294,6 +303,13 @@ final class ReaderFeedStore {
                     publication = nil
                 }
 
+                if let publication {
+                    await OfflineContentStore.shared.cache(publication: publication)
+                }
+                let cachedItemForStorage = cachedItem.map {
+                    $0.toReaderFeedItem(publication: publication, isCached: false).toCachedFeedItem()
+                }
+
                 await MainActor.run {
                     guard let self else { return }
 
@@ -324,8 +340,8 @@ final class ReaderFeedStore {
 
                 // Persist to cache periodically (every event for now;
                 // could batch for efficiency).
-                if let cachedItem {
-                    try? await cache.upsert(items: [cachedItem])
+                if let cachedItemForStorage {
+                    try? await cache.upsert(items: [cachedItemForStorage])
                 } else if payload.operation == "delete" {
                     let deletedUri = "at://\(payload.did)/\(payload.collection)/\(payload.rkey)"
                     try? await cache.remove(uri: deletedUri)
@@ -559,6 +575,17 @@ final class ReaderFeedStore {
         return entries.values
             .sorted(by: ReaderFeedItem.comparator(for: ReaderSortSettings.shared.sortOrder))
     }
+
+    private func publicationURI(for cachedItem: CachedFeedItem) -> String? {
+        if let publicationURI = cachedItem.publicationUri {
+            return publicationURI
+        }
+        guard let parsed = parseAtUri(cachedItem.site),
+              parsed.collection == SiteStandardLexicon.PublicationRecord.type else {
+            return nil
+        }
+        return cachedItem.site
+    }
 }
 
 struct ReaderModerationLabel: Hashable, Sendable {
@@ -571,6 +598,8 @@ struct ReaderFeedItem: Identifiable {
     let publication: PublicationEntry?
     let authorProfile: BSkyActorProfile?
     let isCached: Bool
+    let cachedPublicationURI: String?
+    let cachedPublicationName: String?
     let cachedModerationLabels: [ReaderModerationLabel]
 
     nonisolated init(
@@ -578,12 +607,16 @@ struct ReaderFeedItem: Identifiable {
         publication: PublicationEntry?,
         authorProfile: BSkyActorProfile?,
         isCached: Bool = false,
+        cachedPublicationURI: String? = nil,
+        cachedPublicationName: String? = nil,
         cachedModerationLabels: [ReaderModerationLabel] = []
     ) {
         self.document = document
         self.publication = publication
         self.authorProfile = authorProfile
         self.isCached = isCached
+        self.cachedPublicationURI = cachedPublicationURI
+        self.cachedPublicationName = cachedPublicationName
         self.cachedModerationLabels = cachedModerationLabels
     }
 
