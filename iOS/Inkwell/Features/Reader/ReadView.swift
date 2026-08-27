@@ -82,6 +82,11 @@ struct ReadView: View {
     /// The stable identifier local read/bookmark state is keyed on.
     var articleID: String? { documentURI ?? resolvedDocumentURI }
 
+    private var documentTitleAccessibilityLabel: String {
+        guard let authorDID, !authorDID.isEmpty else { return document.title }
+        return "\(document.title). Author: \(authorDID)"
+    }
+
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
@@ -103,6 +108,7 @@ struct ReadView: View {
                         .foregroundStyle(foregroundColor)
                         .lineSpacing(4)
                         .accessibilityAddTraits(.isHeader)
+                        .accessibilityLabel(documentTitleAccessibilityLabel)
 
                     HStack(spacing: 8) {
                         Text("Published")
@@ -129,6 +135,11 @@ struct ReadView: View {
                             )
                             .foregroundStyle(isVerified ? accentColor : foregroundColor.opacity(0.5))
                             .lineLimit(1)
+                            .accessibilityLabel(
+                                isVerified
+                                    ? "Source verification: verified"
+                                    : "Source verification: unverified"
+                            )
                         }
                         if let url = document.canonicalURL(publication: publication) {
                             Link("Open original", destination: url)
