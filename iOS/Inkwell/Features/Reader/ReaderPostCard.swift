@@ -8,6 +8,7 @@ import ATProtoKit
 
 struct ReaderPostCard: View {
     let item: ReaderFeedItem
+    var reservesOverflowSpace = false
     @Environment(\.colorScheme) private var colorScheme
 
     private var document: SiteStandardLexicon.DocumentRecord { item.document.record }
@@ -74,7 +75,11 @@ struct ReaderPostCard: View {
                             .font(.caption.weight(.medium))
                             .foregroundStyle(foreground.opacity(0.7))
                     }
+                    if reservesOverflowSpace {
+                        Spacer(minLength: 44)
+                    }
                 }
+                .frame(minHeight: reservesOverflowSpace ? 44 : 0, alignment: .leading)
 
                 Text(document.title)
                     .font(theme.headingFont(.title3, weight: .bold))

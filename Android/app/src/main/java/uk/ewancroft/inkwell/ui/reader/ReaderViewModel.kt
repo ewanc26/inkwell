@@ -26,6 +26,7 @@ import uk.ewancroft.inkwell.data.model.bluesky.BlueskyProfile
 import uk.ewancroft.inkwell.data.remote.StandardSiteVerifier
 import uk.ewancroft.inkwell.data.repository.PdsRepository
 import uk.ewancroft.inkwell.data.repository.getProfile
+import uk.ewancroft.inkwell.data.repository.submitReport
 import uk.ewancroft.inkwell.shared.AtUri
 import uk.ewancroft.inkwell.shared.feed.CachedFeedItem
 import uk.ewancroft.inkwell.shared.feed.createFeedCache
@@ -33,6 +34,7 @@ import uk.ewancroft.inkwell.shared.feed.toCachedFeedItem
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 import uk.ewancroft.inkwell.shared.jetstream.JetstreamConfig
 import uk.ewancroft.inkwell.shared.jetstream.createJetstreamClient
+import uk.ewancroft.inkwell.shared.moderation.ReportReasonType
 import uk.ewancroft.inkwell.shared.verification.VerificationResult
 import uk.ewancroft.inkwell.util.ReaderPreferences
 import uk.ewancroft.inkwell.util.formatPublishedDate
@@ -50,6 +52,8 @@ private data class CachedPublicationResolution(
 
 data class PostItem(
     val uri: String,
+    val authorDid: String,
+    val recordCid: String? = null,
     val title: String,
     val description: String?,
     val publicationName: String?,
@@ -74,6 +78,7 @@ data class ReaderUiState(
     val isLoadingMoreFollowing: Boolean = false,
     val hasMoreFollowing: Boolean = false,
     val error: String? = null,
+    val reportError: String? = null,
     val selectedTab: Int = 0,
     val isVerifyingPosts: Boolean = false,
 )
@@ -113,6 +118,33 @@ class ReaderViewModel @Inject constructor(
 
     fun selectTab(index: Int) {
         _uiState.value = _uiState.value.copy(selectedTab = index)
+    }
+
+    fun submitReport(
+        subject: String,
+        recordCid: String?,
+        reasonType: ReportReasonType,
+        reason: String?,
+    ) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(reportError = null)
+            try {
+                pdsRepository.submitReport(
+                    subject = subject,
+                    recordCid = recordCid,
+                    reasonType = reasonType,
+                    reason = reason,
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    reportError = e.message ?: "Failed to submit report",
+                )
+            }
+        }
+    }
+
+    fun dismissReportError() {
+        _uiState.value = _uiState.value.copy(reportError = null)
     }
 
     private fun isPublicationAtUri(site: String): Boolean {
@@ -243,6 +275,8 @@ class ReaderViewModel @Inject constructor(
                                 val docUri = docJson.jsonObject["uri"]?.jsonPrimitive?.content ?: continue
                                 posts.add(PostItem(
                                     uri = docUri,
+                                    authorDid = did,
+                                    recordCid = docJson.jsonObject["cid"]?.jsonPrimitive?.contentOrNull,
                                     title = docValue["title"]?.jsonPrimitive?.content ?: "Untitled",
                                     description = docValue["description"]?.jsonPrimitive?.contentOrNull,
                                     publicationName = profile?.displayName ?: profile?.handle,
@@ -342,6 +376,8 @@ class ReaderViewModel @Inject constructor(
                             val docUri = docJson.jsonObject["uri"]?.jsonPrimitive?.content ?: continue
                             posts.add(PostItem(
                                 uri = docUri,
+                                authorDid = parsed.did,
+                                recordCid = docJson.jsonObject["cid"]?.jsonPrimitive?.contentOrNull,
                                 title = docValue["title"]?.jsonPrimitive?.content ?: "Untitled",
                                 description = docValue["description"]?.jsonPrimitive?.contentOrNull,
                                 publicationName = publicationRecord?.name?.takeIf { it.isNotBlank() }
@@ -461,6 +497,8 @@ class ReaderViewModel @Inject constructor(
                     val docUri = docJson.jsonObject["uri"]?.jsonPrimitive?.content ?: return@mapNotNull null
                     PostItem(
                         uri = docUri,
+                        authorDid = session.did,
+                        recordCid = docJson.jsonObject["cid"]?.jsonPrimitive?.contentOrNull,
                         title = valueObj["title"]?.jsonPrimitive?.content ?: "Untitled",
                         description = valueObj["description"]?.jsonPrimitive?.contentOrNull,
                         publicationName = profile?.displayName ?: profile?.handle,
@@ -497,6 +535,7 @@ class ReaderViewModel @Inject constructor(
     private fun CachedFeedItem.toPostItem(): PostItem {
         return PostItem(
             uri = uri,
+            authorDid = authorDID,
             title = title,
             description = description,
             publicationName = publicationName ?: authorDisplayName,
