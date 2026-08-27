@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -134,9 +135,15 @@ class PostDetailViewModel @Inject constructor(
                 ArticleStatePreferences.markAsRead(context, uri, title ?: "")
 
                 if (pubUri != null) {
-                    verify(documentURI = uri, site = site!!, title = title, path = path, publishedAt = publishedAt)
-                    loadSubscriptionState(pubUri)
-                    loadPublicationTheme(pubUri)
+                    // These three are independent network calls — run
+                    // them concurrently so the detail screen settles
+                    // faster.
+                    coroutineScope {
+                        val v = async { verify(documentURI = uri, site = site!!, title = title, path = path, publishedAt = publishedAt) }
+                        val s = async { loadSubscriptionState(pubUri) }
+                        val t = async { loadPublicationTheme(pubUri) }
+                        v.await(); s.await(); t.await()
+                    }
                 }
             } catch (e: Exception) {
                 if (_uiState.value.uri != uri) return@launch
