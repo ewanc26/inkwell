@@ -17,6 +17,7 @@ data class PostDetailUiState(
     val uri: String = "",
     val isLoading: Boolean = true,
     val loadError: String? = null,
+    val moderationState: PostModerationState = PostModerationState.Visible,
     val title: String? = null,
     val authorDid: String? = null,
     val recordCid: String? = null,

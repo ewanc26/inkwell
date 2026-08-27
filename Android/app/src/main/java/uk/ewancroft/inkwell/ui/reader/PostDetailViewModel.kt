@@ -65,6 +65,7 @@ class PostDetailViewModel @Inject constructor(
     val uiState: StateFlow<PostDetailUiState> = _uiState.asStateFlow()
 
     private var loadedUri: String? = null
+    private val revealedUris = mutableSetOf<String>()
 
     fun loadPost(uri: String, forceRefresh: Boolean = false) {
         val current = _uiState.value
@@ -72,7 +73,12 @@ class PostDetailViewModel @Inject constructor(
         loadedUri = uri
 
         _uiState.value = if (current.uri == uri) {
-            current.copy(isLoading = true, loadError = null, verification = null)
+            current.copy(
+                isLoading = true,
+                loadError = null,
+                moderationState = PostModerationState.Visible,
+                verification = null,
+            )
         } else {
             PostDetailUiState(uri = uri, isLoading = true)
         }
@@ -80,6 +86,13 @@ class PostDetailViewModel @Inject constructor(
         loadDocument(uri)
         loadRecommendState(uri)
         loadComments(uri)
+    }
+
+    /** Reveals a filtered article for this detail session without changing the policy. */
+    fun revealContent() {
+        val uri = loadedUri ?: return
+        revealedUris += uri
+        loadPost(uri, forceRefresh = true)
     }
 
     fun setPreviousNext(previousUri: String?, previousTitle: String?, nextUri: String?, nextTitle: String?) {
@@ -111,26 +124,51 @@ class PostDetailViewModel @Inject constructor(
                     ?: value["coverImage"]?.jsonObject?.get("\$link")?.jsonPrimitive?.contentOrNull
 
                 val textContent = value["textContent"]?.jsonPrimitive?.contentOrNull
-                val moderationLabels = value["labels"]?.jsonObject?.get("values")?.jsonArray
-                    ?.mapNotNull { it.jsonObject["val"]?.jsonPrimitive?.contentOrNull }
+                val documentLabels = value["labels"]?.jsonObject?.get("values")?.jsonArray
+                    ?.mapNotNull { label ->
+                        label.jsonObject["val"]?.jsonPrimitive?.contentOrNull?.let { labelValue ->
+                            ModerationLabel(
+                                value = labelValue,
+                                source = label.jsonObject["src"]?.jsonPrimitive?.contentOrNull,
+                            )
+                        }
+                    }
                     .orEmpty()
-                val moderationDecision = ContentFilterEngine.evaluate(
+                val pubUri = if (site?.startsWith("at://") == true &&
+                    AtUri.parse(site)?.collection == CollectionNsids.PUBLICATION) {
+                    site
+                } else {
+                    null
+                }
+                val publication = pubUri?.let { publicationUri ->
+                    runCatching { resolvePublication(publicationUri) }.getOrNull()
+                }
+                val moderationState = when (ContentFilterEngine.evaluate(
                     FilterableContent(
                         title = title,
                         description = description,
                         textContent = textContent,
-                        labels = moderationLabels.map { ModerationLabel(it) },
+                        labels = documentLabels + publication?.labels?.values.orEmpty().map {
+                            ModerationLabel(value = it.value, source = it.source)
+                        },
                     ),
                     ModerationPolicy(
                         hiddenLabels = ModerationPreferences.hiddenLabels(context),
+                        warningLabels = ModerationPreferences.warningLabels(context),
+                        disabledLabelers = ModerationPreferences.disabledLabelers(context),
                         hiddenKeywords = ModerationPreferences.hiddenKeywords(context),
                     ),
-                )
-                if (moderationDecision is ContentFilterDecision.Hide) {
+                )) {
+                    is ContentFilterDecision.Hide -> PostModerationState.Hidden
+                    is ContentFilterDecision.Warn -> PostModerationState.Warning
+                    ContentFilterDecision.Show -> PostModerationState.Visible
+                }
+                if (moderationState != PostModerationState.Visible && uri !in revealedUris) {
                     if (_uiState.value.uri == uri) {
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
-                            loadError = "This article is hidden by your content filters.",
+                            loadError = null,
+                            moderationState = moderationState,
                         )
                     }
                     return@launch
@@ -144,15 +182,10 @@ class PostDetailViewModel @Inject constructor(
                 }.getOrNull()
 
                 if (_uiState.value.uri != uri) return@launch
-                val pubUri = if (site?.startsWith("at://") == true &&
-                    AtUri.parse(site)?.collection == CollectionNsids.PUBLICATION) {
-                    site
-                } else {
-                    null
-                }
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     loadError = null,
+                    moderationState = PostModerationState.Visible,
                     title = title,
                     authorDid = parsed.did,
                     recordCid = recordCid,
@@ -220,10 +253,11 @@ class PostDetailViewModel @Inject constructor(
         if (!site.startsWith("at://")) return null
         val publicationJson = pdsRepository.getRecord(site)
         val value = publicationJson["value"]?.jsonObject ?: return null
-        val url = value["url"]?.jsonPrimitive?.contentOrNull ?: return null
-        val name = value["name"]?.jsonPrimitive?.contentOrNull ?: ""
-        _uiState.value = _uiState.value.copy(publicationUrl = url)
-        return PublicationRecord(url = url, name = name)
+        val publication = runCatching {
+            json.decodeFromJsonElement<PublicationRecord>(value)
+        }.getOrNull() ?: return null
+        _uiState.value = _uiState.value.copy(publicationUrl = publication.url)
+        return publication
     }
 
     private fun loadRecommendState(documentUri: String) {

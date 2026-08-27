@@ -199,6 +199,7 @@ fun ReaderScreen(
                             next?.uri, next?.title
                         )
                     },
+                    onRevealContent = { post -> viewModel.revealContent(post.uri) },
                     onViewProfile = { post -> onNavigateToProfile(post.authorDid) },
                     onReportPost = { post ->
                         reportTarget = ReaderReportTarget(post.uri, post.recordCid)
@@ -221,6 +222,7 @@ fun ReaderScreen(
                             next?.uri, next?.title
                         )
                     },
+                    onRevealContent = { post -> viewModel.revealContent(post.uri) },
                     onViewProfile = { post -> onNavigateToProfile(post.authorDid) },
                     onReportPost = { post ->
                         reportTarget = ReaderReportTarget(post.uri, post.recordCid)
@@ -278,6 +280,7 @@ fun ReaderScreen(
             userLexiconEnabled = userLexiconEnabled,
             userLexiconBusy = userLexiconBusy,
             onUserLexiconEnabledChange = { userLexiconViewModel.setInkwellUser(it) },
+            onModerationChanged = viewModel::refreshModeration,
             onSignOut = onSignOut,
             onDismiss = {
                 showSettings = false

@@ -276,17 +276,23 @@ struct ReadView: View {
                 HStack(spacing: 12) {
                     if let prev = previousItem {
                         NavigationLink {
-                            ReadView(
-                                document: prev.document.record,
-                                publication: prev.publication?.record,
-                                documentURI: prev.document.uri,
-                                documentCID: prev.document.cid,
-                                authorDID: prev.document.authorDID
-                            )
+                            if prev.moderationPresentation == .visible {
+                                ReadView(
+                                    document: prev.document.record,
+                                    publication: prev.publication?.record,
+                                    documentURI: prev.document.uri,
+                                    documentCID: prev.document.cid,
+                                    authorDID: prev.document.authorDID
+                                )
+                            } else {
+                                RemoteDocumentView(documentURI: prev.document.uri)
+                            }
                         } label: {
                             PostNavButton(
                                 direction: .previous,
-                                title: prev.document.record.title,
+                                title: prev.moderationPresentation == .visible
+                                    ? prev.document.record.title
+                                    : "Content hidden",
                                 theme: theme
                             )
                         }
@@ -294,17 +300,23 @@ struct ReadView: View {
                     }
                     if let next = nextItem {
                         NavigationLink {
-                            ReadView(
-                                document: next.document.record,
-                                publication: next.publication?.record,
-                                documentURI: next.document.uri,
-                                documentCID: next.document.cid,
-                                authorDID: next.document.authorDID
-                            )
+                            if next.moderationPresentation == .visible {
+                                ReadView(
+                                    document: next.document.record,
+                                    publication: next.publication?.record,
+                                    documentURI: next.document.uri,
+                                    documentCID: next.document.cid,
+                                    authorDID: next.document.authorDID
+                                )
+                            } else {
+                                RemoteDocumentView(documentURI: next.document.uri)
+                            }
                         } label: {
                             PostNavButton(
                                 direction: .next,
-                                title: next.document.record.title,
+                                title: next.moderationPresentation == .visible
+                                    ? next.document.record.title
+                                    : "Content hidden",
                                 theme: theme
                             )
                         }

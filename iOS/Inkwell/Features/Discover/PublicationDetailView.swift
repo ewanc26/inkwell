@@ -38,12 +38,24 @@ struct PublicationDetailView: View {
 
             Section("Latest Posts") {
                 ForEach(documents) { document in
-                    Button {
-                        path.append(document.uri)
-                    } label: {
-                        PublicationDocumentRow(document: document)
+                    switch moderationPresentation(for: document) {
+                    case .visible:
+                        Button {
+                            path.append(document.uri)
+                        } label: {
+                            PublicationDocumentRow(document: document)
+                        }
+                        .buttonStyle(.plain)
+                    case .warning, .hidden:
+                        Button {
+                            path.append(document.uri)
+                        } label: {
+                            PublicationModeratedDocumentRow(
+                                presentation: moderationPresentation(for: document)
+                            )
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
                 }
             }
         }
@@ -155,6 +167,16 @@ struct PublicationDetailView: View {
 
         return trimmed
     }
+
+    private func moderationPresentation(for document: DocumentEntry) -> ContentModerationPresentation {
+        contentModerationPresentation(
+            title: document.record.title,
+            description: document.record.description,
+            textContent: document.record.textContent,
+            labels: (document.record.labels?.values.map(\.value) ?? []) +
+                (resolvedPublication?.record.labels?.values.map(\.value) ?? [])
+        )
+    }
 }
 
 private struct PublicationDetailHeader: View {
@@ -236,5 +258,27 @@ struct PublicationDocumentRow: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.vertical, 4)
+    }
+}
+
+private struct PublicationModeratedDocumentRow: View {
+    let presentation: ContentModerationPresentation
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "eye.slash")
+                .font(.title3)
+                .foregroundStyle(.secondary)
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(presentation == .warning ? "Content Warning" : "Content Hidden")
+                    .font(.headline)
+                Text("Open to review or reveal this article.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(.vertical, 6)
+        .accessibilityElement(children: .combine)
     }
 }

@@ -39,7 +39,11 @@ data class PublicationRecord(
 data class SelfLabels(val values: List<SelfLabel> = emptyList())
 
 @Serializable
-data class SelfLabel(@SerialName("val") val value: String)
+data class SelfLabel(
+    @SerialName("val") val value: String,
+    /** Labeler DID/service when a record response preserves its source. */
+    @SerialName("src") val source: String? = null,
+)
 
 // ── standard.site: document ───────────────────────────────────────────────
 
