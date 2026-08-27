@@ -46,3 +46,19 @@ data class SearchResponse(
     val total: Int? = null,
     val hasMore: Boolean = false,
 )
+
+/**
+ * A distinct publication (site) derived from search results. The
+ * leaflet-search-backend indexes documents, not publications, so a
+ * publication is reconstructed by grouping results that share an author DID
+ * and `basePath` (the publication's origin domain).
+ */
+data class PublicationResult(
+    val name: String,
+    val domain: String,
+    val url: String,
+    val did: String,
+    val coverImage: String?,
+) {
+    val isSubscribable: Boolean get() = false
+}

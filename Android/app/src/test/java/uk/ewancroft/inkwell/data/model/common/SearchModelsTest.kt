@@ -78,4 +78,31 @@ class SearchModelsTest {
         assertTrue(results.first().isPublication)
         assertFalse(results.first().isStandardSiteDocument)
     }
+
+    @Test
+    fun `publications mode response decodes to publication results`() {
+        val body = """
+            {
+              "results": [
+                {
+                  "type": "publication",
+                  "uri": "at://did:plc:abc123/site.standard.publication/my-blog",
+                  "did": "did:plc:abc123",
+                  "title": "My Blog",
+                  "basePath": "blog.example.com",
+                  "snippet": "Thoughts on the open web"
+                }
+              ],
+              "total": null,
+              "hasMore": false,
+              "mode": "publications"
+            }
+        """.trimIndent()
+
+        val response = json.decodeFromString<SearchResponse>(body)
+
+        assertEquals(1, response.results.size)
+        assertTrue(response.results.first().isPublication)
+        assertEquals("blog.example.com", response.results.first().basePath)
+    }
 }
