@@ -18,6 +18,7 @@ data class PostDetailUiState(
     val isLoading: Boolean = true,
     val loadError: String? = null,
     val title: String? = null,
+    val authorDid: String? = null,
     val description: String? = null,
     val publishedAt: String? = null,
     val path: String? = null,

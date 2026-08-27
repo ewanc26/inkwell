@@ -122,6 +122,7 @@ class PostDetailViewModel @Inject constructor(
                     isLoading = false,
                     loadError = null,
                     title = title,
+                    authorDid = parsed.did,
                     description = description,
                     publishedAt = publishedAt,
                     path = path,

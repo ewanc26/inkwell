@@ -24,6 +24,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import uk.ewancroft.inkwell.shared.verification.VerificationResult
@@ -54,6 +57,10 @@ internal fun PostDetailContent(
     val titleColor = if (readerTheme.foreground != Color.Unspecified) readerTheme.foreground else MaterialTheme.colorScheme.onBackground
     val bodyColor = if (readerTheme.foreground != Color.Unspecified) readerTheme.foreground else MaterialTheme.colorScheme.onSurfaceVariant
     val accentColor = if (readerTheme.accent != Color.Unspecified) readerTheme.accent else MaterialTheme.colorScheme.primary
+    val titleAccessibilityLabel = buildList {
+        add(uiState.title ?: "Untitled")
+        uiState.authorDid?.takeIf(String::isNotBlank)?.let { add("Author: $it") }
+    }.joinToString(separator = ". ")
 
     val pageBg = if (readerTheme.showPageBackground && readerTheme.pageBackground != Color.Unspecified) {
         readerTheme.pageBackground
@@ -88,6 +95,10 @@ internal fun PostDetailContent(
                     uiState.title ?: "Untitled",
                     style = MaterialTheme.typography.headlineMedium,
                     color = titleColor,
+                    modifier = Modifier.semantics {
+                        heading()
+                        contentDescription = titleAccessibilityLabel
+                    },
                 )
                 if (!uiState.description.isNullOrBlank()) {
                     Text(
@@ -237,6 +248,9 @@ private fun VerificationBadge(result: VerificationResult?) {
 
         is VerificationResult.Verified -> {
             Row(
+                modifier = Modifier.semantics(mergeDescendants = true) {
+                    contentDescription = "Source verification: verified"
+                },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
@@ -255,7 +269,12 @@ private fun VerificationBadge(result: VerificationResult?) {
         }
 
         is VerificationResult.Failed -> {
-            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Column(
+                modifier = Modifier.semantics(mergeDescendants = true) {
+                    contentDescription = "Source verification: unverified. ${result.failure.reason}"
+                },
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
