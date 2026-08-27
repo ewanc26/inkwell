@@ -279,7 +279,10 @@ fun ReaderScreen(
             userLexiconBusy = userLexiconBusy,
             onUserLexiconEnabledChange = { userLexiconViewModel.setInkwellUser(it) },
             onSignOut = onSignOut,
-            onDismiss = { showSettings = false },
+            onDismiss = {
+                showSettings = false
+                viewModel.loadData()
+            },
         )
     }
 

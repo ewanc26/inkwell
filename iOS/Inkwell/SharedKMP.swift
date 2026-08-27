@@ -18,6 +18,32 @@ func parseAtUri(_ uri: String) -> (did: String, collection: String, recordKey: S
     return (did: kotlinUri.did, collection: kotlinUri.collection, recordKey: kotlinUri.recordKey)
 }
 
+// MARK: - Moderation
+
+@MainActor
+func shouldHideContent(
+    title: String?,
+    description: String?,
+    textContent: String?,
+    labels: [String],
+    settings: ModerationSettings? = nil
+) -> Bool {
+    let settings = settings ?? ModerationSettings.shared
+    let content = FilterableContent(
+        title: title,
+        description: description,
+        textContent: textContent,
+        labels: labels.map { ModerationLabel(value: $0, source: nil) }
+    )
+    let policy = ModerationPolicy(
+        hiddenLabels: settings.hiddenLabels,
+        warningLabels: [],
+        disabledLabelers: [],
+        hiddenKeywords: settings.hiddenKeywords
+    )
+    return ContentFilterEngine.shared.evaluate(content: content, policy: policy) is ContentFilterDecisionHide
+}
+
 // MARK: - Facet Schema
 
 struct FacetSchema {

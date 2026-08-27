@@ -31,8 +31,15 @@ data class PublicationRecord(
     val icon: BlobRef? = null,
     val theme: PublicationTheme? = null,
     val basicTheme: BasicTheme? = null,
+    val labels: SelfLabels? = null,
     val preferences: PublicationPreferences? = null
 )
+
+@Serializable
+data class SelfLabels(val values: List<SelfLabel> = emptyList())
+
+@Serializable
+data class SelfLabel(@SerialName("val") val value: String)
 
 // ── standard.site: document ───────────────────────────────────────────────
 
@@ -54,6 +61,7 @@ data class DocumentRecord(
     val textContent: String? = null,
     val coverImage: BlobRef? = null,
     val theme: PublicationTheme? = null,
+    val labels: SelfLabels? = null,
     val preferences: DocumentPreferences? = null,
     val bskyPostRef: StrongRef? = null
 )

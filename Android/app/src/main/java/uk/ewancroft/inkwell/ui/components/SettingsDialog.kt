@@ -53,6 +53,7 @@ import uk.ewancroft.inkwell.util.ArticleStatePreferences
 import uk.ewancroft.inkwell.util.CustomisationPreferences
 import uk.ewancroft.inkwell.util.ImageCacheManager
 import uk.ewancroft.inkwell.util.LinkPreferences
+import uk.ewancroft.inkwell.util.ModerationPreferences
 import uk.ewancroft.inkwell.util.ReaderPreferences
 import uk.ewancroft.inkwell.util.rememberInkwellHaptics
 import java.io.File
@@ -87,6 +88,10 @@ fun SettingsDialog(
     var fontFamilyOverride by remember { mutableStateOf(CustomisationPreferences.getFontFamilyOverride(context)) }
     var appearanceOverride by remember { mutableStateOf(CustomisationPreferences.getAppearanceOverride(context)) }
     var showCustomisationTipPrompt by remember { mutableStateOf(false) }
+    var hideNsfw by remember { mutableStateOf("nsfw" in ModerationPreferences.hiddenLabels(context)) }
+    var hideSexual by remember { mutableStateOf("sexual" in ModerationPreferences.hiddenLabels(context)) }
+    var hideGore by remember { mutableStateOf("gore" in ModerationPreferences.hiddenLabels(context)) }
+    var hideSelfHarm by remember { mutableStateOf("self-harm" in ModerationPreferences.hiddenLabels(context)) }
 
     fun promptForTipIfNeeded() {
         if (!CustomisationPreferences.hasShownTipPrompt(context)) {
@@ -245,6 +250,64 @@ fun SettingsDialog(
                     }
                     Text(
                         "Controls the order documents appear in your reader feed.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    )
+
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+                    SectionHeader("Content Filters")
+                    SettingsRow(
+                        title = "Hide Explicit Content",
+                        trailing = {
+                            Switch(
+                                checked = hideNsfw,
+                                onCheckedChange = {
+                                    hideNsfw = it
+                                    ModerationPreferences.setLabelHidden(context, "nsfw", it)
+                                },
+                            )
+                        },
+                    )
+                    SettingsRow(
+                        title = "Hide Sexual Content",
+                        trailing = {
+                            Switch(
+                                checked = hideSexual,
+                                onCheckedChange = {
+                                    hideSexual = it
+                                    ModerationPreferences.setLabelHidden(context, "sexual", it)
+                                },
+                            )
+                        },
+                    )
+                    SettingsRow(
+                        title = "Hide Graphic Content",
+                        trailing = {
+                            Switch(
+                                checked = hideGore,
+                                onCheckedChange = {
+                                    hideGore = it
+                                    ModerationPreferences.setLabelHidden(context, "gore", it)
+                                },
+                            )
+                        },
+                    )
+                    SettingsRow(
+                        title = "Hide Self-Harm Content",
+                        trailing = {
+                            Switch(
+                                checked = hideSelfHarm,
+                                onCheckedChange = {
+                                    hideSelfHarm = it
+                                    ModerationPreferences.setLabelHidden(context, "self-harm", it)
+                                },
+                            )
+                        },
+                    )
+                    Text(
+                        "Hidden labels are omitted from the reader. Labels come from the publication or document record.",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
