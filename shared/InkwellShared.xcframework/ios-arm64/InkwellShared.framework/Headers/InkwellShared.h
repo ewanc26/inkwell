@@ -6,9 +6,9 @@
 #import <Foundation/NSString.h>
 #import <Foundation/NSValue.h>
 
-@class FacetConverter, InkwellSharedAtUri, InkwellSharedAtUriCompanion, InkwellSharedBasicTheme, InkwellSharedBlobRef, InkwellSharedBlockLossLabels, InkwellSharedBlueskyEmbedTypes, InkwellSharedByteSlice, InkwellSharedCachedFeedItem, InkwellSharedCachedFeedItemCompanion, InkwellSharedCdnUrls, InkwellSharedCollectionNsids, InkwellSharedColorValue, InkwellSharedConstellationBacklink, InkwellSharedConstellationPagination, InkwellSharedConstellationResponse, InkwellSharedConstellationSourcePaths, InkwellSharedContentFormatDetector, InkwellSharedContentFormatDispatcher, InkwellSharedDocumentLinkScanner, InkwellSharedDocumentPreferences, InkwellSharedFacetDefinition, InkwellSharedFacetSchema, InkwellSharedFeedCacheIosCompanion, InkwellSharedHandleUtils, InkwellSharedInlineMarkdownScanner, InkwellSharedInlineSegment, InkwellSharedInlineSegmentBold, InkwellSharedInlineSegmentCode, InkwellSharedInlineSegmentItalic, InkwellSharedInlineSegmentLink, InkwellSharedInlineSegmentPlain, InkwellSharedInlineSegmentStrike, InkwellSharedJetstreamConfig, InkwellSharedJetstreamEvent, InkwellSharedJetstreamEventCompanion, InkwellSharedJetstreamPayload, InkwellSharedJetstreamPayloadCompanion, InkwellSharedJsonMapBridge, InkwellSharedKotlinArray<T>, InkwellSharedKotlinEnum<E>, InkwellSharedKotlinEnumCompanion, InkwellSharedKotlinException, InkwellSharedKotlinIllegalStateException, InkwellSharedKotlinIntIterator, InkwellSharedKotlinIntProgression, InkwellSharedKotlinIntProgressionCompanion, InkwellSharedKotlinIntRange, InkwellSharedKotlinIntRangeCompanion, InkwellSharedKotlinNothing, InkwellSharedKotlinPair<__covariant A, __covariant B>, InkwellSharedKotlinRuntimeException, InkwellSharedKotlinThrowable, InkwellSharedKotlinx_serialization_coreSerialKind, InkwellSharedKotlinx_serialization_coreSerializersModule, InkwellSharedKotlinx_serialization_jsonJsonElement, InkwellSharedKotlinx_serialization_jsonJsonElementCompanion, InkwellSharedLeafletContentConverter, InkwellSharedLeafletFacet, InkwellSharedLeafletFacetFeature, InkwellSharedLeafletTypes, InkwellSharedLegacyPalette, InkwellSharedLegalDocuments, InkwellSharedMarkdownBlock, InkwellSharedMarkdownBlockBlockquote, InkwellSharedMarkdownBlockCode, InkwellSharedMarkdownBlockHeading, InkwellSharedMarkdownBlockHorizontalRule, InkwellSharedMarkdownBlockImage, InkwellSharedMarkdownBlockMath, InkwellSharedMarkdownBlockOrderedList, InkwellSharedMarkdownBlockParagraph, InkwellSharedMarkdownBlockTaskList, InkwellSharedMarkdownBlockUnorderedList, InkwellSharedMarkdownListItem, InkwellSharedMarkdownParser, InkwellSharedMarkdownSerializer, InkwellSharedMarkpubContentConverter, InkwellSharedMarkpubTypes, InkwellSharedNotificationPolicy, InkwellSharedNotificationStyleNone, InkwellSharedNotificationStyleSingle, InkwellSharedNotificationStyleSummary, InkwellSharedNumberFormat, InkwellSharedOAuthScopes, InkwellSharedOffprintContentConverter, InkwellSharedOffprintTypes, InkwellSharedPcktContentConverter, InkwellSharedPcktTypes, InkwellSharedPublicationMatcher, InkwellSharedPublicationPreferences, InkwellSharedPublicationTheme, InkwellSharedRecordListPolicy, InkwellSharedReportReasonType, InkwellSharedReportSubjectKind, InkwellSharedReportSubmission, InkwellSharedReportSubmissionCompanion, InkwellSharedRgbColor, InkwellSharedRgbaColor, InkwellSharedSearchBackendUrl, InkwellSharedSearchResultClassifier, InkwellSharedSharedConvertResult, InkwellSharedSharedDocumentRecord, InkwellSharedSharedGraphRecommend, InkwellSharedSharedGraphSubscription, InkwellSharedSharedLeafletComment, InkwellSharedSharedLeafletCommentReplyRef, InkwellSharedSharedPublicationRecord, InkwellSharedSharedReaderTheme, InkwellSharedSharedReaderThemeCompanion, InkwellSharedSharedReaderThemeFontFamily, InkwellSharedSharedWriteResult, InkwellSharedStringUtils, InkwellSharedStrongRef, InkwellSharedSupportersList, InkwellSharedTipPromptPolicy, InkwellSharedUrlUtils, InkwellSharedUserInputLexicon, InkwellSharedUserLexicon, InkwellSharedUserLexiconRecord, InkwellSharedUserLexiconUtils, InkwellSharedUtf8Offsets, InkwellSharedVerificationFailure, InkwellSharedVerificationFailureDocumentLinkMissing, InkwellSharedVerificationFailureEndpointUnreachable, InkwellSharedVerificationFailureInvalidDocumentURL, InkwellSharedVerificationFailureInvalidPublicationURL, InkwellSharedVerificationFailureMalformedResponse, InkwellSharedVerificationFailureMismatchedURI, InkwellSharedVerificationFailureUnexpected, InkwellSharedVerificationResult, InkwellSharedVerificationResultFailed, InkwellSharedVerificationResultVerified, InkwellSharedVerificationUrls, InkwellSharedXrpcEndpoints, RichTextFacet, RichTextFeature;
+@class FacetConverter, InkwellSharedAtUri, InkwellSharedAtUriCompanion, InkwellSharedBasicTheme, InkwellSharedBlobRef, InkwellSharedBlockLossLabels, InkwellSharedBlueskyEmbedTypes, InkwellSharedByteSlice, InkwellSharedCachedFeedItem, InkwellSharedCachedFeedItemCompanion, InkwellSharedCdnUrls, InkwellSharedCollectionNsids, InkwellSharedColorValue, InkwellSharedConstellationBacklink, InkwellSharedConstellationPagination, InkwellSharedConstellationResponse, InkwellSharedConstellationSourcePaths, InkwellSharedContentFilterDecisionHide, InkwellSharedContentFilterDecisionShow, InkwellSharedContentFilterDecisionWarn, InkwellSharedContentFilterEngine, InkwellSharedContentFormatDetector, InkwellSharedContentFormatDispatcher, InkwellSharedDocumentLinkScanner, InkwellSharedDocumentPreferences, InkwellSharedFacetDefinition, InkwellSharedFacetSchema, InkwellSharedFeedCacheIosCompanion, InkwellSharedFilterMatch, InkwellSharedFilterMatchKind, InkwellSharedFilterableContent, InkwellSharedHandleUtils, InkwellSharedInlineMarkdownScanner, InkwellSharedInlineSegment, InkwellSharedInlineSegmentBold, InkwellSharedInlineSegmentCode, InkwellSharedInlineSegmentItalic, InkwellSharedInlineSegmentLink, InkwellSharedInlineSegmentPlain, InkwellSharedInlineSegmentStrike, InkwellSharedJetstreamConfig, InkwellSharedJetstreamEvent, InkwellSharedJetstreamEventCompanion, InkwellSharedJetstreamPayload, InkwellSharedJetstreamPayloadCompanion, InkwellSharedJsonMapBridge, InkwellSharedKotlinArray<T>, InkwellSharedKotlinEnum<E>, InkwellSharedKotlinEnumCompanion, InkwellSharedKotlinException, InkwellSharedKotlinIllegalStateException, InkwellSharedKotlinIntIterator, InkwellSharedKotlinIntProgression, InkwellSharedKotlinIntProgressionCompanion, InkwellSharedKotlinIntRange, InkwellSharedKotlinIntRangeCompanion, InkwellSharedKotlinNothing, InkwellSharedKotlinPair<__covariant A, __covariant B>, InkwellSharedKotlinRuntimeException, InkwellSharedKotlinThrowable, InkwellSharedKotlinx_serialization_coreSerialKind, InkwellSharedKotlinx_serialization_coreSerializersModule, InkwellSharedKotlinx_serialization_jsonJsonElement, InkwellSharedKotlinx_serialization_jsonJsonElementCompanion, InkwellSharedLeafletContentConverter, InkwellSharedLeafletFacet, InkwellSharedLeafletFacetFeature, InkwellSharedLeafletTypes, InkwellSharedLegacyPalette, InkwellSharedLegalDocuments, InkwellSharedMarkdownBlock, InkwellSharedMarkdownBlockBlockquote, InkwellSharedMarkdownBlockCode, InkwellSharedMarkdownBlockHeading, InkwellSharedMarkdownBlockHorizontalRule, InkwellSharedMarkdownBlockImage, InkwellSharedMarkdownBlockMath, InkwellSharedMarkdownBlockOrderedList, InkwellSharedMarkdownBlockParagraph, InkwellSharedMarkdownBlockTaskList, InkwellSharedMarkdownBlockUnorderedList, InkwellSharedMarkdownListItem, InkwellSharedMarkdownParser, InkwellSharedMarkdownSerializer, InkwellSharedMarkpubContentConverter, InkwellSharedMarkpubTypes, InkwellSharedModerationLabel, InkwellSharedModerationLabelCompanion, InkwellSharedModerationPolicy, InkwellSharedModerationPolicyCompanion, InkwellSharedNotificationPolicy, InkwellSharedNotificationStyleNone, InkwellSharedNotificationStyleSingle, InkwellSharedNotificationStyleSummary, InkwellSharedNumberFormat, InkwellSharedOAuthScopes, InkwellSharedOfflineCacheEntry, InkwellSharedOfflineCacheEntryCompanion, InkwellSharedOfflineCacheKind, InkwellSharedOfflineCacheKindCompanion, InkwellSharedOfflineCachePolicy, InkwellSharedOfflineCachePolicyCompanion, InkwellSharedOffprintContentConverter, InkwellSharedOffprintTypes, InkwellSharedPcktContentConverter, InkwellSharedPcktTypes, InkwellSharedPublicationMatcher, InkwellSharedPublicationPreferences, InkwellSharedPublicationTheme, InkwellSharedRecordListPolicy, InkwellSharedReportReasonType, InkwellSharedReportSubjectKind, InkwellSharedReportSubmission, InkwellSharedReportSubmissionCompanion, InkwellSharedRgbColor, InkwellSharedRgbaColor, InkwellSharedSearchBackendUrl, InkwellSharedSearchResultClassifier, InkwellSharedSharedConvertResult, InkwellSharedSharedDocumentRecord, InkwellSharedSharedGraphRecommend, InkwellSharedSharedGraphSubscription, InkwellSharedSharedLeafletComment, InkwellSharedSharedLeafletCommentReplyRef, InkwellSharedSharedPublicationRecord, InkwellSharedSharedReaderTheme, InkwellSharedSharedReaderThemeCompanion, InkwellSharedSharedReaderThemeFontFamily, InkwellSharedSharedWriteResult, InkwellSharedStandardModerationLabel, InkwellSharedStringUtils, InkwellSharedStrongRef, InkwellSharedSupportersList, InkwellSharedSyncFlushResult, InkwellSharedSyncMutationKind, InkwellSharedSyncMutationKindCompanion, InkwellSharedSyncQueueEntry, InkwellSharedSyncQueueEntryCompanion, InkwellSharedTipPromptPolicy, InkwellSharedUrlUtils, InkwellSharedUserInputLexicon, InkwellSharedUserLexicon, InkwellSharedUserLexiconRecord, InkwellSharedUserLexiconUtils, InkwellSharedUtf8Offsets, InkwellSharedVerificationFailure, InkwellSharedVerificationFailureDocumentLinkMissing, InkwellSharedVerificationFailureEndpointUnreachable, InkwellSharedVerificationFailureInvalidDocumentURL, InkwellSharedVerificationFailureInvalidPublicationURL, InkwellSharedVerificationFailureMalformedResponse, InkwellSharedVerificationFailureMismatchedURI, InkwellSharedVerificationFailureUnexpected, InkwellSharedVerificationResult, InkwellSharedVerificationResultFailed, InkwellSharedVerificationResultVerified, InkwellSharedVerificationUrls, InkwellSharedXrpcEndpoints, RichTextFacet, RichTextFeature;
 
-@protocol InkwellSharedFeedCache, InkwellSharedJetstreamClient, InkwellSharedKotlinAnnotation, InkwellSharedKotlinClosedRange, InkwellSharedKotlinComparable, InkwellSharedKotlinFunction, InkwellSharedKotlinIterable, InkwellSharedKotlinIterator, InkwellSharedKotlinKAnnotatedElement, InkwellSharedKotlinKClass, InkwellSharedKotlinKClassifier, InkwellSharedKotlinKDeclarationContainer, InkwellSharedKotlinOpenEndRange, InkwellSharedKotlinSuspendFunction2, InkwellSharedKotlinx_coroutines_coreFlow, InkwellSharedKotlinx_coroutines_coreFlowCollector, InkwellSharedKotlinx_serialization_coreCompositeDecoder, InkwellSharedKotlinx_serialization_coreCompositeEncoder, InkwellSharedKotlinx_serialization_coreDecoder, InkwellSharedKotlinx_serialization_coreDeserializationStrategy, InkwellSharedKotlinx_serialization_coreEncoder, InkwellSharedKotlinx_serialization_coreKSerializer, InkwellSharedKotlinx_serialization_coreSerialDescriptor, InkwellSharedKotlinx_serialization_coreSerializationStrategy, InkwellSharedKotlinx_serialization_coreSerializersModuleCollector, InkwellSharedNotificationStyle;
+@protocol InkwellSharedContentFilterDecision, InkwellSharedFeedCache, InkwellSharedJetstreamClient, InkwellSharedKotlinAnnotation, InkwellSharedKotlinClosedRange, InkwellSharedKotlinComparable, InkwellSharedKotlinFunction, InkwellSharedKotlinIterable, InkwellSharedKotlinIterator, InkwellSharedKotlinKAnnotatedElement, InkwellSharedKotlinKClass, InkwellSharedKotlinKClassifier, InkwellSharedKotlinKDeclarationContainer, InkwellSharedKotlinOpenEndRange, InkwellSharedKotlinSuspendFunction2, InkwellSharedKotlinx_coroutines_coreFlow, InkwellSharedKotlinx_coroutines_coreFlowCollector, InkwellSharedKotlinx_serialization_coreCompositeDecoder, InkwellSharedKotlinx_serialization_coreCompositeEncoder, InkwellSharedKotlinx_serialization_coreDecoder, InkwellSharedKotlinx_serialization_coreDeserializationStrategy, InkwellSharedKotlinx_serialization_coreEncoder, InkwellSharedKotlinx_serialization_coreKSerializer, InkwellSharedKotlinx_serialization_coreSerialDescriptor, InkwellSharedKotlinx_serialization_coreSerializationStrategy, InkwellSharedKotlinx_serialization_coreSerializersModuleCollector, InkwellSharedNotificationStyle;
 
 NS_ASSUME_NONNULL_BEGIN
 #pragma clang diagnostic push
@@ -2911,6 +2911,77 @@ __attribute__((swift_name("UserLexiconUtils")))
 - (BOOL)isUserLexiconTypeType:(NSString * _Nullable)type __attribute__((swift_name("isUserLexiconType(type:)")));
 @end
 
+__attribute__((swift_name("ContentFilterDecision")))
+@protocol InkwellSharedContentFilterDecision
+@required
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("ContentFilterDecisionHide")))
+@interface InkwellSharedContentFilterDecisionHide : InkwellSharedBase <InkwellSharedContentFilterDecision>
+- (instancetype)initWithMatches:(NSArray<InkwellSharedFilterMatch *> *)matches __attribute__((swift_name("init(matches:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedContentFilterDecisionHide *)doCopyMatches:(NSArray<InkwellSharedFilterMatch *> *)matches __attribute__((swift_name("doCopy(matches:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSArray<InkwellSharedFilterMatch *> *matches __attribute__((swift_name("matches")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("ContentFilterDecisionShow")))
+@interface InkwellSharedContentFilterDecisionShow : InkwellSharedBase <InkwellSharedContentFilterDecision>
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)show __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedContentFilterDecisionShow *shared __attribute__((swift_name("shared")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("ContentFilterDecisionWarn")))
+@interface InkwellSharedContentFilterDecisionWarn : InkwellSharedBase <InkwellSharedContentFilterDecision>
+- (instancetype)initWithMatches:(NSArray<InkwellSharedFilterMatch *> *)matches __attribute__((swift_name("init(matches:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedContentFilterDecisionWarn *)doCopyMatches:(NSArray<InkwellSharedFilterMatch *> *)matches __attribute__((swift_name("doCopy(matches:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSArray<InkwellSharedFilterMatch *> *matches __attribute__((swift_name("matches")));
+@end
+
+
+/**
+ * Pure, deterministic moderation policy evaluator. Network clients provide
+ * labels from protocol responses; this class never invents or fetches labels.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("ContentFilterEngine")))
+@interface InkwellSharedContentFilterEngine : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Pure, deterministic moderation policy evaluator. Network clients provide
+ * labels from protocol responses; this class never invents or fetches labels.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)contentFilterEngine __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedContentFilterEngine *shared __attribute__((swift_name("shared")));
+- (id<InkwellSharedContentFilterDecision>)evaluateContent:(InkwellSharedFilterableContent *)content policy:(InkwellSharedModerationPolicy *)policy __attribute__((swift_name("evaluate(content:policy:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("FilterMatch")))
+@interface InkwellSharedFilterMatch : InkwellSharedBase
+- (instancetype)initWithKind:(InkwellSharedFilterMatchKind *)kind value:(NSString *)value __attribute__((swift_name("init(kind:value:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedFilterMatch *)doCopyKind:(InkwellSharedFilterMatchKind *)kind value:(NSString *)value __attribute__((swift_name("doCopy(kind:value:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) InkwellSharedFilterMatchKind *kind __attribute__((swift_name("kind")));
+@property (readonly) NSString *value __attribute__((swift_name("value")));
+@end
+
 __attribute__((swift_name("KotlinComparable")))
 @protocol InkwellSharedKotlinComparable
 @required
@@ -2927,6 +2998,124 @@ __attribute__((swift_name("KotlinEnum")))
 - (NSString *)description __attribute__((swift_name("description()")));
 @property (readonly) NSString *name __attribute__((swift_name("name")));
 @property (readonly) int32_t ordinal __attribute__((swift_name("ordinal")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("FilterMatchKind")))
+@interface InkwellSharedFilterMatchKind : InkwellSharedKotlinEnum<InkwellSharedFilterMatchKind *>
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
+- (instancetype)initWithName:(NSString *)name ordinal:(int32_t)ordinal __attribute__((swift_name("init(name:ordinal:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+@property (class, readonly) InkwellSharedFilterMatchKind *label __attribute__((swift_name("label")));
+@property (class, readonly) InkwellSharedFilterMatchKind *keyword __attribute__((swift_name("keyword")));
++ (InkwellSharedKotlinArray<InkwellSharedFilterMatchKind *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<InkwellSharedFilterMatchKind *> *entries __attribute__((swift_name("entries")));
+@end
+
+
+/** Content fields available to the shared moderation decision. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("FilterableContent")))
+@interface InkwellSharedFilterableContent : InkwellSharedBase
+- (instancetype)initWithTitle:(NSString * _Nullable)title description:(NSString * _Nullable)description textContent:(NSString * _Nullable)textContent labels:(NSArray<InkwellSharedModerationLabel *> *)labels __attribute__((swift_name("init(title:description:textContent:labels:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedFilterableContent *)doCopyTitle:(NSString * _Nullable)title description:(NSString * _Nullable)description textContent:(NSString * _Nullable)textContent labels:(NSArray<InkwellSharedModerationLabel *> *)labels __attribute__((swift_name("doCopy(title:description:textContent:labels:)")));
+
+/** Content fields available to the shared moderation decision. */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/** Content fields available to the shared moderation decision. */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/** Content fields available to the shared moderation decision. */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString * _Nullable description_ __attribute__((swift_name("description_")));
+@property (readonly) NSArray<InkwellSharedModerationLabel *> *labels __attribute__((swift_name("labels")));
+@property (readonly) NSString * _Nullable textContent __attribute__((swift_name("textContent")));
+@property (readonly) NSString * _Nullable title __attribute__((swift_name("title")));
+@end
+
+
+/** A moderation label supplied by a labeler for a document or publication.
+ *
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("ModerationLabel")))
+@interface InkwellSharedModerationLabel : InkwellSharedBase
+- (instancetype)initWithValue:(NSString *)value source:(NSString * _Nullable)source __attribute__((swift_name("init(value:source:)"))) __attribute__((objc_designated_initializer));
+@property (class, readonly, getter=companion) InkwellSharedModerationLabelCompanion *companion __attribute__((swift_name("companion")));
+- (InkwellSharedModerationLabel *)doCopyValue:(NSString *)value source:(NSString * _Nullable)source __attribute__((swift_name("doCopy(value:source:)")));
+
+/** A moderation label supplied by a labeler for a document or publication. */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/** A moderation label supplied by a labeler for a document or publication. */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/** A moderation label supplied by a labeler for a document or publication. */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString * _Nullable source __attribute__((swift_name("source")));
+@property (readonly) NSString *value __attribute__((swift_name("value")));
+@end
+
+
+/** A moderation label supplied by a labeler for a document or publication. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("ModerationLabel.Companion")))
+@interface InkwellSharedModerationLabelCompanion : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/** A moderation label supplied by a labeler for a document or publication. */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedModerationLabelCompanion *shared __attribute__((swift_name("shared")));
+
+/** A moderation label supplied by a labeler for a document or publication. */
+- (id<InkwellSharedKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end
+
+
+/** Reader-controlled moderation choices. Values are matched case-insensitively.
+ *
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("ModerationPolicy")))
+@interface InkwellSharedModerationPolicy : InkwellSharedBase
+- (instancetype)initWithHiddenLabels:(NSSet<NSString *> *)hiddenLabels warningLabels:(NSSet<NSString *> *)warningLabels disabledLabelers:(NSSet<NSString *> *)disabledLabelers hiddenKeywords:(NSSet<NSString *> *)hiddenKeywords __attribute__((swift_name("init(hiddenLabels:warningLabels:disabledLabelers:hiddenKeywords:)"))) __attribute__((objc_designated_initializer));
+@property (class, readonly, getter=companion) InkwellSharedModerationPolicyCompanion *companion __attribute__((swift_name("companion")));
+- (InkwellSharedModerationPolicy *)doCopyHiddenLabels:(NSSet<NSString *> *)hiddenLabels warningLabels:(NSSet<NSString *> *)warningLabels disabledLabelers:(NSSet<NSString *> *)disabledLabelers hiddenKeywords:(NSSet<NSString *> *)hiddenKeywords __attribute__((swift_name("doCopy(hiddenLabels:warningLabels:disabledLabelers:hiddenKeywords:)")));
+
+/** Reader-controlled moderation choices. Values are matched case-insensitively. */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/** Reader-controlled moderation choices. Values are matched case-insensitively. */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/** Reader-controlled moderation choices. Values are matched case-insensitively. */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSSet<NSString *> *disabledLabelers __attribute__((swift_name("disabledLabelers")));
+@property (readonly) NSSet<NSString *> *hiddenKeywords __attribute__((swift_name("hiddenKeywords")));
+@property (readonly) NSSet<NSString *> *hiddenLabels __attribute__((swift_name("hiddenLabels")));
+@property (readonly) NSSet<NSString *> *warningLabels __attribute__((swift_name("warningLabels")));
+@end
+
+
+/** Reader-controlled moderation choices. Values are matched case-insensitively. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("ModerationPolicy.Companion")))
+@interface InkwellSharedModerationPolicyCompanion : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/** Reader-controlled moderation choices. Values are matched case-insensitively. */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedModerationPolicyCompanion *shared __attribute__((swift_name("shared")));
+
+/** Reader-controlled moderation choices. Values are matched case-insensitively. */
+- (id<InkwellSharedKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
 
@@ -3048,6 +3237,35 @@ __attribute__((swift_name("ReportSubmission.Companion")))
 @property (readonly) int32_t MAX_REASON_LENGTH __attribute__((swift_name("MAX_REASON_LENGTH")));
 @end
 
+
+/**
+ * Common Bluesky label categories exposed as stable display references and
+ * label values. Services can also provide custom values, which the filter
+ * supports through [ModerationPolicy] without an app update.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("StandardModerationLabel")))
+@interface InkwellSharedStandardModerationLabel : InkwellSharedKotlinEnum<InkwellSharedStandardModerationLabel *>
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Common Bluesky label categories exposed as stable display references and
+ * label values. Services can also provide custom values, which the filter
+ * supports through [ModerationPolicy] without an app update.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
+- (instancetype)initWithName:(NSString *)name ordinal:(int32_t)ordinal __attribute__((swift_name("init(name:ordinal:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+@property (class, readonly) InkwellSharedStandardModerationLabel *nsfw __attribute__((swift_name("nsfw")));
+@property (class, readonly) InkwellSharedStandardModerationLabel *gore __attribute__((swift_name("gore")));
+@property (class, readonly) InkwellSharedStandardModerationLabel *impersonation __attribute__((swift_name("impersonation")));
+@property (class, readonly) InkwellSharedStandardModerationLabel *sexual __attribute__((swift_name("sexual")));
+@property (class, readonly) InkwellSharedStandardModerationLabel *selfharm __attribute__((swift_name("selfharm")));
++ (InkwellSharedKotlinArray<InkwellSharedStandardModerationLabel *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<InkwellSharedStandardModerationLabel *> *entries __attribute__((swift_name("entries")));
+@property (readonly) NSString *labelValue __attribute__((swift_name("labelValue")));
+@property (readonly) NSString *reference __attribute__((swift_name("reference")));
+@end
+
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("OAuthScopes")))
 @interface InkwellSharedOAuthScopes : InkwellSharedBase
@@ -3072,6 +3290,367 @@ __attribute__((swift_name("OAuthScopes")))
 
 /** Needed to post feedback to Inkwell's userinput.app board. */
 @property (readonly) NSString *REPO_USERINPUT_DISCUSSION __attribute__((swift_name("REPO_USERINPUT_DISCUSSION")));
+@end
+
+
+/**
+ * A lightweight cache index entry. Platform implementations own the bytes;
+ * this common model keeps eviction decisions consistent between the apps.
+ *
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfflineCacheEntry")))
+@interface InkwellSharedOfflineCacheEntry : InkwellSharedBase
+- (instancetype)initWithKey:(NSString *)key kind:(InkwellSharedOfflineCacheKind *)kind cachedAtMillis:(int64_t)cachedAtMillis lastAccessedAtMillis:(int64_t)lastAccessedAtMillis estimatedByteCount:(int64_t)estimatedByteCount __attribute__((swift_name("init(key:kind:cachedAtMillis:lastAccessedAtMillis:estimatedByteCount:)"))) __attribute__((objc_designated_initializer));
+@property (class, readonly, getter=companion) InkwellSharedOfflineCacheEntryCompanion *companion __attribute__((swift_name("companion")));
+- (InkwellSharedOfflineCacheEntry *)doCopyKey:(NSString *)key kind:(InkwellSharedOfflineCacheKind *)kind cachedAtMillis:(int64_t)cachedAtMillis lastAccessedAtMillis:(int64_t)lastAccessedAtMillis estimatedByteCount:(int64_t)estimatedByteCount __attribute__((swift_name("doCopy(key:kind:cachedAtMillis:lastAccessedAtMillis:estimatedByteCount:)")));
+
+/**
+ * A lightweight cache index entry. Platform implementations own the bytes;
+ * this common model keeps eviction decisions consistent between the apps.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * A lightweight cache index entry. Platform implementations own the bytes;
+ * this common model keeps eviction decisions consistent between the apps.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * A lightweight cache index entry. Platform implementations own the bytes;
+ * this common model keeps eviction decisions consistent between the apps.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) int64_t cachedAtMillis __attribute__((swift_name("cachedAtMillis")));
+@property (readonly) int64_t estimatedByteCount __attribute__((swift_name("estimatedByteCount")));
+@property (readonly) NSString *key __attribute__((swift_name("key")));
+@property (readonly) InkwellSharedOfflineCacheKind *kind __attribute__((swift_name("kind")));
+@property (readonly) int64_t lastAccessedAtMillis __attribute__((swift_name("lastAccessedAtMillis")));
+@end
+
+
+/**
+ * A lightweight cache index entry. Platform implementations own the bytes;
+ * this common model keeps eviction decisions consistent between the apps.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfflineCacheEntry.Companion")))
+@interface InkwellSharedOfflineCacheEntryCompanion : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * A lightweight cache index entry. Platform implementations own the bytes;
+ * this common model keeps eviction decisions consistent between the apps.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedOfflineCacheEntryCompanion *shared __attribute__((swift_name("shared")));
+
+/**
+ * A lightweight cache index entry. Platform implementations own the bytes;
+ * this common model keeps eviction decisions consistent between the apps.
+ */
+- (id<InkwellSharedKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end
+
+
+/** Storage contract for platform-specific offline content caches. */
+__attribute__((swift_name("OfflineCacheIndex")))
+@protocol InkwellSharedOfflineCacheIndex
+@required
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)clearWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("clear(completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)loadEntriesWithCompletionHandler:(void (^)(NSArray<InkwellSharedOfflineCacheEntry *> * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("loadEntries(completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)removeKeys:(NSSet<NSString *> *)keys completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("remove(keys:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)upsertEntry:(InkwellSharedOfflineCacheEntry *)entry completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("upsert(entry:completionHandler:)")));
+@end
+
+
+/** The kind of content retained for offline reading.
+ *
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfflineCacheKind")))
+@interface InkwellSharedOfflineCacheKind : InkwellSharedKotlinEnum<InkwellSharedOfflineCacheKind *>
++ (instancetype)alloc __attribute__((unavailable));
+
+/** The kind of content retained for offline reading. */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
+- (instancetype)initWithName:(NSString *)name ordinal:(int32_t)ordinal __attribute__((swift_name("init(name:ordinal:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+@property (class, readonly, getter=companion) InkwellSharedOfflineCacheKindCompanion *companion __attribute__((swift_name("companion")));
+@property (class, readonly) InkwellSharedOfflineCacheKind *publication __attribute__((swift_name("publication")));
+@property (class, readonly) InkwellSharedOfflineCacheKind *document __attribute__((swift_name("document")));
+@property (class, readonly) InkwellSharedOfflineCacheKind *image __attribute__((swift_name("image")));
++ (InkwellSharedKotlinArray<InkwellSharedOfflineCacheKind *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<InkwellSharedOfflineCacheKind *> *entries __attribute__((swift_name("entries")));
+@end
+
+
+/** The kind of content retained for offline reading. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfflineCacheKind.Companion")))
+@interface InkwellSharedOfflineCacheKindCompanion : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/** The kind of content retained for offline reading. */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedOfflineCacheKindCompanion *shared __attribute__((swift_name("shared")));
+
+/** The kind of content retained for offline reading. */
+- (id<InkwellSharedKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+
+/** The kind of content retained for offline reading. */
+- (id<InkwellSharedKotlinx_serialization_coreKSerializer>)serializerTypeParamsSerializers:(InkwellSharedKotlinArray<id<InkwellSharedKotlinx_serialization_coreKSerializer>> *)typeParamsSerializers __attribute__((swift_name("serializer(typeParamsSerializers:)")));
+@end
+
+
+/** Retention limits used by platform-backed offline caches.
+ *
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfflineCachePolicy")))
+@interface InkwellSharedOfflineCachePolicy : InkwellSharedBase
+- (instancetype)initWithMaxEntries:(int32_t)maxEntries maxBytes:(int64_t)maxBytes metadataTtlMillis:(int64_t)metadataTtlMillis imageTtlMillis:(int64_t)imageTtlMillis __attribute__((swift_name("init(maxEntries:maxBytes:metadataTtlMillis:imageTtlMillis:)"))) __attribute__((objc_designated_initializer));
+@property (class, readonly, getter=companion) InkwellSharedOfflineCachePolicyCompanion *companion __attribute__((swift_name("companion")));
+- (InkwellSharedOfflineCachePolicy *)doCopyMaxEntries:(int32_t)maxEntries maxBytes:(int64_t)maxBytes metadataTtlMillis:(int64_t)metadataTtlMillis imageTtlMillis:(int64_t)imageTtlMillis __attribute__((swift_name("doCopy(maxEntries:maxBytes:metadataTtlMillis:imageTtlMillis:)")));
+
+/** Retention limits used by platform-backed offline caches. */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/** Retention limits used by platform-backed offline caches. */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (BOOL)isExpiredEntry:(InkwellSharedOfflineCacheEntry *)entry nowMillis:(int64_t)nowMillis __attribute__((swift_name("isExpired(entry:nowMillis:)")));
+
+/**
+ * Returns keys to evict, first removing expired data and then least-recently
+ * used entries until both configured limits are satisfied.
+ */
+- (NSSet<NSString *> *)keysToEvictEntries:(id)entries nowMillis:(int64_t)nowMillis __attribute__((swift_name("keysToEvict(entries:nowMillis:)")));
+
+/** Retention limits used by platform-backed offline caches. */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) int64_t imageTtlMillis __attribute__((swift_name("imageTtlMillis")));
+@property (readonly) int64_t maxBytes __attribute__((swift_name("maxBytes")));
+@property (readonly) int32_t maxEntries __attribute__((swift_name("maxEntries")));
+@property (readonly) int64_t metadataTtlMillis __attribute__((swift_name("metadataTtlMillis")));
+@end
+
+
+/** Retention limits used by platform-backed offline caches. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfflineCachePolicy.Companion")))
+@interface InkwellSharedOfflineCachePolicyCompanion : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/** Retention limits used by platform-backed offline caches. */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedOfflineCachePolicyCompanion *shared __attribute__((swift_name("shared")));
+
+/** Retention limits used by platform-backed offline caches. */
+- (id<InkwellSharedKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end
+
+
+/** Storage contract for mutations awaiting a reconnect. */
+__attribute__((swift_name("OfflineSyncQueue")))
+@protocol InkwellSharedOfflineSyncQueue
+@required
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)enqueueEntry:(InkwellSharedSyncQueueEntry *)entry completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("enqueue(entry:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)loadWithCompletionHandler:(void (^)(NSArray<InkwellSharedSyncQueueEntry *> * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("load(completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)removeIds:(NSSet<NSString *> *)ids completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("remove(ids:completionHandler:)")));
+@end
+
+
+/**
+ * Platform implementations call their authenticated mutation paths from this
+ * contract when connectivity returns. The shared model remains transport-free.
+ */
+__attribute__((swift_name("SyncEngine")))
+@protocol InkwellSharedSyncEngine
+@required
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)flushWithCompletionHandler:(void (^)(InkwellSharedSyncFlushResult * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("flush(completionHandler:)")));
+@end
+
+
+/** Result returned after a platform transport attempts to replay queued work. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SyncFlushResult")))
+@interface InkwellSharedSyncFlushResult : InkwellSharedBase
+- (instancetype)initWithCompletedIds:(NSSet<NSString *> *)completedIds failedIds:(NSSet<NSString *> *)failedIds __attribute__((swift_name("init(completedIds:failedIds:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedSyncFlushResult *)doCopyCompletedIds:(NSSet<NSString *> *)completedIds failedIds:(NSSet<NSString *> *)failedIds __attribute__((swift_name("doCopy(completedIds:failedIds:)")));
+
+/** Result returned after a platform transport attempts to replay queued work. */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/** Result returned after a platform transport attempts to replay queued work. */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/** Result returned after a platform transport attempts to replay queued work. */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSSet<NSString *> *completedIds __attribute__((swift_name("completedIds")));
+@property (readonly) NSSet<NSString *> *failedIds __attribute__((swift_name("failedIds")));
+@end
+
+
+/** A pending mutation that must wait for authenticated network access.
+ *
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SyncMutationKind")))
+@interface InkwellSharedSyncMutationKind : InkwellSharedKotlinEnum<InkwellSharedSyncMutationKind *>
++ (instancetype)alloc __attribute__((unavailable));
+
+/** A pending mutation that must wait for authenticated network access. */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
+- (instancetype)initWithName:(NSString *)name ordinal:(int32_t)ordinal __attribute__((swift_name("init(name:ordinal:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+@property (class, readonly, getter=companion) InkwellSharedSyncMutationKindCompanion *companion __attribute__((swift_name("companion")));
+@property (class, readonly) InkwellSharedSyncMutationKind *subscribe __attribute__((swift_name("subscribe")));
+@property (class, readonly) InkwellSharedSyncMutationKind *unsubscribe __attribute__((swift_name("unsubscribe")));
+@property (class, readonly) InkwellSharedSyncMutationKind *recommend __attribute__((swift_name("recommend")));
+@property (class, readonly) InkwellSharedSyncMutationKind *unrecommend __attribute__((swift_name("unrecommend")));
+@property (class, readonly) InkwellSharedSyncMutationKind *createcomment __attribute__((swift_name("createcomment")));
++ (InkwellSharedKotlinArray<InkwellSharedSyncMutationKind *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<InkwellSharedSyncMutationKind *> *entries __attribute__((swift_name("entries")));
+@end
+
+
+/** A pending mutation that must wait for authenticated network access. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SyncMutationKind.Companion")))
+@interface InkwellSharedSyncMutationKindCompanion : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/** A pending mutation that must wait for authenticated network access. */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedSyncMutationKindCompanion *shared __attribute__((swift_name("shared")));
+
+/** A pending mutation that must wait for authenticated network access. */
+- (id<InkwellSharedKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+
+/** A pending mutation that must wait for authenticated network access. */
+- (id<InkwellSharedKotlinx_serialization_coreKSerializer>)serializerTypeParamsSerializers:(InkwellSharedKotlinArray<id<InkwellSharedKotlinx_serialization_coreKSerializer>> *)typeParamsSerializers __attribute__((swift_name("serializer(typeParamsSerializers:)")));
+@end
+
+
+/**
+ * Platform queues persist these entries; platform API clients execute them
+ * after reconnecting. Comment text is deliberately explicit rather than an
+ * opaque JSON payload so it can be validated before it is stored.
+ *
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SyncQueueEntry")))
+@interface InkwellSharedSyncQueueEntry : InkwellSharedBase
+- (instancetype)initWithId:(NSString *)id kind:(InkwellSharedSyncMutationKind *)kind subjectUri:(NSString *)subjectUri createdAtMillis:(int64_t)createdAtMillis commentText:(NSString * _Nullable)commentText __attribute__((swift_name("init(id:kind:subjectUri:createdAtMillis:commentText:)"))) __attribute__((objc_designated_initializer));
+@property (class, readonly, getter=companion) InkwellSharedSyncQueueEntryCompanion *companion __attribute__((swift_name("companion")));
+- (InkwellSharedSyncQueueEntry *)doCopyId:(NSString *)id kind:(InkwellSharedSyncMutationKind *)kind subjectUri:(NSString *)subjectUri createdAtMillis:(int64_t)createdAtMillis commentText:(NSString * _Nullable)commentText __attribute__((swift_name("doCopy(id:kind:subjectUri:createdAtMillis:commentText:)")));
+
+/**
+ * Platform queues persist these entries; platform API clients execute them
+ * after reconnecting. Comment text is deliberately explicit rather than an
+ * opaque JSON payload so it can be validated before it is stored.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * Platform queues persist these entries; platform API clients execute them
+ * after reconnecting. Comment text is deliberately explicit rather than an
+ * opaque JSON payload so it can be validated before it is stored.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * Platform queues persist these entries; platform API clients execute them
+ * after reconnecting. Comment text is deliberately explicit rather than an
+ * opaque JSON payload so it can be validated before it is stored.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString * _Nullable commentText __attribute__((swift_name("commentText")));
+@property (readonly) int64_t createdAtMillis __attribute__((swift_name("createdAtMillis")));
+@property (readonly) NSString *id __attribute__((swift_name("id")));
+@property (readonly) InkwellSharedSyncMutationKind *kind __attribute__((swift_name("kind")));
+@property (readonly) NSString *subjectUri __attribute__((swift_name("subjectUri")));
+@end
+
+
+/**
+ * Platform queues persist these entries; platform API clients execute them
+ * after reconnecting. Comment text is deliberately explicit rather than an
+ * opaque JSON payload so it can be validated before it is stored.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("SyncQueueEntry.Companion")))
+@interface InkwellSharedSyncQueueEntryCompanion : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Platform queues persist these entries; platform API clients execute them
+ * after reconnecting. Comment text is deliberately explicit rather than an
+ * opaque JSON payload so it can be validated before it is stored.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedSyncQueueEntryCompanion *shared __attribute__((swift_name("shared")));
+
+/**
+ * Platform queues persist these entries; platform API clients execute them
+ * after reconnecting. Comment text is deliberately explicit rather than an
+ * opaque JSON payload so it can be validated before it is stored.
+ */
+- (id<InkwellSharedKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
 
