@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Report
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.automirrored.outlined.OpenInNew
@@ -41,6 +42,7 @@ fun PostDetailScreen(
     nextTitle: String? = null,
     onBack: () -> Unit = {},
     onNavigateToPost: (String, String?, String?, String?, String?) -> Unit = { _, _, _, _, _ -> },
+    onNavigateToProfile: (String) -> Unit = {},
     viewModel: PostDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -119,6 +121,18 @@ fun PostDetailScreen(
                             expanded = showMoreMenu,
                             onDismissRequest = { showMoreMenu = false },
                         ) {
+                            uiState.authorDid?.takeIf(String::isNotBlank)?.let { authorDid ->
+                                DropdownMenuItem(
+                                    text = { Text("View profile") },
+                                    onClick = {
+                                        showMoreMenu = false
+                                        onNavigateToProfile(authorDid)
+                                    },
+                                    leadingIcon = {
+                                        Icon(Icons.Outlined.Person, contentDescription = null)
+                                    },
+                                )
+                            }
                             DropdownMenuItem(
                                 text = { Text("Report post") },
                                 onClick = {
