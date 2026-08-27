@@ -13,6 +13,7 @@ struct ReaderPostCard: View {
 
     private var document: SiteStandardLexicon.DocumentRecord { item.document.record }
     private var publication: SiteStandardLexicon.PublicationRecord? { item.publication?.record }
+    private var publicationName: String? { publication?.name ?? item.cachedPublicationName }
 
     // Same theme resolution as ReadView (Leaflet's rich theme falling back
     // to basicTheme, then system defaults) so a card in the feed matches
@@ -99,7 +100,7 @@ struct ReaderPostCard: View {
                         Label("Cached", systemImage: "archivebox")
                             .labelStyle(.titleAndIcon)
                     }
-                    if let publicationName = publication?.name {
+                    if let publicationName {
                         Text("·")
                         Text(publicationName)
                             .fontWeight(.semibold)
@@ -146,7 +147,7 @@ struct ReaderPostCard: View {
             parts.append(description)
         }
 
-        if let publicationName = publication?.name, !publicationName.isEmpty {
+        if let publicationName, !publicationName.isEmpty {
             parts.append("Published in \(publicationName)")
         }
 

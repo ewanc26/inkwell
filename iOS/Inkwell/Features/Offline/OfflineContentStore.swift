@@ -85,6 +85,23 @@ final class OfflineContentStore {
         }
     }
 
+    func publications(uris: Set<String>) async -> [String: PublicationEntry] {
+        guard !uris.isEmpty else { return [:] }
+        let records = (try? await cache.loadAll()) ?? []
+        var publications: [String: PublicationEntry] = [:]
+        for cached in records where cached.kind == .publication && uris.contains(cached.uri) {
+            guard let record = try? decoded(SiteStandardLexicon.PublicationRecord.self, from: cached.recordJson) else {
+                continue
+            }
+            publications[cached.uri] = PublicationEntry(
+                uri: cached.uri,
+                authorDID: cached.authorDid,
+                record: record
+            )
+        }
+        return publications
+    }
+
     func clear() async {
         try? await cache.clear()
         try? await feedCache.clear()

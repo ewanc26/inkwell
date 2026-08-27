@@ -92,6 +92,8 @@ extension CachedFeedItem {
             publication: publication,
             authorProfile: profile,
             isCached: isCached,
+            cachedPublicationURI: publication?.uri ?? publicationUri,
+            cachedPublicationName: publication?.record.name ?? publicationName,
             cachedModerationLabels: moderationLabels.map {
                 ReaderModerationLabel(value: $0.value, source: $0.source)
             }
@@ -112,8 +114,8 @@ extension ReaderFeedItem {
             description: document.record.description,
             textContent: document.record.textContent,
             coverImageUrl: document.record.coverImage?.reference.link,
-            publicationUri: publication?.uri,
-            publicationName: publication?.record.name,
+            publicationUri: publication?.uri ?? cachedPublicationURI,
+            publicationName: publication?.record.name ?? cachedPublicationName,
             publicationUrl: publication?.record.url,
             authorDisplayName: authorProfile?.displayName,
             authorAvatar: authorProfile?.avatar,
