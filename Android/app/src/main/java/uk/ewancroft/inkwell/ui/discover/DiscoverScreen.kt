@@ -15,6 +15,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -225,10 +228,24 @@ private fun SearchResultRow(
     result: SearchResult,
     onClick: () -> Unit = {},
 ) {
+    val accessibilityLabel = buildList {
+        add(result.title)
+        result.snippet?.takeIf(String::isNotBlank)?.let(::add)
+        add("Published on ${result.platform ?: "standard.site"}")
+        result.handle?.takeIf(String::isNotBlank)?.let { add("By $it") }
+    }.joinToString(separator = ". ")
+    val actionLabel = if (result.isStandardSiteDocument) "Open article" else "Open in browser"
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
+            .semantics(mergeDescendants = true) {
+                contentDescription = accessibilityLabel
+            }
+            .clickable(
+                role = Role.Button,
+                onClickLabel = actionLabel,
+                onClick = onClick,
+            ),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Row(
@@ -298,10 +315,18 @@ private fun ActorSearchRow(
     actor: SearchActorResult,
     onClick: () -> Unit,
 ) {
+    val displayName = actor.displayName?.takeIf(String::isNotBlank) ?: actor.handle
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
+            .semantics(mergeDescendants = true) {
+                contentDescription = "$displayName. @${actor.handle}"
+            }
+            .clickable(
+                role = Role.Button,
+                onClickLabel = "Open profile",
+                onClick = onClick,
+            ),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Row(
@@ -352,7 +377,14 @@ private fun PublicationSearchRow(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
+            .semantics(mergeDescendants = true) {
+                contentDescription = "Publication: ${publication.name}. ${publication.domain}"
+            }
+            .clickable(
+                role = Role.Button,
+                onClickLabel = "Open publication",
+                onClick = onClick,
+            ),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Row(

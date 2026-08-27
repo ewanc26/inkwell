@@ -40,6 +40,7 @@ struct SearchResultThumbnail: View {
         // grouped row does — an opaque 5% black never did.
         .background(Color(uiColor: .tertiarySystemFill))
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+        .accessibilityHidden(true)
     }
 
     private var placeholder: some View {
@@ -71,6 +72,18 @@ struct ActorSearchRow: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.vertical, 4)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityLabel)
+    }
+
+    private var accessibilityLabel: String {
+        let displayName: String
+        if let name = actor.displayName, !name.isEmpty {
+            displayName = name
+        } else {
+            displayName = actor.handle
+        }
+        return "\(displayName), @\(actor.handle)"
     }
 }
 
@@ -112,6 +125,25 @@ struct DocumentSearchRow: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.vertical, 4)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityHint("Opens this article")
+    }
+
+    private var accessibilityLabel: String {
+        var parts = [result.title]
+
+        if let snippet = result.snippet, !snippet.isEmpty {
+            parts.append(snippet)
+        }
+
+        parts.append("Published on \(result.platform ?? "standard.site")")
+
+        if let handle = result.handle, !handle.isEmpty {
+            parts.append("By \(handle)")
+        }
+
+        return parts.joined(separator: ". ")
     }
 }
 
@@ -144,5 +176,8 @@ struct PublicationDiscoveryRow: View {
                 .accessibilityHidden(true)
         }
         .padding(.vertical, 4)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Publication: \(publication.name). \(publication.domain)")
+        .accessibilityHint("Opens this publication")
     }
 }
