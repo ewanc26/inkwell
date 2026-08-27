@@ -24,6 +24,7 @@ import coil.compose.AsyncImage
 import uk.ewancroft.inkwell.ui.components.CreditsView
 import uk.ewancroft.inkwell.data.model.common.SearchActorResult
 import uk.ewancroft.inkwell.data.model.common.SearchResult
+import uk.ewancroft.inkwell.data.model.common.PublicationResult
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -92,6 +93,24 @@ fun DiscoverScreen(
                 }
             }
 
+            TabRow(
+                selectedTabIndex = uiState.scope.ordinal,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+            ) {
+                Tab(
+                    selected = uiState.scope == DiscoverSearchScope.DOCUMENTS,
+                    onClick = { viewModel.onScopeChanged(DiscoverSearchScope.DOCUMENTS) },
+                    text = { Text("Documents") }
+                )
+                Tab(
+                    selected = uiState.scope == DiscoverSearchScope.PUBLICATIONS,
+                    onClick = { viewModel.onScopeChanged(DiscoverSearchScope.PUBLICATIONS) },
+                    text = { Text("Publications") }
+                )
+            }
+
             when {
                 uiState.isSearching -> {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -108,7 +127,7 @@ fun DiscoverScreen(
                         Text(uiState.error!!, color = MaterialTheme.colorScheme.error)
                     }
                 }
-                uiState.results.isEmpty() && !uiState.isSearching -> {
+                uiState.results.isEmpty() && uiState.actors.isEmpty() && uiState.publications.isEmpty() && !uiState.isSearching -> {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Icon(Icons.Outlined.Search, null, Modifier.size(48.dp),
@@ -126,66 +145,69 @@ fun DiscoverScreen(
                     }
                 }
                 else -> {
+                    val isPublications = uiState.scope == DiscoverSearchScope.PUBLICATIONS
+                    val documents = uiState.results.filter { !it.isPublication }
+
                     LazyColumn(
                         contentPadding = PaddingValues(16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        if (uiState.actors.isNotEmpty()) {
-                            item {
-                                Text("Users", style = MaterialTheme.typography.titleSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                Spacer(Modifier.height(4.dp))
+                        if (isPublications) {
+                            if (uiState.publications.isNotEmpty()) {
+                                item {
+                                    Text("Publications", style = MaterialTheme.typography.titleSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Spacer(Modifier.height(4.dp))
+                                }
+                                items(uiState.publications, key = { it.domain }) { publication ->
+                                    PublicationSearchRow(
+                                        publication = publication,
+                                        onClick = { openWebUrl(context, publication.url) },
+                                    )
+                                }
                             }
-                            items(uiState.actors, key = { it.did }) { actor ->
-                                ActorSearchRow(
-                                    actor = actor,
-                                    onClick = {
-                                        val profileUrl = "https://bsky.app/profile/${actor.handle}"
-                                        uk.ewancroft.inkwell.util.LinkPreferences.openContentUrl(context, profileUrl)
-                                    },
-                                )
+                        } else {
+                            if (uiState.actors.isNotEmpty()) {
+                                item {
+                                    Text("Users", style = MaterialTheme.typography.titleSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Spacer(Modifier.height(4.dp))
+                                }
+                                items(uiState.actors, key = { it.did }) { actor ->
+                                    ActorSearchRow(
+                                        actor = actor,
+                                        onClick = {
+                                            val profileUrl = "https://bsky.app/profile/${actor.handle}"
+                                            uk.ewancroft.inkwell.util.LinkPreferences.openContentUrl(context, profileUrl)
+                                        },
+                                    )
+                                }
                             }
-                        }
 
-                        if (uiState.results.isNotEmpty()) {
-                            item {
-                                Spacer(Modifier.height(12.dp))
-                                Text("Documents", style = MaterialTheme.typography.titleSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                Spacer(Modifier.height(4.dp))
-                            }
-                            items(uiState.results, key = { it.uri }) { result ->
-                                SearchResultRow(
-                                    result = result,
-                                    isSubscribed = uiState.subscriptions.containsKey(result.uri),
-                                    isSubscriptionPending = result.uri in uiState.pendingSubscriptions,
-                                    onToggleSubscription = { viewModel.toggleSubscription(result) },
-                                    onClick = {
-                                        if (result.isStandardSiteDocument) {
-                                            onNavigateToPost(result.uri, null, null, null, null)
-                                        } else {
-                                            openWebUrl(context, result.uri)
-                                        }
-                                    },
-                                )
+                            if (documents.isNotEmpty()) {
+                                item {
+                                    if (uiState.actors.isNotEmpty()) Spacer(Modifier.height(12.dp))
+                                    Text("Documents", style = MaterialTheme.typography.titleSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Spacer(Modifier.height(4.dp))
+                                }
+                                items(documents, key = { it.uri }) { result ->
+                                    SearchResultRow(
+                                        result = result,
+                                        onClick = {
+                                            if (result.isStandardSiteDocument) {
+                                                onNavigateToPost(result.uri, null, null, null, null)
+                                            } else {
+                                                openWebUrl(context, result.uri)
+                                            }
+                                        },
+                                    )
+                                }
                             }
                         }
                     }
                 }
             }
-        }
-    }
-
-    if (uiState.subscriptionError != null) {
-        Snackbar(
-            modifier = Modifier.padding(16.dp),
-            action = {
-                TextButton(onClick = { viewModel.dismissSubscriptionError() }) {
-                    Text("Dismiss")
-                }
-            }
-        ) {
-            Text(uiState.subscriptionError!!)
         }
     }
 
@@ -202,9 +224,6 @@ fun DiscoverScreen(
 private fun SearchResultRow(
     result: SearchResult,
     onClick: () -> Unit = {},
-    isSubscribed: Boolean = false,
-    isSubscriptionPending: Boolean = false,
-    onToggleSubscription: (() -> Unit)? = null,
 ) {
     Card(
         modifier = Modifier
@@ -222,7 +241,7 @@ private fun SearchResultRow(
                     model = result.coverImage,
                     contentDescription = null,
                     modifier = Modifier
-                        .size(if (result.isPublication) 44.dp else 52.dp)
+                        .size(52.dp)
                         .clip(MaterialTheme.shapes.small),
                     contentScale = ContentScale.Crop,
                 )
@@ -262,28 +281,7 @@ private fun SearchResultRow(
                 }
             }
 
-            if (result.isPublication && onToggleSubscription != null) {
-                Box(contentAlignment = Alignment.Center) {
-                    if (isSubscriptionPending) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(28.dp),
-                            strokeWidth = 2.dp,
-                        )
-                    } else {
-                        OutlinedIconToggleButton(
-                            checked = isSubscribed,
-                            onCheckedChange = { onToggleSubscription() },
-                        ) {
-                            Icon(
-                                if (isSubscribed) Icons.Filled.Notifications else Icons.Outlined.NotificationAdd,
-                                contentDescription = if (isSubscribed) "Unsubscribe" else "Subscribe",
-                                tint = if (isSubscribed) MaterialTheme.colorScheme.primary
-                                       else MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-                }
-            } else if (result.isStandardSiteDocument) {
+            if (result.isStandardSiteDocument) {
                 Icon(
                     Icons.AutoMirrored.Outlined.ArrowForward,
                     contentDescription = null,
@@ -344,4 +342,58 @@ private fun ActorSearchRow(
 
 private fun openWebUrl(context: android.content.Context, url: String) {
     uk.ewancroft.inkwell.util.LinkPreferences.openContentUrl(context, url)
+}
+
+@Composable
+private fun PublicationSearchRow(
+    publication: PublicationResult,
+    onClick: () -> Unit,
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp).fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            if (publication.coverImage != null) {
+                AsyncImage(
+                    model = publication.coverImage,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(MaterialTheme.shapes.small),
+                    contentScale = ContentScale.Crop,
+                )
+            }
+
+            Column(Modifier.weight(1f)) {
+                Text(
+                    publication.name,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    publication.domain,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
+            Icon(
+                Icons.AutoMirrored.Outlined.ArrowForward,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.55f),
+                modifier = Modifier.size(16.dp),
+            )
+        }
+    }
 }
