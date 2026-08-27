@@ -66,7 +66,7 @@ final class ReaderFeedStore {
     /// re-trigger it themselves once it already has.
     func loadData(loginStateManager: LoginStateManager, force: Bool = false) async {
         guard force || !(followingState.hasLoaded || followingState.isLoading) else { return }
-        async let _following: () = loadFollowingFeed(loginStateManager: loginStateManager)
+        async let _following: () = loadFollowingFeed(loginStateManager: loginStateManager, force: force)
         async let _yours: () = loadYoursFeed(loginStateManager: loginStateManager)
         _ = await (_following, _yours)
     }
@@ -84,7 +84,7 @@ final class ReaderFeedStore {
     /// the first publication returns, and each subsequent publication's items
     /// are merged into the feed immediately.  A per-publication timeout ensures
     /// one slow or unreachable PDS cannot hold up the rest.
-    private func loadFollowingFeed(loginStateManager: LoginStateManager) async {
+    private func loadFollowingFeed(loginStateManager: LoginStateManager, force: Bool) async {
         followingState.isLoading = true
         followingState.error = nil
 
@@ -219,7 +219,7 @@ final class ReaderFeedStore {
         let cache = feedCache
 
         jetstreamTask = Task { [weak self] in
-            for await payload in client.connect(config: config) {
+            for await payload in streamJetstreamPayloads(client: client, config: config) {
                 guard !Task.isCancelled else { break }
                 guard payload.collection == "site.standard.document" else { continue }
 

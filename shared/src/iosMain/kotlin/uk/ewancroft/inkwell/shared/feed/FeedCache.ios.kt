@@ -6,6 +6,10 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.usePinned
+import platform.Foundation.NSData
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSString
 import platform.Foundation.NSUTF8StringEncoding
@@ -21,6 +25,7 @@ import platform.Foundation.stringWithContentsOfFile
  * @param cacheDirPath Absolute path to the caches directory (typically
  *   `NSFileManager.defaultManager.cacheDirectoryPath`).
  */
+@OptIn(ExperimentalForeignApi::class)
 class FeedCacheIos(
     cacheDirPath: String
 ) : uk.ewancroft.inkwell.shared.feed.FeedCache {
@@ -71,12 +76,15 @@ class FeedCacheIos(
 
     private fun writeToFile(jsonString: String) {
         val nsString = jsonString as NSString
-        nsString.writeToFile(
-            path = cacheFilePath,
-            atomically = true,
-            encoding = NSUTF8StringEncoding,
-            error = null
-        )
+        val bytes = jsonString.encodeToByteArray()
+        bytes.usePinned {
+            val data = NSData.create(bytes = it.addressOf(0), length = bytes.size.toULong())
+            NSFileManager.defaultManager.createFileAtPath(
+                path = cacheFilePath,
+                contents = data,
+                attributes = null
+            )
+        }
     }
 
     private fun readFromFile(): List<CachedFeedItem> {

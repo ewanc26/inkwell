@@ -8,13 +8,41 @@
 //
 
 import Foundation
+import ATProtoKit
 import InkwellShared
+
+private final class JetstreamFlowCollector: NSObject, Kotlinx_coroutines_coreFlowCollector {
+    let continuation: AsyncStream<JetstreamPayload>.Continuation
+
+    init(continuation: AsyncStream<JetstreamPayload>.Continuation) {
+        self.continuation = continuation
+    }
+
+    func emit(value: Any?, completionHandler: @escaping (Error?) -> Void) {
+        if let payload = value as? JetstreamPayload {
+            continuation.yield(payload)
+        }
+        completionHandler(nil)
+    }
+}
+
+func streamJetstreamPayloads(
+    client: JetstreamClient,
+    config: JetstreamConfig
+) -> AsyncStream<JetstreamPayload> {
+    AsyncStream { continuation in
+        let collector = JetstreamFlowCollector(continuation: continuation)
+        client.connect(config: config).collect(collector: collector) { _ in
+            continuation.finish()
+        }
+    }
+}
 
 // MARK: - Jetstream Client
 
 /// Creates a platform-specific JetstreamClient backed by Ktor + Darwin.
 func createSharedJetstreamClient() -> JetstreamClient {
-    SharedKMPJetstreamKt.createJetstreamClient()
+    CreateJetstreamClient_iosKt.createJetstreamClient()
 }
 
 /// Creates a JetstreamConfig for the given subscription DIDs.
@@ -35,7 +63,7 @@ func createJetstreamConfig(
 /// Creates a platform-specific FeedCache backed by a JSON file.
 func createSharedFeedCache() -> FeedCache {
     let cacheDir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
-    return SharedKMPFeedKt.createFeedCache(cacheDirPath: cacheDir.path)
+    return CreateFeedCache_iosKt.createFeedCache(cacheDirPath: cacheDir.path)
 }
 
 // MARK: - CachedFeedItem Conversion
@@ -47,14 +75,15 @@ extension CachedFeedItem {
         profile: BSkyActorProfile? = nil,
         publication: PublicationEntry? = nil
     ) -> ReaderFeedItem {
+        let publishedDate = ISO8601DateFormatter().date(from: publishedAt) ?? Date(timeIntervalSince1970: 0)
         let docRecord = SiteStandardLexicon.DocumentRecord(
             site: site,
             title: title,
-            publishedAt: publishedAt,
+            publishedAt: publishedDate,
             path: path,
             description: description,
-            textContent: textContent,
-            coverImage: coverImageUrl.map { BlobRef(link: $0, size: 0, type: "image/jpeg", mimeType: "image/jpeg") }
+            coverImage: coverImageUrl.map { BlobRef(link: $0, size: 0, type: "image/jpeg", mimeType: "image/jpeg").toiOS() },
+            textContent: textContent
         )
         let docEntry = DocumentEntry(uri: uri, authorDID: authorDID, record: docRecord)
         return ReaderFeedItem(
@@ -73,11 +102,11 @@ extension ReaderFeedItem {
             authorDID: document.authorDID,
             site: document.record.site,
             title: document.record.title,
-            publishedAt: document.record.publishedAt,
+            publishedAt: ISO8601DateFormatter().string(from: document.record.publishedAt),
             path: document.record.path,
             description: document.record.description,
             textContent: document.record.textContent,
-            coverImageUrl: document.record.coverImage?.link,
+            coverImageUrl: document.record.coverImage?.reference.link,
             publicationUri: publication?.uri,
             publicationName: publication?.record.name,
             publicationUrl: publication?.record.url,
