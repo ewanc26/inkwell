@@ -27,26 +27,20 @@
       ],
       "versions": [
         {
+          "version": "2.4.0",
+          "date": "2026-08-26",
+          "localizedDescription": "Adds native reporting for posts and accounts, the Inkwell-user declaration record with Constellation backlinks, the OAuth permissions required to manage that record, and website integration for the users-of-Inkwell carousel.",
+          "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.4.0.ipa",
+          "size": 11973740,
+          "buildVersion": "57"
+        },
+        {
           "version": "2.3.0",
           "date": "2026-08-25",
           "localizedDescription": "Adds reader sort order (newest/oldest first) that persists across relaunches, in-app link handling so article and post links open in an embedded browser instead of leaving Inkwell (toggle off to restore the system browser; sign-in links always stay external), a Haptics toggle under Accessibility, Storage settings showing the image cache size with a Clear Cache button (the URL cache is now bounded at 150 MB), and article read/bookmark tracking with an Export Data button that produces a shareable JSON. Mute/block management ships on Android in this release and will follow on iOS.",
           "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.3.0.ipa",
           "size": 11944828,
           "buildVersion": "57"
-        },
-        {
-          "version": "2.4.0",
-          "date": "2026-08-25",
-          "localizedDescription": "Inkwell 2.4.0 release - adds Inkwell-user declaration record (uk.ewancroft.inkwell.user) with Constellation backlinks for the \"users already using Inkwell\" carousel, OAuth scope for record writes, and website integration.",
-          "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.4.0.ipa",
-          "size": 11956522,
-          "buildVersion": "58"
-        },
-        {
-          "version": "2.3.0",
-          "buildVersion": "10",
-          "size": 2839922,
-          "date": "2026-08-25"
         },
         {
           "version": "2.2.0",
@@ -109,12 +103,14 @@
         "entitlements": [],
         "privacy": {}
       },
-      "version": "2.3.0",
+      "version": "2.4.0",
       "buildVersion": "57",
-      "versionDate": "2026-08-25"
+      "versionDate": "2026-08-26",
+      "size": 11973740,
+      "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.4.0.ipa"
     }
   ],
   "news": [],
   "version": "2.4.0",
-  "buildVersion": "58"
+  "buildVersion": "57"
 }
