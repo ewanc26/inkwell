@@ -19,8 +19,13 @@ struct PublicationDetailView: View {
 
     @State private var documents: [DocumentEntry] = []
     @State private var publications: [PublicationEntry] = []
+    @State private var resolvedPublication: PublicationEntry?
     @State private var isLoading = false
     @State private var errorMessage: String?
+
+    private var publicationTitle: String {
+        resolvedPublication?.record.name ?? publication.name
+    }
 
     var body: some View {
         List(documents) { document in
@@ -32,7 +37,7 @@ struct PublicationDetailView: View {
             .buttonStyle(.plain)
         }
         .listStyle(.insetGrouped)
-        .navigationTitle(publication.name)
+        .navigationTitle(publicationTitle)
         .overlay {
             if isLoading && documents.isEmpty {
                 ProgressView("Fetching documents…")
@@ -69,6 +74,13 @@ struct PublicationDetailView: View {
 
             self.publications = try await publicationsTask
             let allDocuments = try await documentsTask
+
+            // Search results only identify a publication by domain. Prefer the
+            // authoritative `site.standard.publication` record for its display
+            // name once the author's PDS records have been loaded.
+            resolvedPublication = publications.first { entry in
+                normalizedHost(for: entry.record.url) == normalizedHost(for: publication.domain)
+            }
 
             let publicationURLMap = Dictionary(
                 uniqueKeysWithValues: publications.map { ($0.uri, $0.record.url) }
