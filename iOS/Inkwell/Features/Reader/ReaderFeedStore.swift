@@ -8,6 +8,7 @@
 
 import Foundation
 import ATProtoKit
+import InkwellShared
 
 // MARK: - Pagination State
 
@@ -50,6 +51,12 @@ final class ReaderFeedStore {
     var isLoadingYours = true
     var yoursError: String?
 
+    // MARK: - Jetstream + Cache
+
+    private let jetstreamClient = createSharedJetstreamClient()
+    private let feedCache = createSharedFeedCache()
+    private var jetstreamTask: Task<Void, Never>?
+
     // MARK: - Data Loading
 
     /// Fetches both feeds. Skipped if a load is already in flight or has
@@ -66,12 +73,25 @@ final class ReaderFeedStore {
 
     // MARK: Following — paginated
 
+    /// Per-publication fetch timeout — a single unreachable PDS must not
+    /// block the entire feed from appearing.
+    private static let publicationTimeout: Duration = .seconds(8)
+
     /// Fetches subscriptions and the first page of documents from each followed
     /// publication. Subsequent pages are loaded on-demand via the sentinel.
+    ///
+    /// Results are displayed progressively — the spinner disappears as soon as
+    /// the first publication returns, and each subsequent publication's items
+    /// are merged into the feed immediately.  A per-publication timeout ensures
+    /// one slow or unreachable PDS cannot hold up the rest.
     private func loadFollowingFeed(loginStateManager: LoginStateManager) async {
         followingState.isLoading = true
         followingState.error = nil
-        defer {
+
+        // 1. Show cached data immediately (if available).
+        if !force, let cached = try? await feedCache.load(limit: 200), !cached.isEmpty {
+            followingState.items = cached.compactMap { $0.toReaderFeedItem() }
+            followingState.items = deduplicated(followingState.items)
             followingState.isLoading = false
             followingState.hasLoaded = true
         }
@@ -80,11 +100,17 @@ final class ReaderFeedStore {
             let subscriptions = try await loginStateManager.fetchSubscriptions()
 
             // Reset state
-            followingState.items = []
+            if force || followingState.items.isEmpty {
+                followingState.items = []
+            }
             followingState.cursors = [:]
             followingState.hasMorePages = !subscriptions.isEmpty
 
-            guard !subscriptions.isEmpty else { return }
+            guard !subscriptions.isEmpty else {
+                followingState.isLoading = false
+                followingState.hasLoaded = true
+                return
+            }
 
             // Collect unique DIDs for profile resolution.
             let uniqueDIDs = Set(subscriptions.compactMap { sub in
@@ -92,48 +118,149 @@ final class ReaderFeedStore {
             })
             let profiles = await resolveProfiles(dids: uniqueDIDs)
 
-            // Fetch first page from each subscribed publication concurrently.
+            // 2. Fetch first page from each subscribed publication concurrently.
+            //    Items appear progressively — the spinner disappears as soon as
+            //    the first batch lands and each subsequent batch is merged in.
             await withTaskGroup(of: (did: String, items: [ReaderFeedItem], cursor: String?).self) { group in
                 for subscription in subscriptions {
                     let pubURI = subscription.record.publication
                     guard let pubDID = parseAtUri(pubURI)?.did else { continue }
                     group.addTask { [pubURI, pubDID] in
-                        let pubEntry = try? await loginStateManager.fetchPublication(uri: pubURI)
-                        let (records, cursor) = (try? await loginStateManager.listRecordsPage(
-                            from: pubDID,
-                            collection: SiteStandardLexicon.DocumentRecord.type,
-                            limit: 25
-                        )) ?? ([], nil)
+                        // Race the actual fetch against a per-publication
+                        // timeout so one slow PDS cannot block the whole feed.
+                        await withTaskGroup(
+                            of: (did: String, items: [ReaderFeedItem], cursor: String?).self
+                        ) { inner in
+                            inner.addTask {
+                                let pubEntry = try? await loginStateManager.fetchPublication(uri: pubURI)
+                                let (records, cursor) = (try? await loginStateManager.listRecordsPage(
+                                    from: pubDID,
+                                    collection: SiteStandardLexicon.DocumentRecord.type,
+                                    limit: 25
+                                )) ?? ([], nil)
 
-                        let profile = profiles[pubDID] ?? profiles[pubDID.lowercased()]
-                        let items: [ReaderFeedItem] = records.compactMap { record in
-                            guard let value = record.value,
-                                  let doc = value.getRecord(ofType: SiteStandardLexicon.DocumentRecord.self),
-                                  doc.site == pubURI else { return nil }
-                            return ReaderFeedItem(
-                                document: DocumentEntry(uri: record.uri, authorDID: pubDID, record: doc),
-                                publication: pubEntry,
-                                authorProfile: profile
-                            )
+                                let profile = profiles[pubDID] ?? profiles[pubDID.lowercased()]
+                                let items: [ReaderFeedItem] = records.compactMap { record in
+                                    guard let value = record.value,
+                                          let doc = value.getRecord(ofType: SiteStandardLexicon.DocumentRecord.self),
+                                          doc.site == pubURI else { return nil }
+                                    return ReaderFeedItem(
+                                        document: DocumentEntry(uri: record.uri, authorDID: pubDID, record: doc),
+                                        publication: pubEntry,
+                                        authorProfile: profile
+                                    )
+                                }
+                                return (pubDID, items, cursor)
+                            }
+                            inner.addTask {
+                                try? await Task.sleep(for: ReaderFeedStore.publicationTimeout)
+                                return (pubDID, [], nil)
+                            }
+                            // Return whichever finishes first; the other is
+                            // cancelled when the group scope exits.
+                            var winner = (pubDID, [ReaderFeedItem](), String?.none)
+                            for await r in inner {
+                                winner = r
+                                break
+                            }
+                            return winner
                         }
-                        return (pubDID, items, cursor)
                     }
                 }
                 for await result in group {
+                    guard !result.items.isEmpty else { continue }
                     followingState.items.append(contentsOf: result.items)
                     if let cursor = result.cursor {
                         followingState.cursors[result.did] = cursor
                     }
+                    // Progressive: reveal the feed after the first batch
+                    // arrives so the user sees content immediately rather
+                    // than waiting for every PDS to respond.
+                    if !followingState.hasLoaded {
+                        followingState.isLoading = false
+                        followingState.hasLoaded = true
+                    }
+                    followingState.items = deduplicated(followingState.items)
                 }
             }
 
-            followingState.items = deduplicated(followingState.items)
+            // Ensure flags are finalised even if every publication timed out.
+            followingState.isLoading = false
+            followingState.hasLoaded = true
 
             // Check if any DID still has more pages.
             followingState.hasMorePages = !followingState.cursors.isEmpty
+
+            // 3. Cache the results for next launch.
+            let cachedItems = followingState.items.map { $0.toCachedFeedItem() }
+            try? await feedCache.save(items: Array(cachedItems))
+
+            // 4. Connect to Jetstream for live updates.
+            startJetstreamSubscription(dids: Array(uniqueDIDs))
+
         } catch {
             followingState.error = error.localizedDescription
+            followingState.isLoading = false
+            followingState.hasLoaded = true
         }
+    }
+
+    // MARK: - Jetstream Live Updates
+
+    /// Starts a Jetstream WebSocket subscription for the given DIDs.
+    /// Events are parsed into CachedFeedItem objects and merged into the
+    /// feed in real time.
+    private func startJetstreamSubscription(dids: [String]) {
+        jetstreamTask?.cancel()
+        guard !dids.isEmpty else { return }
+
+        let config = createJetstreamConfig(dids: dids)
+        let client = jetstreamClient
+        let cache = feedCache
+
+        jetstreamTask = Task { [weak self] in
+            for await payload in client.connect(config: config) {
+                guard !Task.isCancelled else { break }
+                guard payload.collection == "site.standard.document" else { continue }
+
+                // Parse the event into a CachedFeedItem.
+                let cachedItem = payload.toCachedFeedItem()
+
+                await MainActor.run {
+                    guard let self else { return }
+
+                    if let cachedItem {
+                        // Convert to a ReaderFeedItem and merge into the feed.
+                        let newItem = cachedItem.toReaderFeedItem()
+                        // Only add if not already present.
+                        if !followingState.items.contains(where: { $0.id == newItem.id }) {
+                            followingState.items.append(newItem)
+                            followingState.items = deduplicated(followingState.items)
+                        }
+                    } else if payload.operation == "delete" {
+                        // Handle deletes by removing the item from the feed.
+                        let deletedUri = "at://\(payload.did)/\(payload.collection)/\(payload.rkey)"
+                        followingState.items.removeAll { $0.id == deletedUri }
+                    }
+                }
+
+                // Persist to cache periodically (every event for now;
+                // could batch for efficiency).
+                if let cachedItem {
+                    try? await cache.upsert(items: [cachedItem])
+                } else if payload.operation == "delete" {
+                    let deletedUri = "at://\(payload.did)/\(payload.collection)/\(payload.rkey)"
+                    try? await cache.remove(uri: deletedUri)
+                }
+            }
+        }
+    }
+
+    /// Stops the Jetstream subscription (e.g. on logout).
+    func stopJetstream() {
+        jetstreamTask?.cancel()
+        jetstreamTask = nil
+        Task { try? await jetstreamClient.disconnect() }
     }
 
     /// Resolves Bluesky profiles for a set of DIDs concurrently.
@@ -223,6 +350,10 @@ final class ReaderFeedStore {
 
         followingState.items = deduplicated(followingState.items)
         followingState.hasMorePages = !followingState.cursors.isEmpty
+
+        // Update cache with new items.
+        let cachedItems = followingState.items.map { $0.toCachedFeedItem() }
+        try? await feedCache.save(items: Array(cachedItems))
     }
 
     // MARK: Yours — eager (own documents are typically few)
