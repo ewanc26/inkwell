@@ -43,6 +43,7 @@ struct ReaderPostCard: View {
                             .frame(maxWidth: .infinity)
                             .aspectRatio(16 / 9, contentMode: .fit)
                             .clipped()
+                            .accessibilityHidden(true)
                     case .failure, .empty:
                         EmptyView()
                     @unknown default:
@@ -60,6 +61,7 @@ struct ReaderPostCard: View {
                                 image.resizable().scaledToFill()
                                     .frame(width: 28, height: 28)
                                     .clipShape(.circle)
+                                    .accessibilityHidden(true)
                             case .failure, .empty:
                                 EmptyView()
                             @unknown default:
@@ -97,6 +99,7 @@ struct ReaderPostCard: View {
                     }
                     Spacer(minLength: 8)
                     Image(systemName: "arrow.up.right")
+                        .accessibilityHidden(true)
                 }
                 .font(.caption)
                 .foregroundStyle(foreground.opacity(0.55))
@@ -109,6 +112,9 @@ struct ReaderPostCard: View {
             RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .stroke(foreground.opacity(0.1), lineWidth: 1)
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityHint("Opens this article")
     }
 
     private var coverURL: URL? {
@@ -118,5 +124,24 @@ struct ReaderPostCard: View {
 
     private var formattedDate: String {
         document.publishedAt.formatted(date: .abbreviated, time: .omitted)
+    }
+
+    private var accessibilityLabel: String {
+        var parts = [document.title]
+
+        if let author = item.authorProfile?.displayName, !author.isEmpty {
+            parts.append("By \(author)")
+        }
+
+        if let description = document.description, !description.isEmpty {
+            parts.append(description)
+        }
+
+        if let publicationName = publication?.name, !publicationName.isEmpty {
+            parts.append("Published in \(publicationName)")
+        }
+
+        parts.append("Published \(formattedDate)")
+        return parts.joined(separator: ". ")
     }
 }
