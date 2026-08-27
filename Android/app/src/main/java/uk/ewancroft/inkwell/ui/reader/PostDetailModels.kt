@@ -65,6 +65,7 @@ data class PostDetailUiState(
     val isBookmarked: Boolean = false,
 
     val reportError: String? = null,
+    val reportConfirmation: String? = null,
 )
 
 data class CommentEntry(

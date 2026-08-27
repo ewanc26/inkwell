@@ -241,6 +241,19 @@ fun ReaderScreen(
         }
     }
 
+    if (uiState.reportConfirmation != null) {
+        Snackbar(
+            modifier = Modifier.padding(16.dp),
+            action = {
+                TextButton(onClick = { viewModel.dismissReportConfirmation() }) {
+                    Text("Dismiss")
+                }
+            }
+        ) {
+            Text(uiState.reportConfirmation!!)
+        }
+    }
+
     if (showCredits) {
         CreditsView(
             appVersion = appVersion,
