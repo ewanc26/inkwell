@@ -28,6 +28,9 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -73,10 +76,23 @@ fun PostCard(
     val secondaryForeground = if (publicationThemeIsPresent) foreground.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant
     val accent = if (publicationThemeIsPresent) readerTheme.accent else MaterialTheme.colorScheme.primary
     val cardBorderColor = foreground.copy(alpha = 0.1f)
+    val accessibilityLabel = buildList {
+        add(title)
+        authorDisplayName?.takeIf(String::isNotBlank)?.let { add("By $it") }
+        description?.takeIf(String::isNotBlank)?.let(::add)
+        publicationName?.takeIf(String::isNotBlank)?.let { add("Published in $it") }
+        add("Published $date")
+    }.joinToString(separator = ". ")
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(role = Role.Button, onClick = onClick)
+            .semantics(mergeDescendants = true) {
+                contentDescription = accessibilityLabel
+                if (isVerified == true) {
+                    stateDescription = "Verified source"
+                }
+            }
             .drawBehind {
                 drawRect(
                     color = cardBorderColor,
@@ -171,7 +187,7 @@ fun PostCard(
                             Spacer(Modifier.width(4.dp))
                             Icon(
                                 Icons.Filled.Verified,
-                                contentDescription = "Verified source",
+                                contentDescription = null,
                                 modifier = Modifier.size(14.dp),
                                 tint = accent,
                             )
