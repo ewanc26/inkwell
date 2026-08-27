@@ -24,7 +24,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import uk.ewancroft.inkwell.TestingConfig
 import uk.ewancroft.inkwell.ui.reader.InkwellNotificationViewModel
 import uk.ewancroft.inkwell.ui.components.CreditsView
+import uk.ewancroft.inkwell.ui.moderation.ReportDialog
 import uk.ewancroft.inkwell.util.TipPromptManager
+
+private data class ReaderReportTarget(
+    val subject: String,
+    val recordCid: String? = null,
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,6 +48,7 @@ fun ReaderScreen(
     var showTipPrompt by remember { mutableStateOf(false) }
     var showNotifications by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
+    var reportTarget by remember { mutableStateOf<ReaderReportTarget?>(null) }
     val notifications by notificationViewModel.notifications.collectAsStateWithLifecycle()
     val unreadCount by notificationViewModel.unreadCount.collectAsStateWithLifecycle()
     val notificationsEnabled by notificationViewModel.notificationsEnabled.collectAsStateWithLifecycle()
@@ -160,6 +167,12 @@ fun ReaderScreen(
                             next?.uri, next?.title
                         )
                     },
+                    onReportPost = { post ->
+                        reportTarget = ReaderReportTarget(post.uri, post.recordCid)
+                    },
+                    onReportAccount = { post ->
+                        reportTarget = ReaderReportTarget(post.authorDid)
+                    },
                 )
                 1 -> FeedContent(
                     posts = uiState.yoursPosts,
@@ -174,6 +187,12 @@ fun ReaderScreen(
                             prev?.uri, prev?.title,
                             next?.uri, next?.title
                         )
+                    },
+                    onReportPost = { post ->
+                        reportTarget = ReaderReportTarget(post.uri, post.recordCid)
+                    },
+                    onReportAccount = { post ->
+                        reportTarget = ReaderReportTarget(post.authorDid)
                     },
                 )
             }
@@ -190,6 +209,35 @@ fun ReaderScreen(
             }
         ) {
             Text(uiState.error!!)
+        }
+    }
+
+    reportTarget?.let { target ->
+        ReportDialog(
+            subject = target.subject,
+            onDismiss = { reportTarget = null },
+            onSubmit = { reasonType, reason ->
+                reportTarget = null
+                viewModel.submitReport(
+                    subject = target.subject,
+                    recordCid = target.recordCid,
+                    reasonType = reasonType,
+                    reason = reason,
+                )
+            },
+        )
+    }
+
+    if (uiState.reportError != null) {
+        Snackbar(
+            modifier = Modifier.padding(16.dp),
+            action = {
+                TextButton(onClick = { viewModel.dismissReportError() }) {
+                    Text("Dismiss")
+                }
+            }
+        ) {
+            Text(uiState.reportError!!)
         }
     }
 

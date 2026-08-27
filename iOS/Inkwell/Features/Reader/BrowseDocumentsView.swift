@@ -15,6 +15,13 @@
 import SwiftUI
 import ATProtoKit
 
+private struct FeedReportTarget: Identifiable {
+    let subject: String
+    let recordCID: String?
+
+    var id: String { subject }
+}
+
 struct BrowseDocumentsView: View {
     @Environment(LoginStateManager.self) private var loginStateManager
     @State private var notificationManager = NotificationManager.shared
@@ -23,6 +30,8 @@ struct BrowseDocumentsView: View {
     @State private var showAbout = false
     @State private var showNotifications = false
     @State private var path = NavigationPath()
+    @State private var reportTarget: FeedReportTarget?
+    @State private var reportMessage: String?
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -53,6 +62,26 @@ struct BrowseDocumentsView: View {
                 }
                 .sheet(isPresented: $showNotifications) {
                     NotificationsView(onOpenDocument: { uri in path.append(uri) })
+                }
+                .sheet(item: $reportTarget) { target in
+                    ReportSheet(
+                        subject: target.subject,
+                        recordCID: target.recordCID,
+                        onSubmit: {
+                            reportMessage = "Report submitted."
+                        },
+                        onError: { message in
+                            reportMessage = "Report failed: \(message)"
+                        }
+                    )
+                }
+                .alert("Report", isPresented: Binding(
+                    get: { reportMessage != nil },
+                    set: { if !$0 { reportMessage = nil } }
+                )) {
+                    Button("OK", role: .cancel) {}
+                } message: {
+                    Text(reportMessage ?? "")
                 }
                 .accountToolbar(showAbout: $showAbout)
                 .task {
@@ -123,20 +152,25 @@ struct BrowseDocumentsView: View {
             ScrollView {
                 LazyVStack(spacing: 18) {
                     ForEach(Array(store.followingState.items.enumerated()), id: \.element.id) { index, item in
-                        NavigationLink {
-                            ReadView(
-                                document: item.document.record,
-                                publication: item.publication?.record,
-                                documentURI: item.document.uri,
-                                documentCID: item.document.cid,
-                                authorDID: item.document.authorDID,
-                                previousItem: index > 0 ? store.followingState.items[index - 1] : nil,
-                                nextItem: index < store.followingState.items.count - 1 ? store.followingState.items[index + 1] : nil
-                            )
-                        } label: {
-                            ReaderPostCard(item: item)
+                        ZStack(alignment: .topTrailing) {
+                            NavigationLink {
+                                ReadView(
+                                    document: item.document.record,
+                                    publication: item.publication?.record,
+                                    documentURI: item.document.uri,
+                                    documentCID: item.document.cid,
+                                    authorDID: item.document.authorDID,
+                                    previousItem: index > 0 ? store.followingState.items[index - 1] : nil,
+                                    nextItem: index < store.followingState.items.count - 1 ? store.followingState.items[index + 1] : nil
+                                )
+                            } label: {
+                                ReaderPostCard(item: item, reservesOverflowSpace: true)
+                            }
+                            .buttonStyle(.readerCard)
+
+                            reportMenu(for: item)
+                                .padding(10)
                         }
-                        .buttonStyle(.readerCard)
                     }
 
                     // Infinite-scroll sentinel
@@ -229,20 +263,25 @@ struct BrowseDocumentsView: View {
             ScrollView {
                 LazyVStack(spacing: 18) {
                     ForEach(Array(store.yours.enumerated()), id: \.element.id) { index, item in
-                        NavigationLink {
-                            ReadView(
-                                document: item.document.record,
-                                publication: item.publication?.record,
-                                documentURI: item.document.uri,
-                                documentCID: item.document.cid,
-                                authorDID: item.document.authorDID,
-                                previousItem: index > 0 ? store.yours[index - 1] : nil,
-                                nextItem: index < store.yours.count - 1 ? store.yours[index + 1] : nil
-                            )
-                        } label: {
-                            ReaderPostCard(item: item)
+                        ZStack(alignment: .topTrailing) {
+                            NavigationLink {
+                                ReadView(
+                                    document: item.document.record,
+                                    publication: item.publication?.record,
+                                    documentURI: item.document.uri,
+                                    documentCID: item.document.cid,
+                                    authorDID: item.document.authorDID,
+                                    previousItem: index > 0 ? store.yours[index - 1] : nil,
+                                    nextItem: index < store.yours.count - 1 ? store.yours[index + 1] : nil
+                                )
+                            } label: {
+                                ReaderPostCard(item: item, reservesOverflowSpace: true)
+                            }
+                            .buttonStyle(.readerCard)
+
+                            reportMenu(for: item)
+                                .padding(10)
                         }
-                        .buttonStyle(.readerCard)
                     }
                 }
                 .padding(.horizontal, 14)
@@ -250,6 +289,30 @@ struct BrowseDocumentsView: View {
             }
             .refreshable { await store.loadData(loginStateManager: loginStateManager, force: true) }
         }
+    }
+
+    private func reportMenu(for item: ReaderFeedItem) -> some View {
+        Menu {
+            Button {
+                reportTarget = FeedReportTarget(
+                    subject: item.document.uri,
+                    recordCID: item.document.cid
+                )
+            } label: {
+                Label("Report Post", systemImage: "doc.text")
+            }
+            Button {
+                reportTarget = FeedReportTarget(subject: item.document.authorDID, recordCID: nil)
+            } label: {
+                Label("Report Account", systemImage: "person")
+            }
+        } label: {
+            Image(systemName: "ellipsis")
+                .font(.body.weight(.bold))
+                .frame(width: 44, height: 44)
+                .background(.ultraThinMaterial, in: Circle())
+        }
+        .accessibilityLabel("More actions for \(item.document.record.title)")
     }
 }
 

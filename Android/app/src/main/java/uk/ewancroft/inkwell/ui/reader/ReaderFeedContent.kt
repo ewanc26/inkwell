@@ -29,6 +29,8 @@ internal fun FeedContent(
     hasMore: Boolean = false,
     onLoadMore: () -> Unit = {},
     onPostClick: (Int, PostItem) -> Unit = { _, _ -> },
+    onReportPost: (PostItem) -> Unit = {},
+    onReportAccount: (PostItem) -> Unit = {},
 ) {
     val pullToRefreshState = rememberPullToRefreshState()
     PullToRefreshBox(
@@ -87,6 +89,12 @@ internal fun FeedContent(
                     publicationTheme = post.publicationTheme,
                     publicationBasicTheme = post.publicationBasicTheme,
                     onClick = { onPostClick(index, post) },
+                    onReportPost = { onReportPost(post) },
+                    onReportAccount = if (post.authorDid.isNotBlank()) {
+                        { onReportAccount(post) }
+                    } else {
+                        null
+                    },
                 )
             }
             if (hasMore) {
