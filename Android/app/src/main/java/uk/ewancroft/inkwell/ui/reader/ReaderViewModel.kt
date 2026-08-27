@@ -44,6 +44,8 @@ import uk.ewancroft.inkwell.shared.moderation.ModerationPolicy
 import uk.ewancroft.inkwell.shared.offline.CachedOfflineRecord
 import uk.ewancroft.inkwell.shared.offline.OfflineCacheKind
 import uk.ewancroft.inkwell.shared.offline.createOfflineContentCache
+import uk.ewancroft.inkwell.ui.offline.OfflineMutationQueue
+import uk.ewancroft.inkwell.ui.offline.isNetworkAvailable
 import uk.ewancroft.inkwell.shared.verification.VerificationResult
 import uk.ewancroft.inkwell.util.ReaderPreferences
 import uk.ewancroft.inkwell.util.ModerationPreferences
@@ -101,6 +103,9 @@ data class ReaderUiState(
     val error: String? = null,
     val reportError: String? = null,
     val reportConfirmation: String? = null,
+    val pendingSyncMessage: String? = null,
+    val pendingSyncCount: Int = 0,
+    val isSyncingPendingChanges: Boolean = false,
     val selectedTab: Int = 0,
     val isVerifyingPosts: Boolean = false,
 )
@@ -129,6 +134,7 @@ class ReaderViewModel @Inject constructor(
     private val offlineContentCache = createOfflineContentCache(context.cacheDir.absolutePath)
     private var jetstreamJob: kotlinx.coroutines.Job? = null
     private val revealedPostUris = mutableSetOf<String>()
+    private var isSyncingPendingMutations = false
 
     private fun sortedByPreference(posts: List<PostItem>): List<PostItem> =
         posts.map(::withModerationState).let { moderated ->
@@ -227,6 +233,56 @@ class ReaderViewModel @Inject constructor(
     fun dismissReportConfirmation() {
         _uiState.value = _uiState.value.copy(reportConfirmation = null)
     }
+
+    /** Replays account-scoped actions saved while offline after a reconnect. */
+    fun flushPendingMutations() {
+        if (isSyncingPendingMutations || !context.isNetworkAvailable()) return
+        isSyncingPendingMutations = true
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isSyncingPendingChanges = true)
+            try {
+                val outcome = OfflineMutationQueue.flush(context, pdsRepository)
+                val message = when {
+                    outcome.completedCount > 0 && outcome.failedCount > 0 ->
+                        "Synced ${outcome.completedCount} saved ${pluralChanges(outcome.completedCount)}; ${outcome.pendingCount} still waiting."
+                    outcome.completedCount > 0 ->
+                        "Synced ${outcome.completedCount} saved ${pluralChanges(outcome.completedCount)}."
+                    outcome.failedCount > 0 ->
+                        "Some saved changes couldn’t sync yet. They’ll be retried."
+                    else -> null
+                }
+                if (message != null) {
+                    _uiState.value = _uiState.value.copy(
+                        pendingSyncMessage = message,
+                        pendingSyncCount = outcome.pendingCount,
+                    )
+                } else {
+                    _uiState.value = _uiState.value.copy(pendingSyncCount = outcome.pendingCount)
+                }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                Log.w("ReaderViewModel", "Could not replay saved offline changes", error)
+            } finally {
+                isSyncingPendingMutations = false
+                _uiState.value = _uiState.value.copy(isSyncingPendingChanges = false)
+            }
+        }
+    }
+
+    fun refreshPendingMutationCount() {
+        viewModelScope.launch {
+            val session = pdsRepository.getSession()
+            val count = session?.let { OfflineMutationQueue.pendingCount(context, it.did) } ?: 0
+            _uiState.value = _uiState.value.copy(pendingSyncCount = count)
+        }
+    }
+
+    fun dismissPendingSyncMessage() {
+        _uiState.value = _uiState.value.copy(pendingSyncMessage = null)
+    }
+
+    private fun pluralChanges(count: Int): String = if (count == 1) "change" else "changes"
 
     fun dismissError() {
         _uiState.value = _uiState.value.copy(error = null)

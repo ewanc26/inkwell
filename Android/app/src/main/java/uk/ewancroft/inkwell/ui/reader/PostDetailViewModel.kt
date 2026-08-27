@@ -51,9 +51,12 @@ import uk.ewancroft.inkwell.shared.moderation.ModerationLabel
 import uk.ewancroft.inkwell.shared.moderation.ModerationPolicy
 import uk.ewancroft.inkwell.shared.offline.CachedOfflineRecord
 import uk.ewancroft.inkwell.shared.offline.OfflineCacheKind
+import uk.ewancroft.inkwell.shared.offline.SyncMutationKind
 import uk.ewancroft.inkwell.shared.offline.createOfflineContentCache
 import uk.ewancroft.inkwell.util.ArticleStatePreferences
 import uk.ewancroft.inkwell.util.ModerationPreferences
+import uk.ewancroft.inkwell.ui.offline.OfflineMutationQueue
+import uk.ewancroft.inkwell.ui.offline.isNetworkAvailable
 import javax.inject.Inject
 
 @HiltViewModel
@@ -359,8 +362,34 @@ class PostDetailViewModel @Inject constructor(
         if (state.isTogglingRecommend || state.uri.isBlank()) return
 
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isTogglingRecommend = true, recommendError = null)
+            _uiState.value = _uiState.value.copy(
+                isTogglingRecommend = true,
+                recommendError = null,
+                pendingMutationMessage = null,
+            )
             try {
+                if (!context.isNetworkAvailable()) {
+                    val accountDid = pdsRepository.getSession()?.did
+                        ?: throw IllegalStateException("You need to sign in before saving a recommendation.")
+                    OfflineMutationQueue.enqueue(
+                        context = context,
+                        accountDid = accountDid,
+                        kind = if (state.isRecommended) SyncMutationKind.Unrecommend else SyncMutationKind.Recommend,
+                        subjectUri = state.uri,
+                    )
+                    _uiState.value = _uiState.value.copy(
+                        isRecommended = !state.isRecommended,
+                        recommendRkey = null,
+                        recommendCount = if (state.isRecommended) {
+                            (state.recommendCount - 1).coerceAtLeast(0)
+                        } else {
+                            state.recommendCount + 1
+                        },
+                        isTogglingRecommend = false,
+                        pendingMutationMessage = "Recommendation saved and will sync when you’re back online.",
+                    )
+                    return@launch
+                }
                 if (state.isRecommended) {
                     val rkey = state.recommendRkey
                         ?: throw IllegalStateException("Missing record key for existing recommend")
@@ -430,8 +459,31 @@ class PostDetailViewModel @Inject constructor(
         if (state.isTogglingSubscription || state.uri.isBlank()) return
 
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isTogglingSubscription = true, subscriptionError = null)
+            _uiState.value = _uiState.value.copy(
+                isTogglingSubscription = true,
+                subscriptionError = null,
+                pendingMutationMessage = null,
+            )
             try {
+                val publicationUri = state.publicationUri
+                    ?: throw IllegalStateException("Missing publication URI")
+                if (!context.isNetworkAvailable()) {
+                    val accountDid = pdsRepository.getSession()?.did
+                        ?: throw IllegalStateException("You need to sign in before saving a subscription.")
+                    OfflineMutationQueue.enqueue(
+                        context = context,
+                        accountDid = accountDid,
+                        kind = if (state.isSubscribed) SyncMutationKind.Unsubscribe else SyncMutationKind.Subscribe,
+                        subjectUri = publicationUri,
+                    )
+                    _uiState.value = _uiState.value.copy(
+                        isSubscribed = !state.isSubscribed,
+                        subscriptionRkey = null,
+                        isTogglingSubscription = false,
+                        pendingMutationMessage = "Subscription saved and will sync when you’re back online.",
+                    )
+                    return@launch
+                }
                 if (state.isSubscribed) {
                     val rkey = state.subscriptionRkey
                         ?: throw IllegalStateException("Missing record key for existing subscription")
@@ -442,8 +494,6 @@ class PostDetailViewModel @Inject constructor(
                         isTogglingSubscription = false,
                     )
                 } else {
-                    val publicationUri = state.publicationUri
-                        ?: throw IllegalStateException("Missing publication URI")
                     val result = pdsRepository.createSubscription(publicationUri)
                     val newUri = result["uri"]?.jsonPrimitive?.content
                     val rkey = newUri?.let { AtUri.parse(it)?.recordKey }
@@ -559,8 +609,31 @@ class PostDetailViewModel @Inject constructor(
         if (text.isEmpty() || state.uri.isBlank()) return
 
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isSubmittingComment = true, commentError = null)
+            _uiState.value = _uiState.value.copy(
+                isSubmittingComment = true,
+                commentError = null,
+                pendingMutationMessage = null,
+            )
             try {
+                if (!context.isNetworkAvailable()) {
+                    val accountDid = pdsRepository.getSession()?.did
+                        ?: throw IllegalStateException("You need to sign in before saving a comment.")
+                    OfflineMutationQueue.enqueue(
+                        context = context,
+                        accountDid = accountDid,
+                        kind = SyncMutationKind.CreateComment,
+                        subjectUri = state.uri,
+                        commentText = text,
+                        replyToUri = state.replyToComment?.uri,
+                    )
+                    _uiState.value = _uiState.value.copy(
+                        isSubmittingComment = false,
+                        newCommentText = "",
+                        replyToComment = null,
+                        pendingMutationMessage = "Comment saved and will sync when you’re back online.",
+                    )
+                    return@launch
+                }
                 pdsRepository.createComment(
                     subject = state.uri,
                     plaintext = text,
@@ -588,6 +661,10 @@ class PostDetailViewModel @Inject constructor(
 
     fun dismissCommentError() {
         _uiState.value = _uiState.value.copy(commentError = null)
+    }
+
+    fun dismissPendingMutationMessage() {
+        _uiState.value = _uiState.value.copy(pendingMutationMessage = null)
     }
 
     fun submitReport(

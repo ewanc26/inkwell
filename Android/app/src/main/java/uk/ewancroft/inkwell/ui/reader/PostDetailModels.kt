@@ -59,6 +59,9 @@ data class PostDetailUiState(
     val replyToComment: CommentEntry? = null,
     val commentError: String? = null,
 
+    /** Confirmation that a user action was saved locally for the next reconnect. */
+    val pendingMutationMessage: String? = null,
+
     val previousUri: String? = null,
     val previousTitle: String? = null,
     val nextUri: String? = null,

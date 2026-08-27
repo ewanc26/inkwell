@@ -116,6 +116,17 @@ fun ReaderScreen(
         }
     }
 
+    LaunchedEffect(isNetworkAvailable) {
+        if (isNetworkAvailable) viewModel.flushPendingMutations()
+    }
+
+    LaunchedEffect(uiState.pendingSyncMessage) {
+        uiState.pendingSyncMessage?.let { message ->
+            snackbarHostState.showSnackbar(message)
+            viewModel.dismissPendingSyncMessage()
+        }
+    }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -260,7 +271,10 @@ fun ReaderScreen(
     }
 
     LaunchedEffect(showSettings) {
-        if (showSettings) userLexiconViewModel.load()
+        if (showSettings) {
+            userLexiconViewModel.load()
+            viewModel.refreshPendingMutationCount()
+        }
     }
 
     if (showNotifications) {
@@ -281,6 +295,10 @@ fun ReaderScreen(
             userLexiconBusy = userLexiconBusy,
             onUserLexiconEnabledChange = { userLexiconViewModel.setInkwellUser(it) },
             onModerationChanged = viewModel::refreshModeration,
+            pendingSyncCount = uiState.pendingSyncCount,
+            isSyncingPendingChanges = uiState.isSyncingPendingChanges,
+            canSyncPendingChanges = isNetworkAvailable,
+            onSyncPendingChanges = viewModel::flushPendingMutations,
             onSignOut = onSignOut,
             onDismiss = {
                 showSettings = false

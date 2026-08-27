@@ -53,7 +53,8 @@ private fun Context.networkAvailability(): Flow<Boolean> = callbackFlow {
     awaitClose { connectivityManager.unregisterNetworkCallback(callback) }
 }.distinctUntilChanged()
 
-private fun Context.isNetworkAvailable(): Boolean {
+/** Lightweight point-in-time check for user actions that can be saved offline. */
+fun Context.isNetworkAvailable(): Boolean {
     val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     return connectivityManager.isNetworkAvailable()
 }

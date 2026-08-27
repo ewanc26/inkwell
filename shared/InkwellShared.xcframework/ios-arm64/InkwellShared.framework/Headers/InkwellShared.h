@@ -6,9 +6,9 @@
 #import <Foundation/NSString.h>
 #import <Foundation/NSValue.h>
 
-@class FacetConverter, InkwellSharedAtUri, InkwellSharedAtUriCompanion, InkwellSharedBasicTheme, InkwellSharedBlobRef, InkwellSharedBlockLossLabels, InkwellSharedBlueskyEmbedTypes, InkwellSharedByteSlice, InkwellSharedCachedFeedItem, InkwellSharedCachedFeedItemCompanion, InkwellSharedCachedOfflineRecord, InkwellSharedCachedOfflineRecordCompanion, InkwellSharedCdnUrls, InkwellSharedCollectionNsids, InkwellSharedColorValue, InkwellSharedConstellationBacklink, InkwellSharedConstellationPagination, InkwellSharedConstellationResponse, InkwellSharedConstellationSourcePaths, InkwellSharedContentFilterDecisionHide, InkwellSharedContentFilterDecisionShow, InkwellSharedContentFilterDecisionWarn, InkwellSharedContentFilterEngine, InkwellSharedContentFormatDetector, InkwellSharedContentFormatDispatcher, InkwellSharedDocumentLinkScanner, InkwellSharedDocumentPreferences, InkwellSharedFacetDefinition, InkwellSharedFacetSchema, InkwellSharedFeedCacheIosCompanion, InkwellSharedFeedCacheRetention, InkwellSharedFilterMatch, InkwellSharedFilterMatchKind, InkwellSharedFilterableContent, InkwellSharedHandleUtils, InkwellSharedInlineMarkdownScanner, InkwellSharedInlineSegment, InkwellSharedInlineSegmentBold, InkwellSharedInlineSegmentCode, InkwellSharedInlineSegmentItalic, InkwellSharedInlineSegmentLink, InkwellSharedInlineSegmentPlain, InkwellSharedInlineSegmentStrike, InkwellSharedJetstreamConfig, InkwellSharedJetstreamEvent, InkwellSharedJetstreamEventCompanion, InkwellSharedJetstreamPayload, InkwellSharedJetstreamPayloadCompanion, InkwellSharedJsonMapBridge, InkwellSharedKotlinArray<T>, InkwellSharedKotlinEnum<E>, InkwellSharedKotlinEnumCompanion, InkwellSharedKotlinException, InkwellSharedKotlinIllegalStateException, InkwellSharedKotlinIntIterator, InkwellSharedKotlinIntProgression, InkwellSharedKotlinIntProgressionCompanion, InkwellSharedKotlinIntRange, InkwellSharedKotlinIntRangeCompanion, InkwellSharedKotlinNothing, InkwellSharedKotlinPair<__covariant A, __covariant B>, InkwellSharedKotlinRuntimeException, InkwellSharedKotlinThrowable, InkwellSharedKotlinx_serialization_coreSerialKind, InkwellSharedKotlinx_serialization_coreSerializersModule, InkwellSharedKotlinx_serialization_jsonJsonElement, InkwellSharedKotlinx_serialization_jsonJsonElementCompanion, InkwellSharedLeafletContentConverter, InkwellSharedLeafletFacet, InkwellSharedLeafletFacetFeature, InkwellSharedLeafletTypes, InkwellSharedLegacyPalette, InkwellSharedLegalDocuments, InkwellSharedMarkdownBlock, InkwellSharedMarkdownBlockBlockquote, InkwellSharedMarkdownBlockCode, InkwellSharedMarkdownBlockHeading, InkwellSharedMarkdownBlockHorizontalRule, InkwellSharedMarkdownBlockImage, InkwellSharedMarkdownBlockMath, InkwellSharedMarkdownBlockOrderedList, InkwellSharedMarkdownBlockParagraph, InkwellSharedMarkdownBlockTaskList, InkwellSharedMarkdownBlockUnorderedList, InkwellSharedMarkdownListItem, InkwellSharedMarkdownParser, InkwellSharedMarkdownSerializer, InkwellSharedMarkpubContentConverter, InkwellSharedMarkpubTypes, InkwellSharedModerationLabel, InkwellSharedModerationLabelCompanion, InkwellSharedModerationPolicy, InkwellSharedModerationPolicyCompanion, InkwellSharedNotificationPolicy, InkwellSharedNotificationStyleNone, InkwellSharedNotificationStyleSingle, InkwellSharedNotificationStyleSummary, InkwellSharedNumberFormat, InkwellSharedOAuthScopes, InkwellSharedOfflineCacheEntry, InkwellSharedOfflineCacheEntryCompanion, InkwellSharedOfflineCacheKind, InkwellSharedOfflineCacheKindCompanion, InkwellSharedOfflineCachePolicy, InkwellSharedOfflineCachePolicyCompanion, InkwellSharedOfflineContentCacheRetention, InkwellSharedOffprintContentConverter, InkwellSharedOffprintTypes, InkwellSharedPcktContentConverter, InkwellSharedPcktTypes, InkwellSharedPublicationMatcher, InkwellSharedPublicationPreferences, InkwellSharedPublicationTheme, InkwellSharedRecordListPolicy, InkwellSharedReportReasonType, InkwellSharedReportSubjectKind, InkwellSharedReportSubmission, InkwellSharedReportSubmissionCompanion, InkwellSharedRgbColor, InkwellSharedRgbaColor, InkwellSharedSearchBackendUrl, InkwellSharedSearchResultClassifier, InkwellSharedSharedConvertResult, InkwellSharedSharedDocumentRecord, InkwellSharedSharedGraphRecommend, InkwellSharedSharedGraphSubscription, InkwellSharedSharedLeafletComment, InkwellSharedSharedLeafletCommentReplyRef, InkwellSharedSharedPublicationRecord, InkwellSharedSharedReaderTheme, InkwellSharedSharedReaderThemeCompanion, InkwellSharedSharedReaderThemeFontFamily, InkwellSharedSharedWriteResult, InkwellSharedStandardModerationLabel, InkwellSharedStringUtils, InkwellSharedStrongRef, InkwellSharedSupportersList, InkwellSharedSyncFlushResult, InkwellSharedSyncMutationKind, InkwellSharedSyncMutationKindCompanion, InkwellSharedSyncQueueEntry, InkwellSharedSyncQueueEntryCompanion, InkwellSharedTipPromptPolicy, InkwellSharedUrlUtils, InkwellSharedUserInputLexicon, InkwellSharedUserLexicon, InkwellSharedUserLexiconRecord, InkwellSharedUserLexiconUtils, InkwellSharedUtf8Offsets, InkwellSharedVerificationFailure, InkwellSharedVerificationFailureDocumentLinkMissing, InkwellSharedVerificationFailureEndpointUnreachable, InkwellSharedVerificationFailureInvalidDocumentURL, InkwellSharedVerificationFailureInvalidPublicationURL, InkwellSharedVerificationFailureMalformedResponse, InkwellSharedVerificationFailureMismatchedURI, InkwellSharedVerificationFailureUnexpected, InkwellSharedVerificationResult, InkwellSharedVerificationResultFailed, InkwellSharedVerificationResultVerified, InkwellSharedVerificationUrls, InkwellSharedXrpcEndpoints, RichTextFacet, RichTextFeature;
+@class FacetConverter, InkwellSharedAtUri, InkwellSharedAtUriCompanion, InkwellSharedBasicTheme, InkwellSharedBlobRef, InkwellSharedBlockLossLabels, InkwellSharedBlueskyEmbedTypes, InkwellSharedByteSlice, InkwellSharedCachedFeedItem, InkwellSharedCachedFeedItemCompanion, InkwellSharedCachedOfflineRecord, InkwellSharedCachedOfflineRecordCompanion, InkwellSharedCdnUrls, InkwellSharedCollectionNsids, InkwellSharedColorValue, InkwellSharedConstellationBacklink, InkwellSharedConstellationPagination, InkwellSharedConstellationResponse, InkwellSharedConstellationSourcePaths, InkwellSharedContentFilterDecisionHide, InkwellSharedContentFilterDecisionShow, InkwellSharedContentFilterDecisionWarn, InkwellSharedContentFilterEngine, InkwellSharedContentFormatDetector, InkwellSharedContentFormatDispatcher, InkwellSharedDocumentLinkScanner, InkwellSharedDocumentPreferences, InkwellSharedFacetDefinition, InkwellSharedFacetSchema, InkwellSharedFeedCacheIosCompanion, InkwellSharedFeedCacheRetention, InkwellSharedFilterMatch, InkwellSharedFilterMatchKind, InkwellSharedFilterableContent, InkwellSharedHandleUtils, InkwellSharedInlineMarkdownScanner, InkwellSharedInlineSegment, InkwellSharedInlineSegmentBold, InkwellSharedInlineSegmentCode, InkwellSharedInlineSegmentItalic, InkwellSharedInlineSegmentLink, InkwellSharedInlineSegmentPlain, InkwellSharedInlineSegmentStrike, InkwellSharedJetstreamConfig, InkwellSharedJetstreamEvent, InkwellSharedJetstreamEventCompanion, InkwellSharedJetstreamPayload, InkwellSharedJetstreamPayloadCompanion, InkwellSharedJsonMapBridge, InkwellSharedKotlinArray<T>, InkwellSharedKotlinEnum<E>, InkwellSharedKotlinEnumCompanion, InkwellSharedKotlinException, InkwellSharedKotlinIllegalStateException, InkwellSharedKotlinIntIterator, InkwellSharedKotlinIntProgression, InkwellSharedKotlinIntProgressionCompanion, InkwellSharedKotlinIntRange, InkwellSharedKotlinIntRangeCompanion, InkwellSharedKotlinNothing, InkwellSharedKotlinPair<__covariant A, __covariant B>, InkwellSharedKotlinRuntimeException, InkwellSharedKotlinThrowable, InkwellSharedKotlinx_serialization_coreSerialKind, InkwellSharedKotlinx_serialization_coreSerializersModule, InkwellSharedKotlinx_serialization_jsonJsonElement, InkwellSharedKotlinx_serialization_jsonJsonElementCompanion, InkwellSharedLeafletContentConverter, InkwellSharedLeafletFacet, InkwellSharedLeafletFacetFeature, InkwellSharedLeafletTypes, InkwellSharedLegacyPalette, InkwellSharedLegalDocuments, InkwellSharedMarkdownBlock, InkwellSharedMarkdownBlockBlockquote, InkwellSharedMarkdownBlockCode, InkwellSharedMarkdownBlockHeading, InkwellSharedMarkdownBlockHorizontalRule, InkwellSharedMarkdownBlockImage, InkwellSharedMarkdownBlockMath, InkwellSharedMarkdownBlockOrderedList, InkwellSharedMarkdownBlockParagraph, InkwellSharedMarkdownBlockTaskList, InkwellSharedMarkdownBlockUnorderedList, InkwellSharedMarkdownListItem, InkwellSharedMarkdownParser, InkwellSharedMarkdownSerializer, InkwellSharedMarkpubContentConverter, InkwellSharedMarkpubTypes, InkwellSharedModerationLabel, InkwellSharedModerationLabelCompanion, InkwellSharedModerationPolicy, InkwellSharedModerationPolicyCompanion, InkwellSharedNotificationPolicy, InkwellSharedNotificationStyleNone, InkwellSharedNotificationStyleSingle, InkwellSharedNotificationStyleSummary, InkwellSharedNumberFormat, InkwellSharedOAuthScopes, InkwellSharedOfflineCacheEntry, InkwellSharedOfflineCacheEntryCompanion, InkwellSharedOfflineCacheKind, InkwellSharedOfflineCacheKindCompanion, InkwellSharedOfflineCachePolicy, InkwellSharedOfflineCachePolicyCompanion, InkwellSharedOfflineContentCacheRetention, InkwellSharedOfflineSyncQueueRetention, InkwellSharedOffprintContentConverter, InkwellSharedOffprintTypes, InkwellSharedPcktContentConverter, InkwellSharedPcktTypes, InkwellSharedPublicationMatcher, InkwellSharedPublicationPreferences, InkwellSharedPublicationTheme, InkwellSharedRecordListPolicy, InkwellSharedReportReasonType, InkwellSharedReportSubjectKind, InkwellSharedReportSubmission, InkwellSharedReportSubmissionCompanion, InkwellSharedRgbColor, InkwellSharedRgbaColor, InkwellSharedSearchBackendUrl, InkwellSharedSearchResultClassifier, InkwellSharedSharedConvertResult, InkwellSharedSharedDocumentRecord, InkwellSharedSharedGraphRecommend, InkwellSharedSharedGraphSubscription, InkwellSharedSharedLeafletComment, InkwellSharedSharedLeafletCommentReplyRef, InkwellSharedSharedPublicationRecord, InkwellSharedSharedReaderTheme, InkwellSharedSharedReaderThemeCompanion, InkwellSharedSharedReaderThemeFontFamily, InkwellSharedSharedWriteResult, InkwellSharedStandardModerationLabel, InkwellSharedStringUtils, InkwellSharedStrongRef, InkwellSharedSupportersList, InkwellSharedSyncMutationKind, InkwellSharedSyncMutationKindCompanion, InkwellSharedSyncQueueEntry, InkwellSharedSyncQueueEntryCompanion, InkwellSharedTipPromptPolicy, InkwellSharedUrlUtils, InkwellSharedUserInputLexicon, InkwellSharedUserLexicon, InkwellSharedUserLexiconRecord, InkwellSharedUserLexiconUtils, InkwellSharedUtf8Offsets, InkwellSharedVerificationFailure, InkwellSharedVerificationFailureDocumentLinkMissing, InkwellSharedVerificationFailureEndpointUnreachable, InkwellSharedVerificationFailureInvalidDocumentURL, InkwellSharedVerificationFailureInvalidPublicationURL, InkwellSharedVerificationFailureMalformedResponse, InkwellSharedVerificationFailureMismatchedURI, InkwellSharedVerificationFailureUnexpected, InkwellSharedVerificationResult, InkwellSharedVerificationResultFailed, InkwellSharedVerificationResultVerified, InkwellSharedVerificationUrls, InkwellSharedXrpcEndpoints, RichTextFacet, RichTextFeature;
 
-@protocol InkwellSharedContentFilterDecision, InkwellSharedFeedCache, InkwellSharedJetstreamClient, InkwellSharedKotlinAnnotation, InkwellSharedKotlinClosedRange, InkwellSharedKotlinComparable, InkwellSharedKotlinFunction, InkwellSharedKotlinIterable, InkwellSharedKotlinIterator, InkwellSharedKotlinKAnnotatedElement, InkwellSharedKotlinKClass, InkwellSharedKotlinKClassifier, InkwellSharedKotlinKDeclarationContainer, InkwellSharedKotlinOpenEndRange, InkwellSharedKotlinSuspendFunction2, InkwellSharedKotlinx_coroutines_coreFlow, InkwellSharedKotlinx_coroutines_coreFlowCollector, InkwellSharedKotlinx_serialization_coreCompositeDecoder, InkwellSharedKotlinx_serialization_coreCompositeEncoder, InkwellSharedKotlinx_serialization_coreDecoder, InkwellSharedKotlinx_serialization_coreDeserializationStrategy, InkwellSharedKotlinx_serialization_coreEncoder, InkwellSharedKotlinx_serialization_coreKSerializer, InkwellSharedKotlinx_serialization_coreSerialDescriptor, InkwellSharedKotlinx_serialization_coreSerializationStrategy, InkwellSharedKotlinx_serialization_coreSerializersModuleCollector, InkwellSharedNotificationStyle, InkwellSharedOfflineContentCache;
+@protocol InkwellSharedContentFilterDecision, InkwellSharedFeedCache, InkwellSharedJetstreamClient, InkwellSharedKotlinAnnotation, InkwellSharedKotlinClosedRange, InkwellSharedKotlinComparable, InkwellSharedKotlinFunction, InkwellSharedKotlinIterable, InkwellSharedKotlinIterator, InkwellSharedKotlinKAnnotatedElement, InkwellSharedKotlinKClass, InkwellSharedKotlinKClassifier, InkwellSharedKotlinKDeclarationContainer, InkwellSharedKotlinOpenEndRange, InkwellSharedKotlinSuspendFunction2, InkwellSharedKotlinx_coroutines_coreFlow, InkwellSharedKotlinx_coroutines_coreFlowCollector, InkwellSharedKotlinx_serialization_coreCompositeDecoder, InkwellSharedKotlinx_serialization_coreCompositeEncoder, InkwellSharedKotlinx_serialization_coreDecoder, InkwellSharedKotlinx_serialization_coreDeserializationStrategy, InkwellSharedKotlinx_serialization_coreEncoder, InkwellSharedKotlinx_serialization_coreKSerializer, InkwellSharedKotlinx_serialization_coreSerialDescriptor, InkwellSharedKotlinx_serialization_coreSerializationStrategy, InkwellSharedKotlinx_serialization_coreSerializersModuleCollector, InkwellSharedNotificationStyle, InkwellSharedOfflineContentCache, InkwellSharedOfflineSyncQueue;
 
 NS_ASSUME_NONNULL_BEGIN
 #pragma clang diagnostic push
@@ -3710,39 +3710,45 @@ __attribute__((swift_name("OfflineSyncQueue")))
 @end
 
 
-/**
- * Platform implementations call their authenticated mutation paths from this
- * contract when connectivity returns. The shared model remains transport-free.
- */
-__attribute__((swift_name("SyncEngine")))
-@protocol InkwellSharedSyncEngine
-@required
+/** iOS JSON-file implementation of the pending mutation queue. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfflineSyncQueueIos")))
+@interface InkwellSharedOfflineSyncQueueIos : InkwellSharedBase <InkwellSharedOfflineSyncQueue>
+- (instancetype)initWithCacheDirPath:(NSString *)cacheDirPath __attribute__((swift_name("init(cacheDirPath:)"))) __attribute__((objc_designated_initializer));
 
 /**
  * @note This method converts instances of CancellationException to errors.
  * Other uncaught Kotlin exceptions are fatal.
 */
-- (void)flushWithCompletionHandler:(void (^)(InkwellSharedSyncFlushResult * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("flush(completionHandler:)")));
+- (void)enqueueEntry:(InkwellSharedSyncQueueEntry *)entry completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("enqueue(entry:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)loadWithCompletionHandler:(void (^)(NSArray<InkwellSharedSyncQueueEntry *> * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("load(completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)removeIds:(NSSet<NSString *> *)ids completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("remove(ids:completionHandler:)")));
 @end
 
 
-/** Result returned after a platform transport attempts to replay queued work. */
+/** Bounded retention for locally pending, user-initiated mutations. */
 __attribute__((objc_subclassing_restricted))
-__attribute__((swift_name("SyncFlushResult")))
-@interface InkwellSharedSyncFlushResult : InkwellSharedBase
-- (instancetype)initWithCompletedIds:(NSSet<NSString *> *)completedIds failedIds:(NSSet<NSString *> *)failedIds __attribute__((swift_name("init(completedIds:failedIds:)"))) __attribute__((objc_designated_initializer));
-- (InkwellSharedSyncFlushResult *)doCopyCompletedIds:(NSSet<NSString *> *)completedIds failedIds:(NSSet<NSString *> *)failedIds __attribute__((swift_name("doCopy(completedIds:failedIds:)")));
+__attribute__((swift_name("OfflineSyncQueueRetention")))
+@interface InkwellSharedOfflineSyncQueueRetention : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
 
-/** Result returned after a platform transport attempts to replay queued work. */
-- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
-
-/** Result returned after a platform transport attempts to replay queued work. */
-- (NSUInteger)hash __attribute__((swift_name("hash()")));
-
-/** Result returned after a platform transport attempts to replay queued work. */
-- (NSString *)description __attribute__((swift_name("description()")));
-@property (readonly) NSSet<NSString *> *completedIds __attribute__((swift_name("completedIds")));
-@property (readonly) NSSet<NSString *> *failedIds __attribute__((swift_name("failedIds")));
+/** Bounded retention for locally pending, user-initiated mutations. */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)offlineSyncQueueRetention __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedOfflineSyncQueueRetention *shared __attribute__((swift_name("shared")));
+- (NSArray<InkwellSharedSyncQueueEntry *> *)retainEntries:(id)entries nowMillis:(int64_t)nowMillis __attribute__((swift_name("retain(entries:nowMillis:)")));
+@property (readonly) int64_t maxAgeMillis __attribute__((swift_name("maxAgeMillis")));
+@property (readonly) int32_t maxEntries __attribute__((swift_name("maxEntries")));
 @end
 
 
@@ -3791,8 +3797,9 @@ __attribute__((swift_name("SyncMutationKind.Companion")))
 
 /**
  * Platform queues persist these entries; platform API clients execute them
- * after reconnecting. Comment text is deliberately explicit rather than an
- * opaque JSON payload so it can be validated before it is stored.
+ * after reconnecting. The owning account, comment text, and reply target are
+ * deliberately explicit rather than an opaque JSON payload so each can be
+ * validated before it is stored.
  *
  * @note annotations
  *   kotlinx.serialization.Serializable
@@ -3800,42 +3807,48 @@ __attribute__((swift_name("SyncMutationKind.Companion")))
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("SyncQueueEntry")))
 @interface InkwellSharedSyncQueueEntry : InkwellSharedBase
-- (instancetype)initWithId:(NSString *)id kind:(InkwellSharedSyncMutationKind *)kind subjectUri:(NSString *)subjectUri createdAtMillis:(int64_t)createdAtMillis commentText:(NSString * _Nullable)commentText __attribute__((swift_name("init(id:kind:subjectUri:createdAtMillis:commentText:)"))) __attribute__((objc_designated_initializer));
+- (instancetype)initWithId:(NSString *)id accountDid:(NSString *)accountDid kind:(InkwellSharedSyncMutationKind *)kind subjectUri:(NSString *)subjectUri createdAtMillis:(int64_t)createdAtMillis commentText:(NSString * _Nullable)commentText replyToUri:(NSString * _Nullable)replyToUri __attribute__((swift_name("init(id:accountDid:kind:subjectUri:createdAtMillis:commentText:replyToUri:)"))) __attribute__((objc_designated_initializer));
 @property (class, readonly, getter=companion) InkwellSharedSyncQueueEntryCompanion *companion __attribute__((swift_name("companion")));
-- (InkwellSharedSyncQueueEntry *)doCopyId:(NSString *)id kind:(InkwellSharedSyncMutationKind *)kind subjectUri:(NSString *)subjectUri createdAtMillis:(int64_t)createdAtMillis commentText:(NSString * _Nullable)commentText __attribute__((swift_name("doCopy(id:kind:subjectUri:createdAtMillis:commentText:)")));
+- (InkwellSharedSyncQueueEntry *)doCopyId:(NSString *)id accountDid:(NSString *)accountDid kind:(InkwellSharedSyncMutationKind *)kind subjectUri:(NSString *)subjectUri createdAtMillis:(int64_t)createdAtMillis commentText:(NSString * _Nullable)commentText replyToUri:(NSString * _Nullable)replyToUri __attribute__((swift_name("doCopy(id:accountDid:kind:subjectUri:createdAtMillis:commentText:replyToUri:)")));
 
 /**
  * Platform queues persist these entries; platform API clients execute them
- * after reconnecting. Comment text is deliberately explicit rather than an
- * opaque JSON payload so it can be validated before it is stored.
+ * after reconnecting. The owning account, comment text, and reply target are
+ * deliberately explicit rather than an opaque JSON payload so each can be
+ * validated before it is stored.
  */
 - (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
 
 /**
  * Platform queues persist these entries; platform API clients execute them
- * after reconnecting. Comment text is deliberately explicit rather than an
- * opaque JSON payload so it can be validated before it is stored.
+ * after reconnecting. The owning account, comment text, and reply target are
+ * deliberately explicit rather than an opaque JSON payload so each can be
+ * validated before it is stored.
  */
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 
 /**
  * Platform queues persist these entries; platform API clients execute them
- * after reconnecting. Comment text is deliberately explicit rather than an
- * opaque JSON payload so it can be validated before it is stored.
+ * after reconnecting. The owning account, comment text, and reply target are
+ * deliberately explicit rather than an opaque JSON payload so each can be
+ * validated before it is stored.
  */
 - (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString *accountDid __attribute__((swift_name("accountDid")));
 @property (readonly) NSString * _Nullable commentText __attribute__((swift_name("commentText")));
 @property (readonly) int64_t createdAtMillis __attribute__((swift_name("createdAtMillis")));
 @property (readonly) NSString *id __attribute__((swift_name("id")));
 @property (readonly) InkwellSharedSyncMutationKind *kind __attribute__((swift_name("kind")));
+@property (readonly) NSString * _Nullable replyToUri __attribute__((swift_name("replyToUri")));
 @property (readonly) NSString *subjectUri __attribute__((swift_name("subjectUri")));
 @end
 
 
 /**
  * Platform queues persist these entries; platform API clients execute them
- * after reconnecting. Comment text is deliberately explicit rather than an
- * opaque JSON payload so it can be validated before it is stored.
+ * after reconnecting. The owning account, comment text, and reply target are
+ * deliberately explicit rather than an opaque JSON payload so each can be
+ * validated before it is stored.
  */
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("SyncQueueEntry.Companion")))
@@ -3844,8 +3857,9 @@ __attribute__((swift_name("SyncQueueEntry.Companion")))
 
 /**
  * Platform queues persist these entries; platform API clients execute them
- * after reconnecting. Comment text is deliberately explicit rather than an
- * opaque JSON payload so it can be validated before it is stored.
+ * after reconnecting. The owning account, comment text, and reply target are
+ * deliberately explicit rather than an opaque JSON payload so each can be
+ * validated before it is stored.
  */
 + (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
 + (instancetype)companion __attribute__((swift_name("init()")));
@@ -3853,8 +3867,9 @@ __attribute__((swift_name("SyncQueueEntry.Companion")))
 
 /**
  * Platform queues persist these entries; platform API clients execute them
- * after reconnecting. Comment text is deliberately explicit rather than an
- * opaque JSON payload so it can be validated before it is stored.
+ * after reconnecting. The owning account, comment text, and reply target are
+ * deliberately explicit rather than an opaque JSON payload so each can be
+ * validated before it is stored.
  */
 - (id<InkwellSharedKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
@@ -4515,6 +4530,12 @@ __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("CreateOfflineContentCache_iosKt")))
 @interface InkwellSharedCreateOfflineContentCache_iosKt : InkwellSharedBase
 + (id<InkwellSharedOfflineContentCache>)createOfflineContentCacheCacheDirPath:(NSString *)cacheDirPath __attribute__((swift_name("createOfflineContentCache(cacheDirPath:)")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("CreateOfflineSyncQueue_iosKt")))
+@interface InkwellSharedCreateOfflineSyncQueue_iosKt : InkwellSharedBase
++ (id<InkwellSharedOfflineSyncQueue>)createOfflineSyncQueueCacheDirPath:(NSString *)cacheDirPath __attribute__((swift_name("createOfflineSyncQueue(cacheDirPath:)")));
 @end
 
 __attribute__((swift_name("Kotlinx_serialization_coreSerializationStrategy")))

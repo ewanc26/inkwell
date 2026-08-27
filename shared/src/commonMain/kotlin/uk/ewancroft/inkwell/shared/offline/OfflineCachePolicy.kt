@@ -91,25 +91,30 @@ enum class SyncMutationKind {
 
 /**
  * Platform queues persist these entries; platform API clients execute them
- * after reconnecting. Comment text is deliberately explicit rather than an
- * opaque JSON payload so it can be validated before it is stored.
+ * after reconnecting. The owning account, comment text, and reply target are
+ * deliberately explicit rather than an opaque JSON payload so each can be
+ * validated before it is stored.
  */
 @Serializable
 data class SyncQueueEntry(
     val id: String,
+    val accountDid: String,
     val kind: SyncMutationKind,
     val subjectUri: String,
     val createdAtMillis: Long,
     val commentText: String? = null,
+    val replyToUri: String? = null,
 ) {
     init {
         require(id.isNotBlank()) { "A queued mutation needs an identifier." }
+        require(accountDid.isNotBlank()) { "A queued mutation needs an owning account." }
         require(subjectUri.isNotBlank()) { "A queued mutation needs a subject." }
         require(createdAtMillis >= 0) { "A queued mutation timestamp cannot be negative." }
         if (kind == SyncMutationKind.CreateComment) {
             require(!commentText.isNullOrBlank()) { "A queued comment needs text." }
         } else {
             require(commentText == null) { "Only queued comments may include text." }
+            require(replyToUri == null) { "Only queued comments may include a reply target." }
         }
     }
 }
@@ -129,22 +134,19 @@ interface OfflineSyncQueue {
     suspend fun remove(ids: Set<String>)
 }
 
-/** Result returned after a platform transport attempts to replay queued work. */
-data class SyncFlushResult(
-    val completedIds: Set<String>,
-    val failedIds: Set<String>,
-) {
-    init {
-        require(completedIds.intersect(failedIds).isEmpty()) {
-            "A sync entry cannot both succeed and fail."
-        }
-    }
-}
+/** Bounded retention for locally pending, user-initiated mutations. */
+object OfflineSyncQueueRetention {
+    const val maxEntries: Int = 500
+    const val maxAgeMillis: Long = 30L * 24 * 60 * 60 * 1_000
 
-/**
- * Platform implementations call their authenticated mutation paths from this
- * contract when connectivity returns. The shared model remains transport-free.
- */
-interface SyncEngine {
-    suspend fun flush(): SyncFlushResult
+    fun retain(entries: Collection<SyncQueueEntry>, nowMillis: Long): List<SyncQueueEntry> {
+        val latestById = linkedMapOf<String, SyncQueueEntry>()
+        entries.forEach { latestById[it.id] = it }
+        return latestById.values
+            .asSequence()
+            .filter { nowMillis - it.createdAtMillis < maxAgeMillis }
+            .sortedWith(compareBy<SyncQueueEntry> { it.createdAtMillis }.thenBy { it.id })
+            .toList()
+            .takeLast(maxEntries)
+    }
 }

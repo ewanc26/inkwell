@@ -14,6 +14,7 @@ import UIKit
 
 struct SettingsView: View {
     @Environment(LoginStateManager.self) private var loginStateManager
+    @Environment(ConnectivityMonitor.self) private var connectivityMonitor
     @Environment(\.dismiss) private var dismiss
 
     @State private var notificationManager = NotificationManager.shared
@@ -36,6 +37,7 @@ struct SettingsView: View {
     @State private var readerSort = ReaderSortSettings.shared
 
     @State private var cacheSizeBytes = URLCache.shared.currentDiskUsage
+    @State private var offlineMutationStore = OfflineMutationStore.shared
 
     @State private var articleState = ArticleStateStore.shared
     @State private var exportFileURL: URL?
@@ -197,7 +199,28 @@ struct SettingsView: View {
                 } header: {
                     Text("Storage")
                 } footer: {
-                    Text("Removes downloaded images, saved feed cards, and full documents and publications available for offline reading.")
+                    Text("Removes downloaded images, saved feed cards, and full documents and publications available for offline reading. Saved changes waiting to sync are kept.")
+                }
+
+                Section {
+                    LabeledContent(
+                        "Saved changes",
+                        value: offlineMutationStore.pendingCount == 1
+                            ? "1 waiting to sync"
+                            : "\(offlineMutationStore.pendingCount) waiting to sync"
+                    )
+                    if offlineMutationStore.pendingCount > 0 {
+                        Button("Sync Saved Changes Now") {
+                            Task {
+                                _ = await offlineMutationStore.flush(loginStateManager: loginStateManager)
+                            }
+                        }
+                        .disabled(!connectivityMonitor.isOnline || offlineMutationStore.isSyncing)
+                    }
+                } header: {
+                    Text("Pending Changes")
+                } footer: {
+                    Text("Recommendations, subscriptions, and comments saved while offline sync automatically when you reconnect. They stay attached to the account that made them.")
                 }
 
                 Section {
@@ -231,6 +254,9 @@ struct SettingsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 accentColor = customisation.accentColorHex.flatMap(Color.init(hex:))
+            }
+            .task(id: loginStateManager.currentDID) {
+                await offlineMutationStore.refresh(accountDID: loginStateManager.currentDID)
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -299,6 +325,7 @@ struct SettingsView: View {
 #Preview {
     SettingsView()
         .environment(LoginStateManager())
+        .environment(ConnectivityMonitor())
 }
 
 private extension Color {
