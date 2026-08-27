@@ -1,7 +1,10 @@
 package uk.ewancroft.inkwell.shared.feed
 
 import uk.ewancroft.inkwell.shared.jetstream.JetstreamPayload
+import uk.ewancroft.inkwell.shared.moderation.ModerationLabel
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.contentOrNull
 
@@ -30,6 +33,7 @@ fun JetstreamPayload.toCachedFeedItem(): CachedFeedItem? {
         description = record["description"]?.jsonPrimitive?.contentOrNull,
         textContent = record["textContent"]?.jsonPrimitive?.contentOrNull,
         coverImageUrl = extractCoverImageUrl(record),
+        moderationLabels = extractModerationLabels(record),
         cachedAt = currentTimeMillis()
     )
 }
@@ -47,3 +51,15 @@ private fun extractCoverImageUrl(record: JsonObject): String? {
     // For now, return the CID and let the caller construct the URL.
     return ref
 }
+
+private fun extractModerationLabels(record: JsonObject): List<ModerationLabel> =
+    record["labels"]?.jsonObject?.get("values")?.jsonArray
+        ?.mapNotNull { label ->
+            label.jsonObject["val"]?.jsonPrimitive?.contentOrNull?.let { value ->
+                ModerationLabel(
+                    value = value,
+                    source = label.jsonObject["src"]?.jsonPrimitive?.contentOrNull,
+                )
+            }
+        }
+        .orEmpty()

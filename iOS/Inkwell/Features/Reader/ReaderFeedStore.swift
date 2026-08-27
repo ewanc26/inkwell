@@ -561,22 +561,30 @@ final class ReaderFeedStore {
     }
 }
 
+struct ReaderModerationLabel: Hashable, Sendable {
+    let value: String
+    let source: String?
+}
+
 struct ReaderFeedItem: Identifiable {
     let document: DocumentEntry
     let publication: PublicationEntry?
     let authorProfile: BSkyActorProfile?
     let isCached: Bool
+    let cachedModerationLabels: [ReaderModerationLabel]
 
     nonisolated init(
         document: DocumentEntry,
         publication: PublicationEntry?,
         authorProfile: BSkyActorProfile?,
-        isCached: Bool = false
+        isCached: Bool = false,
+        cachedModerationLabels: [ReaderModerationLabel] = []
     ) {
         self.document = document
         self.publication = publication
         self.authorProfile = authorProfile
         self.isCached = isCached
+        self.cachedModerationLabels = cachedModerationLabels
     }
 
     var id: String { document.uri }
@@ -587,8 +595,11 @@ struct ReaderFeedItem: Identifiable {
             title: document.record.title,
             description: document.record.description,
             textContent: document.record.textContent,
-            labels: (document.record.labels?.values.map(\.value) ?? []) +
-                (publication?.record.labels?.values.map(\.value) ?? [])
+            labels: cachedModerationLabels.map {
+                ModerationLabel(value: $0.value, source: $0.source)
+            } +
+                (document.record.labels?.values.map { ModerationLabel(value: $0.value, source: nil) } ?? []) +
+                (publication?.record.labels?.values.map { ModerationLabel(value: $0.value, source: nil) } ?? [])
         )
     }
 

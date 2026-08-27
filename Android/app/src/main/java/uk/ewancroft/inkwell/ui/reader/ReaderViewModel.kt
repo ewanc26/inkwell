@@ -640,7 +640,7 @@ class ReaderViewModel @Inject constructor(
             authorAvatar = authorAvatar,
             isCached = isCached,
             textContent = textContent,
-            moderationLabels = emptyList(),
+            moderationLabels = moderationLabels,
         )
     }
 
@@ -660,6 +660,7 @@ class ReaderViewModel @Inject constructor(
             publicationUrl = null,
             authorDisplayName = authorDisplayName,
             authorAvatar = authorAvatar,
+            moderationLabels = moderationLabels,
             cachedAt = System.currentTimeMillis(),
         )
     }

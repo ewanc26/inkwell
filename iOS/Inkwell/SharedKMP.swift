@@ -54,6 +54,33 @@ func contentModerationPresentation(
 }
 
 @MainActor
+func contentModerationPresentation(
+    title: String?,
+    description: String?,
+    textContent: String?,
+    labels: [ModerationLabel],
+    settings: ModerationSettings? = nil
+) -> ContentModerationPresentation {
+    let settings = settings ?? ModerationSettings.shared
+    let content = FilterableContent(
+        title: title,
+        description: description,
+        textContent: textContent,
+        labels: labels
+    )
+    let policy = ModerationPolicy(
+        hiddenLabels: settings.hiddenLabels,
+        warningLabels: settings.warningLabels,
+        disabledLabelers: settings.disabledLabelers,
+        hiddenKeywords: settings.hiddenKeywords
+    )
+    let decision = ContentFilterEngine.shared.evaluate(content: content, policy: policy)
+    if decision is ContentFilterDecisionHide { return .hidden }
+    if decision is ContentFilterDecisionWarn { return .warning }
+    return .visible
+}
+
+@MainActor
 func shouldHideContent(
     title: String?,
     description: String?,
