@@ -1,6 +1,7 @@
 package uk.ewancroft.inkwell.shared.feed
 
 import kotlinx.serialization.Serializable
+import uk.ewancroft.inkwell.shared.moderation.ModerationLabel
 
 /**
  * A feed item persisted in the local cache.
@@ -39,6 +40,8 @@ data class CachedFeedItem(
     val authorDisplayName: String? = null,
     /** Snapshot of the author's avatar URL. */
     val authorAvatar: String? = null,
+    /** Document and publication labels, including a labeler source when known. */
+    val moderationLabels: List<ModerationLabel> = emptyList(),
     /** Epoch-millis timestamp of when this item was written to cache. */
     val cachedAt: Long = 0
 )

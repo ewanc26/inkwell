@@ -2,6 +2,9 @@ package uk.ewancroft.inkwell.shared.feed
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import uk.ewancroft.inkwell.shared.moderation.ModerationLabel
 import uk.ewancroft.inkwell.shared.offline.OfflineCachePolicy
 
 class FeedCacheRetentionTest {
@@ -28,6 +31,17 @@ class FeedCacheRetentionTest {
 
         assertEquals(1, retained.size)
         assertEquals("new", retained.single().title)
+    }
+
+    @Test
+    fun `cached feed items retain label values and labeler sources`() {
+        val original = item("labelled", 1).copy(
+            moderationLabels = listOf(ModerationLabel(value = "gore", source = "did:plc:labeler")),
+        )
+
+        val restored = Json.decodeFromString<CachedFeedItem>(Json.encodeToString(original))
+
+        assertEquals(original.moderationLabels, restored.moderationLabels)
     }
 
     private fun item(uri: String, cachedAt: Long, title: String = uri) = CachedFeedItem(

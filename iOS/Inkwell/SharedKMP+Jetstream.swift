@@ -91,7 +91,10 @@ extension CachedFeedItem {
             document: docEntry,
             publication: publication,
             authorProfile: profile,
-            isCached: isCached
+            isCached: isCached,
+            cachedModerationLabels: moderationLabels.map {
+                ReaderModerationLabel(value: $0.value, source: $0.source)
+            }
         )
     }
 }
@@ -114,6 +117,11 @@ extension ReaderFeedItem {
             publicationUrl: publication?.record.url,
             authorDisplayName: authorProfile?.displayName,
             authorAvatar: authorProfile?.avatar,
+            moderationLabels: cachedModerationLabels.map {
+                ModerationLabel(value: $0.value, source: $0.source)
+            } +
+                (document.record.labels?.values.map { ModerationLabel(value: $0.value, source: nil) } ?? []) +
+                (publication?.record.labels?.values.map { ModerationLabel(value: $0.value, source: nil) } ?? []),
             cachedAt: Int64(Date().timeIntervalSince1970 * 1000)
         )
     }
