@@ -541,7 +541,9 @@ final class ReaderFeedStore {
                 entries[item.id] = item
             }
         }
-        return entries.values.sorted(by: ReaderFeedItem.comparator(for: ReaderSortSettings.shared.sortOrder))
+        return entries.values
+            .filter { !$0.isHiddenByModeration }
+            .sorted(by: ReaderFeedItem.comparator(for: ReaderSortSettings.shared.sortOrder))
     }
 }
 
@@ -564,6 +566,16 @@ struct ReaderFeedItem: Identifiable {
     }
 
     var id: String { document.uri }
+
+    var isHiddenByModeration: Bool {
+        shouldHideContent(
+            title: document.record.title,
+            description: document.record.description,
+            textContent: document.record.textContent,
+            labels: (document.record.labels?.values.map(\.value) ?? []) +
+                (publication?.record.labels?.values.map(\.value) ?? [])
+        )
+    }
 
     nonisolated static func newestFirst(_ lhs: Self, _ rhs: Self) -> Bool {
         lhs.document.record.publishedAt > rhs.document.record.publishedAt

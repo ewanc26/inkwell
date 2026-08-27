@@ -36,8 +36,14 @@ import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 import uk.ewancroft.inkwell.shared.jetstream.JetstreamConfig
 import uk.ewancroft.inkwell.shared.jetstream.createJetstreamClient
 import uk.ewancroft.inkwell.shared.moderation.ReportReasonType
+import uk.ewancroft.inkwell.shared.moderation.ContentFilterDecision
+import uk.ewancroft.inkwell.shared.moderation.ContentFilterEngine
+import uk.ewancroft.inkwell.shared.moderation.FilterableContent
+import uk.ewancroft.inkwell.shared.moderation.ModerationLabel
+import uk.ewancroft.inkwell.shared.moderation.ModerationPolicy
 import uk.ewancroft.inkwell.shared.verification.VerificationResult
 import uk.ewancroft.inkwell.util.ReaderPreferences
+import uk.ewancroft.inkwell.util.ModerationPreferences
 import uk.ewancroft.inkwell.util.formatPublishedDate
 import javax.inject.Inject
 
@@ -68,6 +74,7 @@ data class PostItem(
     val publicationTheme: uk.ewancroft.inkwell.data.model.atproto.PublicationTheme? = null,
     val publicationBasicTheme: uk.ewancroft.inkwell.data.model.atproto.BasicTheme? = null,
     val isCached: Boolean = false,
+    val moderationLabels: List<String> = emptyList(),
 ) {
     val date: String get() = publishedAt.formatPublishedDate()
 }
@@ -110,10 +117,27 @@ class ReaderViewModel @Inject constructor(
     private var jetstreamJob: kotlinx.coroutines.Job? = null
 
     private fun sortedByPreference(posts: List<PostItem>): List<PostItem> =
+        posts.filterNot(::isHiddenByModeration).let { visible ->
         when (ReaderPreferences.getSortOrder(context)) {
-            ReaderPreferences.SortOrder.NEWEST_FIRST -> posts.sortedByDescending { it.publishedAt }
-            ReaderPreferences.SortOrder.OLDEST_FIRST -> posts.sortedBy { it.publishedAt }
+            ReaderPreferences.SortOrder.NEWEST_FIRST -> visible.sortedByDescending { it.publishedAt }
+            ReaderPreferences.SortOrder.OLDEST_FIRST -> visible.sortedBy { it.publishedAt }
         }
+        }
+
+    private fun isHiddenByModeration(post: PostItem): Boolean {
+        val decision = ContentFilterEngine.evaluate(
+            FilterableContent(
+                title = post.title,
+                description = post.description,
+                labels = post.moderationLabels.map { ModerationLabel(it) },
+            ),
+            ModerationPolicy(
+                hiddenLabels = ModerationPreferences.hiddenLabels(context),
+                hiddenKeywords = ModerationPreferences.hiddenKeywords(context),
+            ),
+        )
+        return decision is ContentFilterDecision.Hide
+    }
 
     init {
         loadData()
@@ -200,6 +224,7 @@ class ReaderViewModel @Inject constructor(
             publicationName = publication.name.ifBlank { publicationName },
             publicationTheme = publication.theme,
             publicationBasicTheme = publication.basicTheme,
+            moderationLabels = moderationLabels + publication.labels?.values.orEmpty().map { it.value },
         )
     }
 
@@ -304,6 +329,7 @@ class ReaderViewModel @Inject constructor(
                                     path = docValue["path"]?.jsonPrimitive?.contentOrNull,
                                     authorDisplayName = profile?.displayName,
                                     authorAvatar = profile?.avatar,
+                                    moderationLabels = docValue.moderationLabels(),
                                 ))
                             } catch (e: Exception) {
                                 Log.w("ReaderViewModel", "Failed to parse document in following feed", e)
@@ -408,6 +434,8 @@ class ReaderViewModel @Inject constructor(
                                 authorAvatar = profile?.avatar,
                                 publicationTheme = publicationRecord?.theme,
                                 publicationBasicTheme = publicationRecord?.basicTheme,
+                                moderationLabels = docValue.moderationLabels() +
+                                    publicationRecord?.labels?.values.orEmpty().map { it.value },
                             ))
                         } catch (e: Exception) {
                             Log.w("ReaderViewModel", "Failed to parse following feed document", e)
@@ -526,6 +554,7 @@ class ReaderViewModel @Inject constructor(
                         path = valueObj["path"]?.jsonPrimitive?.contentOrNull,
                         authorDisplayName = profile?.displayName,
                         authorAvatar = profile?.avatar,
+                        moderationLabels = valueObj.moderationLabels(),
                     )
                 } catch (e: Exception) {
                     Log.w("ReaderViewModel", "Failed to parse document in yours feed", e)
@@ -563,6 +592,7 @@ class ReaderViewModel @Inject constructor(
             authorDisplayName = authorDisplayName,
             authorAvatar = authorAvatar,
             isCached = isCached,
+            moderationLabels = emptyList(),
         )
     }
 
@@ -586,3 +616,8 @@ class ReaderViewModel @Inject constructor(
         )
     }
 }
+
+private fun kotlinx.serialization.json.JsonObject.moderationLabels(): List<String> =
+    this["labels"]?.jsonObject?.get("values")?.jsonArray
+        ?.mapNotNull { it.jsonObject["val"]?.jsonPrimitive?.contentOrNull }
+        .orEmpty()

@@ -72,6 +72,9 @@ struct SettingsView: View {
                     NavigationLink("Muted & Blocked") {
                         MutedBlockedView(loginStateManager: loginStateManager)
                     }
+                    NavigationLink("Content Filters") {
+                        ModerationSettingsView()
+                    }
                     Button("Sign Out", role: .destructive) {
                         isConfirmingSignOut = true
                     }

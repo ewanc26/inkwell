@@ -53,6 +53,9 @@ struct BrowseDocumentsView: View {
                 // opaque band. Older OS versions fall back to a plain
                 // safe-area inset without that effect.
                 .modifier(FeedSwitcherBar(selection: $store.selectedFeed))
+                .onReceive(NotificationCenter.default.publisher(for: .moderationSettingsChanged)) { _ in
+                    Task { await store.loadData(loginStateManager: loginStateManager, force: true) }
+                }
                 .navigationTitle("Reader")
                 .navigationDestination(for: String.self) { documentURI in
                     RemoteDocumentView(documentURI: documentURI)
