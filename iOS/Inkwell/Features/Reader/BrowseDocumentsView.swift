@@ -28,6 +28,7 @@ private struct ReaderProfileRoute: Hashable {
 
 struct BrowseDocumentsView: View {
     @Environment(LoginStateManager.self) private var loginStateManager
+    @Environment(ConnectivityMonitor.self) private var connectivityMonitor
     @State private var notificationManager = NotificationManager.shared
     @State private var store = ReaderFeedStore.shared
 
@@ -40,6 +41,11 @@ struct BrowseDocumentsView: View {
     var body: some View {
         NavigationStack(path: $path) {
             content
+                .safeAreaInset(edge: .top, spacing: 0) {
+                    if !connectivityMonitor.isOnline {
+                        OfflineStatusBanner()
+                    }
+                }
                 // As a safe-area bar rather than a plain VStack row (on iOS
                 // 26+), the feed switcher picks up the scroll-edge effect:
                 // content slides under it and it stays legible over

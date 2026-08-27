@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -66,6 +67,7 @@ data class PostItem(
     val isVerified: Boolean? = null,
     val publicationTheme: uk.ewancroft.inkwell.data.model.atproto.PublicationTheme? = null,
     val publicationBasicTheme: uk.ewancroft.inkwell.data.model.atproto.BasicTheme? = null,
+    val isCached: Boolean = false,
 ) {
     val date: String get() = publishedAt.formatPublishedDate()
 }
@@ -140,6 +142,8 @@ class ReaderViewModel @Inject constructor(
                     reason = reason,
                 )
                 _uiState.value = _uiState.value.copy(reportConfirmation = "Report submitted.")
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     reportError = e.message ?: "Failed to submit report",
@@ -154,6 +158,10 @@ class ReaderViewModel @Inject constructor(
 
     fun dismissReportConfirmation() {
         _uiState.value = _uiState.value.copy(reportConfirmation = null)
+    }
+
+    fun dismissError() {
+        _uiState.value = _uiState.value.copy(error = null)
     }
 
     private fun isPublicationAtUri(site: String): Boolean {
@@ -457,7 +465,7 @@ class ReaderViewModel @Inject constructor(
 
                     if (cachedItem != null) {
                         // Convert to PostItem and merge into UI state.
-                        val newItem = cachedItem.toPostItem().withPublicationTheme()
+                        val newItem = cachedItem.toPostItem(isCached = false).withPublicationTheme()
                         val currentPosts = _uiState.value.followingPosts
                         if (currentPosts.none { it.uri == newItem.uri }) {
                             val merged = sortedByPreference((currentPosts + newItem).distinctBy { it.uri })
@@ -541,7 +549,7 @@ class ReaderViewModel @Inject constructor(
 
     // ── CachedFeedItem ↔ PostItem Conversion ────────────────────────────
 
-    private fun CachedFeedItem.toPostItem(): PostItem {
+    private fun CachedFeedItem.toPostItem(isCached: Boolean = true): PostItem {
         return PostItem(
             uri = uri,
             authorDid = authorDID,
@@ -554,6 +562,7 @@ class ReaderViewModel @Inject constructor(
             path = path,
             authorDisplayName = authorDisplayName,
             authorAvatar = authorAvatar,
+            isCached = isCached,
         )
     }
 

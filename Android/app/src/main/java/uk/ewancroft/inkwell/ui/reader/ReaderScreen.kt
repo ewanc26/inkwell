@@ -25,6 +25,8 @@ import uk.ewancroft.inkwell.TestingConfig
 import uk.ewancroft.inkwell.ui.reader.InkwellNotificationViewModel
 import uk.ewancroft.inkwell.ui.components.CreditsView
 import uk.ewancroft.inkwell.ui.moderation.ReportDialog
+import uk.ewancroft.inkwell.ui.offline.OfflineStatusBanner
+import uk.ewancroft.inkwell.ui.offline.rememberNetworkAvailable
 import uk.ewancroft.inkwell.util.TipPromptManager
 
 private data class ReaderReportTarget(
@@ -55,6 +57,8 @@ fun ReaderScreen(
     val notificationsEnabled by notificationViewModel.notificationsEnabled.collectAsStateWithLifecycle()
     val userLexiconEnabled by userLexiconViewModel.isInkwellUser.collectAsStateWithLifecycle()
     val userLexiconBusy by userLexiconViewModel.isBusy.collectAsStateWithLifecycle()
+    val isNetworkAvailable = rememberNetworkAvailable()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val appContext = androidx.compose.ui.platform.LocalContext.current
     val appVersion = remember { uk.ewancroft.inkwell.util.appVersionString(appContext) }
@@ -87,6 +91,29 @@ fun ReaderScreen(
     // Mirrors iOS BrowseDocumentsView's `.task { ...; notificationManager.markAllAsRead() }`.
     LaunchedEffect(Unit) {
         notificationViewModel.markAllAsRead()
+    }
+
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let { message ->
+            when (snackbarHostState.showSnackbar(message, actionLabel = "Retry")) {
+                SnackbarResult.ActionPerformed -> viewModel.loadData()
+                SnackbarResult.Dismissed -> viewModel.dismissError()
+            }
+        }
+    }
+
+    LaunchedEffect(uiState.reportError) {
+        uiState.reportError?.let { message ->
+            snackbarHostState.showSnackbar(message)
+            viewModel.dismissReportError()
+        }
+    }
+
+    LaunchedEffect(uiState.reportConfirmation) {
+        uiState.reportConfirmation?.let { message ->
+            snackbarHostState.showSnackbar(message)
+            viewModel.dismissReportConfirmation()
+        }
     }
 
     Scaffold(
@@ -137,9 +164,13 @@ fun ReaderScreen(
                     }
                 },
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) { innerPadding ->
         Column(Modifier.padding(innerPadding)) {
+            if (!isNetworkAvailable) {
+                OfflineStatusBanner()
+            }
             PrimaryTabRow(selectedTabIndex = uiState.selectedTab) {
                 tabs.forEachIndexed { index, title ->
                     Tab(
@@ -202,19 +233,6 @@ fun ReaderScreen(
         }
     }
 
-    if (uiState.error != null) {
-        Snackbar(
-            modifier = Modifier.padding(16.dp),
-            action = {
-                TextButton(onClick = { viewModel.loadData() }) {
-                    Text("Retry")
-                }
-            }
-        ) {
-            Text(uiState.error!!)
-        }
-    }
-
     reportTarget?.let { target ->
         ReportDialog(
             subject = target.subject,
@@ -229,32 +247,6 @@ fun ReaderScreen(
                 )
             },
         )
-    }
-
-    if (uiState.reportError != null) {
-        Snackbar(
-            modifier = Modifier.padding(16.dp),
-            action = {
-                TextButton(onClick = { viewModel.dismissReportError() }) {
-                    Text("Dismiss")
-                }
-            }
-        ) {
-            Text(uiState.reportError!!)
-        }
-    }
-
-    if (uiState.reportConfirmation != null) {
-        Snackbar(
-            modifier = Modifier.padding(16.dp),
-            action = {
-                TextButton(onClick = { viewModel.dismissReportConfirmation() }) {
-                    Text("Dismiss")
-                }
-            }
-        ) {
-            Text(uiState.reportConfirmation!!)
-        }
     }
 
     if (showCredits) {

@@ -10,6 +10,7 @@ import SwiftUI
 @main
 struct InkwellApp: App {
     @UIApplicationDelegateAdaptor(InkwellAppDelegate.self) private var appDelegate
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var loginStateManager = LoginStateManager()
     @State private var tipPromptManager = TipPromptManager.shared
 
@@ -20,12 +21,14 @@ struct InkwellApp: App {
     @State private var showSplash = true
     @State private var splashOpacity: Double = 1.0
     @State private var customisation = CustomisationSettings.shared
+    @State private var connectivityMonitor = ConnectivityMonitor()
 
     var body: some Scene {
         WindowGroup {
             ZStack {
                 ContentView()
                     .environment(loginStateManager)
+                    .environment(connectivityMonitor)
 
                 // Splash overlay — matches UILaunchScreen exactly.
                 // Removed from hierarchy after fade, not just hidden.
@@ -40,16 +43,23 @@ struct InkwellApp: App {
                         .opacity(splashOpacity)
                 }
             }
-            .task {
+            .task(id: reduceMotion) {
+                guard !reduceMotion else {
+                    splashOpacity = 0.0
+                    showSplash = false
+                    return
+                }
                 // Hold briefly so the system launch screen → SwiftUI
                 // transition isn't a flash, then fade out.
                 try? await Task.sleep(for: .milliseconds(300))
+                guard !Task.isCancelled else { return }
                 withAnimation(.spring(response: 0.6, dampingFraction: 0.85)) {
                     splashOpacity = 0.0
                 }
                 // Wait for animation to finish, then remove from hierarchy
                 // so it doesn't block touches on nav bar / toolbar buttons.
                 try? await Task.sleep(for: .milliseconds(700))
+                guard !Task.isCancelled else { return }
                 showSplash = false
             }
             // MARK: - Launch Task

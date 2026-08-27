@@ -67,6 +67,7 @@ fun PostCard(
     isVerified: Boolean? = null,
     publicationTheme: PublicationTheme? = null,
     publicationBasicTheme: BasicTheme? = null,
+    isCached: Boolean = false,
     onClick: () -> Unit = {},
     onViewProfile: (() -> Unit)? = null,
     onReportPost: (() -> Unit)? = null,
@@ -95,6 +96,7 @@ fun PostCard(
         authorDisplayName?.takeIf(String::isNotBlank)?.let { add("By $it") }
         description?.takeIf(String::isNotBlank)?.let(::add)
         publicationName?.takeIf(String::isNotBlank)?.let { add("Published in $it") }
+        if (isCached) add("Available offline")
         add("Published $date")
     }.joinToString(separator = ". ")
     val hasOverflowActions = onViewProfile != null || onReportPost != null || onReportAccount != null
@@ -194,6 +196,13 @@ fun PostCard(
                             style = MaterialTheme.typography.labelSmall,
                             color = secondaryForeground,
                         )
+                        if (isCached) {
+                            Text(
+                                "Cached",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = secondaryForeground,
+                            )
+                        }
                         if (publicationName != null) {
                             Text(
                                 "·",

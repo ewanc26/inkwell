@@ -73,7 +73,8 @@ extension CachedFeedItem {
     /// The caller is responsible for resolving profiles separately.
     func toReaderFeedItem(
         profile: BSkyActorProfile? = nil,
-        publication: PublicationEntry? = nil
+        publication: PublicationEntry? = nil,
+        isCached: Bool = true
     ) -> ReaderFeedItem {
         let publishedDate = ISO8601DateFormatter().date(from: publishedAt) ?? Date(timeIntervalSince1970: 0)
         let docRecord = SiteStandardLexicon.DocumentRecord(
@@ -89,7 +90,8 @@ extension CachedFeedItem {
         return ReaderFeedItem(
             document: docEntry,
             publication: publication,
-            authorProfile: profile
+            authorProfile: profile,
+            isCached: isCached
         )
     }
 }

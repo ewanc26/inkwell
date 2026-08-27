@@ -89,6 +89,7 @@ internal fun FeedContent(
                     isVerified = post.isVerified,
                     publicationTheme = post.publicationTheme,
                     publicationBasicTheme = post.publicationBasicTheme,
+                    isCached = post.isCached,
                     onClick = { onPostClick(index, post) },
                     onViewProfile = if (post.authorDid.isNotBlank()) {
                         { onViewProfile(post) }

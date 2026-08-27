@@ -29,6 +29,7 @@ enum DiscoverSearchScope: String, CaseIterable, Identifiable {
 
 struct DiscoverView: View {
     @Environment(LoginStateManager.self) private var loginStateManager
+    @Environment(ConnectivityMonitor.self) private var connectivityMonitor
 
     @Binding var path: NavigationPath
     @State private var query = ""
@@ -101,6 +102,11 @@ struct DiscoverView: View {
             // designed to sit in.
             .overlay {
                 placeholder
+            }
+        }
+        .safeAreaInset(edge: .top, spacing: 0) {
+            if !connectivityMonitor.isOnline {
+                OfflineStatusBanner()
             }
         }
         .navigationTitle("Discover")

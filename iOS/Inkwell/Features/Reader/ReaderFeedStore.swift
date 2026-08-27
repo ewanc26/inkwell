@@ -284,7 +284,10 @@ final class ReaderFeedStore {
 
                     if let cachedItem {
                         // Convert to a ReaderFeedItem and merge into the feed.
-                        let newItem = cachedItem.toReaderFeedItem(publication: publication)
+                        let newItem = cachedItem.toReaderFeedItem(
+                            publication: publication,
+                            isCached: false
+                        )
                         if let index = self.followingState.items.firstIndex(where: { $0.id == newItem.id }) {
                             // Enrich an already-visible cached card once its
                             // publication record arrives, rather than leaving
@@ -533,7 +536,8 @@ final class ReaderFeedStore {
             // Cached items deliberately render before the publication lookup
             // completes. Prefer the later, enriched item once it arrives so
             // the feed card inherits its linked publication's theme.
-            if existing.publication == nil, item.publication != nil {
+            if (existing.isCached && !item.isCached) ||
+                (existing.publication == nil && item.publication != nil) {
                 entries[item.id] = item
             }
         }
@@ -545,6 +549,19 @@ struct ReaderFeedItem: Identifiable {
     let document: DocumentEntry
     let publication: PublicationEntry?
     let authorProfile: BSkyActorProfile?
+    let isCached: Bool
+
+    nonisolated init(
+        document: DocumentEntry,
+        publication: PublicationEntry?,
+        authorProfile: BSkyActorProfile?,
+        isCached: Bool = false
+    ) {
+        self.document = document
+        self.publication = publication
+        self.authorProfile = authorProfile
+        self.isCached = isCached
+    }
 
     var id: String { document.uri }
 
