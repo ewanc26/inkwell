@@ -203,27 +203,6 @@ struct ReadView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                         .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
                     }
-                } else {
-                    // No cover image: a small Inkwell-branded gradient banner
-                    // instead of leaving a gap, so plain-text documents still
-                    // have some visual presence on the way in. Purely
-                    // decorative chrome, tinted from the resolved theme's own
-                    // accent so it never fights whatever the publication has
-                    // actually set — it just keeps the page from feeling bare
-                    // before the content underneath kicks in.
-                    LinearGradient(
-                        colors: [accentColor.opacity(0.16), accentColor.opacity(0.04)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                    .frame(maxWidth: .infinity)
-                    .aspectRatio(16 / 9, contentMode: .fit)
-                    .overlay {
-                        InkwellMark()
-                            .frame(width: 30, height: 30 * 952 / 400)
-                            .foregroundStyle(accentColor.opacity(0.45))
-                    }
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
 
                 // Content Section

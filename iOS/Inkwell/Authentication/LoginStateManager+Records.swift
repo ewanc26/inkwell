@@ -201,10 +201,20 @@ extension LoginStateManager {
     }
 
     /// Fetches and decodes a single record from a repository.
+    ///
+    /// - Parameters:
+    ///   - did: The DID whose repository to query.
+    ///   - collection: The NSID of the collection.
+    ///   - recordKey: The record key (rkey).
+    ///   - forceUnauthenticated: When `true`, always uses unauthenticated
+    ///     requests even for the current user's DID. Use this for public
+    ///     records fetched through Discover to avoid DPoP errors on the
+    ///     user's PDS.
     func getRepositoryRecord(
         from did: String,
         collection: String,
-        recordKey: String
+        recordKey: String,
+        forceUnauthenticated: Bool = false
     ) async throws -> (uri: String, cid: String?, value: UnknownType?) {
         let pdsURL = try await repositoryPDSURL(for: did)
 
@@ -215,7 +225,7 @@ extension LoginStateManager {
         ]
 
         let data: Data
-        if did == currentDID {
+        if !forceUnauthenticated && did == currentDID {
             data = try await authenticatedData(
                 path: sharedXrpcRepoGetRecord(),
                 queryItems: queryItems
@@ -241,10 +251,20 @@ extension LoginStateManager {
 
     /// Lists all records of a given collection from a repository,
     /// following pagination cursors up to `maximumCount`.
+    ///
+    /// - Parameters:
+    ///   - did: The DID whose repository to query.
+    ///   - collection: The NSID of the collection to list.
+    ///   - maximumCount: The maximum number of records to return.
+    ///   - forceUnauthenticated: When `true`, always uses unauthenticated
+    ///     requests even for the current user's DID. Use this for public
+    ///     records fetched through Discover to avoid DPoP errors on the
+    ///     user's PDS.
     func listAllRecords(
         from did: String,
         collection: String,
-        maximumCount: Int = sharedMaxRecordsPerList
+        maximumCount: Int = sharedMaxRecordsPerList,
+        forceUnauthenticated: Bool = false
     ) async throws -> [RepositoryRecord] {
         let pdsURL = try await repositoryPDSURL(for: did)
 
@@ -266,8 +286,12 @@ extension LoginStateManager {
             // requires authentication (401/403), retry with auth.
             // This avoids DPoP nonce exhaustion when multiple
             // collections are listed in sequence for the same DID.
+            //
+            // When forceUnauthenticated is set (e.g. for Discover views
+            // fetching public records), skip the authenticated fallback
+            // entirely to avoid DPoP errors on the user's own PDS.
             let data: Data
-            if did == currentDID {
+            if !forceUnauthenticated && did == currentDID {
                 do {
                     data = try await unauthenticatedData(
                         pdsURL: pdsURL,

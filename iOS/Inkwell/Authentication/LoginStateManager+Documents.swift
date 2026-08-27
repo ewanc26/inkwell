@@ -23,8 +23,15 @@ extension LoginStateManager {
     }
 
     /// Fetches documents from any user's repository.
+    ///
+    /// Always uses unauthenticated requests to avoid DPoP errors when
+    /// fetching public records through Discover.
     func fetchDocuments(fromDID did: String) async throws -> [DocumentEntry] {
-        let records = try await listAllRecords(from: did, collection: SiteStandardLexicon.DocumentRecord.type)
+        let records = try await listAllRecords(
+            from: did,
+            collection: SiteStandardLexicon.DocumentRecord.type,
+            forceUnauthenticated: true
+        )
         let decoded = records.compactMap { record in
             record.value
                 .flatMap { $0.getRecord(ofType: SiteStandardLexicon.DocumentRecord.self) }
@@ -44,13 +51,17 @@ extension LoginStateManager {
     }
 
     /// Fetches one document by AT-URI.
+    ///
+    /// Always uses unauthenticated requests to avoid DPoP errors when
+    /// fetching public records through Discover.
     func fetchDocument(uri: String) async throws -> DocumentEntry {
         guard let parsed = parseAtUri(uri),
               parsed.collection == SiteStandardLexicon.DocumentRecord.type else {
             throw LoginError.invalidURI
         }
         let (recordURI, _, value) = try await getRepositoryRecord(
-            from: parsed.did, collection: parsed.collection, recordKey: parsed.recordKey
+            from: parsed.did, collection: parsed.collection, recordKey: parsed.recordKey,
+            forceUnauthenticated: true
         )
         guard let document = value?.getRecord(ofType: SiteStandardLexicon.DocumentRecord.self) else {
             throw LoginError.unexpectedRecordType

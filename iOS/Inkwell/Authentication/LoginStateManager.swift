@@ -86,25 +86,39 @@ final class LoginStateManager {
     /// - `uk.ewancroft.inkwell.user` for the Inkwell-user declaration record.
     /// - Bluesky personal moderation RPCs plus create/delete access to
     ///   `app.bsky.graph.block`, matching the moderation UI on both platforms.
+    /// Percent-encodes the characters that OAuthenticator's PAR form-body
+    /// builder fails to encode. The library joins key=value pairs with raw
+    /// `&` and `=` — no percent-encoding — so `&`, `=`, `+`, and `%` inside
+    /// a scope value are misinterpreted by the PDS's form parser. We
+    /// pre-encode them so the PDS decodes them back to the original value
+    /// that matches the published client metadata.
+    private func formEncodeScope(_ scope: String) -> String {
+        var allowed = CharacterSet.urlQueryAllowed
+        allowed.remove(charactersIn: "&=+%")
+        return scope.addingPercentEncoding(withAllowedCharacters: allowed) ?? scope
+    }
+
     var appCredentials: AppCredentials {
-        AppCredentials(
+        let rawScopes = [
+            sharedOAuthScopeAtproto(),
+            sharedOAuthScopeBlobAll(),
+            sharedOAuthScopeRepoPublication(),
+            sharedOAuthScopeRepoDocument(),
+            sharedOAuthScopeRepoSubscription(),
+            sharedOAuthScopeRepoRecommend(),
+            sharedOAuthScopeRepoUserInputDiscussion(),
+            "repo:uk.ewancroft.inkwell.user",
+            "repo:app.bsky.graph.block?action=create&action=delete",
+            "rpc:app.bsky.graph.muteActor?aud=did:web:api.bsky.app%23bsky_appview",
+            "rpc:app.bsky.graph.unmuteActor?aud=did:web:api.bsky.app%23bsky_appview",
+            "rpc:app.bsky.graph.getMutes?aud=did:web:api.bsky.app%23bsky_appview",
+            "rpc:app.bsky.graph.getBlocks?aud=did:web:api.bsky.app%23bsky_appview",
+            "rpc:com.atproto.moderation.createReport?aud=did:web:api.bsky.app%23bsky_appview",
+        ]
+        return AppCredentials(
             clientId: "https://inkwell.ewancroft.uk/client-metadata.json",
             clientPassword: "",
-            scopes: [
-                sharedOAuthScopeAtproto(),
-                sharedOAuthScopeBlobAll(),
-                sharedOAuthScopeRepoPublication(),
-                sharedOAuthScopeRepoDocument(),
-                sharedOAuthScopeRepoSubscription(),
-                sharedOAuthScopeRepoRecommend(),
-                sharedOAuthScopeRepoUserInputDiscussion(),
-                "repo:uk.ewancroft.inkwell.user",
-                "repo:app.bsky.graph.block?action=create&action=delete",
-                "rpc:app.bsky.graph.muteActor?aud=did:web:api.bsky.app%23bsky_appview",
-                "rpc:app.bsky.graph.unmuteActor?aud=did:web:api.bsky.app%23bsky_appview",
-                "rpc:app.bsky.graph.getMutes?aud=did:web:api.bsky.app%23bsky_appview",
-                "rpc:app.bsky.graph.getBlocks?aud=did:web:api.bsky.app%23bsky_appview"
-            ],
+            scopes: rawScopes.map(formEncodeScope),
             callbackURL: URL(string: "uk.ewancroft.inkwell:/callback")!
         )
     }
