@@ -23,8 +23,15 @@ extension LoginStateManager {
     }
 
     /// Fetches publications from any user's repository.
+    ///
+    /// Always uses unauthenticated requests to avoid DPoP errors when
+    /// fetching public records through Discover.
     func fetchPublications(fromDID did: String) async throws -> [PublicationEntry] {
-        let records = try await listAllRecords(from: did, collection: SiteStandardLexicon.PublicationRecord.type)
+        let records = try await listAllRecords(
+            from: did,
+            collection: SiteStandardLexicon.PublicationRecord.type,
+            forceUnauthenticated: true
+        )
         let decoded = records.compactMap { record in
             record.value
                 .flatMap { $0.getRecord(ofType: SiteStandardLexicon.PublicationRecord.self) }
@@ -44,13 +51,17 @@ extension LoginStateManager {
     }
 
     /// Fetches one publication by AT-URI.
+    ///
+    /// Always uses unauthenticated requests to avoid DPoP errors when
+    /// fetching public records through Discover.
     func fetchPublication(uri: String) async throws -> PublicationEntry {
         guard let parsed = parseAtUri(uri),
               parsed.collection == SiteStandardLexicon.PublicationRecord.type else {
             throw LoginError.invalidURI
         }
         let (recordURI, _, value) = try await getRepositoryRecord(
-            from: parsed.did, collection: parsed.collection, recordKey: parsed.recordKey
+            from: parsed.did, collection: parsed.collection, recordKey: parsed.recordKey,
+            forceUnauthenticated: true
         )
         guard let publication = value?.getRecord(ofType: SiteStandardLexicon.PublicationRecord.self) else {
             throw LoginError.unexpectedRecordType

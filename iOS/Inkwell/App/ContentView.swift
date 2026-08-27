@@ -17,6 +17,8 @@ struct ContentView: View {
     /// Shortcuts-driven tab switch is just an assignment — no mapping
     /// between intent cases and anonymous integer tags.
     @State private var selectedTab: InkwellTab = .reader
+    @State private var previousTab: InkwellTab = .reader
+    @State private var discoverPath = NavigationPath()
     @State private var showingTip = false
     @State private var testingNotice = TestingModeNotice.shared
 
@@ -110,7 +112,15 @@ struct ContentView: View {
             .badge(notificationManager.unreadCount)
 
             Tab("Discover", systemImage: "safari", value: InkwellTab.discover) {
-                DiscoverView()
+                NavigationStack(path: $discoverPath) {
+                    DiscoverView(path: $discoverPath)
+                        .navigationDestination(for: String.self) { documentURI in
+                            RemoteDocumentView(documentURI: documentURI)
+                        }
+                        .navigationDestination(for: PublicationResult.self) { publication in
+                            PublicationDetailView(publication: publication, path: $discoverPath)
+                        }
+                }
             }
 
             Tab("Write", systemImage: "square.and.pencil", value: InkwellTab.writer) {
@@ -122,6 +132,18 @@ struct ContentView: View {
         // tabBarMinimizeBehavior is iOS 26+; the app's floor is much lower,
         // so this only applies on devices new enough to have it.
         .modifier(MinimizeTabBarOnScrollDown())
+        .onChange(of: selectedTab) { _, newTab in
+            // When the user taps the already-selected tab, pop that tab's
+            // navigation stack back to its root — matching the native
+            // iOS tab-bar convention.
+            if newTab == previousTab {
+                switch newTab {
+                case .discover: discoverPath = NavigationPath()
+                default: break
+                }
+            }
+            previousTab = newTab
+        }
         .task {
             if !TestingMode.suppressesInterruptions {
                 await NotificationManager.shared.requestPermission()
