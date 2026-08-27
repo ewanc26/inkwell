@@ -28,13 +28,24 @@ struct PublicationDetailView: View {
     }
 
     var body: some View {
-        List(documents) { document in
-            Button {
-                path.append(document.uri)
-            } label: {
-                PublicationDocumentRow(document: document)
+        List {
+            if let resolvedPublication {
+                Section {
+                    PublicationDetailHeader(publication: resolvedPublication)
+                        .listRowInsets(EdgeInsets(top: 12, leading: 20, bottom: 12, trailing: 20))
+                }
             }
-            .buttonStyle(.plain)
+
+            Section("Latest Posts") {
+                ForEach(documents) { document in
+                    Button {
+                        path.append(document.uri)
+                    } label: {
+                        PublicationDocumentRow(document: document)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
         }
         .listStyle(.insetGrouped)
         .navigationTitle(publicationTitle)
@@ -143,6 +154,53 @@ struct PublicationDetailView: View {
         }
 
         return trimmed
+    }
+}
+
+private struct PublicationDetailHeader: View {
+    let publication: PublicationEntry
+
+    private var iconURL: String? {
+        guard let icon = publication.record.icon else { return nil }
+        return "https://cdn.bsky.app/img/feed_thumbnail/plain/\(publication.authorDID)/\(icon.reference.link)"
+    }
+
+    private var domain: String {
+        URL(string: publication.record.url)?.host ?? publication.record.url
+    }
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 14) {
+            SearchResultThumbnail(
+                urlString: iconURL,
+                placeholderSystemImage: "building.2.crop.left.right.fill",
+                size: 64,
+                cornerRadius: 16
+            )
+
+            VStack(alignment: .leading, spacing: 5) {
+                Text(publication.record.name)
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(.primary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Text(domain)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+
+                if let description = publication.record.description,
+                   !description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    Text(description)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .accessibilityElement(children: .combine)
     }
 }
 

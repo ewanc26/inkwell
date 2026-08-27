@@ -3309,6 +3309,9 @@ __attribute__((swift_name("SharedReaderTheme.Companion")))
 + (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
 + (instancetype)companion __attribute__((swift_name("init()")));
 @property (class, readonly, getter=shared) InkwellSharedSharedReaderThemeCompanion *shared __attribute__((swift_name("shared")));
+
+/** WCAG relative-luminance contrast ratio for two 0xRRGGBB colours. */
+- (double)contrastRatioFirst:(int32_t)first second:(int32_t)second __attribute__((swift_name("contrastRatio(first:second:)")));
 - (InkwellSharedSharedReaderThemeFontFamily *)fontFamilyForIdentifier:(NSString * _Nullable)identifier __attribute__((swift_name("fontFamilyFor(identifier:)")));
 - (InkwellSharedInt * _Nullable)hexToRgbHex:(NSString *)hex __attribute__((swift_name("hexToRgb(hex:)")));
 

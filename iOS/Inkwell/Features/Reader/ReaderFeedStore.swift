@@ -18,7 +18,9 @@ import InkwellShared
 @MainActor
 struct FollowingFeedState {
     var items: [ReaderFeedItem] = []
-    var isLoading = true        // true during initial load
+    // Starts false so `loadData` can begin the initial request. The loading
+    // flag is set synchronously by `loadFollowingFeed` once work is underway.
+    var isLoading = false
     var isLoadingNextPage = false
     var error: String?
     /// Per-DID cursors for the next page of `site.standard.document`.
@@ -35,6 +37,33 @@ enum ReaderFeed: String, CaseIterable, Identifiable {
     var id: Self { self }
 }
 
+private enum ReaderFeedLoadError: LocalizedError {
+    case subscriptionsTimedOut
+
+    var errorDescription: String? {
+        switch self {
+        case .subscriptionsTimedOut:
+            "Couldn't reach your subscriptions. Check your connection and try again."
+        }
+    }
+}
+
+/// Ensures only the first completion of an unstructured fetch race resumes its
+/// continuation. NSLock keeps the small critical section safe without making
+/// the Reader's @MainActor state responsible for a stalled network task.
+private final class ReaderFeedRaceGate: @unchecked Sendable {
+    private let lock = NSLock()
+    private var completed = false
+
+    func claim() -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        guard !completed else { return false }
+        completed = true
+        return true
+    }
+}
+
 /// Owns the Reader feed's loaded state and fetch logic, shared across the
 /// app so loading can start as soon as the user is authenticated —
 /// independent of whether the Reader tab has actually been shown yet —
@@ -48,7 +77,7 @@ final class ReaderFeedStore {
     var selectedFeed: ReaderFeed = .following
     var followingState = FollowingFeedState()
     var yours: [ReaderFeedItem] = []
-    var isLoadingYours = true
+    var isLoadingYours = false
     var yoursError: String?
 
     // MARK: - Jetstream + Cache
@@ -76,6 +105,11 @@ final class ReaderFeedStore {
     /// Per-publication fetch timeout — a single unreachable PDS must not
     /// block the entire feed from appearing.
     private static let publicationTimeout: Duration = .seconds(8)
+    /// Subscription records are the gateway to the whole Following feed. They
+    /// need their own bound: the per-publication timeout below cannot help if
+    /// this request never completes.
+    private static let subscriptionsTimeout: Duration = .seconds(12)
+    private static let profileTimeout: Duration = .seconds(4)
 
     /// Fetches subscriptions and the first page of documents from each followed
     /// publication. Subsequent pages are loaded on-demand via the sentinel.
@@ -97,7 +131,10 @@ final class ReaderFeedStore {
         }
 
         do {
-            let subscriptions = try await loginStateManager.fetchSubscriptions()
+            let subscriptions = try await fetchSubscriptions(
+                loginStateManager: loginStateManager,
+                timeout: ReaderFeedStore.subscriptionsTimeout
+            )
 
             // Reset state
             if force || followingState.items.isEmpty {
@@ -268,8 +305,7 @@ final class ReaderFeedStore {
         await withTaskGroup(of: (String, BSkyActorProfile?).self) { group in
             for did in dids {
                 group.addTask {
-                    let profile = try? await BSkyProfileFetcher.fetchProfile(did: did)
-                    return (did, profile)
+                    (did, await self.fetchProfile(did: did))
                 }
             }
             var result: [String: BSkyActorProfile] = [:]
@@ -280,6 +316,62 @@ final class ReaderFeedStore {
                 }
             }
             return result
+        }
+    }
+
+    /// Races the authenticated subscription fetch against a short timeout.
+    /// Without this, a stalled PDS leaves the Reader spinner on screen before
+    /// the per-publication timeouts have a chance to take effect.
+    private func fetchSubscriptions(
+        loginStateManager: LoginStateManager,
+        timeout: Duration
+    ) async throws -> [SubscriptionEntry] {
+        let fetchTask = Task { try await loginStateManager.fetchSubscriptions() }
+        return try await withCheckedThrowingContinuation { continuation in
+            let gate = ReaderFeedRaceGate()
+
+            Task {
+                do {
+                    let subscriptions = try await fetchTask.value
+                    if gate.claim() {
+                        continuation.resume(returning: subscriptions)
+                    }
+                } catch {
+                    if gate.claim() {
+                        continuation.resume(throwing: error)
+                    }
+                }
+            }
+
+            Task {
+                try? await Task.sleep(for: timeout)
+                guard gate.claim() else { return }
+                fetchTask.cancel()
+                continuation.resume(throwing: ReaderFeedLoadError.subscriptionsTimedOut)
+            }
+        }
+    }
+
+    /// Profile data is decorative. A hung public-profile request must never
+    /// delay publication cards from becoming readable.
+    private func fetchProfile(did: String) async -> BSkyActorProfile? {
+        let fetchTask = Task { try? await BSkyProfileFetcher.fetchProfile(did: did) }
+        return await withCheckedContinuation { continuation in
+            let gate = ReaderFeedRaceGate()
+
+            Task {
+                let profile = await fetchTask.value
+                if gate.claim() {
+                    continuation.resume(returning: profile)
+                }
+            }
+
+            Task {
+                try? await Task.sleep(for: ReaderFeedStore.profileTimeout)
+                guard gate.claim() else { return }
+                fetchTask.cancel()
+                continuation.resume(returning: nil)
+            }
         }
     }
 
