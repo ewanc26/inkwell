@@ -233,7 +233,10 @@ final class ReaderFeedStore {
             try? await feedCache.save(items: Array(cachedItems))
 
             // 4. Connect to Jetstream for live updates.
-            startJetstreamSubscription(dids: Array(uniqueDIDs))
+            startJetstreamSubscription(
+                dids: Array(uniqueDIDs),
+                loginStateManager: loginStateManager
+            )
 
         } catch {
             followingState.error = error.localizedDescription
@@ -247,7 +250,10 @@ final class ReaderFeedStore {
     /// Starts a Jetstream WebSocket subscription for the given DIDs.
     /// Events are parsed into CachedFeedItem objects and merged into the
     /// feed in real time.
-    private func startJetstreamSubscription(dids: [String]) {
+    private func startJetstreamSubscription(
+        dids: [String],
+        loginStateManager: LoginStateManager
+    ) {
         jetstreamTask?.cancel()
         guard !dids.isEmpty else { return }
 
@@ -262,22 +268,39 @@ final class ReaderFeedStore {
 
                 // Parse the event into a CachedFeedItem.
                 let cachedItem = payload.toCachedFeedItem()
+                let publication: PublicationEntry?
+                if let cachedItem {
+                    // Jetstream document commits contain the document but
+                    // not its publication record. Resolve that record once
+                    // here so a live card uses the same publication theme
+                    // as the document it opens.
+                    publication = try? await loginStateManager.fetchPublication(uri: cachedItem.site)
+                } else {
+                    publication = nil
+                }
 
                 await MainActor.run {
                     guard let self else { return }
 
                     if let cachedItem {
                         // Convert to a ReaderFeedItem and merge into the feed.
-                        let newItem = cachedItem.toReaderFeedItem()
-                        // Only add if not already present.
-                        if !followingState.items.contains(where: { $0.id == newItem.id }) {
-                            followingState.items.append(newItem)
-                            followingState.items = deduplicated(followingState.items)
+                        let newItem = cachedItem.toReaderFeedItem(publication: publication)
+                        if let index = self.followingState.items.firstIndex(where: { $0.id == newItem.id }) {
+                            // Enrich an already-visible cached card once its
+                            // publication record arrives, rather than leaving
+                            // it on the fallback system theme.
+                            if self.followingState.items[index].publication == nil,
+                               newItem.publication != nil {
+                                self.followingState.items[index] = newItem
+                            }
+                        } else {
+                            self.followingState.items.append(newItem)
                         }
+                        self.followingState.items = self.deduplicated(self.followingState.items)
                     } else if payload.operation == "delete" {
                         // Handle deletes by removing the item from the feed.
                         let deletedUri = "at://\(payload.did)/\(payload.collection)/\(payload.rkey)"
-                        followingState.items.removeAll { $0.id == deletedUri }
+                        self.followingState.items.removeAll { $0.id == deletedUri }
                     }
                 }
 
@@ -401,6 +424,15 @@ final class ReaderFeedStore {
             }
             return map
         }()
+        let existingPublications: [String: PublicationEntry] = {
+            var map: [String: PublicationEntry] = [:]
+            for item in followingState.items {
+                if let publication = item.publication {
+                    map[publication.uri] = publication
+                }
+            }
+            return map
+        }()
 
         await withTaskGroup(of: (did: String, items: [ReaderFeedItem], cursor: String?).self) { group in
             for (did, cursor) in cursors {
@@ -425,7 +457,7 @@ final class ReaderFeedStore {
                         }
                         return ReaderFeedItem(
                             document: DocumentEntry(uri: record.uri, authorDID: did, record: doc),
-                            publication: nil,
+                            publication: existingPublications[doc.site],
                             authorProfile: profile
                         )
                     }
@@ -491,10 +523,21 @@ final class ReaderFeedStore {
     // MARK: - Helpers
 
     private func deduplicated(_ items: [ReaderFeedItem]) -> [ReaderFeedItem] {
-        var seen = Set<String>()
-        return items
-            .sorted(by: ReaderFeedItem.comparator(for: ReaderSortSettings.shared.sortOrder))
-            .filter { seen.insert($0.id).inserted }
+        var entries: [String: ReaderFeedItem] = [:]
+        for item in items {
+            guard let existing = entries[item.id] else {
+                entries[item.id] = item
+                continue
+            }
+
+            // Cached items deliberately render before the publication lookup
+            // completes. Prefer the later, enriched item once it arrives so
+            // the feed card inherits its linked publication's theme.
+            if existing.publication == nil, item.publication != nil {
+                entries[item.id] = item
+            }
+        }
+        return entries.values.sorted(by: ReaderFeedItem.comparator(for: ReaderSortSettings.shared.sortOrder))
     }
 }
 
