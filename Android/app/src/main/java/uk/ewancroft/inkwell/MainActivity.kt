@@ -2,6 +2,7 @@ package uk.ewancroft.inkwell
 
 import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -75,8 +76,21 @@ class MainActivity : ComponentActivity() {
 
             var showSplash by remember { mutableStateOf(!TestingConfig.enabled) }
             val splashOpacity = remember { Animatable(1f) }
+            val animationScale = remember {
+                Settings.Global.getFloat(
+                    contentResolver,
+                    Settings.Global.ANIMATOR_DURATION_SCALE,
+                    1f,
+                )
+            }
 
-            LaunchedEffect(Unit) {
+            LaunchedEffect(showSplash, animationScale) {
+                if (!showSplash) return@LaunchedEffect
+                if (animationScale <= 0f) {
+                    splashOpacity.snapTo(0f)
+                    showSplash = false
+                    return@LaunchedEffect
+                }
                 kotlinx.coroutines.delay(300)
                 splashOpacity.animateTo(
                     targetValue = 0f,

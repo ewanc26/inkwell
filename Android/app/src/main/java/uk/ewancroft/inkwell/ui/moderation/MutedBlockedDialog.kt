@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import uk.ewancroft.inkwell.data.repository.BlockedActorEntry
 import uk.ewancroft.inkwell.data.repository.ModeratedActor
 
@@ -54,7 +55,7 @@ fun MutedBlockedDialog(
     onDismiss: () -> Unit,
     viewModel: MutedBlockedViewModel = hiltViewModel(),
 ) {
-    val state by viewModel.uiState.collectAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
     var selectedTab by remember { mutableIntStateOf(0) }
 
     Dialog(
