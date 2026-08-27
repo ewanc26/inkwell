@@ -25,6 +25,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
@@ -92,6 +93,8 @@ fun SettingsDialog(
     var hideSexual by remember { mutableStateOf("sexual" in ModerationPreferences.hiddenLabels(context)) }
     var hideGore by remember { mutableStateOf("gore" in ModerationPreferences.hiddenLabels(context)) }
     var hideSelfHarm by remember { mutableStateOf("self-harm" in ModerationPreferences.hiddenLabels(context)) }
+    var moderationKeyword by remember { mutableStateOf("") }
+    var hiddenKeywords by remember { mutableStateOf(ModerationPreferences.hiddenKeywords(context)) }
 
     fun promptForTipIfNeeded() {
         if (!CustomisationPreferences.hasShownTipPrompt(context)) {
@@ -312,6 +315,34 @@ fun SettingsDialog(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     )
+                    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
+                        OutlinedTextField(
+                            value = moderationKeyword,
+                            onValueChange = { moderationKeyword = it },
+                            label = { Text("Keyword to hide") },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
+                        )
+                        TextButton(
+                            onClick = {
+                                ModerationPreferences.addKeyword(context, moderationKeyword)
+                                hiddenKeywords = ModerationPreferences.hiddenKeywords(context)
+                                moderationKeyword = ""
+                            },
+                            enabled = moderationKeyword.isNotBlank(),
+                        ) { Text("Add keyword") }
+                        hiddenKeywords.sorted().forEach { keyword ->
+                            SettingsRow(
+                                title = keyword,
+                                titleColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                onClick = {
+                                    ModerationPreferences.removeKeyword(context, keyword)
+                                    hiddenKeywords = ModerationPreferences.hiddenKeywords(context)
+                                },
+                                trailing = { Text("Remove", color = MaterialTheme.colorScheme.error) },
+                            )
+                        }
+                    }
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
