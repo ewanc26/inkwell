@@ -85,7 +85,7 @@ extension CachedFeedItem {
             coverImage: coverImageUrl.map { BlobRef(link: $0, size: 0, type: "image/jpeg", mimeType: "image/jpeg").toiOS() },
             textContent: textContent
         )
-        let docEntry = DocumentEntry(uri: uri, authorDID: authorDID, record: docRecord)
+        let docEntry = DocumentEntry(uri: uri, cid: nil, authorDID: authorDID, record: docRecord)
         return ReaderFeedItem(
             document: docEntry,
             publication: publication,

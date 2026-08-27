@@ -19,6 +19,7 @@ data class PostDetailUiState(
     val loadError: String? = null,
     val title: String? = null,
     val authorDid: String? = null,
+    val recordCid: String? = null,
     val description: String? = null,
     val publishedAt: String? = null,
     val path: String? = null,

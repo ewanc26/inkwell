@@ -20,6 +20,7 @@ struct RemoteDocumentView: View {
                     document: document.record,
                     publication: publication?.record,
                     documentURI: document.uri,
+                    documentCID: document.cid,
                     authorDID: document.authorDID
                 )
             } else if let errorMessage {

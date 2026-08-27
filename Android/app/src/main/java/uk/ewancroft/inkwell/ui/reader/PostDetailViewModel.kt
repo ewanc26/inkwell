@@ -40,8 +40,8 @@ import uk.ewancroft.inkwell.data.repository.deleteSubscription
 import uk.ewancroft.inkwell.data.repository.fetchComments
 import uk.ewancroft.inkwell.data.repository.fetchRecommends
 import uk.ewancroft.inkwell.data.repository.fetchSubscriptions
-import uk.ewancroft.inkwell.data.repository.submitReportForAccount
-import uk.ewancroft.inkwell.data.repository.submitReportForRecord
+import uk.ewancroft.inkwell.data.repository.submitReport
+import uk.ewancroft.inkwell.shared.moderation.ReportReasonType
 import uk.ewancroft.inkwell.util.ArticleStatePreferences
 import javax.inject.Inject
 
@@ -93,6 +93,7 @@ class PostDetailViewModel @Inject constructor(
                 val record = pdsRepository.getRecord(uri)
                 val value = record["value"]?.jsonObject
                     ?: throw IllegalStateException("This post's record could not be read.")
+                val recordCid = record["cid"]?.jsonPrimitive?.contentOrNull
 
                 val title = value["title"]?.jsonPrimitive?.contentOrNull
                 val description = value["description"]?.jsonPrimitive?.contentOrNull
@@ -123,6 +124,7 @@ class PostDetailViewModel @Inject constructor(
                     loadError = null,
                     title = title,
                     authorDid = parsed.did,
+                    recordCid = recordCid,
                     description = description,
                     publishedAt = publishedAt,
                     path = path,
@@ -473,27 +475,21 @@ class PostDetailViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(commentError = null)
     }
 
-    fun submitReport(reasonType: String, reason: String?, isAccountReport: Boolean) {
-        val state = _uiState.value
-        if (state.uri.isBlank()) return
-
+    fun submitReport(
+        subject: String,
+        recordCid: String?,
+        reasonType: ReportReasonType,
+        reason: String?,
+    ) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(reportError = null)
             try {
-                if (isAccountReport) {
-                    val did = AtUri.parse(state.uri)?.did ?: return@launch
-                    pdsRepository.submitReportForAccount(
-                        did = did,
-                        reasonType = reasonType,
-                        reason = reason,
-                    )
-                } else {
-                    pdsRepository.submitReportForRecord(
-                        uri = state.uri,
-                        reasonType = reasonType,
-                        reason = reason,
-                    )
-                }
+                pdsRepository.submitReport(
+                    subject = subject,
+                    recordCid = recordCid,
+                    reasonType = reasonType,
+                    reason = reason,
+                )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     reportError = e.message ?: "Failed to submit report",
