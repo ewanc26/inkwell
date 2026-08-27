@@ -50,7 +50,7 @@ fun CreditsView(
     var showTerms by remember { mutableStateOf(false) }
     var supporters by remember { mutableStateOf<List<BlueskyProfile>>(emptyList()) }
 
-    if (showFeedback) {
+    if (isAuthenticated && showFeedback) {
         FeedbackDialog(onDismiss = { showFeedback = false })
     }
 
@@ -156,24 +156,26 @@ fun CreditsView(
                 // Support
                 SectionHeader("Support")
                 SupportRow(onClick = { showSupport = true })
-                Row(
-                    modifier = Modifier.fillMaxWidth().clickable { showFeedback = true }.padding(vertical = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(
-                        Icons.Outlined.Feedback,
-                        contentDescription = null,
-                        Modifier.size(18.dp),
-                        tint = MaterialTheme.colorScheme.primary,
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text("Send Feedback", style = MaterialTheme.typography.bodyMedium)
-                        Text(
-                            "Bugs, questions, anything",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                if (isAuthenticated) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().clickable { showFeedback = true }.padding(vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            Icons.Outlined.Feedback,
+                            contentDescription = null,
+                            Modifier.size(18.dp),
+                            tint = MaterialTheme.colorScheme.primary,
                         )
+                        Spacer(Modifier.width(8.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text("Send Feedback", style = MaterialTheme.typography.bodyMedium)
+                            Text(
+                                "Bugs, questions, anything",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                     }
                 }
                 CreditRow(title = "Source on GitHub", detail = "ewanc26/inkwell", url = "https://github.com/ewanc26/inkwell", openUrl = ::openUrl)

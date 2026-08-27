@@ -120,11 +120,13 @@ struct CreditsView: View {
                             .foregroundStyle(.pink)
                     }
 
-                    Button {
-                        isShowingFeedback = true
-                    } label: {
-                        Label("Send Feedback", systemImage: "exclamationmark.bubble")
-                            .foregroundStyle(.primary)
+                    if loginStateManager.isAuthenticated {
+                        Button {
+                            isShowingFeedback = true
+                        } label: {
+                            Label("Send Feedback", systemImage: "exclamationmark.bubble")
+                                .foregroundStyle(.primary)
+                        }
                     }
 
                     creditRow(
@@ -195,7 +197,10 @@ struct CreditsView: View {
             } message: {
                 Text("Your publications and subscriptions stay in your PDS. You can sign back in at any time.")
             }
-            .sheet(isPresented: $isShowingFeedback) {
+            .sheet(isPresented: Binding(
+                get: { loginStateManager.isAuthenticated && isShowingFeedback },
+                set: { isShowingFeedback = $0 }
+            )) {
                 FeedbackView()
             }
             .task {
