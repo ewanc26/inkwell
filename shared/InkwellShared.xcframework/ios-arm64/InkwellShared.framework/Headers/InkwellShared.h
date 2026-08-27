@@ -6,9 +6,9 @@
 #import <Foundation/NSString.h>
 #import <Foundation/NSValue.h>
 
-@class FacetConverter, InkwellSharedAtUri, InkwellSharedAtUriCompanion, InkwellSharedBasicTheme, InkwellSharedBlobRef, InkwellSharedBlockLossLabels, InkwellSharedBlueskyEmbedTypes, InkwellSharedByteSlice, InkwellSharedCachedFeedItem, InkwellSharedCachedFeedItemCompanion, InkwellSharedCdnUrls, InkwellSharedCollectionNsids, InkwellSharedColorValue, InkwellSharedConstellationBacklink, InkwellSharedConstellationPagination, InkwellSharedConstellationResponse, InkwellSharedConstellationSourcePaths, InkwellSharedContentFilterDecisionHide, InkwellSharedContentFilterDecisionShow, InkwellSharedContentFilterDecisionWarn, InkwellSharedContentFilterEngine, InkwellSharedContentFormatDetector, InkwellSharedContentFormatDispatcher, InkwellSharedDocumentLinkScanner, InkwellSharedDocumentPreferences, InkwellSharedFacetDefinition, InkwellSharedFacetSchema, InkwellSharedFeedCacheIosCompanion, InkwellSharedFilterMatch, InkwellSharedFilterMatchKind, InkwellSharedFilterableContent, InkwellSharedHandleUtils, InkwellSharedInlineMarkdownScanner, InkwellSharedInlineSegment, InkwellSharedInlineSegmentBold, InkwellSharedInlineSegmentCode, InkwellSharedInlineSegmentItalic, InkwellSharedInlineSegmentLink, InkwellSharedInlineSegmentPlain, InkwellSharedInlineSegmentStrike, InkwellSharedJetstreamConfig, InkwellSharedJetstreamEvent, InkwellSharedJetstreamEventCompanion, InkwellSharedJetstreamPayload, InkwellSharedJetstreamPayloadCompanion, InkwellSharedJsonMapBridge, InkwellSharedKotlinArray<T>, InkwellSharedKotlinEnum<E>, InkwellSharedKotlinEnumCompanion, InkwellSharedKotlinException, InkwellSharedKotlinIllegalStateException, InkwellSharedKotlinIntIterator, InkwellSharedKotlinIntProgression, InkwellSharedKotlinIntProgressionCompanion, InkwellSharedKotlinIntRange, InkwellSharedKotlinIntRangeCompanion, InkwellSharedKotlinNothing, InkwellSharedKotlinPair<__covariant A, __covariant B>, InkwellSharedKotlinRuntimeException, InkwellSharedKotlinThrowable, InkwellSharedKotlinx_serialization_coreSerialKind, InkwellSharedKotlinx_serialization_coreSerializersModule, InkwellSharedKotlinx_serialization_jsonJsonElement, InkwellSharedKotlinx_serialization_jsonJsonElementCompanion, InkwellSharedLeafletContentConverter, InkwellSharedLeafletFacet, InkwellSharedLeafletFacetFeature, InkwellSharedLeafletTypes, InkwellSharedLegacyPalette, InkwellSharedLegalDocuments, InkwellSharedMarkdownBlock, InkwellSharedMarkdownBlockBlockquote, InkwellSharedMarkdownBlockCode, InkwellSharedMarkdownBlockHeading, InkwellSharedMarkdownBlockHorizontalRule, InkwellSharedMarkdownBlockImage, InkwellSharedMarkdownBlockMath, InkwellSharedMarkdownBlockOrderedList, InkwellSharedMarkdownBlockParagraph, InkwellSharedMarkdownBlockTaskList, InkwellSharedMarkdownBlockUnorderedList, InkwellSharedMarkdownListItem, InkwellSharedMarkdownParser, InkwellSharedMarkdownSerializer, InkwellSharedMarkpubContentConverter, InkwellSharedMarkpubTypes, InkwellSharedModerationLabel, InkwellSharedModerationLabelCompanion, InkwellSharedModerationPolicy, InkwellSharedModerationPolicyCompanion, InkwellSharedNotificationPolicy, InkwellSharedNotificationStyleNone, InkwellSharedNotificationStyleSingle, InkwellSharedNotificationStyleSummary, InkwellSharedNumberFormat, InkwellSharedOAuthScopes, InkwellSharedOfflineCacheEntry, InkwellSharedOfflineCacheEntryCompanion, InkwellSharedOfflineCacheKind, InkwellSharedOfflineCacheKindCompanion, InkwellSharedOfflineCachePolicy, InkwellSharedOfflineCachePolicyCompanion, InkwellSharedOffprintContentConverter, InkwellSharedOffprintTypes, InkwellSharedPcktContentConverter, InkwellSharedPcktTypes, InkwellSharedPublicationMatcher, InkwellSharedPublicationPreferences, InkwellSharedPublicationTheme, InkwellSharedRecordListPolicy, InkwellSharedReportReasonType, InkwellSharedReportSubjectKind, InkwellSharedReportSubmission, InkwellSharedReportSubmissionCompanion, InkwellSharedRgbColor, InkwellSharedRgbaColor, InkwellSharedSearchBackendUrl, InkwellSharedSearchResultClassifier, InkwellSharedSharedConvertResult, InkwellSharedSharedDocumentRecord, InkwellSharedSharedGraphRecommend, InkwellSharedSharedGraphSubscription, InkwellSharedSharedLeafletComment, InkwellSharedSharedLeafletCommentReplyRef, InkwellSharedSharedPublicationRecord, InkwellSharedSharedReaderTheme, InkwellSharedSharedReaderThemeCompanion, InkwellSharedSharedReaderThemeFontFamily, InkwellSharedSharedWriteResult, InkwellSharedStandardModerationLabel, InkwellSharedStringUtils, InkwellSharedStrongRef, InkwellSharedSupportersList, InkwellSharedSyncFlushResult, InkwellSharedSyncMutationKind, InkwellSharedSyncMutationKindCompanion, InkwellSharedSyncQueueEntry, InkwellSharedSyncQueueEntryCompanion, InkwellSharedTipPromptPolicy, InkwellSharedUrlUtils, InkwellSharedUserInputLexicon, InkwellSharedUserLexicon, InkwellSharedUserLexiconRecord, InkwellSharedUserLexiconUtils, InkwellSharedUtf8Offsets, InkwellSharedVerificationFailure, InkwellSharedVerificationFailureDocumentLinkMissing, InkwellSharedVerificationFailureEndpointUnreachable, InkwellSharedVerificationFailureInvalidDocumentURL, InkwellSharedVerificationFailureInvalidPublicationURL, InkwellSharedVerificationFailureMalformedResponse, InkwellSharedVerificationFailureMismatchedURI, InkwellSharedVerificationFailureUnexpected, InkwellSharedVerificationResult, InkwellSharedVerificationResultFailed, InkwellSharedVerificationResultVerified, InkwellSharedVerificationUrls, InkwellSharedXrpcEndpoints, RichTextFacet, RichTextFeature;
+@class FacetConverter, InkwellSharedAtUri, InkwellSharedAtUriCompanion, InkwellSharedBasicTheme, InkwellSharedBlobRef, InkwellSharedBlockLossLabels, InkwellSharedBlueskyEmbedTypes, InkwellSharedByteSlice, InkwellSharedCachedFeedItem, InkwellSharedCachedFeedItemCompanion, InkwellSharedCachedOfflineRecord, InkwellSharedCachedOfflineRecordCompanion, InkwellSharedCdnUrls, InkwellSharedCollectionNsids, InkwellSharedColorValue, InkwellSharedConstellationBacklink, InkwellSharedConstellationPagination, InkwellSharedConstellationResponse, InkwellSharedConstellationSourcePaths, InkwellSharedContentFilterDecisionHide, InkwellSharedContentFilterDecisionShow, InkwellSharedContentFilterDecisionWarn, InkwellSharedContentFilterEngine, InkwellSharedContentFormatDetector, InkwellSharedContentFormatDispatcher, InkwellSharedDocumentLinkScanner, InkwellSharedDocumentPreferences, InkwellSharedFacetDefinition, InkwellSharedFacetSchema, InkwellSharedFeedCacheIosCompanion, InkwellSharedFeedCacheRetention, InkwellSharedFilterMatch, InkwellSharedFilterMatchKind, InkwellSharedFilterableContent, InkwellSharedHandleUtils, InkwellSharedInlineMarkdownScanner, InkwellSharedInlineSegment, InkwellSharedInlineSegmentBold, InkwellSharedInlineSegmentCode, InkwellSharedInlineSegmentItalic, InkwellSharedInlineSegmentLink, InkwellSharedInlineSegmentPlain, InkwellSharedInlineSegmentStrike, InkwellSharedJetstreamConfig, InkwellSharedJetstreamEvent, InkwellSharedJetstreamEventCompanion, InkwellSharedJetstreamPayload, InkwellSharedJetstreamPayloadCompanion, InkwellSharedJsonMapBridge, InkwellSharedKotlinArray<T>, InkwellSharedKotlinEnum<E>, InkwellSharedKotlinEnumCompanion, InkwellSharedKotlinException, InkwellSharedKotlinIllegalStateException, InkwellSharedKotlinIntIterator, InkwellSharedKotlinIntProgression, InkwellSharedKotlinIntProgressionCompanion, InkwellSharedKotlinIntRange, InkwellSharedKotlinIntRangeCompanion, InkwellSharedKotlinNothing, InkwellSharedKotlinPair<__covariant A, __covariant B>, InkwellSharedKotlinRuntimeException, InkwellSharedKotlinThrowable, InkwellSharedKotlinx_serialization_coreSerialKind, InkwellSharedKotlinx_serialization_coreSerializersModule, InkwellSharedKotlinx_serialization_jsonJsonElement, InkwellSharedKotlinx_serialization_jsonJsonElementCompanion, InkwellSharedLeafletContentConverter, InkwellSharedLeafletFacet, InkwellSharedLeafletFacetFeature, InkwellSharedLeafletTypes, InkwellSharedLegacyPalette, InkwellSharedLegalDocuments, InkwellSharedMarkdownBlock, InkwellSharedMarkdownBlockBlockquote, InkwellSharedMarkdownBlockCode, InkwellSharedMarkdownBlockHeading, InkwellSharedMarkdownBlockHorizontalRule, InkwellSharedMarkdownBlockImage, InkwellSharedMarkdownBlockMath, InkwellSharedMarkdownBlockOrderedList, InkwellSharedMarkdownBlockParagraph, InkwellSharedMarkdownBlockTaskList, InkwellSharedMarkdownBlockUnorderedList, InkwellSharedMarkdownListItem, InkwellSharedMarkdownParser, InkwellSharedMarkdownSerializer, InkwellSharedMarkpubContentConverter, InkwellSharedMarkpubTypes, InkwellSharedModerationLabel, InkwellSharedModerationLabelCompanion, InkwellSharedModerationPolicy, InkwellSharedModerationPolicyCompanion, InkwellSharedNotificationPolicy, InkwellSharedNotificationStyleNone, InkwellSharedNotificationStyleSingle, InkwellSharedNotificationStyleSummary, InkwellSharedNumberFormat, InkwellSharedOAuthScopes, InkwellSharedOfflineCacheEntry, InkwellSharedOfflineCacheEntryCompanion, InkwellSharedOfflineCacheKind, InkwellSharedOfflineCacheKindCompanion, InkwellSharedOfflineCachePolicy, InkwellSharedOfflineCachePolicyCompanion, InkwellSharedOfflineContentCacheRetention, InkwellSharedOffprintContentConverter, InkwellSharedOffprintTypes, InkwellSharedPcktContentConverter, InkwellSharedPcktTypes, InkwellSharedPublicationMatcher, InkwellSharedPublicationPreferences, InkwellSharedPublicationTheme, InkwellSharedRecordListPolicy, InkwellSharedReportReasonType, InkwellSharedReportSubjectKind, InkwellSharedReportSubmission, InkwellSharedReportSubmissionCompanion, InkwellSharedRgbColor, InkwellSharedRgbaColor, InkwellSharedSearchBackendUrl, InkwellSharedSearchResultClassifier, InkwellSharedSharedConvertResult, InkwellSharedSharedDocumentRecord, InkwellSharedSharedGraphRecommend, InkwellSharedSharedGraphSubscription, InkwellSharedSharedLeafletComment, InkwellSharedSharedLeafletCommentReplyRef, InkwellSharedSharedPublicationRecord, InkwellSharedSharedReaderTheme, InkwellSharedSharedReaderThemeCompanion, InkwellSharedSharedReaderThemeFontFamily, InkwellSharedSharedWriteResult, InkwellSharedStandardModerationLabel, InkwellSharedStringUtils, InkwellSharedStrongRef, InkwellSharedSupportersList, InkwellSharedSyncFlushResult, InkwellSharedSyncMutationKind, InkwellSharedSyncMutationKindCompanion, InkwellSharedSyncQueueEntry, InkwellSharedSyncQueueEntryCompanion, InkwellSharedTipPromptPolicy, InkwellSharedUrlUtils, InkwellSharedUserInputLexicon, InkwellSharedUserLexicon, InkwellSharedUserLexiconRecord, InkwellSharedUserLexiconUtils, InkwellSharedUtf8Offsets, InkwellSharedVerificationFailure, InkwellSharedVerificationFailureDocumentLinkMissing, InkwellSharedVerificationFailureEndpointUnreachable, InkwellSharedVerificationFailureInvalidDocumentURL, InkwellSharedVerificationFailureInvalidPublicationURL, InkwellSharedVerificationFailureMalformedResponse, InkwellSharedVerificationFailureMismatchedURI, InkwellSharedVerificationFailureUnexpected, InkwellSharedVerificationResult, InkwellSharedVerificationResultFailed, InkwellSharedVerificationResultVerified, InkwellSharedVerificationUrls, InkwellSharedXrpcEndpoints, RichTextFacet, RichTextFeature;
 
-@protocol InkwellSharedContentFilterDecision, InkwellSharedFeedCache, InkwellSharedJetstreamClient, InkwellSharedKotlinAnnotation, InkwellSharedKotlinClosedRange, InkwellSharedKotlinComparable, InkwellSharedKotlinFunction, InkwellSharedKotlinIterable, InkwellSharedKotlinIterator, InkwellSharedKotlinKAnnotatedElement, InkwellSharedKotlinKClass, InkwellSharedKotlinKClassifier, InkwellSharedKotlinKDeclarationContainer, InkwellSharedKotlinOpenEndRange, InkwellSharedKotlinSuspendFunction2, InkwellSharedKotlinx_coroutines_coreFlow, InkwellSharedKotlinx_coroutines_coreFlowCollector, InkwellSharedKotlinx_serialization_coreCompositeDecoder, InkwellSharedKotlinx_serialization_coreCompositeEncoder, InkwellSharedKotlinx_serialization_coreDecoder, InkwellSharedKotlinx_serialization_coreDeserializationStrategy, InkwellSharedKotlinx_serialization_coreEncoder, InkwellSharedKotlinx_serialization_coreKSerializer, InkwellSharedKotlinx_serialization_coreSerialDescriptor, InkwellSharedKotlinx_serialization_coreSerializationStrategy, InkwellSharedKotlinx_serialization_coreSerializersModuleCollector, InkwellSharedNotificationStyle;
+@protocol InkwellSharedContentFilterDecision, InkwellSharedFeedCache, InkwellSharedJetstreamClient, InkwellSharedKotlinAnnotation, InkwellSharedKotlinClosedRange, InkwellSharedKotlinComparable, InkwellSharedKotlinFunction, InkwellSharedKotlinIterable, InkwellSharedKotlinIterator, InkwellSharedKotlinKAnnotatedElement, InkwellSharedKotlinKClass, InkwellSharedKotlinKClassifier, InkwellSharedKotlinKDeclarationContainer, InkwellSharedKotlinOpenEndRange, InkwellSharedKotlinSuspendFunction2, InkwellSharedKotlinx_coroutines_coreFlow, InkwellSharedKotlinx_coroutines_coreFlowCollector, InkwellSharedKotlinx_serialization_coreCompositeDecoder, InkwellSharedKotlinx_serialization_coreCompositeEncoder, InkwellSharedKotlinx_serialization_coreDecoder, InkwellSharedKotlinx_serialization_coreDeserializationStrategy, InkwellSharedKotlinx_serialization_coreEncoder, InkwellSharedKotlinx_serialization_coreKSerializer, InkwellSharedKotlinx_serialization_coreSerialDescriptor, InkwellSharedKotlinx_serialization_coreSerializationStrategy, InkwellSharedKotlinx_serialization_coreSerializersModuleCollector, InkwellSharedNotificationStyle, InkwellSharedOfflineContentCache;
 
 NS_ASSUME_NONNULL_BEGIN
 #pragma clang diagnostic push
@@ -1315,6 +1315,32 @@ __attribute__((swift_name("FeedCacheIos.Companion")))
 + (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
 + (instancetype)companion __attribute__((swift_name("init()")));
 @property (class, readonly, getter=shared) InkwellSharedFeedCacheIosCompanion *shared __attribute__((swift_name("shared")));
+@end
+
+
+/**
+ * Shared eviction policy for the persisted reader-feed snapshot.
+ *
+ * Feed items are document metadata, so they use the same 30-day, 500-entry,
+ * 100 MB metadata limits as the full-record cache. Platform backends only
+ * perform file I/O; this object keeps their retention behaviour identical.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("FeedCacheRetention")))
+@interface InkwellSharedFeedCacheRetention : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Shared eviction policy for the persisted reader-feed snapshot.
+ *
+ * Feed items are document metadata, so they use the same 30-day, 500-entry,
+ * 100 MB metadata limits as the full-record cache. Platform backends only
+ * perform file I/O; this object keeps their retention behaviour identical.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)feedCacheRetention __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedFeedCacheRetention *shared __attribute__((swift_name("shared")));
+- (NSArray<InkwellSharedCachedFeedItem *> *)retainItems:(id)items nowMillis:(int64_t)nowMillis policy:(InkwellSharedOfflineCachePolicy *)policy __attribute__((swift_name("retain(items:nowMillis:policy:)")));
 @end
 
 
@@ -3294,6 +3320,87 @@ __attribute__((swift_name("OAuthScopes")))
 
 
 /**
+ * A serialized publication or document record retained for offline reading.
+ * The JSON is the record value rather than an authenticated XRPC response, so
+ * it never includes session material and can be decoded by each native app's
+ * existing Standard.site models.
+ *
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("CachedOfflineRecord")))
+@interface InkwellSharedCachedOfflineRecord : InkwellSharedBase
+- (instancetype)initWithUri:(NSString *)uri kind:(InkwellSharedOfflineCacheKind *)kind authorDid:(NSString *)authorDid cid:(NSString * _Nullable)cid recordJson:(NSString *)recordJson cachedAtMillis:(int64_t)cachedAtMillis lastAccessedAtMillis:(int64_t)lastAccessedAtMillis __attribute__((swift_name("init(uri:kind:authorDid:cid:recordJson:cachedAtMillis:lastAccessedAtMillis:)"))) __attribute__((objc_designated_initializer));
+@property (class, readonly, getter=companion) InkwellSharedCachedOfflineRecordCompanion *companion __attribute__((swift_name("companion")));
+- (InkwellSharedOfflineCacheEntry *)cacheEntry __attribute__((swift_name("cacheEntry()")));
+- (InkwellSharedCachedOfflineRecord *)doCopyUri:(NSString *)uri kind:(InkwellSharedOfflineCacheKind *)kind authorDid:(NSString *)authorDid cid:(NSString * _Nullable)cid recordJson:(NSString *)recordJson cachedAtMillis:(int64_t)cachedAtMillis lastAccessedAtMillis:(int64_t)lastAccessedAtMillis __attribute__((swift_name("doCopy(uri:kind:authorDid:cid:recordJson:cachedAtMillis:lastAccessedAtMillis:)")));
+
+/**
+ * A serialized publication or document record retained for offline reading.
+ * The JSON is the record value rather than an authenticated XRPC response, so
+ * it never includes session material and can be decoded by each native app's
+ * existing Standard.site models.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * A serialized publication or document record retained for offline reading.
+ * The JSON is the record value rather than an authenticated XRPC response, so
+ * it never includes session material and can be decoded by each native app's
+ * existing Standard.site models.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * A serialized publication or document record retained for offline reading.
+ * The JSON is the record value rather than an authenticated XRPC response, so
+ * it never includes session material and can be decoded by each native app's
+ * existing Standard.site models.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString *authorDid __attribute__((swift_name("authorDid")));
+@property (readonly) int64_t cachedAtMillis __attribute__((swift_name("cachedAtMillis")));
+@property (readonly) NSString * _Nullable cid __attribute__((swift_name("cid")));
+@property (readonly) InkwellSharedOfflineCacheKind *kind __attribute__((swift_name("kind")));
+@property (readonly) int64_t lastAccessedAtMillis __attribute__((swift_name("lastAccessedAtMillis")));
+@property (readonly) NSString *recordJson __attribute__((swift_name("recordJson")));
+@property (readonly) NSString *uri __attribute__((swift_name("uri")));
+@end
+
+
+/**
+ * A serialized publication or document record retained for offline reading.
+ * The JSON is the record value rather than an authenticated XRPC response, so
+ * it never includes session material and can be decoded by each native app's
+ * existing Standard.site models.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("CachedOfflineRecord.Companion")))
+@interface InkwellSharedCachedOfflineRecordCompanion : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * A serialized publication or document record retained for offline reading.
+ * The JSON is the record value rather than an authenticated XRPC response, so
+ * it never includes session material and can be decoded by each native app's
+ * existing Standard.site models.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedCachedOfflineRecordCompanion *shared __attribute__((swift_name("shared")));
+
+/**
+ * A serialized publication or document record retained for offline reading.
+ * The JSON is the record value rather than an authenticated XRPC response, so
+ * it never includes session material and can be decoded by each native app's
+ * existing Standard.site models.
+ */
+- (id<InkwellSharedKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end
+
+
+/**
  * A lightweight cache index entry. Platform implementations own the bytes;
  * this common model keeps eviction decisions consistent between the apps.
  *
@@ -3476,6 +3583,102 @@ __attribute__((swift_name("OfflineCachePolicy.Companion")))
 
 /** Retention limits used by platform-backed offline caches. */
 - (id<InkwellSharedKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
+@end
+
+
+/** Local storage contract for full records that have been opened before. */
+__attribute__((swift_name("OfflineContentCache")))
+@protocol InkwellSharedOfflineContentCache
+@required
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)clearWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("clear(completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)loadUri:(NSString *)uri completionHandler:(void (^)(InkwellSharedCachedOfflineRecord * _Nullable_result, NSError * _Nullable))completionHandler __attribute__((swift_name("load(uri:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)loadAllWithCompletionHandler:(void (^)(NSArray<InkwellSharedCachedOfflineRecord *> * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("loadAll(completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)removeUri:(NSString *)uri completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("remove(uri:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)upsertRecord:(InkwellSharedCachedOfflineRecord *)record completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("upsert(record:completionHandler:)")));
+@end
+
+
+/** iOS caches full public records in Caches/, where the OS may safely purge them. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfflineContentCacheIos")))
+@interface InkwellSharedOfflineContentCacheIos : InkwellSharedBase <InkwellSharedOfflineContentCache>
+- (instancetype)initWithCacheDirPath:(NSString *)cacheDirPath policy:(InkwellSharedOfflineCachePolicy *)policy __attribute__((swift_name("init(cacheDirPath:policy:)"))) __attribute__((objc_designated_initializer));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)clearWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("clear(completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)loadUri:(NSString *)uri completionHandler:(void (^)(InkwellSharedCachedOfflineRecord * _Nullable_result, NSError * _Nullable))completionHandler __attribute__((swift_name("load(uri:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)loadAllWithCompletionHandler:(void (^)(NSArray<InkwellSharedCachedOfflineRecord *> * _Nullable, NSError * _Nullable))completionHandler __attribute__((swift_name("loadAll(completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)removeUri:(NSString *)uri completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("remove(uri:completionHandler:)")));
+
+/**
+ * @note This method converts instances of CancellationException to errors.
+ * Other uncaught Kotlin exceptions are fatal.
+*/
+- (void)upsertRecord:(InkwellSharedCachedOfflineRecord *)record completionHandler:(void (^)(NSError * _Nullable))completionHandler __attribute__((swift_name("upsert(record:completionHandler:)")));
+@end
+
+
+/**
+ * Common eviction logic used by the Android, iOS, and JVM file backends.
+ * Platform implementations only provide locking, clock access, and file I/O.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("OfflineContentCacheRetention")))
+@interface InkwellSharedOfflineContentCacheRetention : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Common eviction logic used by the Android, iOS, and JVM file backends.
+ * Platform implementations only provide locking, clock access, and file I/O.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)offlineContentCacheRetention __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedOfflineContentCacheRetention *shared __attribute__((swift_name("shared")));
+- (BOOL)isExpiredRecord:(InkwellSharedCachedOfflineRecord *)record policy:(InkwellSharedOfflineCachePolicy *)policy nowMillis:(int64_t)nowMillis __attribute__((swift_name("isExpired(record:policy:nowMillis:)")));
+- (NSArray<InkwellSharedCachedOfflineRecord *> *)retainRecords:(id)records policy:(InkwellSharedOfflineCachePolicy *)policy nowMillis:(int64_t)nowMillis __attribute__((swift_name("retain(records:policy:nowMillis:)")));
 @end
 
 
@@ -4303,6 +4506,12 @@ __attribute__((swift_name("CreateJetstreamClient_iosKt")))
  * iOS factory — creates a [JetstreamClient] backed by Ktor + Darwin.
  */
 + (id<InkwellSharedJetstreamClient>)createJetstreamClient __attribute__((swift_name("createJetstreamClient()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("CreateOfflineContentCache_iosKt")))
+@interface InkwellSharedCreateOfflineContentCache_iosKt : InkwellSharedBase
++ (id<InkwellSharedOfflineContentCache>)createOfflineContentCacheCacheDirPath:(NSString *)cacheDirPath __attribute__((swift_name("createOfflineContentCache(cacheDirPath:)")));
 @end
 
 __attribute__((swift_name("Kotlinx_serialization_coreSerializationStrategy")))

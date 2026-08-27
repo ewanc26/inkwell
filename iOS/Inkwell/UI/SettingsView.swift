@@ -187,12 +187,17 @@ struct SettingsView: View {
 
                 Section {
                     LabeledContent("Image Cache", value: formattedCacheSize)
-                    Button("Clear Cache", role: .destructive) {
+                    Button("Clear Cached Content", role: .destructive) {
                         URLCache.shared.removeAllCachedResponses()
                         cacheSizeBytes = URLCache.shared.currentDiskUsage
+                        Task {
+                            await OfflineContentStore.shared.clear()
+                        }
                     }
                 } header: {
                     Text("Storage")
+                } footer: {
+                    Text("Removes downloaded images, saved feed cards, and full documents and publications available for offline reading.")
                 }
 
                 Section {

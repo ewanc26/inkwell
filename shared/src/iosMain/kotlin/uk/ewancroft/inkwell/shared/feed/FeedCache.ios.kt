@@ -7,6 +7,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 import platform.Foundation.NSData
@@ -25,7 +26,7 @@ import platform.Foundation.stringWithContentsOfFile
  * @param cacheDirPath Absolute path to the caches directory (typically
  *   `NSFileManager.defaultManager.cacheDirectoryPath`).
  */
-@OptIn(ExperimentalForeignApi::class)
+@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 class FeedCacheIos(
     cacheDirPath: String
 ) : uk.ewancroft.inkwell.shared.feed.FeedCache {
@@ -36,7 +37,7 @@ class FeedCacheIos(
 
     override suspend fun save(items: List<CachedFeedItem>) = withContext(Dispatchers.Default) {
         mutex.withLock {
-            writeToFile(json.encodeToString(items))
+            writeToFile(json.encodeToString(FeedCacheRetention.retain(items)))
         }
     }
 
@@ -46,13 +47,13 @@ class FeedCacheIos(
             for (item in items) {
                 existing[item.uri] = item
             }
-            writeToFile(json.encodeToString(existing.values.toList()))
+            writeToFile(json.encodeToString(FeedCacheRetention.retain(existing.values)))
         }
     }
 
     override suspend fun remove(uri: String) = withContext(Dispatchers.Default) {
         mutex.withLock {
-            val filtered = readFromFile().filter { it.uri != uri }
+            val filtered = FeedCacheRetention.retain(readFromFile().filter { it.uri != uri })
             writeToFile(json.encodeToString(filtered))
         }
     }
@@ -75,7 +76,6 @@ class FeedCacheIos(
     // ── File I/O ──────────────────────────────────────────────────────────
 
     private fun writeToFile(jsonString: String) {
-        val nsString = jsonString as NSString
         val bytes = jsonString.encodeToByteArray()
         bytes.usePinned {
             val data = NSData.create(bytes = it.addressOf(0), length = bytes.size.toULong())
@@ -96,7 +96,7 @@ class FeedCacheIos(
                 encoding = NSUTF8StringEncoding,
                 error = null
             ) ?: return emptyList()
-            json.decodeFromString<List<CachedFeedItem>>(content as String)
+            json.decodeFromString<List<CachedFeedItem>>(content)
         } catch (_: Exception) {
             emptyList()
         }

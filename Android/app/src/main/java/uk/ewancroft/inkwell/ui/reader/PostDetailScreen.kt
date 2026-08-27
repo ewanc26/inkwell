@@ -2,6 +2,7 @@ package uk.ewancroft.inkwell.ui.reader
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -182,37 +183,38 @@ fun PostDetailScreen(
         },
         containerColor = if (readerTheme.background != Color.Unspecified) readerTheme.background else MaterialTheme.colorScheme.background,
     ) { padding ->
-        when {
-            uiState.isLoading -> LoadingState(Modifier.padding(padding))
-            uiState.moderationState != PostModerationState.Visible -> ModeratedDetailState(
-                state = uiState.moderationState,
-                modifier = Modifier.padding(padding),
-                onReveal = viewModel::revealContent,
-            )
-            uiState.loadError != null -> ErrorState(
-                message = uiState.loadError!!,
-                modifier = Modifier.padding(padding),
-                onRetry = { viewModel.loadPost(uri, forceRefresh = true) },
-            )
-            else -> PostDetailContent(
-                uiState = uiState,
-                readerTheme = readerTheme,
-                onToggleSubscription = { viewModel.toggleSubscription() },
-                onToggleRecommend = { viewModel.toggleRecommend() },
-                onToggleBookmark = { viewModel.toggleBookmark() },
-                previousUri = uiState.previousUri,
-                previousTitle = uiState.previousTitle,
-                nextUri = uiState.nextUri,
-                nextTitle = uiState.nextTitle,
-                onNavigateToPost = onNavigateToPost,
-                onNewCommentTextChanged = { viewModel.onNewCommentTextChanged(it) },
-                onSubmitComment = { viewModel.submitComment() },
-                onSetReplyTo = { viewModel.setReplyTo(it) },
-                pollData = viewModel.pollData,
-                onLoadPoll = { pollRef -> viewModel.loadPoll(pollRef) },
-                onCastVote = { pollUri, options -> viewModel.castVote(pollUri, options) },
-                modifier = Modifier.padding(padding),
-            )
+        Column(Modifier.padding(padding)) {
+            if (uiState.isCached && !uiState.isLoading) CachedDetailBanner()
+            when {
+                uiState.isLoading -> LoadingState()
+                uiState.moderationState != PostModerationState.Visible -> ModeratedDetailState(
+                    state = uiState.moderationState,
+                    onReveal = viewModel::revealContent,
+                )
+                uiState.loadError != null -> ErrorState(
+                    message = uiState.loadError!!,
+                    onRetry = { viewModel.loadPost(uri, forceRefresh = true) },
+                )
+                else -> PostDetailContent(
+                    uiState = uiState,
+                    readerTheme = readerTheme,
+                    onToggleSubscription = { viewModel.toggleSubscription() },
+                    onToggleRecommend = { viewModel.toggleRecommend() },
+                    onToggleBookmark = { viewModel.toggleBookmark() },
+                    previousUri = uiState.previousUri,
+                    previousTitle = uiState.previousTitle,
+                    nextUri = uiState.nextUri,
+                    nextTitle = uiState.nextTitle,
+                    onNavigateToPost = onNavigateToPost,
+                    onNewCommentTextChanged = { viewModel.onNewCommentTextChanged(it) },
+                    onSubmitComment = { viewModel.submitComment() },
+                    onSetReplyTo = { viewModel.setReplyTo(it) },
+                    pollData = viewModel.pollData,
+                    onLoadPoll = { pollRef -> viewModel.loadPoll(pollRef) },
+                    onCastVote = { pollUri, options -> viewModel.castVote(pollUri, options) },
+                    modifier = Modifier,
+                )
+            }
         }
     }
 
@@ -239,6 +241,19 @@ private fun LoadingState(modifier: Modifier = Modifier) {
     Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         CircularProgressIndicator()
     }
+}
+
+@Composable
+private fun CachedDetailBanner() {
+    Text(
+        "Showing a saved copy",
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.onSecondaryContainer,
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.secondaryContainer)
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+    )
 }
 
 @Composable
