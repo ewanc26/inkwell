@@ -20,14 +20,20 @@ func parseAtUri(_ uri: String) -> (did: String, collection: String, recordKey: S
 
 // MARK: - Moderation
 
+enum ContentModerationPresentation: Equatable {
+    case visible
+    case warning
+    case hidden
+}
+
 @MainActor
-func shouldHideContent(
+func contentModerationPresentation(
     title: String?,
     description: String?,
     textContent: String?,
     labels: [String],
     settings: ModerationSettings? = nil
-) -> Bool {
+) -> ContentModerationPresentation {
     let settings = settings ?? ModerationSettings.shared
     let content = FilterableContent(
         title: title,
@@ -37,11 +43,31 @@ func shouldHideContent(
     )
     let policy = ModerationPolicy(
         hiddenLabels: settings.hiddenLabels,
-        warningLabels: [],
-        disabledLabelers: [],
+        warningLabels: settings.warningLabels,
+        disabledLabelers: settings.disabledLabelers,
         hiddenKeywords: settings.hiddenKeywords
     )
-    return ContentFilterEngine.shared.evaluate(content: content, policy: policy) is ContentFilterDecisionHide
+    let decision = ContentFilterEngine.shared.evaluate(content: content, policy: policy)
+    if decision is ContentFilterDecisionHide { return .hidden }
+    if decision is ContentFilterDecisionWarn { return .warning }
+    return .visible
+}
+
+@MainActor
+func shouldHideContent(
+    title: String?,
+    description: String?,
+    textContent: String?,
+    labels: [String],
+    settings: ModerationSettings? = nil
+) -> Bool {
+    contentModerationPresentation(
+        title: title,
+        description: description,
+        textContent: textContent,
+        labels: labels,
+        settings: settings
+    ) == .hidden
 }
 
 // MARK: - Facet Schema

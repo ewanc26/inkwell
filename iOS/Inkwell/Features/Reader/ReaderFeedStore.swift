@@ -85,6 +85,21 @@ final class ReaderFeedStore {
     private let jetstreamClient = createSharedJetstreamClient()
     private let feedCache = createSharedFeedCache()
     private var jetstreamTask: Task<Void, Never>?
+    private var revealedModeratedItemIDs: Set<String> = []
+
+    /// A filtered item remains visible as a neutral warning card until the
+    /// reader explicitly reveals it for this app session.
+    func moderationPresentation(for item: ReaderFeedItem) -> ContentModerationPresentation {
+        revealedModeratedItemIDs.contains(item.id) ? .visible : item.moderationPresentation
+    }
+
+    func revealModeratedItem(_ item: ReaderFeedItem) {
+        revealedModeratedItemIDs.insert(item.id)
+    }
+
+    func refreshModeration() {
+        revealedModeratedItemIDs.removeAll()
+    }
 
     // MARK: - Data Loading
 
@@ -542,7 +557,6 @@ final class ReaderFeedStore {
             }
         }
         return entries.values
-            .filter { !$0.isHiddenByModeration }
             .sorted(by: ReaderFeedItem.comparator(for: ReaderSortSettings.shared.sortOrder))
     }
 }
@@ -567,8 +581,9 @@ struct ReaderFeedItem: Identifiable {
 
     var id: String { document.uri }
 
-    var isHiddenByModeration: Bool {
-        shouldHideContent(
+    @MainActor
+    var moderationPresentation: ContentModerationPresentation {
+        contentModerationPresentation(
             title: document.record.title,
             description: document.record.description,
             textContent: document.record.textContent,

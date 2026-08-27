@@ -63,6 +63,7 @@ data class PostItem(
     val recordCid: String? = null,
     val title: String,
     val description: String?,
+    val textContent: String? = null,
     val publicationName: String?,
     val publishedAt: String,
     val coverUrl: String?,
@@ -74,9 +75,17 @@ data class PostItem(
     val publicationTheme: uk.ewancroft.inkwell.data.model.atproto.PublicationTheme? = null,
     val publicationBasicTheme: uk.ewancroft.inkwell.data.model.atproto.BasicTheme? = null,
     val isCached: Boolean = false,
-    val moderationLabels: List<String> = emptyList(),
+    val moderationLabels: List<ModerationLabel> = emptyList(),
+    val moderationState: PostModerationState = PostModerationState.Visible,
 ) {
     val date: String get() = publishedAt.formatPublishedDate()
+}
+
+/** Presentation-only state derived from the shared moderation decision. */
+enum class PostModerationState {
+    Visible,
+    Warning,
+    Hidden,
 }
 
 data class ReaderUiState(
@@ -115,28 +124,37 @@ class ReaderViewModel @Inject constructor(
     private val jetstreamClient = createJetstreamClient()
     private val feedCache = createFeedCache(context.cacheDir.absolutePath)
     private var jetstreamJob: kotlinx.coroutines.Job? = null
+    private val revealedPostUris = mutableSetOf<String>()
 
     private fun sortedByPreference(posts: List<PostItem>): List<PostItem> =
-        posts.filterNot(::isHiddenByModeration).let { visible ->
+        posts.map(::withModerationState).let { moderated ->
         when (ReaderPreferences.getSortOrder(context)) {
-            ReaderPreferences.SortOrder.NEWEST_FIRST -> visible.sortedByDescending { it.publishedAt }
-            ReaderPreferences.SortOrder.OLDEST_FIRST -> visible.sortedBy { it.publishedAt }
+            ReaderPreferences.SortOrder.NEWEST_FIRST -> moderated.sortedByDescending { it.publishedAt }
+            ReaderPreferences.SortOrder.OLDEST_FIRST -> moderated.sortedBy { it.publishedAt }
         }
         }
 
-    private fun isHiddenByModeration(post: PostItem): Boolean {
-        val decision = ContentFilterEngine.evaluate(
+    private fun withModerationState(post: PostItem): PostItem {
+        if (post.uri in revealedPostUris) return post.copy(moderationState = PostModerationState.Visible)
+        val state = when (ContentFilterEngine.evaluate(
             FilterableContent(
                 title = post.title,
                 description = post.description,
-                labels = post.moderationLabels.map { ModerationLabel(it) },
+                textContent = post.textContent,
+                labels = post.moderationLabels,
             ),
             ModerationPolicy(
                 hiddenLabels = ModerationPreferences.hiddenLabels(context),
+                warningLabels = ModerationPreferences.warningLabels(context),
+                disabledLabelers = ModerationPreferences.disabledLabelers(context),
                 hiddenKeywords = ModerationPreferences.hiddenKeywords(context),
             ),
-        )
-        return decision is ContentFilterDecision.Hide
+        )) {
+            is ContentFilterDecision.Hide -> PostModerationState.Hidden
+            is ContentFilterDecision.Warn -> PostModerationState.Warning
+            ContentFilterDecision.Show -> PostModerationState.Visible
+        }
+        return post.copy(moderationState = state)
     }
 
     init {
@@ -145,6 +163,28 @@ class ReaderViewModel @Inject constructor(
 
     fun selectTab(index: Int) {
         _uiState.value = _uiState.value.copy(selectedTab = index)
+    }
+
+    /** Re-applies the shared policy without making a new reader-feed request. */
+    fun refreshModeration() {
+        revealedPostUris.clear()
+        _uiState.value = _uiState.value.let { state ->
+            state.copy(
+                followingPosts = sortedByPreference(state.followingPosts),
+                yoursPosts = sortedByPreference(state.yoursPosts),
+            )
+        }
+    }
+
+    /** Reveals a filtered item for this reader session only. */
+    fun revealContent(uri: String) {
+        revealedPostUris += uri
+        _uiState.value = _uiState.value.let { state ->
+            state.copy(
+                followingPosts = sortedByPreference(state.followingPosts),
+                yoursPosts = sortedByPreference(state.yoursPosts),
+            )
+        }
     }
 
     fun submitReport(
@@ -224,7 +264,9 @@ class ReaderViewModel @Inject constructor(
             publicationName = publication.name.ifBlank { publicationName },
             publicationTheme = publication.theme,
             publicationBasicTheme = publication.basicTheme,
-            moderationLabels = moderationLabels + publication.labels?.values.orEmpty().map { it.value },
+            moderationLabels = moderationLabels + publication.labels?.values.orEmpty().map {
+                ModerationLabel(value = it.value, source = it.source)
+            },
         )
     }
 
@@ -321,6 +363,7 @@ class ReaderViewModel @Inject constructor(
                                     recordCid = docJson.jsonObject["cid"]?.jsonPrimitive?.contentOrNull,
                                     title = docValue["title"]?.jsonPrimitive?.content ?: "Untitled",
                                     description = docValue["description"]?.jsonPrimitive?.contentOrNull,
+                                    textContent = docValue["textContent"]?.jsonPrimitive?.contentOrNull,
                                     publicationName = profile?.displayName ?: profile?.handle,
                                     publishedAt = docValue["publishedAt"]?.jsonPrimitive?.content ?: "",
                                     coverUrl = docValue["coverImage"]?.jsonObject?.get("link")?.jsonPrimitive?.content
@@ -423,6 +466,7 @@ class ReaderViewModel @Inject constructor(
                                 recordCid = docJson.jsonObject["cid"]?.jsonPrimitive?.contentOrNull,
                                 title = docValue["title"]?.jsonPrimitive?.content ?: "Untitled",
                                 description = docValue["description"]?.jsonPrimitive?.contentOrNull,
+                                textContent = docValue["textContent"]?.jsonPrimitive?.contentOrNull,
                                 publicationName = publicationRecord?.name?.takeIf { it.isNotBlank() }
                                     ?: profile?.displayName ?: profile?.handle,
                                 publishedAt = docValue["publishedAt"]?.jsonPrimitive?.content ?: "",
@@ -435,7 +479,9 @@ class ReaderViewModel @Inject constructor(
                                 publicationTheme = publicationRecord?.theme,
                                 publicationBasicTheme = publicationRecord?.basicTheme,
                                 moderationLabels = docValue.moderationLabels() +
-                                    publicationRecord?.labels?.values.orEmpty().map { it.value },
+                                    publicationRecord?.labels?.values.orEmpty().map {
+                                        ModerationLabel(value = it.value, source = it.source)
+                                    },
                             ))
                         } catch (e: Exception) {
                             Log.w("ReaderViewModel", "Failed to parse following feed document", e)
@@ -546,6 +592,7 @@ class ReaderViewModel @Inject constructor(
                         recordCid = docJson.jsonObject["cid"]?.jsonPrimitive?.contentOrNull,
                         title = valueObj["title"]?.jsonPrimitive?.content ?: "Untitled",
                         description = valueObj["description"]?.jsonPrimitive?.contentOrNull,
+                        textContent = valueObj["textContent"]?.jsonPrimitive?.contentOrNull,
                         publicationName = profile?.displayName ?: profile?.handle,
                         publishedAt = valueObj["publishedAt"]?.jsonPrimitive?.content ?: "",
                         coverUrl = valueObj["coverImage"]?.jsonObject?.get("link")?.jsonPrimitive?.content
@@ -592,6 +639,7 @@ class ReaderViewModel @Inject constructor(
             authorDisplayName = authorDisplayName,
             authorAvatar = authorAvatar,
             isCached = isCached,
+            textContent = textContent,
             moderationLabels = emptyList(),
         )
     }
@@ -605,7 +653,7 @@ class ReaderViewModel @Inject constructor(
             publishedAt = publishedAt,
             path = path,
             description = description,
-            textContent = null,
+            textContent = textContent,
             coverImageUrl = coverUrl,
             publicationUri = null,
             publicationName = publicationName,
@@ -617,7 +665,14 @@ class ReaderViewModel @Inject constructor(
     }
 }
 
-private fun kotlinx.serialization.json.JsonObject.moderationLabels(): List<String> =
+private fun kotlinx.serialization.json.JsonObject.moderationLabels(): List<ModerationLabel> =
     this["labels"]?.jsonObject?.get("values")?.jsonArray
-        ?.mapNotNull { it.jsonObject["val"]?.jsonPrimitive?.contentOrNull }
+        ?.mapNotNull { label ->
+            label.jsonObject["val"]?.jsonPrimitive?.contentOrNull?.let { value ->
+                ModerationLabel(
+                    value = value,
+                    source = label.jsonObject["src"]?.jsonPrimitive?.contentOrNull,
+                )
+            }
+        }
         .orEmpty()

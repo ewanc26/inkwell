@@ -10,6 +10,7 @@ import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Report
 import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -183,6 +184,11 @@ fun PostDetailScreen(
     ) { padding ->
         when {
             uiState.isLoading -> LoadingState(Modifier.padding(padding))
+            uiState.moderationState != PostModerationState.Visible -> ModeratedDetailState(
+                state = uiState.moderationState,
+                modifier = Modifier.padding(padding),
+                onReveal = viewModel::revealContent,
+            )
             uiState.loadError != null -> ErrorState(
                 message = uiState.loadError!!,
                 modifier = Modifier.padding(padding),
@@ -232,6 +238,44 @@ fun PostDetailScreen(
 private fun LoadingState(modifier: Modifier = Modifier) {
     Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         CircularProgressIndicator()
+    }
+}
+
+@Composable
+private fun ModeratedDetailState(
+    state: PostModerationState,
+    onReveal: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val isWarning = state == PostModerationState.Warning
+    val title = if (isWarning) "Content warning" else "Content hidden"
+    val message = if (isWarning) {
+        "This article has a content label you chose to see behind a warning."
+    } else {
+        "This article matches one of your content filters."
+    }
+
+    Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.padding(24.dp),
+        ) {
+            Icon(
+                Icons.Outlined.VisibilityOff,
+                contentDescription = null,
+                modifier = Modifier.size(40.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(title, style = MaterialTheme.typography.titleMedium)
+            Text(
+                message,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            )
+            Button(onClick = onReveal) { Text("Reveal article") }
+        }
     }
 }
 

@@ -54,7 +54,7 @@ struct BrowseDocumentsView: View {
                 // safe-area inset without that effect.
                 .modifier(FeedSwitcherBar(selection: $store.selectedFeed))
                 .onReceive(NotificationCenter.default.publisher(for: .moderationSettingsChanged)) { _ in
-                    Task { await store.loadData(loginStateManager: loginStateManager, force: true) }
+                    store.refreshModeration()
                 }
                 .navigationTitle("Reader")
                 .navigationDestination(for: String.self) { documentURI in
@@ -168,24 +168,32 @@ struct BrowseDocumentsView: View {
             ScrollView {
                 LazyVStack(spacing: 18) {
                     ForEach(Array(store.followingState.items.enumerated()), id: \.element.id) { index, item in
-                        ZStack(alignment: .topTrailing) {
-                            NavigationLink {
-                                ReadView(
-                                    document: item.document.record,
-                                    publication: item.publication?.record,
-                                    documentURI: item.document.uri,
-                                    documentCID: item.document.cid,
-                                    authorDID: item.document.authorDID,
-                                    previousItem: index > 0 ? store.followingState.items[index - 1] : nil,
-                                    nextItem: index < store.followingState.items.count - 1 ? store.followingState.items[index + 1] : nil
-                                )
-                            } label: {
-                                ReaderPostCard(item: item, reservesOverflowSpace: true)
-                            }
-                            .buttonStyle(.readerCard)
+                        switch store.moderationPresentation(for: item) {
+                        case .visible:
+                            ZStack(alignment: .topTrailing) {
+                                NavigationLink {
+                                    ReadView(
+                                        document: item.document.record,
+                                        publication: item.publication?.record,
+                                        documentURI: item.document.uri,
+                                        documentCID: item.document.cid,
+                                        authorDID: item.document.authorDID,
+                                        previousItem: index > 0 ? store.followingState.items[index - 1] : nil,
+                                        nextItem: index < store.followingState.items.count - 1 ? store.followingState.items[index + 1] : nil
+                                    )
+                                } label: {
+                                    ReaderPostCard(item: item, reservesOverflowSpace: true)
+                                }
+                                .buttonStyle(.readerCard)
 
-                            reportMenu(for: item)
-                                .padding(10)
+                                reportMenu(for: item)
+                                    .padding(10)
+                            }
+                        case .warning, .hidden:
+                            ModeratedReaderPostCard(
+                                presentation: store.moderationPresentation(for: item),
+                                onReveal: { store.revealModeratedItem(item) }
+                            )
                         }
                     }
 
@@ -279,24 +287,32 @@ struct BrowseDocumentsView: View {
             ScrollView {
                 LazyVStack(spacing: 18) {
                     ForEach(Array(store.yours.enumerated()), id: \.element.id) { index, item in
-                        ZStack(alignment: .topTrailing) {
-                            NavigationLink {
-                                ReadView(
-                                    document: item.document.record,
-                                    publication: item.publication?.record,
-                                    documentURI: item.document.uri,
-                                    documentCID: item.document.cid,
-                                    authorDID: item.document.authorDID,
-                                    previousItem: index > 0 ? store.yours[index - 1] : nil,
-                                    nextItem: index < store.yours.count - 1 ? store.yours[index + 1] : nil
-                                )
-                            } label: {
-                                ReaderPostCard(item: item, reservesOverflowSpace: true)
-                            }
-                            .buttonStyle(.readerCard)
+                        switch store.moderationPresentation(for: item) {
+                        case .visible:
+                            ZStack(alignment: .topTrailing) {
+                                NavigationLink {
+                                    ReadView(
+                                        document: item.document.record,
+                                        publication: item.publication?.record,
+                                        documentURI: item.document.uri,
+                                        documentCID: item.document.cid,
+                                        authorDID: item.document.authorDID,
+                                        previousItem: index > 0 ? store.yours[index - 1] : nil,
+                                        nextItem: index < store.yours.count - 1 ? store.yours[index + 1] : nil
+                                    )
+                                } label: {
+                                    ReaderPostCard(item: item, reservesOverflowSpace: true)
+                                }
+                                .buttonStyle(.readerCard)
 
-                            reportMenu(for: item)
-                                .padding(10)
+                                reportMenu(for: item)
+                                    .padding(10)
+                            }
+                        case .warning, .hidden:
+                            ModeratedReaderPostCard(
+                                presentation: store.moderationPresentation(for: item),
+                                onReveal: { store.revealModeratedItem(item) }
+                            )
                         }
                     }
                 }

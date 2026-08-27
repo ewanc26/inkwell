@@ -2,7 +2,7 @@ package uk.ewancroft.inkwell.ui.reader
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material3.CircularProgressIndicator
@@ -29,6 +29,7 @@ internal fun FeedContent(
     hasMore: Boolean = false,
     onLoadMore: () -> Unit = {},
     onPostClick: (Int, PostItem) -> Unit = { _, _ -> },
+    onRevealContent: (PostItem) -> Unit = {},
     onViewProfile: (PostItem) -> Unit = {},
     onReportPost: (PostItem) -> Unit = {},
     onReportAccount: (PostItem) -> Unit = {},
@@ -76,33 +77,39 @@ internal fun FeedContent(
             contentPadding = PaddingValues(horizontal = 14.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(18.dp),
         ) {
-            items(posts, key = { it.uri }) { post ->
-                val index = posts.indexOf(post)
-                PostCard(
-                    title = post.title,
-                    description = post.description,
-                    publicationName = post.publicationName,
-                    date = post.date,
-                    coverUrl = post.coverUrl,
-                    authorDisplayName = post.authorDisplayName,
-                    authorAvatar = post.authorAvatar,
-                    isVerified = post.isVerified,
-                    publicationTheme = post.publicationTheme,
-                    publicationBasicTheme = post.publicationBasicTheme,
-                    isCached = post.isCached,
-                    onClick = { onPostClick(index, post) },
-                    onViewProfile = if (post.authorDid.isNotBlank()) {
-                        { onViewProfile(post) }
-                    } else {
-                        null
-                    },
-                    onReportPost = { onReportPost(post) },
-                    onReportAccount = if (post.authorDid.isNotBlank()) {
-                        { onReportAccount(post) }
-                    } else {
-                        null
-                    },
-                )
+            itemsIndexed(posts, key = { _, post -> post.uri }) { index, post ->
+                if (post.moderationState == PostModerationState.Visible) {
+                    PostCard(
+                        title = post.title,
+                        description = post.description,
+                        publicationName = post.publicationName,
+                        date = post.date,
+                        coverUrl = post.coverUrl,
+                        authorDisplayName = post.authorDisplayName,
+                        authorAvatar = post.authorAvatar,
+                        isVerified = post.isVerified,
+                        publicationTheme = post.publicationTheme,
+                        publicationBasicTheme = post.publicationBasicTheme,
+                        isCached = post.isCached,
+                        onClick = { onPostClick(index, post) },
+                        onViewProfile = if (post.authorDid.isNotBlank()) {
+                            { onViewProfile(post) }
+                        } else {
+                            null
+                        },
+                        onReportPost = { onReportPost(post) },
+                        onReportAccount = if (post.authorDid.isNotBlank()) {
+                            { onReportAccount(post) }
+                        } else {
+                            null
+                        },
+                    )
+                } else {
+                    ModeratedPostCard(
+                        state = post.moderationState,
+                        onReveal = { onRevealContent(post) },
+                    )
+                }
             }
             if (hasMore) {
                 item(key = "sentinel") {
