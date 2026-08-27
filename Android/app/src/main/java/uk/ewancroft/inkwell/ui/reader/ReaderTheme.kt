@@ -104,7 +104,9 @@ private fun RgbColor.toHexString(): String {
     return String.format("#%02X%02X%02X", r, g, b)
 }
 
-private fun Int.toColor(): Color = Color(this)
+/** Reader theme colours are 0xRRGGBB. Compose's Int constructor expects
+ * 0xAARRGGBB, so explicitly add an opaque alpha channel before rendering. */
+private fun Int.toColor(): Color = Color(0xFF000000.toInt() or (this and 0x00FFFFFF))
 
 private fun SharedReaderTheme.FontFamily.toLocal(): ReaderTheme.FontFamily = when (this) {
     SharedReaderTheme.FontFamily.Sans -> ReaderTheme.FontFamily.Sans

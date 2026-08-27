@@ -32,6 +32,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import uk.ewancroft.inkwell.data.model.atproto.BasicTheme
+import uk.ewancroft.inkwell.data.model.atproto.PublicationTheme
+import uk.ewancroft.inkwell.ui.theme.LocalForceDarkTheme
+import uk.ewancroft.inkwell.util.AccessibilityPreferences
+import uk.ewancroft.inkwell.util.CustomisationPreferences
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun PostCard(
@@ -43,10 +51,28 @@ fun PostCard(
     authorDisplayName: String? = null,
     authorAvatar: String? = null,
     isVerified: Boolean? = null,
+    publicationTheme: PublicationTheme? = null,
+    publicationBasicTheme: BasicTheme? = null,
     onClick: () -> Unit = {},
 ) {
-    val cardBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
-    val cardContainerColor = MaterialTheme.colorScheme.surface
+    val context = LocalContext.current
+    val isDarkTheme = LocalForceDarkTheme.current ?: isSystemInDarkTheme()
+    val publicationThemeIsPresent = publicationTheme != null || publicationBasicTheme != null
+    val readerTheme = remember(publicationTheme, publicationBasicTheme, isDarkTheme) {
+        ReaderTheme.resolve(
+            publicationTheme = publicationTheme,
+            basicTheme = publicationBasicTheme,
+            isDarkTheme = isDarkTheme,
+            overrideAccentRgb = CustomisationPreferences.getAccentColorRgbInt(context),
+            overrideFontFamily = CustomisationPreferences.getFontFamilyOverride(context),
+            increaseContrast = AccessibilityPreferences.getIncreaseContrast(context),
+        )
+    }
+    val cardContainerColor = if (publicationThemeIsPresent) readerTheme.background else MaterialTheme.colorScheme.surface
+    val foreground = if (publicationThemeIsPresent) readerTheme.foreground else MaterialTheme.colorScheme.onSurface
+    val secondaryForeground = if (publicationThemeIsPresent) foreground.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant
+    val accent = if (publicationThemeIsPresent) readerTheme.accent else MaterialTheme.colorScheme.primary
+    val cardBorderColor = foreground.copy(alpha = 0.1f)
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -96,7 +122,7 @@ fun PostCard(
                         Text(
                             authorDisplayName,
                             style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = secondaryForeground,
                         )
                     }
                 }
@@ -104,6 +130,7 @@ fun PostCard(
                 Text(
                     title,
                     style = MaterialTheme.typography.titleMedium,
+                    color = foreground,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -112,7 +139,7 @@ fun PostCard(
                     Text(
                         description,
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = secondaryForeground,
                         maxLines = 3,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -125,18 +152,18 @@ fun PostCard(
                     Text(
                         date,
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = secondaryForeground,
                     )
                     if (publicationName != null) {
                         Text(
                             "·",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = secondaryForeground,
                         )
                         Text(
                             publicationName,
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.primary,
+                            color = accent,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
@@ -146,7 +173,7 @@ fun PostCard(
                                 Icons.Filled.Verified,
                                 contentDescription = "Verified source",
                                 modifier = Modifier.size(14.dp),
-                                tint = MaterialTheme.colorScheme.primary,
+                                tint = accent,
                             )
                         }
                     }
@@ -154,7 +181,7 @@ fun PostCard(
                     Icon(
                         Icons.AutoMirrored.Outlined.ArrowForward,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.55f),
+                        tint = secondaryForeground.copy(alpha = 0.55f),
                         modifier = Modifier.size(16.dp),
                     )
                 }

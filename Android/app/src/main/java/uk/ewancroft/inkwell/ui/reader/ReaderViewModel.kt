@@ -15,9 +15,11 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.Json
 import uk.ewancroft.inkwell.data.model.atproto.DocumentRecord
 import uk.ewancroft.inkwell.data.model.atproto.PublicationRecord
 import uk.ewancroft.inkwell.data.model.bluesky.BlueskyProfile
@@ -58,6 +60,8 @@ data class PostItem(
     val authorDisplayName: String? = null,
     val authorAvatar: String? = null,
     val isVerified: Boolean? = null,
+    val publicationTheme: uk.ewancroft.inkwell.data.model.atproto.PublicationTheme? = null,
+    val publicationBasicTheme: uk.ewancroft.inkwell.data.model.atproto.BasicTheme? = null,
 ) {
     val date: String get() = publishedAt.formatPublishedDate()
 }
@@ -79,6 +83,8 @@ class ReaderViewModel @Inject constructor(
     private val pdsRepository: PdsRepository,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
+
+    private val json = Json { ignoreUnknownKeys = true }
 
     private val _uiState = MutableStateFlow(ReaderUiState())
     val uiState: StateFlow<ReaderUiState> = _uiState.asStateFlow()
@@ -126,9 +132,7 @@ class ReaderViewModel @Inject constructor(
         val publication = runCatching {
             val record = pdsRepository.getRecord(site)
             val value = record["value"]?.jsonObject ?: return@runCatching null
-            val url = value["url"]?.jsonPrimitive?.contentOrNull ?: return@runCatching null
-            val name = value["name"]?.jsonPrimitive?.contentOrNull ?: ""
-            PublicationRecord(url = url, name = name)
+            json.decodeFromJsonElement<PublicationRecord>(value)
         }.getOrNull() ?: return null
 
         publicationResolutionCache[site] = CachedPublicationResolution(
@@ -136,6 +140,18 @@ class ReaderViewModel @Inject constructor(
             timestamp = now,
         )
         return publication
+    }
+
+    private suspend fun PostItem.withPublicationTheme(): PostItem {
+        if (!isPublicationAtUri(site)) return this
+        val publication = runCatching {
+            withTimeout(PUBLICATION_TIMEOUT_MS) { resolvePublication(site) }
+        }.getOrNull() ?: return this
+        return copy(
+            publicationName = publication.name.ifBlank { publicationName },
+            publicationTheme = publication.theme,
+            publicationBasicTheme = publication.basicTheme,
+        )
     }
 
     private suspend fun verifyPosts(posts: List<PostItem>): List<PostItem> {
@@ -246,7 +262,8 @@ class ReaderViewModel @Inject constructor(
                         Log.w("ReaderViewModel", "Failed to fetch documents for DID $did", e)
                     }
                 }
-                val merged = sortedByPreference((state.followingPosts + posts).distinctBy { it.uri })
+                val themedPosts = posts.map { it.withPublicationTheme() }
+                val merged = sortedByPreference((state.followingPosts + themedPosts).distinctBy { it.uri })
                 _uiState.value = _uiState.value.copy(
                     followingPosts = merged,
                     isLoadingMoreFollowing = false,
@@ -316,6 +333,9 @@ class ReaderViewModel @Inject constructor(
                     val cursor = docsResponse["cursor"]?.jsonPrimitive?.contentOrNull
                     if (cursor != null) followingCursors[parsed.did] = cursor
                     val profile = didToProfile[parsed.did]
+                    val publicationRecord = runCatching {
+                        withTimeout(PUBLICATION_TIMEOUT_MS) { resolvePublication(publication) }
+                    }.getOrNull()
                     for (docJson in docsJson) {
                         try {
                             val docValue = docJson.jsonObject["value"]?.jsonObject ?: continue
@@ -324,7 +344,8 @@ class ReaderViewModel @Inject constructor(
                                 uri = docUri,
                                 title = docValue["title"]?.jsonPrimitive?.content ?: "Untitled",
                                 description = docValue["description"]?.jsonPrimitive?.contentOrNull,
-                                publicationName = profile?.displayName ?: profile?.handle,
+                                publicationName = publicationRecord?.name?.takeIf { it.isNotBlank() }
+                                    ?: profile?.displayName ?: profile?.handle,
                                 publishedAt = docValue["publishedAt"]?.jsonPrimitive?.content ?: "",
                                 coverUrl = docValue["coverImage"]?.jsonObject?.get("link")?.jsonPrimitive?.content
                                     ?: docValue["coverImage"]?.jsonObject?.get("\$link")?.jsonPrimitive?.content,
@@ -332,6 +353,8 @@ class ReaderViewModel @Inject constructor(
                                 path = docValue["path"]?.jsonPrimitive?.contentOrNull,
                                 authorDisplayName = profile?.displayName,
                                 authorAvatar = profile?.avatar,
+                                publicationTheme = publicationRecord?.theme,
+                                publicationBasicTheme = publicationRecord?.basicTheme,
                             ))
                         } catch (e: Exception) {
                             Log.w("ReaderViewModel", "Failed to parse following feed document", e)
@@ -389,7 +412,7 @@ class ReaderViewModel @Inject constructor(
 
                     if (cachedItem != null) {
                         // Convert to PostItem and merge into UI state.
-                        val newItem = cachedItem.toPostItem()
+                        val newItem = cachedItem.toPostItem().withPublicationTheme()
                         val currentPosts = _uiState.value.followingPosts
                         if (currentPosts.none { it.uri == newItem.uri }) {
                             val merged = sortedByPreference((currentPosts + newItem).distinctBy { it.uri })

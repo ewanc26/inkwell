@@ -84,6 +84,8 @@ internal fun FeedContent(
                     authorDisplayName = post.authorDisplayName,
                     authorAvatar = post.authorAvatar,
                     isVerified = post.isVerified,
+                    publicationTheme = post.publicationTheme,
+                    publicationBasicTheme = post.publicationBasicTheme,
                     onClick = { onPostClick(index, post) },
                 )
             }
