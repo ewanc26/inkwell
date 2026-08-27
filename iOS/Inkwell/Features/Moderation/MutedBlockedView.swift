@@ -116,7 +116,7 @@ struct MutedBlockedView: View {
             if isRemoving {
                 ProgressView()
                     .controlSize(.small)
-                    .accessibilityLabel("\(actionLabel) in progress")
+                    .accessibilityLabel("\(actionLabel) @\(actor.handle) in progress")
             } else {
                 Button(actionLabel, action: action)
                     .buttonStyle(.borderless)

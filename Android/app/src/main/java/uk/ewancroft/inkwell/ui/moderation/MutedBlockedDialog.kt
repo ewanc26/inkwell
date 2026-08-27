@@ -33,6 +33,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -101,7 +103,11 @@ fun MutedBlockedDialog(
 
                     when {
                         state.isLoading -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator()
+                            CircularProgressIndicator(
+                                modifier = Modifier.semantics {
+                                    contentDescription = "Loading moderation settings"
+                                },
+                            )
                         }
                         selectedTab == 0 -> MutedList(
                             mutes = state.mutes,
@@ -194,9 +200,23 @@ private fun ActorRow(
             )
         }
         if (isRemoving) {
-            CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .size(20.dp)
+                    .semantics {
+                        contentDescription = "$actionLabel @${actor.handle} in progress"
+                    },
+                strokeWidth = 2.dp,
+            )
         } else {
-            TextButton(onClick = onAction) { Text(actionLabel) }
+            TextButton(
+                onClick = onAction,
+                modifier = Modifier.semantics {
+                    contentDescription = "$actionLabel @${actor.handle}"
+                },
+            ) {
+                Text(actionLabel)
+            }
         }
     }
 }
