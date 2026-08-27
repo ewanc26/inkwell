@@ -172,15 +172,19 @@ struct BrowseDocumentsView: View {
                         case .visible:
                             ZStack(alignment: .topTrailing) {
                                 NavigationLink {
-                                    ReadView(
-                                        document: item.document.record,
-                                        publication: item.publication?.record,
-                                        documentURI: item.document.uri,
-                                        documentCID: item.document.cid,
-                                        authorDID: item.document.authorDID,
-                                        previousItem: index > 0 ? store.followingState.items[index - 1] : nil,
-                                        nextItem: index < store.followingState.items.count - 1 ? store.followingState.items[index + 1] : nil
-                                    )
+                                    if item.isCached {
+                                        RemoteDocumentView(documentURI: item.document.uri)
+                                    } else {
+                                        ReadView(
+                                            document: item.document.record,
+                                            publication: item.publication?.record,
+                                            documentURI: item.document.uri,
+                                            documentCID: item.document.cid,
+                                            authorDID: item.document.authorDID,
+                                            previousItem: index > 0 ? store.followingState.items[index - 1] : nil,
+                                            nextItem: index < store.followingState.items.count - 1 ? store.followingState.items[index + 1] : nil
+                                        )
+                                    }
                                 } label: {
                                     ReaderPostCard(item: item, reservesOverflowSpace: true)
                                 }
@@ -291,15 +295,19 @@ struct BrowseDocumentsView: View {
                         case .visible:
                             ZStack(alignment: .topTrailing) {
                                 NavigationLink {
-                                    ReadView(
-                                        document: item.document.record,
-                                        publication: item.publication?.record,
-                                        documentURI: item.document.uri,
-                                        documentCID: item.document.cid,
-                                        authorDID: item.document.authorDID,
-                                        previousItem: index > 0 ? store.yours[index - 1] : nil,
-                                        nextItem: index < store.yours.count - 1 ? store.yours[index + 1] : nil
-                                    )
+                                    if item.isCached {
+                                        RemoteDocumentView(documentURI: item.document.uri)
+                                    } else {
+                                        ReadView(
+                                            document: item.document.record,
+                                            publication: item.publication?.record,
+                                            documentURI: item.document.uri,
+                                            documentCID: item.document.cid,
+                                            authorDID: item.document.authorDID,
+                                            previousItem: index > 0 ? store.yours[index - 1] : nil,
+                                            nextItem: index < store.yours.count - 1 ? store.yours[index + 1] : nil
+                                        )
+                                    }
                                 } label: {
                                     ReaderPostCard(item: item, reservesOverflowSpace: true)
                                 }

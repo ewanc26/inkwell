@@ -14,12 +14,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
-import uk.ewancroft.inkwell.data.model.atproto.BasicTheme
 import uk.ewancroft.inkwell.data.model.atproto.DocumentRecord
 import uk.ewancroft.inkwell.data.model.atproto.PublicationRecord
 import uk.ewancroft.inkwell.data.model.atproto.PublicationTheme
@@ -48,6 +49,9 @@ import uk.ewancroft.inkwell.shared.moderation.ContentFilterEngine
 import uk.ewancroft.inkwell.shared.moderation.FilterableContent
 import uk.ewancroft.inkwell.shared.moderation.ModerationLabel
 import uk.ewancroft.inkwell.shared.moderation.ModerationPolicy
+import uk.ewancroft.inkwell.shared.offline.CachedOfflineRecord
+import uk.ewancroft.inkwell.shared.offline.OfflineCacheKind
+import uk.ewancroft.inkwell.shared.offline.createOfflineContentCache
 import uk.ewancroft.inkwell.util.ArticleStatePreferences
 import uk.ewancroft.inkwell.util.ModerationPreferences
 import javax.inject.Inject
@@ -60,12 +64,18 @@ class PostDetailViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
+    private val offlineContentCache = createOfflineContentCache(context.cacheDir.absolutePath)
 
     private val _uiState = MutableStateFlow(PostDetailUiState())
     val uiState: StateFlow<PostDetailUiState> = _uiState.asStateFlow()
 
     private var loadedUri: String? = null
     private val revealedUris = mutableSetOf<String>()
+
+    private data class CachedRecordLoad(
+        val record: JsonObject,
+        val isCached: Boolean,
+    )
 
     fun loadPost(uri: String, forceRefresh: Boolean = false) {
         val current = _uiState.value
@@ -110,7 +120,12 @@ class PostDetailViewModel @Inject constructor(
                 val parsed = AtUri.parse(uri)
                     ?: throw IllegalArgumentException("Malformed post link.")
 
-                val record = pdsRepository.getRecord(uri)
+                val loadedRecord = loadRecordWithOfflineFallback(
+                    uri = uri,
+                    authorDid = parsed.did,
+                    kind = OfflineCacheKind.Document,
+                )
+                val record = loadedRecord.record
                 val value = record["value"]?.jsonObject
                     ?: throw IllegalStateException("This post's record could not be read.")
                 val recordCid = record["cid"]?.jsonPrimitive?.contentOrNull
@@ -186,6 +201,7 @@ class PostDetailViewModel @Inject constructor(
                     isLoading = false,
                     loadError = null,
                     moderationState = PostModerationState.Visible,
+                    isCached = loadedRecord.isCached,
                     title = title,
                     authorDid = parsed.did,
                     recordCid = recordCid,
@@ -251,13 +267,54 @@ class PostDetailViewModel @Inject constructor(
 
     private suspend fun resolvePublication(site: String): PublicationRecord? {
         if (!site.startsWith("at://")) return null
-        val publicationJson = pdsRepository.getRecord(site)
+        val parsed = AtUri.parse(site) ?: return null
+        val publicationJson = loadRecordWithOfflineFallback(
+            uri = site,
+            authorDid = parsed.did,
+            kind = OfflineCacheKind.Publication,
+        ).record
         val value = publicationJson["value"]?.jsonObject ?: return null
         val publication = runCatching {
             json.decodeFromJsonElement<PublicationRecord>(value)
         }.getOrNull() ?: return null
         _uiState.value = _uiState.value.copy(publicationUrl = publication.url)
         return publication
+    }
+
+    private suspend fun loadRecordWithOfflineFallback(
+        uri: String,
+        authorDid: String,
+        kind: OfflineCacheKind,
+    ): CachedRecordLoad {
+        return try {
+            val networkRecord = pdsRepository.getRecord(uri)
+            val recordValue = networkRecord["value"]
+                ?: throw IllegalStateException("This record could not be read.")
+            val now = System.currentTimeMillis()
+            runCatching {
+                offlineContentCache.upsert(
+                    CachedOfflineRecord(
+                        uri = uri,
+                        kind = kind,
+                        authorDid = authorDid,
+                        cid = networkRecord["cid"]?.jsonPrimitive?.contentOrNull,
+                        recordJson = recordValue.toString(),
+                        cachedAtMillis = now,
+                        lastAccessedAtMillis = now,
+                    ),
+                )
+            }
+            CachedRecordLoad(record = networkRecord, isCached = false)
+        } catch (networkError: Exception) {
+            val cached = runCatching { offlineContentCache.load(uri) }.getOrNull()
+                ?.takeIf { it.kind == kind }
+                ?: throw networkError
+            val cachedRecord = buildJsonObject {
+                put("value", json.parseToJsonElement(cached.recordJson).jsonObject)
+                cached.cid?.let { put("cid", JsonPrimitive(it)) }
+            }
+            CachedRecordLoad(record = cachedRecord, isCached = true)
+        }
     }
 
     private fun loadRecommendState(documentUri: String) {
@@ -420,18 +477,11 @@ class PostDetailViewModel @Inject constructor(
     private fun loadPublicationTheme(publicationUri: String) {
         viewModelScope.launch {
             try {
-                val record = pdsRepository.getRecord(publicationUri)
-                val value = record["value"]?.jsonObject ?: return@launch
-                val pubTheme = runCatching {
-                    value["theme"]?.jsonObject?.let { json.decodeFromJsonElement<PublicationTheme>(it) }
-                }.getOrNull()
-                val basic = runCatching {
-                    value["basicTheme"]?.jsonObject?.let { json.decodeFromJsonElement<BasicTheme>(it) }
-                }.getOrNull()
+                val publication = resolvePublication(publicationUri) ?: return@launch
                 if (_uiState.value.publicationUri != publicationUri) return@launch
                 _uiState.value = _uiState.value.copy(
-                    publicationTheme = pubTheme,
-                    basicTheme = basic,
+                    publicationTheme = publication.theme,
+                    basicTheme = publication.basicTheme,
                 )
             } catch (e: Exception) {
                 Log.w("PostDetailVM", "Failed to load theme", e)

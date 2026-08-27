@@ -22,6 +22,7 @@ struct PublicationDetailView: View {
     @State private var resolvedPublication: PublicationEntry?
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @State private var isShowingCachedCopy = false
 
     private var publicationTitle: String {
         resolvedPublication?.record.name ?? publication.name
@@ -60,6 +61,11 @@ struct PublicationDetailView: View {
             }
         }
         .listStyle(.insetGrouped)
+        .safeAreaInset(edge: .top, spacing: 0) {
+            if isShowingCachedCopy {
+                CachedPublicationBanner()
+            }
+        }
         .navigationTitle(publicationTitle)
         .overlay {
             if isLoading && documents.isEmpty {
@@ -89,35 +95,54 @@ struct PublicationDetailView: View {
 
     private func load() async {
         isLoading = true
+        isShowingCachedCopy = false
         defer { isLoading = false }
 
         do {
             async let publicationsTask = loginStateManager.fetchPublications(fromDID: publication.did)
             async let documentsTask = loginStateManager.fetchDocuments(fromDID: publication.did)
 
-            self.publications = try await publicationsTask
-            let allDocuments = try await documentsTask
-
-            // Search results only identify a publication by domain. Prefer the
-            // authoritative `site.standard.publication` record for its display
-            // name once the author's PDS records have been loaded.
-            resolvedPublication = publications.first { entry in
-                normalizedHost(for: entry.record.url) == normalizedHost(for: publication.domain)
+            let fetchedPublications = try await publicationsTask
+            let fetchedDocuments = try await documentsTask
+            for entry in fetchedPublications {
+                await OfflineContentStore.shared.cache(publication: entry)
             }
-
-            let publicationURLMap = Dictionary(
-                uniqueKeysWithValues: publications.map { ($0.uri, $0.record.url) }
-            )
-
-            documents = allDocuments.compactMap { entry in
-                documentBelongsToPublication(entry.record, publicationURLMap: publicationURLMap)
-                    ? entry
-                    : nil
+            for entry in fetchedDocuments {
+                await OfflineContentStore.shared.cache(document: entry)
             }
-            .sorted { $0.record.publishedAt > $1.record.publishedAt }
+            present(publications: fetchedPublications, documents: fetchedDocuments)
         } catch {
-            errorMessage = "Couldn't load documents: \(error.localizedDescription)"
+            let cachedPublications = await OfflineContentStore.shared.publications(authorDID: publication.did)
+            let cachedDocuments = await OfflineContentStore.shared.documents(authorDID: publication.did)
+            guard !cachedPublications.isEmpty || !cachedDocuments.isEmpty else {
+                errorMessage = "Couldn't load documents: \(error.localizedDescription)"
+                return
+            }
+            present(publications: cachedPublications, documents: cachedDocuments)
+            isShowingCachedCopy = true
         }
+    }
+
+    private func present(publications: [PublicationEntry], documents: [DocumentEntry]) {
+        self.publications = publications
+
+        // Search results only identify a publication by domain. Prefer the
+        // authoritative `site.standard.publication` record for its display
+        // name once the author's PDS records have been loaded.
+        resolvedPublication = publications.first { entry in
+            normalizedHost(for: entry.record.url) == normalizedHost(for: publication.domain)
+        }
+
+        let publicationURLMap = Dictionary(
+            uniqueKeysWithValues: publications.map { ($0.uri, $0.record.url) }
+        )
+
+        self.documents = documents.compactMap { entry in
+            documentBelongsToPublication(entry.record, publicationURLMap: publicationURLMap)
+                ? entry
+                : nil
+        }
+        .sorted { $0.record.publishedAt > $1.record.publishedAt }
     }
 
     /// A document belongs to this publication when its `site` field matches the
@@ -280,5 +305,16 @@ private struct PublicationModeratedDocumentRow: View {
         }
         .padding(.vertical, 6)
         .accessibilityElement(children: .combine)
+    }
+}
+
+private struct CachedPublicationBanner: View {
+    var body: some View {
+        Label("Showing saved publication data", systemImage: "archivebox")
+            .font(.footnote.weight(.medium))
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 8)
+            .background(.thinMaterial)
+            .accessibilityLabel("Showing saved publication data")
     }
 }

@@ -37,6 +37,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,9 +56,11 @@ import uk.ewancroft.inkwell.util.ArticleStatePreferences
 import uk.ewancroft.inkwell.util.CustomisationPreferences
 import uk.ewancroft.inkwell.util.ImageCacheManager
 import uk.ewancroft.inkwell.util.LinkPreferences
+import uk.ewancroft.inkwell.util.OfflineContentCacheManager
 import uk.ewancroft.inkwell.util.ReaderPreferences
 import uk.ewancroft.inkwell.util.rememberInkwellHaptics
 import java.io.File
+import kotlinx.coroutines.launch
 
 /**
  * The app's actual settings surface: notifications, legal, and about, in
@@ -85,6 +88,7 @@ fun SettingsDialog(
     var showMutedBlocked by remember { mutableStateOf(false) }
     var showModerationSettings by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     val haptics = rememberInkwellHaptics()
 
     var accentColorHex by remember { mutableStateOf(CustomisationPreferences.getAccentColorHex(context)) }
@@ -465,12 +469,19 @@ fun SettingsDialog(
                     SectionHeader("Storage")
                     SettingsRow(title = "Image Cache", trailing = { Text(formatCacheSize(cacheSizeBytes)) })
                     SettingsRow(
-                        title = "Clear Cache",
+                        title = "Clear Cached Content",
                         titleColor = MaterialTheme.colorScheme.error,
                         onClick = {
                             ImageCacheManager.clear(context)
                             cacheSizeBytes = ImageCacheManager.currentSizeBytes(context)
+                            coroutineScope.launch { OfflineContentCacheManager.clear(context) }
                         },
+                    )
+                    Text(
+                        "Removes downloaded images, saved feed cards, and full documents and publications available for offline reading.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     )
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))

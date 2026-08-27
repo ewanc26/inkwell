@@ -276,7 +276,7 @@ struct ReadView: View {
                 HStack(spacing: 12) {
                     if let prev = previousItem {
                         NavigationLink {
-                            if prev.moderationPresentation == .visible {
+                            if prev.moderationPresentation == .visible && !prev.isCached {
                                 ReadView(
                                     document: prev.document.record,
                                     publication: prev.publication?.record,
@@ -300,7 +300,7 @@ struct ReadView: View {
                     }
                     if let next = nextItem {
                         NavigationLink {
-                            if next.moderationPresentation == .visible {
+                            if next.moderationPresentation == .visible && !next.isCached {
                                 ReadView(
                                     document: next.document.record,
                                     publication: next.publication?.record,

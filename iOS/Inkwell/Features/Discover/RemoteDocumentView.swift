@@ -16,6 +16,7 @@ struct RemoteDocumentView: View {
     @State private var pendingPublication: PublicationEntry?
     @State private var moderationPresentation: ContentModerationPresentation?
     @State private var errorMessage: String?
+    @State private var isShowingCachedCopy = false
 
     var body: some View {
         Group {
@@ -27,6 +28,11 @@ struct RemoteDocumentView: View {
                     documentCID: document.cid,
                     authorDID: document.authorDID
                 )
+                .safeAreaInset(edge: .top, spacing: 0) {
+                    if isShowingCachedCopy {
+                        CachedDocumentBanner()
+                    }
+                }
             } else if let moderationPresentation {
                 ContentUnavailableView {
                     Label(
@@ -61,6 +67,9 @@ struct RemoteDocumentView: View {
     private func load() async {
         errorMessage = nil
         moderationPresentation = nil
+        pendingDocument = nil
+        pendingPublication = nil
+        isShowingCachedCopy = false
 
         do {
             guard let parsed = parseAtUri(documentURI),
@@ -69,33 +78,33 @@ struct RemoteDocumentView: View {
             }
 
             let fetchedDocument = try await loginStateManager.fetchDocument(uri: documentURI)
-            let fetchedPublication: PublicationEntry?
-            if let site = parseAtUri(fetchedDocument.record.site),
-               site.collection == SiteStandardLexicon.PublicationRecord.type {
-                fetchedPublication = try? await loginStateManager.fetchPublication(uri: fetchedDocument.record.site)
+            var fetchedPublication: PublicationEntry?
+            if let site = publicationURI(for: fetchedDocument) {
+                fetchedPublication = try? await loginStateManager.fetchPublication(uri: site)
+                if fetchedPublication == nil {
+                    fetchedPublication = await OfflineContentStore.shared.publication(uri: site)
+                }
             } else {
                 fetchedPublication = nil
             }
 
-            let decision = contentModerationPresentation(
-                title: fetchedDocument.record.title,
-                description: fetchedDocument.record.description,
-                textContent: fetchedDocument.record.textContent,
-                labels: (fetchedDocument.record.labels?.values.map(\.value) ?? []) +
-                    (fetchedPublication?.record.labels?.values.map(\.value) ?? [])
-            )
-
-            switch decision {
-            case .visible:
-                document = fetchedDocument
-                publication = fetchedPublication
-            case .warning, .hidden:
-                pendingDocument = fetchedDocument
-                pendingPublication = fetchedPublication
-                moderationPresentation = decision
+            await OfflineContentStore.shared.cache(document: fetchedDocument)
+            if let fetchedPublication {
+                await OfflineContentStore.shared.cache(publication: fetchedPublication)
             }
+            present(fetchedDocument, publication: fetchedPublication, isCached: false)
         } catch {
-            errorMessage = error.localizedDescription
+            guard let cachedDocument = await OfflineContentStore.shared.document(uri: documentURI) else {
+                errorMessage = error.localizedDescription
+                return
+            }
+            let cachedPublication: PublicationEntry?
+            if let site = publicationURI(for: cachedDocument) {
+                cachedPublication = await OfflineContentStore.shared.publication(uri: site)
+            } else {
+                cachedPublication = nil
+            }
+            present(cachedDocument, publication: cachedPublication, isCached: true)
         }
     }
 
@@ -104,5 +113,49 @@ struct RemoteDocumentView: View {
         document = pendingDocument
         publication = pendingPublication
         moderationPresentation = nil
+    }
+
+    private func present(
+        _ fetchedDocument: DocumentEntry,
+        publication fetchedPublication: PublicationEntry?,
+        isCached: Bool
+    ) {
+        isShowingCachedCopy = isCached
+        let decision = contentModerationPresentation(
+            title: fetchedDocument.record.title,
+            description: fetchedDocument.record.description,
+            textContent: fetchedDocument.record.textContent,
+            labels: (fetchedDocument.record.labels?.values.map(\.value) ?? []) +
+                (fetchedPublication?.record.labels?.values.map(\.value) ?? [])
+        )
+
+        switch decision {
+        case .visible:
+            document = fetchedDocument
+            publication = fetchedPublication
+        case .warning, .hidden:
+            pendingDocument = fetchedDocument
+            pendingPublication = fetchedPublication
+            moderationPresentation = decision
+        }
+    }
+
+    private func publicationURI(for document: DocumentEntry) -> String? {
+        guard let parsed = parseAtUri(document.record.site),
+              parsed.collection == SiteStandardLexicon.PublicationRecord.type else {
+            return nil
+        }
+        return document.record.site
+    }
+}
+
+private struct CachedDocumentBanner: View {
+    var body: some View {
+        Label("Showing a saved copy", systemImage: "archivebox")
+            .font(.footnote.weight(.medium))
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 8)
+            .background(.thinMaterial)
+            .accessibilityLabel("Showing a saved copy of this article")
     }
 }

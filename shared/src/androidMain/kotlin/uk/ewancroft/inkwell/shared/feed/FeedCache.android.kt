@@ -27,7 +27,7 @@ class FeedCacheAndroid(
 
     override suspend fun save(items: List<CachedFeedItem>) = withContext(Dispatchers.IO) {
         mutex.withLock {
-            cacheFile.writeText(json.encodeToString(items))
+            cacheFile.writeText(json.encodeToString(FeedCacheRetention.retain(items)))
         }
     }
 
@@ -37,13 +37,13 @@ class FeedCacheAndroid(
             for (item in items) {
                 existing[item.uri] = item
             }
-            cacheFile.writeText(json.encodeToString(existing.values.toList()))
+            cacheFile.writeText(json.encodeToString(FeedCacheRetention.retain(existing.values)))
         }
     }
 
     override suspend fun remove(uri: String) = withContext(Dispatchers.IO) {
         mutex.withLock {
-            val filtered = readInternal().filter { it.uri != uri }
+            val filtered = FeedCacheRetention.retain(readInternal().filter { it.uri != uri })
             cacheFile.writeText(json.encodeToString(filtered))
         }
     }

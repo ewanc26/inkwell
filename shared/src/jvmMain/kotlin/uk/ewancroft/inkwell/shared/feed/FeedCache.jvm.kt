@@ -16,19 +16,19 @@ class FeedCacheJvm(cacheDirPath: String) : FeedCache {
     private val cacheFile = File(cacheDirPath, FEED_CACHE_FILENAME)
 
     override suspend fun save(items: List<CachedFeedItem>) = withContext(Dispatchers.IO) {
-        mutex.withLock { write(json.encodeToString(items)) }
+        mutex.withLock { write(json.encodeToString(FeedCacheRetention.retain(items))) }
     }
 
     override suspend fun upsert(items: List<CachedFeedItem>) = withContext(Dispatchers.IO) {
         mutex.withLock {
             val existing = read().associateBy { it.uri }.toMutableMap()
             items.forEach { existing[it.uri] = it }
-            write(json.encodeToString(existing.values.toList()))
+            write(json.encodeToString(FeedCacheRetention.retain(existing.values)))
         }
     }
 
     override suspend fun remove(uri: String) = withContext(Dispatchers.IO) {
-        mutex.withLock { write(json.encodeToString(read().filter { it.uri != uri })) }
+        mutex.withLock { write(json.encodeToString(FeedCacheRetention.retain(read().filter { it.uri != uri }))) }
     }
 
     override suspend fun load(limit: Int) = withContext(Dispatchers.IO) {
