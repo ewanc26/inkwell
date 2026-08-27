@@ -244,6 +244,19 @@ fun PostDetailScreen(
             Text(uiState.reportError!!)
         }
     }
+
+    if (uiState.reportConfirmation != null) {
+        Snackbar(
+            modifier = Modifier.padding(16.dp),
+            action = {
+                TextButton(onClick = { viewModel.dismissReportConfirmation() }) {
+                    Text("Dismiss")
+                }
+            }
+        ) {
+            Text(uiState.reportConfirmation!!)
+        }
+    }
 }
 
 @Composable

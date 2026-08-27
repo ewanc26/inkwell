@@ -482,7 +482,10 @@ class PostDetailViewModel @Inject constructor(
         reason: String?,
     ) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(reportError = null)
+            _uiState.value = _uiState.value.copy(
+                reportError = null,
+                reportConfirmation = null,
+            )
             try {
                 pdsRepository.submitReport(
                     subject = subject,
@@ -490,6 +493,7 @@ class PostDetailViewModel @Inject constructor(
                     reasonType = reasonType,
                     reason = reason,
                 )
+                _uiState.value = _uiState.value.copy(reportConfirmation = "Report submitted.")
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     reportError = e.message ?: "Failed to submit report",
@@ -500,6 +504,10 @@ class PostDetailViewModel @Inject constructor(
 
     fun dismissReportError() {
         _uiState.value = _uiState.value.copy(reportError = null)
+    }
+
+    fun dismissReportConfirmation() {
+        _uiState.value = _uiState.value.copy(reportConfirmation = null)
     }
 
     data class PollData(

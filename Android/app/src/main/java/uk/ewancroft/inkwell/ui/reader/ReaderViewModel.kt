@@ -79,6 +79,7 @@ data class ReaderUiState(
     val hasMoreFollowing: Boolean = false,
     val error: String? = null,
     val reportError: String? = null,
+    val reportConfirmation: String? = null,
     val selectedTab: Int = 0,
     val isVerifyingPosts: Boolean = false,
 )
@@ -127,7 +128,10 @@ class ReaderViewModel @Inject constructor(
         reason: String?,
     ) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(reportError = null)
+            _uiState.value = _uiState.value.copy(
+                reportError = null,
+                reportConfirmation = null,
+            )
             try {
                 pdsRepository.submitReport(
                     subject = subject,
@@ -135,6 +139,7 @@ class ReaderViewModel @Inject constructor(
                     reasonType = reasonType,
                     reason = reason,
                 )
+                _uiState.value = _uiState.value.copy(reportConfirmation = "Report submitted.")
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     reportError = e.message ?: "Failed to submit report",
@@ -145,6 +150,10 @@ class ReaderViewModel @Inject constructor(
 
     fun dismissReportError() {
         _uiState.value = _uiState.value.copy(reportError = null)
+    }
+
+    fun dismissReportConfirmation() {
+        _uiState.value = _uiState.value.copy(reportConfirmation = null)
     }
 
     private fun isPublicationAtUri(site: String): Boolean {
