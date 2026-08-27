@@ -1,7 +1,9 @@
 // ── Shared Core — Kotlin Multiplatform Module ─────────────────────────────
 //
 // Pure business logic shared between Android (JVM) and iOS (XCFramework).
-// No platform UI, no networking I/O in commonMain.
+// Platform-specific implementations (WebSocket, file I/O) live in
+// androidMain/iosMain.  commonMain contains models, interfaces, and
+// business logic only.
 
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
@@ -35,6 +37,10 @@ kotlin {
         commonMain.dependencies {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.websocket)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
         }
 
         commonTest.dependencies {
