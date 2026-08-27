@@ -1,5 +1,7 @@
 package uk.ewancroft.inkwell.shared.theme
 
+import kotlin.math.pow
+
 /**
  * Shared reader theme resolution — the cascade logic and font-family matching
  * that is identical on both platforms.
@@ -92,12 +94,11 @@ data class SharedReaderTheme(
                 0xFFFFFFFF.toInt()
             )
 
-            if (increaseContrast) {
+            if (increaseContrast || contrastRatio(foreground, background) < 4.5) {
                 // Snap to pure black/white rather than compute a target
-                // contrast ratio -- matches how iOS/Android's own system
-                // "Increase Contrast" settings behave (maximum, not a
-                // negotiated ratio), and is trivially correct regardless
-                // of what a publication's rich theme set.
+                // contrast ratio. Accessibility explicitly requests this;
+                // otherwise it is a safety net for a publication palette that
+                // would make ordinary reader text illegible on its background.
                 foreground = if (isPerceptuallyDark(background)) 0xFFFFFFFF.toInt() else 0xFF000000.toInt()
             }
 
@@ -128,6 +129,14 @@ data class SharedReaderTheme(
             return luminance < 0.5
         }
 
+        /** WCAG relative-luminance contrast ratio for two 0xRRGGBB colours. */
+        fun contrastRatio(first: Int, second: Int): Double {
+            val firstLuminance = relativeLuminance(first)
+            val secondLuminance = relativeLuminance(second)
+            return (maxOf(firstLuminance, secondLuminance) + 0.05) /
+                (minOf(firstLuminance, secondLuminance) + 0.05)
+        }
+
         fun fontFamilyFor(identifier: String?): FontFamily {
             val value = identifier?.lowercase() ?: return FontFamily.Sans
             return when {
@@ -149,6 +158,22 @@ data class SharedReaderTheme(
                 if (c != null) return c
             }
             error("No non-null candidate provided")
+        }
+
+        private fun relativeLuminance(rgbInt: Int): Double {
+            fun channel(value: Int): Double {
+                val normalized = value / 255.0
+                return if (normalized <= 0.04045) {
+                    normalized / 12.92
+                } else {
+                    ((normalized + 0.055) / 1.055).pow(2.4)
+                }
+            }
+
+            val red = channel((rgbInt shr 16) and 0xFF)
+            val green = channel((rgbInt shr 8) and 0xFF)
+            val blue = channel(rgbInt and 0xFF)
+            return 0.2126 * red + 0.7152 * green + 0.0722 * blue
         }
     }
 }

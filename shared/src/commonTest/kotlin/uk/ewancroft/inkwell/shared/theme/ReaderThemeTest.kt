@@ -205,11 +205,20 @@ class ReaderThemeTest {
     }
 
     @Test
-    fun noIncreaseContrastKeepsRichForeground() {
+    fun readableRichForegroundIsPreserved() {
         val theme = SharedReaderTheme.resolve(
             richBackgroundColor = 0x000000,
-            richPrimaryColor = 0x888888,
+            richPrimaryColor = 0xFFFFFF,
         )
-        assertEquals(0x888888, theme.foregroundRgb)
+        assertEquals(0xFFFFFF, theme.foregroundRgb)
+    }
+
+    @Test
+    fun unsafePublicationForegroundFallsBackToReadableText() {
+        val theme = SharedReaderTheme.resolve(
+            richBackgroundColor = 0x072409,
+            basicForeground = "#000000",
+        )
+        assertEquals(0xFFFFFFFF.toInt(), theme.foregroundRgb)
     }
 }

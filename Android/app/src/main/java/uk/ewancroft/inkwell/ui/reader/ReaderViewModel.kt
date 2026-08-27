@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -36,6 +37,9 @@ import uk.ewancroft.inkwell.util.formatPublishedDate
 import javax.inject.Inject
 
 private const val PUBLICATION_RESOLUTION_CACHE_TTL_MS = 5 * 60 * 1000L
+private const val SUBSCRIPTIONS_TIMEOUT_MS = 12_000L
+private const val PROFILE_TIMEOUT_MS = 4_000L
+private const val PUBLICATION_TIMEOUT_MS = 8_000L
 
 private data class CachedPublicationResolution(
     val publication: PublicationRecord,
@@ -272,11 +276,13 @@ class ReaderViewModel @Inject constructor(
         }
 
         try {
-            val subscriptionsResponse = pdsRepository.listRecords(
-                did = session.did,
-                collection = CollectionNsids.GRAPH_SUBSCRIPTION,
-                pdsUrl = session.pdsUrl
-            )
+            val subscriptionsResponse = withTimeout(SUBSCRIPTIONS_TIMEOUT_MS) {
+                pdsRepository.listRecords(
+                    did = session.did,
+                    collection = CollectionNsids.GRAPH_SUBSCRIPTION,
+                    pdsUrl = session.pdsUrl
+                )
+            }
 
             val subscriptionsJson = subscriptionsResponse["records"]?.jsonArray.orEmpty()
 
@@ -291,15 +297,21 @@ class ReaderViewModel @Inject constructor(
                     val parsed = AtUri.parse(publication) ?: continue
 
                     if (parsed.did !in didToProfile) {
-                        runCatching { pdsRepository.getProfile(parsed.did) }
+                        runCatching {
+                            withTimeout(PROFILE_TIMEOUT_MS) {
+                                pdsRepository.getProfile(parsed.did)
+                            }
+                        }
                             .onSuccess { didToProfile[parsed.did] = it }
                     }
 
-                    val docsResponse = pdsRepository.listRecords(
-                        did = parsed.did,
-                        collection = CollectionNsids.DOCUMENT,
-                        limit = 25
-                    )
+                    val docsResponse = withTimeout(PUBLICATION_TIMEOUT_MS) {
+                        pdsRepository.listRecords(
+                            did = parsed.did,
+                            collection = CollectionNsids.DOCUMENT,
+                            limit = 25
+                        )
+                    }
                     val docsJson = docsResponse["records"]?.jsonArray.orEmpty()
                     val cursor = docsResponse["cursor"]?.jsonPrimitive?.contentOrNull
                     if (cursor != null) followingCursors[parsed.did] = cursor
