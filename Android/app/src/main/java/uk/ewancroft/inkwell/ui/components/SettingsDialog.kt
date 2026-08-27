@@ -79,6 +79,10 @@ fun SettingsDialog(
     userLexiconBusy: Boolean,
     onUserLexiconEnabledChange: (Boolean) -> Unit,
     onModerationChanged: () -> Unit,
+    pendingSyncCount: Int,
+    isSyncingPendingChanges: Boolean,
+    canSyncPendingChanges: Boolean,
+    onSyncPendingChanges: () -> Unit,
     onSignOut: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -478,7 +482,35 @@ fun SettingsDialog(
                         },
                     )
                     Text(
-                        "Removes downloaded images, saved feed cards, and full documents and publications available for offline reading.",
+                        "Removes downloaded images, saved feed cards, and full documents and publications available for offline reading. Saved changes waiting to sync are kept.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    )
+
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+                    SectionHeader("Pending Changes")
+                    SettingsRow(
+                        title = "Saved Changes",
+                        trailing = {
+                            Text(
+                                if (pendingSyncCount == 1) "1 waiting to sync"
+                                else "$pendingSyncCount waiting to sync",
+                            )
+                        },
+                    )
+                    if (pendingSyncCount > 0) {
+                        TextButton(
+                            onClick = onSyncPendingChanges,
+                            enabled = canSyncPendingChanges && !isSyncingPendingChanges,
+                            modifier = Modifier.padding(horizontal = 8.dp),
+                        ) {
+                            Text(if (isSyncingPendingChanges) "Syncing…" else "Sync Saved Changes Now")
+                        }
+                    }
+                    Text(
+                        "Recommendations, subscriptions, and comments saved while offline sync automatically when you reconnect. They stay attached to the account that made them.",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(LoginStateManager.self) private var loginStateManager
+    @Environment(ConnectivityMonitor.self) private var connectivityMonitor
     @Environment(\.scenePhase) private var scenePhase
     @State private var notificationManager = NotificationManager.shared
     @State private var tipPromptManager = TipPromptManager.shared
@@ -47,8 +48,20 @@ struct ContentView: View {
         // so it's often already loaded (or well underway) by the time they
         // actually tap over to it.
         .task(id: loginStateManager.isAuthenticated) {
-            guard loginStateManager.isAuthenticated else { return }
+            guard loginStateManager.isAuthenticated else {
+                await OfflineMutationStore.shared.refresh(accountDID: nil)
+                return
+            }
+            if connectivityMonitor.isOnline {
+                _ = await OfflineMutationStore.shared.flush(loginStateManager: loginStateManager)
+            }
             await ReaderFeedStore.shared.loadData(loginStateManager: loginStateManager)
+        }
+        .onChange(of: connectivityMonitor.isOnline) { _, isOnline in
+            guard isOnline, loginStateManager.isAuthenticated else { return }
+            Task {
+                _ = await OfflineMutationStore.shared.flush(loginStateManager: loginStateManager)
+            }
         }
         .alert("Enjoying Inkwell?", isPresented: $showingTip) {
             Button("Maybe Later", role: .cancel) { tipPromptManager.markShown() }
@@ -162,6 +175,7 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .environment(LoginStateManager())
+        .environment(ConnectivityMonitor())
 }
 
 private struct MinimizeTabBarOnScrollDown: ViewModifier {

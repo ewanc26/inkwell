@@ -23,6 +23,7 @@ private struct ReportTarget: Identifiable {
 
 struct ReadView: View {
     @Environment(LoginStateManager.self) var loginStateManager
+    @Environment(ConnectivityMonitor.self) var connectivityMonitor
     @Environment(\.colorScheme) var colorScheme
 
     let document: SiteStandardLexicon.DocumentRecord
@@ -51,6 +52,7 @@ struct ReadView: View {
     @State var recommendRecordKey: String?
     @State var isSubmittingRecommend = false
     @State var actionMessage: String?
+    @State var actionMessageIsError = false
 
     // Local read/bookmark tracking — see ArticleStateStore.swift.
     @State var articleState = ArticleStateStore.shared
@@ -166,7 +168,7 @@ struct ReadView: View {
                 // that on narrow screens or larger Dynamic Type sizes the
                 // pills stack vertically instead of clipping or squeezing
                 // off the trailing edge.
-                if publicationURI != nil || documentURI != nil {
+                if publicationURI != nil || documentURI != nil || actionMessage != nil {
                     VStack(alignment: .leading, spacing: 6) {
                         ViewThatFits(in: .horizontal) {
                             HStack(spacing: 10) { actionPills }
@@ -175,7 +177,7 @@ struct ReadView: View {
                         if let actionMessage {
                             Text(actionMessage)
                                 .font(.caption)
-                                .foregroundStyle(.red)
+                                .foregroundStyle(actionMessageIsError ? .red : .secondary)
                         }
                     }
                 }
@@ -452,9 +454,11 @@ struct ReadView: View {
                 recordCID: target.recordCID,
                 onSubmit: {
                     actionMessage = "Report submitted."
+                    actionMessageIsError = false
                 },
                 onError: { message in
                     actionMessage = "Report failed: \(message)"
+                    actionMessageIsError = true
                 }
             )
         }

@@ -34,10 +34,36 @@ class OfflineCachePolicyTest {
     @Test
     fun `queued comments require text while other actions reject it`() {
         assertFailsWith<IllegalArgumentException> {
-            SyncQueueEntry("one", SyncMutationKind.CreateComment, "at://did:example:me/post/1", 1)
+            SyncQueueEntry(
+                id = "one",
+                accountDid = "did:example:me",
+                kind = SyncMutationKind.CreateComment,
+                subjectUri = "at://did:example:me/post/1",
+                createdAtMillis = 1,
+            )
         }
         assertFailsWith<IllegalArgumentException> {
-            SyncQueueEntry("two", SyncMutationKind.Recommend, "at://did:example:me/post/1", 1, "No")
+            SyncQueueEntry(
+                id = "two",
+                accountDid = "did:example:me",
+                kind = SyncMutationKind.Recommend,
+                subjectUri = "at://did:example:me/post/1",
+                createdAtMillis = 1,
+                commentText = "No",
+            )
+        }
+    }
+
+    @Test
+    fun `queued mutations require an owning account`() {
+        assertFailsWith<IllegalArgumentException> {
+            SyncQueueEntry(
+                id = "one",
+                accountDid = "",
+                kind = SyncMutationKind.Recommend,
+                subjectUri = "at://did:example:me/site.standard.document/post",
+                createdAtMillis = 1,
+            )
         }
     }
 

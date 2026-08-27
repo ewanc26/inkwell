@@ -84,6 +84,12 @@ fun PostDetailScreen(
     LaunchedEffect(uiState.commentError) {
         uiState.commentError?.let { snackbarHostState.showSnackbar(it); viewModel.dismissCommentError() }
     }
+    LaunchedEffect(uiState.pendingMutationMessage) {
+        uiState.pendingMutationMessage?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.dismissPendingMutationMessage()
+        }
+    }
     LaunchedEffect(uiState.reportError) {
         uiState.reportError?.let { snackbarHostState.showSnackbar(it); viewModel.dismissReportError() }
     }

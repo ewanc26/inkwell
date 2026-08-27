@@ -5,6 +5,7 @@
 
 import SwiftUI
 import ATProtoKit
+import InkwellShared
 
 extension ReadView {
     // MARK: - Comments
@@ -27,7 +28,22 @@ extension ReadView {
         guard !text.isEmpty else { return }
 
         isSubmittingComment = true
+        actionMessage = nil
+        actionMessageIsError = false
         defer { isSubmittingComment = false }
+
+        if !connectivityMonitor.isOnline {
+            guard await queueOfflineMutation(
+                kind: .createcomment,
+                subjectURI: uri,
+                commentText: text,
+                replyToURI: replyToComment?.uri
+            ) else { return }
+            newCommentText = ""
+            replyToComment = nil
+            actionMessage = "Comment saved and will sync when you’re back online."
+            return
+        }
 
         do {
             try await loginStateManager.createComment(
@@ -40,7 +56,8 @@ extension ReadView {
             replyToComment = nil
             await loadComments()  // refresh
         } catch {
-            print("[ReadView] submitComment failed: \(error)")
+            actionMessage = "Couldn't post comment: \(error.localizedDescription)"
+            actionMessageIsError = true
         }
     }
 
@@ -129,7 +146,19 @@ extension ReadView {
         guard !isTogglingSubscription else { return }
         isTogglingSubscription = true
         actionMessage = nil
+        actionMessageIsError = false
         defer { isTogglingSubscription = false }
+
+        if !connectivityMonitor.isOnline {
+            guard await queueOfflineMutation(
+                kind: isSubscribed ? .unsubscribe : .subscribe,
+                subjectURI: publicationURI
+            ) else { return }
+            isSubscribed.toggle()
+            subscriptionRecordKey = nil
+            actionMessage = "Subscription saved and will sync when you’re back online."
+            return
+        }
 
         do {
             if isSubscribed, let key = subscriptionRecordKey {
@@ -152,6 +181,7 @@ extension ReadView {
             }
         } catch {
             actionMessage = "Couldn't update subscription: \(error.localizedDescription)"
+            actionMessageIsError = true
         }
     }
 
@@ -159,7 +189,19 @@ extension ReadView {
         guard !isSubmittingRecommend else { return }
         isSubmittingRecommend = true
         actionMessage = nil
+        actionMessageIsError = false
         defer { isSubmittingRecommend = false }
+
+        if !connectivityMonitor.isOnline {
+            guard await queueOfflineMutation(
+                kind: isRecommended ? .unrecommend : .recommend,
+                subjectURI: documentURI
+            ) else { return }
+            isRecommended.toggle()
+            recommendRecordKey = nil
+            actionMessage = "Recommendation saved and will sync when you’re back online."
+            return
+        }
 
         do {
             if isRecommended, let key = recommendRecordKey {
@@ -173,6 +215,34 @@ extension ReadView {
             }
         } catch {
             actionMessage = "Couldn't update recommendation: \(error.localizedDescription)"
+            actionMessageIsError = true
+        }
+    }
+
+    private func queueOfflineMutation(
+        kind: SyncMutationKind,
+        subjectURI: String,
+        commentText: String? = nil,
+        replyToURI: String? = nil
+    ) async -> Bool {
+        guard let accountDID = loginStateManager.currentDID else {
+            actionMessage = "You need to sign in before saving this change."
+            actionMessageIsError = true
+            return false
+        }
+        do {
+            try await OfflineMutationStore.shared.enqueue(
+                accountDID: accountDID,
+                kind: kind,
+                subjectURI: subjectURI,
+                commentText: commentText,
+                replyToURI: replyToURI
+            )
+            return true
+        } catch {
+            actionMessage = "Couldn't save this change for later: \(error.localizedDescription)"
+            actionMessageIsError = true
+            return false
         }
     }
 
