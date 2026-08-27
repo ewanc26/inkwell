@@ -38,3 +38,6 @@ website/DESIGN.md linguist-documentation
 # OS metadata
 .DS_Store linguist-generated
 **/.DS_Store linguist-generated
+
+# Generated Kotlin/Native framework executables
+shared/InkwellShared.xcframework/**/InkwellShared filter=lfs diff=lfs merge=lfs -text
