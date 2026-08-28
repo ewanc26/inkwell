@@ -59,6 +59,8 @@ jobs:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: true
 
       - name: Select an Xcode version that supports Icon Composer (.icon) assets
         run: |
