@@ -1,6 +1,6 @@
-# Inkwell 2.5.0 release notes (draft)
+# Inkwell 2.5.0 release notes
 
-Inkwell 2.5.0 is the next iOS (build 58) and Android (version code 12) release. These notes describe code currently in the repository; store packages have not yet been published.
+Inkwell 2.5.0 brings the iOS and Android apps closer together, with shared real-time feeds, publication-aware reading, profiles, reporting, moderation, offline support, and accessibility improvements.
 
 ## Highlights
 
@@ -11,8 +11,3 @@ Inkwell 2.5.0 is the next iOS (build 58) and Android (version code 12) release. 
 - Enhanced moderation: labeler preferences, keyword filters, moderation labels, and explicit reveal controls are available on both platforms.
 - Offline-first reading: cached feeds and full documents appear immediately, while queued subscriptions, recommendations, and comments replay after connectivity returns.
 - Accessibility and readability improvements across Reader, Discover, Writer, profiles, and Settings.
-
-## Still in progress
-
-- Manual VoiceOver, TalkBack, largest-text, reduced-motion, and increased-contrast validation remains in progress.
-- APNs/FCM push delivery and official App Store/Play Store distribution remain roadmap work.
