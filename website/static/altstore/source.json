@@ -14,7 +14,7 @@
       "bundleIdentifier": "uk.ewancroft.Inkwell",
       "developerName": "Ewan Croft",
       "subtitle": "Read and write on Standard.site via AT Protocol",
-      "localizedDescription": "A native SwiftUI reader and writer for the Standard.site publishing ecosystem on AT Protocol.\n\nRead \u2014 Reads site.standard.publication and site.standard.document records from their owning PDS, rendered in a three-tab layout (Read / Discover / Write). Renders Leaflet block content and Markpub/Offprint/pckt markdown formats. Resolves display themes from Leaflet's rich palette through basicTheme to system defaults.\n\nDiscover \u2014 Searches the cross-platform public index used by the Standard.site ecosystem, then fetches authoritative records directly from the author. Cross-repo comment discovery via Constellation (microcosm.blue).\n\nWrite \u2014 Publishes Standard.site documents with portable metadata and selectable content formats.\n\nAuthentication is OAuth-based with your AT Protocol handle \u2014 no app password needed. Silent session restoration from the Keychain on relaunch.",
+      "localizedDescription": "A native SwiftUI reader and writer for the Standard.site publishing ecosystem on AT Protocol.\n\nRead — Reads site.standard.publication and site.standard.document records from their owning PDS, rendered in a three-tab layout (Read / Discover / Write). Renders Leaflet block content and Markpub/Offprint/pckt markdown formats. Resolves display themes from Leaflet's rich palette through basicTheme to system defaults.\n\nDiscover — Searches the cross-platform public index used by the Standard.site ecosystem, then fetches authoritative records directly from the author. Cross-repo comment discovery via Constellation (microcosm.blue).\n\nWrite — Publishes Standard.site documents with portable metadata and selectable content formats.\n\nAuthentication is OAuth-based with your AT Protocol handle — no app password needed. Silent session restoration from the Keychain on relaunch.",
       "iconURL": "https://inkwell.ewancroft.uk/altstore/icon.png",
       "tintColor": "#a6e3a1",
       "category": "social",
@@ -26,6 +26,14 @@
         "https://inkwell.ewancroft.uk/screenshots/ios/reader-5.5.png"
       ],
       "versions": [
+        {
+          "version": "2.5.0",
+          "date": "2026-08-28",
+          "localizedDescription": "# Inkwell 2.5.0 release notes\n\nInkwell 2.5.0 brings the iOS and Android apps closer together, with shared real-time feeds, publication-aware reading, profiles, reporting, moderation, offline support, and accessibility improvements.\n\n## Highlights\n\n- Cross-platform moderation parity: iOS now includes the same Muted & Blocked account management available on Android.\n- Cross-platform reader verification: Android now verifies publication-backed documents using their AT URIs, matching iOS behaviour.\n- Publication-aware reading: full publication views and reader cards use publication names, descriptions, icons, and readable publication themes instead of falling back to hostnames.\n- Account profiles and reporting: both apps include profile views and native account/content reporting flows.\n- Enhanced moderation: labeler preferences, keyword filters, moderation labels, and explicit reveal controls are available on both platforms.\n- Offline-first reading: cached feeds and full documents appear immediately, while queued subscriptions, recommendations, and comments replay after connectivity returns.\n- Accessibility and readability improvements across Reader, Discover, Writer, profiles, and Settings.\n",
+          "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.5.0.ipa",
+          "size": 13730992,
+          "buildVersion": "58"
+        },
         {
           "version": "2.4.0",
           "date": "2026-08-26",
@@ -70,7 +78,7 @@
           "version": "2.0.0",
           "buildVersion": "52",
           "date": "2026-08-18",
-          "localizedDescription": "Lowers the minimum supported iOS version from 26.0 to 18.0 for broader device compatibility \u2014 the two iOS 26-only visual effects used (tab bar minimize-on-scroll, the Reader feed switcher's scroll-edge bar) now fall back gracefully on older versions instead of being required. No other behavior changes from build 51.",
+          "localizedDescription": "Lowers the minimum supported iOS version from 26.0 to 18.0 for broader device compatibility — the two iOS 26-only visual effects used (tab bar minimize-on-scroll, the Reader feed switcher's scroll-edge bar) now fall back gracefully on older versions instead of being required. No other behavior changes from build 51.",
           "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.0.0.ipa",
           "size": 11400915
         },
@@ -103,11 +111,11 @@
         "entitlements": [],
         "privacy": {}
       },
-      "version": "2.4.0",
-      "buildVersion": "57",
-      "versionDate": "2026-08-26",
-      "size": 11973740,
-      "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.4.0.ipa"
+      "version": "2.5.0",
+      "buildVersion": "58",
+      "versionDate": "2026-08-28",
+      "size": 13730992,
+      "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.5.0.ipa"
     }
   ],
   "news": [],
