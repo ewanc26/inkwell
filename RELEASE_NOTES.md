@@ -147,12 +147,12 @@ The GitHub release and platform tag were created retroactively. The attached APK
 
 ## 1.3.0 — 2026-08-16
 
-Android versionCode 5 · Android only
+[Android versionCode 5](https://github.com/ewanc26/inkwell/releases/tag/android-v1.3.0) · Android only
 
 - Aligned Android post and feed-card styling with iOS, including colours, chevrons, outlines, and the splash screen.
 - Published the signed APK through the self-hosted F-Droid repository.
 
-This short-lived release was superseded by 1.3.1 later the same day. It did not receive a platform tag or a backfilled GitHub Release, but its version bump and distributed APK are preserved in the Git history.
+This short-lived release was superseded by 1.3.1 later the same day. Its platform tag and GitHub Release were created retroactively on 2026-08-28 using the exact original APK preserved in the repository's F-Droid history.
 
 ## 1.2.0 — 2026-08-16
 
