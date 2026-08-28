@@ -45,6 +45,7 @@ jobs:
             ios:
               - 'iOS/**'
               - 'shared/**'
+              - '.github/workflows/ci.yml'
             android:
               - 'Android/**'
               - 'shared/**'
