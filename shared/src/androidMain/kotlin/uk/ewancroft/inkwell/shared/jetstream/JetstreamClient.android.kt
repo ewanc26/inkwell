@@ -9,9 +9,9 @@ import io.ktor.serialization.kotlinx.json.json
 import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
-import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
 import kotlinx.serialization.json.Json
 import kotlin.coroutines.coroutineContext
@@ -36,12 +36,11 @@ class JetstreamClientAndroid : uk.ewancroft.inkwell.shared.jetstream.JetstreamCl
 
     private var session: io.ktor.websocket.WebSocketSession? = null
 
-    override fun connect(config: JetstreamConfig): Flow<JetstreamPayload> = callbackFlow {
-        val url = buildUrl(config)
-        val wsSession = httpClient.webSocketSession(urlString = url)
-        session = wsSession
-
+    override fun connect(config: JetstreamConfig): Flow<JetstreamPayload> = flow {
+        var wsSession: io.ktor.websocket.WebSocketSession? = null
         try {
+            wsSession = httpClient.webSocketSession(urlString = buildJetstreamUrl(config))
+            session = wsSession
             while (coroutineContext.isActive) {
                 val frame = wsSession.incoming.receive()
                 when (frame) {
@@ -50,7 +49,7 @@ class JetstreamClientAndroid : uk.ewancroft.inkwell.shared.jetstream.JetstreamCl
                         try {
                             val event = json.decodeFromString<JetstreamEvent>(text)
                             if (event.payload.operation == "commit") {
-                                trySend(event.payload)
+                                emit(event.payload)
                             }
                         } catch (_: Exception) {
                             // Skip malformed frames
@@ -60,12 +59,15 @@ class JetstreamClientAndroid : uk.ewancroft.inkwell.shared.jetstream.JetstreamCl
                     else -> { /* ignore binary, ping, pong */ }
                 }
             }
+        } catch (error: CancellationException) {
+            throw error
+        } catch (_: Exception) {
+            // Treat upgrade rejection and disconnect as normal stream end.
+            // The feed remains usable from its cache and regular refresh.
         } finally {
-            session = null
-            wsSession.close()
+            if (session === wsSession) session = null
+            wsSession?.close()
         }
-
-        awaitClose { session = null }
     }
 
     override suspend fun disconnect() {
@@ -76,19 +78,4 @@ class JetstreamClientAndroid : uk.ewancroft.inkwell.shared.jetstream.JetstreamCl
     override val isConnected: Boolean
         get() = session?.isActive == true
 
-    // ── URL Builder ──────────────────────────────────────────────────────
-
-    private fun buildUrl(config: JetstreamConfig): String {
-        val base = "wss://jetstream.us-east.bsky.network/xrpc/network.bsky.jetstream.subscribeEvents"
-        val params = mutableListOf<String>()
-        for (collection in config.collections) {
-            params.add("collections=$collection")
-        }
-        if (config.dids.isNotEmpty()) {
-            params.add("dids=${config.dids.joinToString(",")}")
-        }
-        params.add("kinds=commit")
-        config.cursor?.let { params.add("cursor=$it") }
-        return "$base?${params.joinToString("&")}"
-    }
 }
