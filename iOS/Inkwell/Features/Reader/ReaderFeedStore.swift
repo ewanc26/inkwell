@@ -624,15 +624,22 @@ struct ReaderFeedItem: Identifiable {
 
     @MainActor
     var moderationPresentation: ContentModerationPresentation {
-        contentModerationPresentation(
+        let cachedLabels: [ModerationLabel] = cachedModerationLabels.map { label in
+            ModerationLabel(value: label.value, source: label.source)
+        }
+        let documentLabels: [ModerationLabel] = document.record.labels?.values.map { label in
+            ModerationLabel(value: label.value, source: nil)
+        } ?? []
+        let publicationLabels: [ModerationLabel] = publication?.record.labels?.values.map { label in
+            ModerationLabel(value: label.value, source: nil)
+        } ?? []
+        let labels = cachedLabels + documentLabels + publicationLabels
+
+        return contentModerationPresentation(
             title: document.record.title,
             description: document.record.description,
             textContent: document.record.textContent,
-            labels: cachedModerationLabels.map {
-                ModerationLabel(value: $0.value, source: $0.source)
-            } +
-                (document.record.labels?.values.map { ModerationLabel(value: $0.value, source: nil) } ?? []) +
-                (publication?.record.labels?.values.map { ModerationLabel(value: $0.value, source: nil) } ?? [])
+            labels: labels
         )
     }
 
