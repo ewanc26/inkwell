@@ -19,7 +19,7 @@ A native reader and writer for the [Standard.site](https://standard.site) publis
 
 Inkwell is a **native app** available on iOS and Android. This monorepo also contains the marketing/legal site that hosts the app's install sources and OAuth metadata.
 
-Release notes for the upcoming 2.5.0 builds are available in [RELEASE_NOTES.md](RELEASE_NOTES.md).
+The complete release history is available in the [changelog](RELEASE_NOTES.md).
 
 ## Repository structure
 
