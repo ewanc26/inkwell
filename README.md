@@ -21,6 +21,17 @@ Inkwell is a **native app** available on iOS and Android. This monorepo also con
 
 The complete release history is available in the [changelog](RELEASE_NOTES.md).
 
+## Screenshots
+
+<p align="center">
+  <img src="website/static/screenshots/ios/reader.png" alt="Inkwell for iOS Reader" width="220">
+  <img src="website/static/screenshots/ios/discover.png" alt="Inkwell for iOS Discover" width="220">
+</p>
+<p align="center">
+  <img src="website/static/screenshots/android/reader.png" alt="Inkwell for Android Reader" width="220">
+  <img src="website/static/screenshots/android/discover.png" alt="Inkwell for Android Discover" width="220">
+</p>
+
 ## Repository structure
 
 | Directory | Purpose |
@@ -34,7 +45,7 @@ The complete release history is available in the [changelog](RELEASE_NOTES.md).
 
 - Reads `site.standard.publication` and `site.standard.document` records from the author's PDS.
 - Renders Markpub Markdown plus Leaflet, pckt, and Offprint content. Uses `textContent` as a fallback. Native block rendering for Leaflet (including blob-stored pages), Markdown for everything else.
-- Real device screenshots are checked in under `iOS/screenshots/`, `Android/fastlane/metadata/.../images/phoneScreenshots/`, and `website/static/screenshots/`, captured in testing mode — `-testing` (iOS) / `--ez testing true` (Android). Testing mode uses the real signed-in session and real network reads; it intercepts every write and shows a "Testing mode" notice instead. Captures therefore require being logged in.
+- Representative app screenshots are checked in under `iOS/screenshots/`, `Android/fastlane/metadata/.../images/phoneScreenshots/`, and `website/static/screenshots/`, captured in testing mode — `-testing` (iOS) / `--ez testing true` (Android). Testing mode uses the real signed-in session and real network reads; it intercepts every write and shows a "Testing mode" notice instead. Captures therefore require being logged in.
 - Theme resolution: Leaflet's light/dark palette → `basicTheme` → system defaults. Publication-level by default, overridable per document.
 - Split-pane editor with live markdown preview, formatting toolbar, and selectable content formats.
 - Image upload directly into the editor.
