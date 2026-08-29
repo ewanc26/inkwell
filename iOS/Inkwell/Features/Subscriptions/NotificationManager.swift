@@ -5,8 +5,9 @@
 //  Created by Letta on 20/06/2026.
 //
 //  Manages local notifications for new documents from subscribed
-//  publications. On each poll (triggered by the app's background fetch
-//  or a manual refresh), the manager:
+//  publications. A Jetstream event while the Reader is open, or a poll
+//  triggered by the app's background fetch/manual refresh, reaches the same
+//  delivery path:
 //
 //  1. Fetches the user's subscriptions (site.standard.graph.subscription
 //     records).
@@ -17,10 +18,9 @@
 //  4. For any new documents, schedules a local notification and updates
 //     the last-seen set.
 //
-//  This is a "pull" notification model — there's no push server. The
-//  app polls on launch and via iOS background fetch. This is the
-//  standard approach for AT Protocol apps that don't have their own
-//  backend to relay firehose events as push notifications.
+//  This is still a local-notification model — there is no remote push
+//  provider. Jetstream gives an open Reader immediate updates; iOS
+//  background refresh polls when the app is not active.
 //
 
 import Foundation
@@ -87,6 +87,26 @@ final class NotificationManager {
 
     // MARK: - Polling
 
+    /// Records a just-created document received through the Reader's live
+    /// Jetstream connection. The caller must already have established that
+    /// the document belongs to a subscription.
+    ///
+    /// Background refresh still uses polling, but both paths share the
+    /// seen-URI store and delivery rules so a foreground event never results
+    /// in a second banner when the next refresh runs.
+    func recordLiveDocument(
+        _ document: DocumentEntry,
+        publication: PublicationEntry?
+    ) async {
+        var seen = lastSeenURIs
+        guard !seen.contains(document.uri) else { return }
+
+        await recordNewDocuments([(doc: document, pub: publication)])
+        seen.insert(document.uri)
+        saveLastSeenURIs(seen)
+        defaults.set(Date(), forKey: lastPollKey)
+    }
+
     /// Polls subscribed publications for new documents and sends local
     /// notifications for any that are new since the last poll.
     ///
@@ -136,18 +156,32 @@ final class NotificationManager {
             }
         }
 
+        await recordNewDocuments(newDocs)
+
+        // Update last-seen URIs and poll time.
+        saveLastSeenURIs(allSeenURIs)
+        defaults.set(Date(), forKey: lastPollKey)
+    }
+
+    // MARK: - Delivery
+
+    /// Applies the identical first-run, grouping and history policy to
+    /// foreground Jetstream events and background polling results.
+    private func recordNewDocuments(_ newDocs: [(doc: DocumentEntry, pub: PublicationEntry?)]) async {
+        guard !newDocs.isEmpty else { return }
+
         // Only send notifications if this isn't the first poll (first
         // poll just establishes the baseline of existing documents).
         let lastPoll = defaults.object(forKey: lastPollKey) as? Date
         let isFirstPoll = isFirstPoll(lastPollEpochMillis: Int64(lastPoll?.timeIntervalSince1970 ?? -1))
 
-        if !isFirstPoll && !newDocs.isEmpty {
+        if !isFirstPoll {
             // Sort newest first.
-            newDocs.sort { $0.doc.record.publishedAt > $1.doc.record.publishedAt }
+            let sortedDocs = newDocs.sorted { $0.doc.record.publishedAt > $1.doc.record.publishedAt }
 
-            switch notificationStyle(newDocCount: Int32(newDocs.count)) {
+            switch notificationStyle(newDocCount: Int32(sortedDocs.count)) {
             case .single:
-                let doc = newDocs[0]
+                let doc = sortedDocs[0]
                 if notificationsEnabled {
                     await sendNotification(
                         title: doc.pub?.record.name ?? "New Document",
@@ -156,7 +190,7 @@ final class NotificationManager {
                     )
                 }
             case .summary(let count):
-                let newest = newDocs[0]
+                let newest = sortedDocs[0]
                 if notificationsEnabled {
                     await sendNotification(
                         title: "\(count) New Documents",
@@ -169,7 +203,7 @@ final class NotificationManager {
             }
 
             // Update in-app notification list.
-            let newNotifications = newDocs.map { doc in
+            let newNotifications = sortedDocs.map { doc in
                 StandardSiteNotification(
                     documentURI: doc.doc.uri,
                     documentTitle: doc.doc.record.title,
@@ -183,13 +217,9 @@ final class NotificationManager {
             // Keep only the most recent notifications.
             notifications = trimNotifications(notifications) as? [StandardSiteNotification] ?? notifications
 
-            unreadCount += newDocs.count
+            unreadCount += sortedDocs.count
             persistNotifications()
         }
-
-        // Update last-seen URIs and poll time.
-        saveLastSeenURIs(allSeenURIs)
-        defaults.set(Date(), forKey: lastPollKey)
     }
 
     /// Marks all notifications as read.

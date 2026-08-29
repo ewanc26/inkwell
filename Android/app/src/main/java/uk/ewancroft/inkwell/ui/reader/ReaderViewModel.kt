@@ -24,11 +24,14 @@ import kotlinx.serialization.json.Json
 import uk.ewancroft.inkwell.data.model.atproto.DocumentRecord
 import uk.ewancroft.inkwell.data.model.atproto.PublicationRecord
 import uk.ewancroft.inkwell.data.model.bluesky.BlueskyProfile
+import uk.ewancroft.inkwell.data.remote.InkwellNotificationManager
+import uk.ewancroft.inkwell.data.remote.NewDocument
 import uk.ewancroft.inkwell.data.remote.StandardSiteVerifier
 import uk.ewancroft.inkwell.data.repository.PdsRepository
 import uk.ewancroft.inkwell.data.repository.getProfile
 import uk.ewancroft.inkwell.data.repository.submitReport
 import uk.ewancroft.inkwell.shared.AtUri
+import uk.ewancroft.inkwell.shared.content.PublicationMatcher
 import uk.ewancroft.inkwell.shared.feed.CachedFeedItem
 import uk.ewancroft.inkwell.shared.feed.createFeedCache
 import uk.ewancroft.inkwell.shared.feed.toCachedFeedItem
@@ -113,6 +116,7 @@ data class ReaderUiState(
 @HiltViewModel
 class ReaderViewModel @Inject constructor(
     private val pdsRepository: PdsRepository,
+    private val notificationManager: InkwellNotificationManager,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
@@ -530,6 +534,8 @@ class ReaderViewModel @Inject constructor(
 
             followingCursors.clear()
             val didToProfile = mutableMapOf<String, BlueskyProfile>()
+            val subscribedDids = mutableSetOf<String>()
+            val liveSubscriptions = mutableListOf<LiveSubscribedPublication>()
             val posts = mutableListOf<PostItem>()
 
             for (subJson in subscriptionsJson) {
@@ -537,6 +543,7 @@ class ReaderViewModel @Inject constructor(
                     val valueObj = subJson.jsonObject["value"]?.jsonObject ?: continue
                     val publication = valueObj["publication"]?.jsonPrimitive?.content ?: continue
                     val parsed = AtUri.parse(publication) ?: continue
+                    subscribedDids += parsed.did
 
                     if (parsed.did !in didToProfile) {
                         runCatching {
@@ -561,6 +568,12 @@ class ReaderViewModel @Inject constructor(
                     val publicationRecord = runCatching {
                         withTimeout(PUBLICATION_TIMEOUT_MS) { resolvePublication(publication) }
                     }.getOrNull()
+                    liveSubscriptions += LiveSubscribedPublication(
+                        uri = publication,
+                        url = publicationRecord?.url,
+                        name = publicationRecord?.name?.takeIf { it.isNotBlank() }
+                            ?: profile?.displayName ?: profile?.handle,
+                    )
                     for (docJson in docsJson) {
                         try {
                             val docValue = docJson.jsonObject["value"]?.jsonObject ?: continue
@@ -610,7 +623,10 @@ class ReaderViewModel @Inject constructor(
             feedCache.save(cachedItems)
 
             // 4. Connect to Jetstream for live updates.
-            startJetstreamSubscription(dids = didToProfile.keys.toList())
+            startJetstreamSubscription(
+                dids = subscribedDids.toList(),
+                subscriptions = liveSubscriptions,
+            )
 
         } catch (e: Exception) {
             _uiState.value = _uiState.value.copy(
@@ -622,7 +638,10 @@ class ReaderViewModel @Inject constructor(
 
     // ── Jetstream Live Updates ──────────────────────────────────────────
 
-    private fun startJetstreamSubscription(dids: List<String>) {
+    private fun startJetstreamSubscription(
+        dids: List<String>,
+        subscriptions: List<LiveSubscribedPublication>,
+    ) {
         jetstreamJob?.cancel()
         if (dids.isEmpty()) return
 
@@ -642,7 +661,17 @@ class ReaderViewModel @Inject constructor(
                     // Parse the event into a CachedFeedItem.
                     val cachedItem = payload.toCachedFeedItem()
 
-                    if (cachedItem != null) {
+                    val subscription = cachedItem?.let { item ->
+                        subscriptions.firstOrNull { publication ->
+                            PublicationMatcher.documentBelongsToPublication(
+                                documentSite = item.site,
+                                publicationUri = publication.uri,
+                                publicationUrl = publication.url,
+                            )
+                        }
+                    }
+
+                    if (cachedItem != null && subscription != null) {
                         // Convert to PostItem and merge into UI state.
                         val newItem = cachedItem.toPostItem(isCached = false).withPublicationTheme()
                         val currentPosts = _uiState.value.followingPosts
@@ -652,6 +681,17 @@ class ReaderViewModel @Inject constructor(
                         }
                         // Persist to cache.
                         feedCache.upsert(listOf(cachedItem))
+
+                        if (payload.operation == "create") {
+                            notificationManager.recordLiveDocument(
+                                NewDocument(
+                                    uri = cachedItem.uri,
+                                    title = cachedItem.title,
+                                    publicationName = subscription.name,
+                                    publishedAt = cachedItem.publishedAt,
+                                )
+                            )
+                        }
                     } else if (payload.operation == "delete") {
                         // Handle deletes by removing the item from the feed.
                         val deletedUri = "at://${payload.did}/${payload.collection}/${payload.rkey}"

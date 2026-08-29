@@ -158,7 +158,10 @@ fun ReaderScreen(
                     }) {
                         if (unreadCount > 0) {
                             BadgedBox(badge = { Badge { Text("$unreadCount") } }) {
-                                Icon(Icons.Outlined.Notifications, contentDescription = "Notifications")
+                                Icon(
+                                    Icons.Outlined.Notifications,
+                                    contentDescription = "Notifications, $unreadCount unread",
+                                )
                             }
                         } else {
                             Icon(Icons.Outlined.Notifications, contentDescription = "Notifications")

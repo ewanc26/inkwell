@@ -43,7 +43,7 @@ The complete release history is available in the [changelog](RELEASE_NOTES.md).
 - Creates and removes `site.standard.graph.subscription` records and recommends.
 - Searches the cross-platform Standard.site public index, fetches records directly from the author.
 - Publication `.well-known` and document `<link>` verification.
-- Polls subscribed publications for notifications (in-app + local), including background app refresh.
+- Delivers local notifications for new subscribed documents as they arrive in the open app, with background polling as the fallback.
 - OAuth sign-in with your AT Protocol handle (no app password). Session resumes silently on relaunch.
 
 ## Getting started

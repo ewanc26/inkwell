@@ -105,7 +105,11 @@ fun PostCard(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable(role = Role.Button, onClick = onClick)
+                .clickable(
+                    role = Role.Button,
+                    onClickLabel = "Open article",
+                    onClick = onClick,
+                )
                 .semantics(mergeDescendants = true) {
                     contentDescription = accessibilityLabel
                     if (isVerified == true) {

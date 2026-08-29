@@ -259,6 +259,7 @@ final class ReaderFeedStore {
             // 4. Connect to Jetstream for live updates.
             startJetstreamSubscription(
                 dids: Array(uniqueDIDs),
+                subscriptionPublicationURIs: Set(subscriptions.map(\.record.publication)),
                 loginStateManager: loginStateManager
             )
 
@@ -276,6 +277,7 @@ final class ReaderFeedStore {
     /// feed in real time.
     private func startJetstreamSubscription(
         dids: [String],
+        subscriptionPublicationURIs: Set<String>,
         loginStateManager: LoginStateManager
     ) {
         jetstreamTask?.cancel()
@@ -305,6 +307,23 @@ final class ReaderFeedStore {
 
                 if let publication {
                     await OfflineContentStore.shared.cache(publication: publication)
+                }
+
+                // Jetstream can only filter at repository-DID level. A
+                // publisher may host several publications, so an event is a
+                // subscription update only when its `site` names one of the
+                // publications the reader follows.
+                if payload.operation == "create",
+                   let cachedItem,
+                   subscriptionPublicationURIs.contains(cachedItem.site) {
+                    let document = cachedItem.toReaderFeedItem(
+                        publication: publication,
+                        isCached: false
+                    ).document
+                    await NotificationManager.shared.recordLiveDocument(
+                        document,
+                        publication: publication
+                    )
                 }
                 let cachedItemForStorage = cachedItem.map {
                     $0.toReaderFeedItem(publication: publication, isCached: false).toCachedFeedItem()

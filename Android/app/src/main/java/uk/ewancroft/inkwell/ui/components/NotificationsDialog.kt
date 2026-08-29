@@ -25,6 +25,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -114,10 +117,19 @@ fun NotificationsDialog(
 
 @Composable
 private fun NotificationRow(notification: InkwellNotification, onClick: () -> Unit) {
+    val metadata = listOfNotNull(
+        notification.publicationName,
+        relativeTime(notification.date),
+    ).joinToString(" • ")
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
+            .semantics(mergeDescendants = true) {
+                contentDescription = listOf(notification.documentTitle, metadata, "Open article")
+                    .filter(String::isNotBlank)
+                    .joinToString(". ")
+            }
+            .clickable(role = Role.Button, onClickLabel = "Open article", onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
@@ -126,7 +138,7 @@ private fun NotificationRow(notification: InkwellNotification, onClick: () -> Un
             style = MaterialTheme.typography.bodyLarge,
         )
         Text(
-            listOfNotNull(notification.publicationName, relativeTime(notification.date)).joinToString(" • "),
+            metadata,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
