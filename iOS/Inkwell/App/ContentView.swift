@@ -137,7 +137,7 @@ struct ContentView: View {
             }
 
             Tab("Write", systemImage: "square.and.pencil", value: InkwellTab.writer) {
-                WriteView()
+                WriteView(loginStateManager: loginStateManager)
             }
         }
         // Reading is the point of the app: give the feed and the article

@@ -17,7 +17,7 @@ import PhotosUI
 import ATProtoKit
 
 struct WriteView: View {
-    @Environment(LoginStateManager.self) private var loginStateManager
+    let loginStateManager: LoginStateManager
     @Environment(\.colorScheme) private var colorScheme
     @State private var viewModel: WriterViewModel
     @State private var showSignIn = false
@@ -26,9 +26,9 @@ struct WriteView: View {
     @State private var showToolbarPhotoPicker = false
     @State private var markdownSelection: TextSelection?
 
-    init() {
-        let lsm = LoginStateManager()
-        _viewModel = State(initialValue: WriterViewModel(loginStateManager: lsm))
+    init(loginStateManager: LoginStateManager) {
+        self.loginStateManager = loginStateManager
+        _viewModel = State(initialValue: WriterViewModel(loginStateManager: loginStateManager))
     }
 
     var body: some View {
@@ -332,6 +332,5 @@ struct WriteView: View {
 }
 
 #Preview {
-    WriteView()
-        .environment(LoginStateManager())
+    WriteView(loginStateManager: LoginStateManager())
 }
