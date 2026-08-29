@@ -15,6 +15,8 @@ import androidx.work.WorkManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -41,6 +43,9 @@ class InkwellNotificationManager @Inject constructor(
     private val prefs = context.getSharedPreferences("inkwell_notifications", Context.MODE_PRIVATE)
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
     private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    /** A live event and a periodic poll can discover the same document at
+     *  nearly the same time. Serialize persistence so it produces one alert. */
+    private val documentLock = Mutex()
 
     companion object {
         const val CHANNEL_ID = "inkwell_notifications"
@@ -75,9 +80,27 @@ class InkwellNotificationManager @Inject constructor(
     }
 
     suspend fun pollForNewDocuments() = withContext(Dispatchers.IO) {
-        val session = pdsRepository.getSession() ?: return@withContext
+        documentLock.withLock { pollForNewDocumentsLocked() }
+    }
+
+    /** Records a subscribed document received through the foreground
+     *  Jetstream connection. Background delivery remains WorkManager's job. */
+    suspend fun recordLiveDocument(document: NewDocument) = withContext(Dispatchers.IO) {
+        documentLock.withLock {
+            val seen = loadLastSeenURIs().toMutableSet()
+            if (document.uri in seen) return@withLock
+
+            recordNewDocuments(mutableListOf(document))
+            seen += document.uri
+            saveLastSeenURIs(seen)
+            prefs.edit().putLong(LAST_POLL_KEY, System.currentTimeMillis()).apply()
+        }
+    }
+
+    private suspend fun pollForNewDocumentsLocked() {
+        val session = pdsRepository.getSession() ?: return
         val subs = try { pdsRepository.fetchSubscriptions(session.did, session.pdsUrl) } catch (_: Exception) { emptyList() }
-        if (subs.isEmpty()) return@withContext
+        if (subs.isEmpty()) return
 
         var newDocs = mutableListOf<NewDocument>()
         var allSeenURIs = loadLastSeenURIs().toMutableSet()
@@ -87,7 +110,9 @@ class InkwellNotificationManager @Inject constructor(
             val pubDid = pubUri.did
 
             val docs = try {
-                pdsRepository.fetchDocumentEntries(pubDid, session.pdsUrl)
+                // Cross-repo records are served by their author's PDS, not
+                // necessarily by the signed-in reader's PDS.
+                pdsRepository.fetchDocumentEntries(pubDid)
             } catch (_: Exception) { emptyList() }
 
             val pubRecord = try {
@@ -117,6 +142,13 @@ class InkwellNotificationManager @Inject constructor(
             }
         }
 
+        recordNewDocuments(newDocs)
+
+        saveLastSeenURIs(allSeenURIs)
+        prefs.edit().putLong(LAST_POLL_KEY, System.currentTimeMillis()).apply()
+    }
+
+    private fun recordNewDocuments(newDocs: MutableList<NewDocument>) {
         val isFirstPoll = NotificationPolicy.isFirstPoll(
             lastPollEpochMillis = prefs.getLong(LAST_POLL_KEY, -1L)
         )
@@ -160,9 +192,6 @@ class InkwellNotificationManager @Inject constructor(
             saveNotifications(notificationEntries)
             prefs.edit().putInt(UNREAD_COUNT_KEY, getUnreadCount() + newDocs.size).apply()
         }
-
-        saveLastSeenURIs(allSeenURIs)
-        prefs.edit().putLong(LAST_POLL_KEY, System.currentTimeMillis()).apply()
     }
 
     fun getUnreadCount(): Int = prefs.getInt(UNREAD_COUNT_KEY, 0)
