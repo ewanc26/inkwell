@@ -27,6 +27,14 @@
       ],
       "versions": [
         {
+          "version": "2.6.0",
+          "date": "2026-08-29",
+          "localizedDescription": "# Inkwell for iOS 2.6.0\n\n- New subscribed documents arriving through the Reader's live feed are added to notification history and can trigger a local alert while Inkwell is open.\n- Live events are matched to the exact publications you follow, preventing unrelated publications in the same repository from appearing as subscribed updates.\n- Background refresh polling remains available when the app is not active.\n\n",
+          "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.6.0.ipa",
+          "size": 13022572,
+          "buildVersion": "59"
+        },
+        {
           "version": "2.5.0",
           "date": "2026-08-28",
           "localizedDescription": "# Inkwell 2.5.0 release notes\n\nInkwell 2.5.0 brings the iOS and Android apps closer together, with shared real-time feeds, publication-aware reading, profiles, reporting, moderation, offline support, and accessibility improvements.\n\n## Highlights\n\n- Cross-platform moderation parity: iOS now includes the same Muted & Blocked account management available on Android.\n- Cross-platform reader verification: Android now verifies publication-backed documents using their AT URIs, matching iOS behaviour.\n- Publication-aware reading: full publication views and reader cards use publication names, descriptions, icons, and readable publication themes instead of falling back to hostnames.\n- Account profiles and reporting: both apps include profile views and native account/content reporting flows.\n- Enhanced moderation: labeler preferences, keyword filters, moderation labels, and explicit reveal controls are available on both platforms.\n- Offline-first reading: cached feeds and full documents appear immediately, while queued subscriptions, recommendations, and comments replay after connectivity returns.\n- Accessibility and readability improvements across Reader, Discover, Writer, profiles, and Settings.\n",
@@ -111,11 +119,11 @@
         "entitlements": [],
         "privacy": {}
       },
-      "version": "2.5.0",
-      "buildVersion": "58",
-      "versionDate": "2026-08-28",
-      "size": 13730992,
-      "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.5.0.ipa"
+      "version": "2.6.0",
+      "buildVersion": "59",
+      "versionDate": "2026-08-29",
+      "size": 13022572,
+      "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.6.0.ipa"
     }
   ],
   "news": [],
