@@ -27,7 +27,7 @@
       <strong>Version 2.0 &mdash; Effective Date: <time datetime="2026-08-21">21 August 2026</time></strong>
   </p>
 
-  <p>Inkwell is a decentralised client for the Standard.site ecosystem on the AT Protocol. Your data belongs to you. This policy applies to Inkwell for iOS (version 2.5.0, build 58, distributed via AltStore), Inkwell for Android (version 2.5.0, distributed via a self-hosted F-Droid repository), and the website at inkwell.ewancroft.uk.</p>
+  <p>Inkwell is a decentralised client for the Standard.site ecosystem on the AT Protocol. Your data belongs to you. This policy applies to Inkwell for iOS (version 2.6.0, build 59, distributed via AltStore), Inkwell for Android (version 2.6.0, distributed via a self-hosted F-Droid repository), and the website at inkwell.ewancroft.uk.</p>
   <h2>1. Who is responsible for your data</h2>
   <p>Inkwell is developed and published by Ewan Croft, an individual developer based in the United Kingdom, acting as the data controller for the limited processing described in this policy. This policy is written to meet the UK GDPR and the Data Protection Act 2018.</p>
   <p>Contact: <a href="mailto:contact@ewancroft.uk">contact@ewancroft.uk</a>. There is no separately appointed Data Protection Officer; Inkwell is not required to appoint one.</p>
