@@ -32,7 +32,7 @@
       <strong>Version 2.0 &mdash; Effective Date: <time datetime="2026-08-21">21 August 2026</time></strong>
   </p>
 
-  <p>By downloading or using Inkwell (the “App”), you agree to these terms. Inkwell is provided for iOS (version 2.5.0, build 58) via AltStore and for Android (version 2.5.0) via a self-hosted F-Droid repository. It is not distributed through the Apple App Store or Google Play.</p>
+  <p>By downloading or using Inkwell (the “App”), you agree to these terms. Inkwell is provided for iOS (version 2.6.0, build 59) via AltStore and for Android (version 2.6.0) via a self-hosted F-Droid repository. It is not distributed through the Apple App Store or Google Play.</p>
   <p>The App is published by Ewan Croft, an individual developer based in the United Kingdom (“the developer”), contactable at <a href="mailto:contact@ewancroft.uk">contact@ewancroft.uk</a>.</p>
   <h2>1. Licence</h2>
   <p>Inkwell is free and open-source software licensed under the <a href="https://www.gnu.org/licenses/agpl-3.0.en.html">GNU Affero General Public License v3.0 (AGPL-3.0)</a>. Your rights to use, study, modify, and redistribute the App come from that licence. Nothing in these terms restricts the freedoms the AGPL-3.0 grants you; where these terms and the AGPL-3.0 conflict, the AGPL-3.0 prevails. No store-imposed end-user licence agreement applies to the AltStore or F-Droid distribution channels.</p>

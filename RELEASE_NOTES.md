@@ -4,6 +4,23 @@ This changelog covers every published Inkwell release and the tagged development
 
 Inkwell used generic `v*` and date-based tags during early development. Since 1.0, distributable builds use separate `ios-v*` and `android-v*` tags because the two apps have independent build numbers and artifacts.
 
+## 2.6.0 — 2026-08-29
+
+[iOS build 59](https://github.com/ewanc26/inkwell/releases/tag/ios-v2.6.0) · [Android versionCode 13](https://github.com/ewanc26/inkwell/releases/tag/android-v2.6.0)
+
+### Added
+
+- Reader live updates now add subscribed documents to the in-app notification history and issue local alerts while the app is active.
+
+### Changed
+
+- Android notification polling now resolves each publication from its owning PDS, so subscriptions continue to work across PDS providers.
+- Live repository events are filtered to the exact publications a reader follows before they update the feed or create a notification.
+
+### Improved
+
+- Android reader cards, notification rows, and the unread-notifications control provide clearer TalkBack labels and button actions.
+
 ## 2.5.0 — 2026-08-28
 
 [iOS build 58](https://github.com/ewanc26/inkwell/releases/tag/ios-v2.5.0) · [Android versionCode 12](https://github.com/ewanc26/inkwell/releases/tag/android-v2.5.0)
