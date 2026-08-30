@@ -4,13 +4,15 @@ This changelog covers every published Inkwell release and the tagged development
 
 Inkwell used generic `v*` and date-based tags during early development. Since 1.0, distributable builds use separate `ios-v*` and `android-v*` tags because the two apps have independent build numbers and artifacts.
 
-## 2.6.1 — 2026-08-29
+## 2.6.1 — 2026-08-30
 
-[iOS build 60](https://github.com/ewanc26/inkwell/releases/tag/ios-v2.6.1) · iOS only
+[iOS build 60](https://github.com/ewanc26/inkwell/releases/tag/ios-v2.6.1) · [Android versionCode 14](https://github.com/ewanc26/inkwell/releases/tag/android-v2.6.1)
 
 ### Fixed
 
 - The Writer now uses the active authenticated account session, so signed-in people can load their publications and publish documents.
+- Android sign-in now requests a correctly separated OAuth scope, allowing supported authorization servers to accept the request.
+- The Android launcher icon now fits comfortably within adaptive, round, legacy, and themed icon masks.
 
 ## 2.6.0 — 2026-08-29
 
