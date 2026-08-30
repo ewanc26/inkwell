@@ -5,7 +5,8 @@
   A serif "I" letterform (top bar + vertical stroke + bottom bar) with a
   single ink drop beneath it. Geometry is scaled from the iOS icon's
   1024x1024 design space (Inkwell.icon/Assets/letter.svg + dot.svg) to
-  the Android adaptive icon's 108x108 viewport, centered in the safe zone.
+  the Android adaptive icon's 108x108 viewport. The group scales the complete
+  mark to 54x54dp or less, comfortably inside Android's 66x66dp safe zone.
 
   Letterform: #1A1A2E (ink-900, matching the website favicon light mode)
   Ink drop:   #139500 (canonical brand green, Display P3 in iOS)
@@ -16,23 +17,30 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Top bar (rounded rect) -->
-    <path
-        android:fillColor="#1A1A2E"
-        android:pathData="M42.1,18.0h23.8a1.3,1.3 0 0 1 1.3,1.3v4.0a1.3,1.3 0 0 1 -1.3,1.3h-23.8a1.3,1.3 0 0 1 -1.3,-1.3v-4.0a1.3,1.3 0 0 1 1.3,-1.3z" />
+    <group
+        android:pivotX="54"
+        android:pivotY="54"
+        android:scaleX="0.75"
+        android:scaleY="0.75">
 
-    <!-- Vertical stroke -->
-    <path
-        android:fillColor="#1A1A2E"
-        android:pathData="M47.8,24.6h12.4v52.8h-12.4z" />
+        <!-- Top bar (rounded rect) -->
+        <path
+            android:fillColor="#1A1A2E"
+            android:pathData="M42.1,18.0h23.8a1.3,1.3 0 0 1 1.3,1.3v4.0a1.3,1.3 0 0 1 -1.3,1.3h-23.8a1.3,1.3 0 0 1 -1.3,-1.3v-4.0a1.3,1.3 0 0 1 1.3,-1.3z" />
 
-    <!-- Bottom bar (rounded rect) -->
-    <path
-        android:fillColor="#1A1A2E"
-        android:pathData="M42.1,77.5h23.8a1.3,1.3 0 0 1 1.3,1.3v4.0a1.3,1.3 0 0 1 -1.3,1.3h-23.8a1.3,1.3 0 0 1 -1.3,-1.3v-4.0a1.3,1.3 0 0 1 1.3,-1.3z" />
+        <!-- Vertical stroke -->
+        <path
+            android:fillColor="#1A1A2E"
+            android:pathData="M47.8,24.6h12.4v52.8h-12.4z" />
 
-    <!-- Ink drop -->
-    <path
-        android:fillColor="#139500"
-        android:pathData="M54.0,87.4m-2.6,0a2.6,2.6 0 1 0,5.2 0a2.6,2.6 0 1 0,-5.2 0" />
+        <!-- Bottom bar (rounded rect) -->
+        <path
+            android:fillColor="#1A1A2E"
+            android:pathData="M42.1,77.5h23.8a1.3,1.3 0 0 1 1.3,1.3v4.0a1.3,1.3 0 0 1 -1.3,1.3h-23.8a1.3,1.3 0 0 1 -1.3,-1.3v-4.0a1.3,1.3 0 0 1 1.3,-1.3z" />
+
+        <!-- Ink drop -->
+        <path
+            android:fillColor="#139500"
+            android:pathData="M54.0,87.4m-2.6,0a2.6,2.6 0 1 0,5.2 0a2.6,2.6 0 1 0,-5.2 0" />
+    </group>
 </vector>
