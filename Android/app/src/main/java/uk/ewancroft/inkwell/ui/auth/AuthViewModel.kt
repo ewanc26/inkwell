@@ -13,11 +13,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
 
 sealed interface AuthUiState {
     data object Loading : AuthUiState
-    data object LoggedOut : AuthUiState
+    data class LoggedOut(val errorMessage: String? = null) : AuthUiState
     data class LoggedIn(val handle: String, val did: String?) : AuthUiState
 }
 
@@ -46,19 +47,21 @@ class AuthViewModel @Inject constructor(
                     did = session.did,
                 )
             } else {
-                AuthUiState.LoggedOut
+                AuthUiState.LoggedOut()
             }
         }
     }
 
     fun beginLogin(handle: String) {
         viewModelScope.launch {
-            _uiState.value = AuthUiState.LoggedOut
-            runCatching { oauth.beginLogin(handle) }
+            _uiState.value = AuthUiState.LoggedOut()
+            runCatching { withTimeout(LOGIN_TIMEOUT_MS) { oauth.beginLogin(handle.trim()) } }
                 .onSuccess { url -> _authUrl.emit(url) }
                 .onFailure { t ->
                     Log.e(TAG, "beginLogin failed", t)
-                    _uiState.value = AuthUiState.LoggedOut
+                    _uiState.value = AuthUiState.LoggedOut(
+                        "Couldn't start sign-in. Check your handle and try again.",
+                    )
                 }
         }
     }
@@ -74,12 +77,16 @@ class AuthViewModel @Inject constructor(
                             did = session.did,
                         )
                     } else {
-                        _uiState.value = AuthUiState.LoggedOut
+                        _uiState.value = AuthUiState.LoggedOut(
+                            "Sign-in completed without a saved session. Please try again.",
+                        )
                     }
                 }
                 .onFailure { t ->
                     Log.e(TAG, "completeLogin failed", t)
-                    _uiState.value = AuthUiState.LoggedOut
+                    _uiState.value = AuthUiState.LoggedOut(
+                        "Couldn't complete sign-in. Please try again.",
+                    )
                 }
         }
     }
@@ -87,11 +94,12 @@ class AuthViewModel @Inject constructor(
     fun logout() {
         viewModelScope.launch {
             oauth.logout()
-            _uiState.value = AuthUiState.LoggedOut
+            _uiState.value = AuthUiState.LoggedOut()
         }
     }
 
     companion object {
         private const val TAG = "AuthViewModel"
+        private const val LOGIN_TIMEOUT_MS = 30_000L
     }
 }

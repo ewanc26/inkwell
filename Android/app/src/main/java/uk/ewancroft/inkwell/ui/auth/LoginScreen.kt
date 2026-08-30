@@ -28,6 +28,7 @@ fun LoginScreen(
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val errorMessage = (uiState as? AuthUiState.LoggedOut)?.errorMessage
 
     var handle by remember { mutableStateOf("") }
     var isSigningIn by remember { mutableStateOf(false) }
@@ -131,6 +132,17 @@ fun LoginScreen(
                 Spacer(Modifier.width(8.dp))
             }
             Text("Continue")
+        }
+
+        if (errorMessage != null) {
+            Spacer(Modifier.height(8.dp))
+            Text(
+                errorMessage,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                modifier = Modifier.fillMaxWidth(),
+            )
         }
 
         Spacer(Modifier.height(12.dp))
