@@ -22,17 +22,22 @@ object OAuthModule {
         "https://inkwell.ewancroft.uk/client-metadata.json"
     private const val REDIRECT_URI = "uk.ewancroft.inkwell:/callback"
 
-    private const val SCOPE =
-        "atproto blob:*/* repo:site.standard.publication repo:site.standard.document " +
-            "repo:site.standard.graph.subscription repo:site.standard.graph.recommend " +
-            "repo:app.userinput.discussion " +
-            OAuthScopes.REPO_USER +
-            "repo:app.bsky.graph.block?action=create&action=delete " +
-            "rpc:app.bsky.graph.muteActor?aud=did:web:api.bsky.app%23bsky_appview " +
-            "rpc:app.bsky.graph.unmuteActor?aud=did:web:api.bsky.app%23bsky_appview " +
-            "rpc:app.bsky.graph.getMutes?aud=did:web:api.bsky.app%23bsky_appview " +
-            "rpc:app.bsky.graph.getBlocks?aud=did:web:api.bsky.app%23bsky_appview " +
-            "rpc:com.atproto.moderation.createReport?aud=did:web:api.bsky.app%23bsky_appview"
+    internal val SCOPE = listOf(
+        OAuthScopes.ATPROTO,
+        OAuthScopes.BLOB_ALL,
+        OAuthScopes.REPO_PUBLICATION,
+        OAuthScopes.REPO_DOCUMENT,
+        OAuthScopes.REPO_SUBSCRIPTION,
+        OAuthScopes.REPO_RECOMMEND,
+        OAuthScopes.REPO_USERINPUT_DISCUSSION,
+        OAuthScopes.REPO_USER,
+        "repo:app.bsky.graph.block?action=create&action=delete",
+        "rpc:app.bsky.graph.muteActor?aud=did:web:api.bsky.app%23bsky_appview",
+        "rpc:app.bsky.graph.unmuteActor?aud=did:web:api.bsky.app%23bsky_appview",
+        "rpc:app.bsky.graph.getMutes?aud=did:web:api.bsky.app%23bsky_appview",
+        "rpc:app.bsky.graph.getBlocks?aud=did:web:api.bsky.app%23bsky_appview",
+        "rpc:com.atproto.moderation.createReport?aud=did:web:api.bsky.app%23bsky_appview",
+    ).joinToString(" ")
 
     @Provides
     @Singleton
