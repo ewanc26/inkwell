@@ -67,12 +67,14 @@ export const load: PageServerLoad = async ({ setHeaders }) => {
     }
 
     const payload = (await response.json()) as GitHubContributor[];
-    const contributors = payload.filter(isHumanContributor).map((contributor) => ({
-      login: contributor.login,
-      avatarUrl: avatarUrl(contributor.avatar_url),
-      profileUrl: contributor.html_url,
-      contributions: contributor.contributions ?? 0,
-    }));
+    const contributors = payload
+      .filter(isHumanContributor)
+      .map((contributor) => ({
+        login: contributor.login,
+        avatarUrl: avatarUrl(contributor.avatar_url),
+        profileUrl: contributor.html_url,
+        contributions: contributor.contributions ?? 0,
+      }));
 
     cache = { at: Date.now(), contributors };
     setHeaders({
