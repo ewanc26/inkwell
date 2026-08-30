@@ -141,7 +141,9 @@
                 {contributor.contributions === 1 ? "commit" : "commits"} attributed by GitHub
               </span>
             </span>
-            <ArrowUpRight class="contributor-arrow h-4 w-4" aria-hidden="true" />
+            <span class="contributor-arrow">
+              <ArrowUpRight class="h-4 w-4" aria-hidden="true" />
+            </span>
           </a>
         </li>
       {/each}
@@ -292,6 +294,7 @@
   }
 
   .contributor-arrow {
+    display: inline-flex;
     flex-shrink: 0;
     color: var(--color-primary-600);
   }
