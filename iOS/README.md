@@ -13,19 +13,27 @@ Inkwell for iOS — the primary SwiftUI client.
 
 ## Building
 
-Open `Inkwell.xcodeproj` in Xcode and run the `Inkwell` scheme on an iOS 26.0+ simulator or device.
+Inkwell has an iOS 18.0 deployment target, but **building the project requires Xcode 26 or newer** because the app icon uses Xcode 26's Icon Composer `.icon` format.
+
+Open `Inkwell.xcodeproj` in Xcode, select the `Inkwell` scheme, choose an installed iOS 18+ simulator or compatible device, and run the app.
+
+For full human contributor setup — including simulator installation, signing, Git LFS, testing mode, shared Kotlin changes, and troubleshooting — see [`../CONTRIBUTING.md`](../CONTRIBUTING.md#ios-development-in-xcode).
 
 ## Tests
+
+From Xcode, use **Product → Test** (`⌘U`). For a command-line equivalent, substitute a simulator that is installed on your Mac:
 
 ```bash
 xcodebuild -project Inkwell.xcodeproj -scheme Inkwell \
   -destination 'platform=iOS Simulator,name=<available iOS 18+ device>' \
-  -skip-testing:InkwellUITests build test
+  build test
 ```
 
-There are two unit test sources, twelve tests in total: `InkwellTests/StandardSiteTests.swift` (nine — NSID namespacing, AT-URI rejection, publication/document association and canonical URLs, verification endpoints, wire keys, search v2 decoding, notification JSON, malformed-record tolerance) and `InkwellTests/BSkyListModelsTests.swift` (three — `app.bsky.graph.getList` decoding and the supporters-list AT-URI). `InkwellUITests` has no source files and fails to load its bundle if run, hence the skip.
+The Xcode test target does not exercise the shared KMP core. Those tests live in `../shared/src/commonTest/` and run through Gradle from `../Android`:
 
-This target does not cover the shared KMP core. Those 135 tests live in `../shared/src/commonTest/` and run through Gradle from `../Android`: `./gradlew :shared:jvmTest`.
+```bash
+./gradlew :shared:jvmTest
+```
 
 ## Distribution
 
