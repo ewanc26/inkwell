@@ -54,5 +54,5 @@ Description: |-
 # still-pending submission.
 AutoUpdateMode: None
 UpdateCheckMode: None
-CurrentVersion: '2.6.0'
-CurrentVersionCode: 13
+CurrentVersion: '2.6.1'
+CurrentVersionCode: 14
