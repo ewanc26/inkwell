@@ -11,6 +11,7 @@ struct ContentView: View {
     @Environment(LoginStateManager.self) private var loginStateManager
     @Environment(ConnectivityMonitor.self) private var connectivityMonitor
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var notificationManager = NotificationManager.shared
     @State private var tipPromptManager = TipPromptManager.shared
 
@@ -95,8 +96,12 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: .inkwellOpenTab)) { notification in
             guard let raw = notification.userInfo?[InkwellTabKey.tab] as? String,
                   let tab = InkwellTab(rawValue: raw) else { return }
-            withAnimation {
+            if reduceMotion {
                 selectedTab = tab
+            } else {
+                withAnimation(InkwellMotion.standard) {
+                    selectedTab = tab
+                }
             }
         }
     }
