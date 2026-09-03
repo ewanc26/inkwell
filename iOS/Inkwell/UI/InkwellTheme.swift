@@ -119,6 +119,32 @@ struct ConditionalHaptic<T: Equatable>: ViewModifier {
     }
 }
 
+private struct InkwellCelebrateModifier<V: Equatable>: ViewModifier {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    let value: V
+
+    func body(content: Content) -> some View {
+        content
+            .sensoryFeedback(
+                .success,
+                trigger: value,
+                condition: { _, _ in HapticsSettings.shared.enabled }
+            )
+            .animation(reduceMotion ? nil : InkwellMotion.celebrate, value: value)
+    }
+}
+
+private struct InkwellStaggerEntranceModifier: ViewModifier {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    let isActive: Bool
+
+    func body(content: Content) -> some View {
+        content
+            .opacity(isActive ? 1 : 0)
+            .animation(reduceMotion ? nil : InkwellMotion.soft, value: isActive)
+    }
+}
+
 extension View {
 
     /// Adds a light haptic on tap — for buttons, toggles, and selectable rows.
@@ -129,18 +155,17 @@ extension View {
     }
 
     /// Adds success haptic + a subtle scale bounce. Use on publish/subscribe
-    /// confirmations.
+    /// confirmations. The haptic remains available with Reduce Motion, but the
+    /// spring animation is disabled.
     func inkwellCelebrate<V: Equatable>(value: V) -> some View {
-        self
-            .sensoryFeedback(.success, trigger: value, condition: { _, _ in HapticsSettings.shared.enabled })
-            .animation(InkwellMotion.celebrate, value: value)
+        modifier(InkwellCelebrateModifier(value: value))
     }
 
     /// Staggers child view appearances with increasing delay.
-    /// Wrap a ForEach or VStack content with this.
+    /// Wrap a ForEach or VStack content with this. Reduce Motion applies the
+    /// final opacity immediately instead of animating the reveal.
     func inkwellStaggerEntrance(isActive: Bool = true) -> some View {
-        self.opacity(isActive ? 1 : 0)
-            .animation(InkwellMotion.soft, value: isActive)
+        modifier(InkwellStaggerEntranceModifier(isActive: isActive))
     }
 }
 
@@ -150,6 +175,7 @@ extension View {
 /// and light haptic feedback. Use for primary actions: Publish, Subscribe,
 /// Sign In.
 struct InkwellButtonStyle: ButtonStyle {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     var tint: Color = .accentColor
 
     func makeBody(configuration: Configuration) -> some View {
@@ -163,8 +189,8 @@ struct InkwellButtonStyle: ButtonStyle {
             .padding(.vertical, 12)
             .background(tint)
             .clipShape(Capsule())
-            .scaleEffect(configuration.isPressed ? 0.96 : 1.0)
-            .animation(InkwellMotion.micro, value: configuration.isPressed)
+            .scaleEffect(reduceMotion ? 1.0 : (configuration.isPressed ? 0.96 : 1.0))
+            .animation(reduceMotion ? nil : InkwellMotion.micro, value: configuration.isPressed)
             .onChange(of: configuration.isPressed) { _, pressed in
                 if pressed { InkwellHaptics.light() }
             }
@@ -175,13 +201,16 @@ struct InkwellButtonStyle: ButtonStyle {
 ///
 /// `.buttonStyle(.plain)` leaves a tappable card completely inert under
 /// the finger — no highlight, no lift, nothing to confirm the tap landed.
-/// A list row would dim; this does the card equivalent.
+/// A list row would dim; this does the card equivalent. With Reduce Motion,
+/// the opacity feedback remains but the scale/lift transition is removed.
 struct ReaderCardButtonStyle: ButtonStyle {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.98 : 1)
+            .scaleEffect(reduceMotion ? 1.0 : (configuration.isPressed ? 0.98 : 1))
             .opacity(configuration.isPressed ? 0.85 : 1)
-            .animation(InkwellMotion.micro, value: configuration.isPressed)
+            .animation(reduceMotion ? nil : InkwellMotion.micro, value: configuration.isPressed)
     }
 }
 
