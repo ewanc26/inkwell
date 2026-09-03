@@ -94,7 +94,7 @@ private fun FormatButton(
     IconButton(
         onClick = onClick,
         enabled = enabled,
-        modifier = Modifier.size(36.dp),
+        modifier = Modifier.size(48.dp),
     ) {
         Icon(
             imageVector = icon,
