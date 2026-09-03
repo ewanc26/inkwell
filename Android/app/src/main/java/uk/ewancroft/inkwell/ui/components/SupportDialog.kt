@@ -18,6 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -79,6 +82,7 @@ fun SupportDialog(onDismiss: () -> Unit) {
                     icon = Icons.Filled.Share,
                     title = "Share Inkwell",
                     detail = "Word of mouth is the best support",
+                    actionLabel = "Share Inkwell",
                     onClick = ::shareInkwell,
                 )
                 SupportMethodRow(
@@ -102,10 +106,22 @@ private fun SupportMethodRow(
     icon: ImageVector,
     title: String,
     detail: String,
+    actionLabel: String = "Open $title",
     onClick: () -> Unit,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .defaultMinSize(minHeight = 48.dp)
+            .semantics(mergeDescendants = true) {
+                contentDescription = "$title. $detail"
+            }
+            .clickable(
+                role = Role.Button,
+                onClickLabel = actionLabel,
+                onClick = onClick,
+            )
+            .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
