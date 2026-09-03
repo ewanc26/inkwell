@@ -10,6 +10,7 @@ struct ReaderPostCard: View {
     let item: ReaderFeedItem
     var reservesOverflowSpace = false
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     private var document: SiteStandardLexicon.DocumentRecord { item.document.record }
     private var publication: SiteStandardLexicon.PublicationRecord? { item.publication?.record }
@@ -34,6 +35,7 @@ struct ReaderPostCard: View {
     }
     private var foreground: Color { theme.foreground }
     private var accent: Color { theme.accent }
+    private var usesAccessibilityTextLayout: Bool { dynamicTypeSize.isAccessibilitySize }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -85,34 +87,22 @@ struct ReaderPostCard: View {
                 Text(document.title)
                     .font(theme.headingFont(.title3, weight: .bold))
                     .foregroundStyle(foreground)
-                    .lineLimit(2)
+                    .lineLimit(usesAccessibilityTextLayout ? nil : 2)
+                    .fixedSize(horizontal: false, vertical: true)
 
                 if let description = document.description, !description.isEmpty {
                     Text(description)
                         .font(theme.bodyFont(.subheadline))
                         .foregroundStyle(foreground.opacity(0.7))
-                        .lineLimit(3)
+                        .lineLimit(usesAccessibilityTextLayout ? nil : 3)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
 
-                HStack(spacing: 6) {
-                    Text(formattedDate)
-                    if item.isCached {
-                        Label("Cached", systemImage: "archivebox")
-                            .labelStyle(.titleAndIcon)
-                    }
-                    if let publicationName {
-                        Text("·")
-                        Text(publicationName)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(accent)
-                            .lineLimit(1)
-                    }
-                    Spacer(minLength: 8)
-                    Image(systemName: "arrow.up.right")
-                        .accessibilityHidden(true)
+                if usesAccessibilityTextLayout {
+                    accessibilityMetadata
+                } else {
+                    compactMetadata
                 }
-                .font(.caption)
-                .foregroundStyle(foreground.opacity(0.55))
             }
             .padding(16)
         }
@@ -125,6 +115,46 @@ struct ReaderPostCard: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityLabel)
         .accessibilityHint("Opens this article")
+    }
+
+    private var compactMetadata: some View {
+        HStack(spacing: 6) {
+            Text(formattedDate)
+            if item.isCached {
+                Label("Cached", systemImage: "archivebox")
+                    .labelStyle(.titleAndIcon)
+            }
+            if let publicationName {
+                Text("·")
+                Text(publicationName)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(accent)
+                    .lineLimit(1)
+            }
+            Spacer(minLength: 8)
+            Image(systemName: "arrow.up.right")
+                .accessibilityHidden(true)
+        }
+        .font(.caption)
+        .foregroundStyle(foreground.opacity(0.55))
+    }
+
+    private var accessibilityMetadata: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(formattedDate)
+            if item.isCached {
+                Label("Cached", systemImage: "archivebox")
+                    .labelStyle(.titleAndIcon)
+            }
+            if let publicationName {
+                Text(publicationName)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(accent)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .font(.caption)
+        .foregroundStyle(foreground.opacity(0.55))
     }
 
     private var coverURL: URL? {
