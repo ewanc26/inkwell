@@ -26,6 +26,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -158,7 +161,14 @@ fun CreditsView(
                 SupportRow(onClick = { showSupport = true })
                 if (isAuthenticated) {
                     Row(
-                        modifier = Modifier.fillMaxWidth().clickable { showFeedback = true }.padding(vertical = 6.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .accessibleAction(
+                                description = "Send Feedback. Bugs, questions, anything",
+                                actionLabel = "Open feedback form",
+                                onClick = { showFeedback = true },
+                            )
+                            .padding(vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
@@ -191,14 +201,26 @@ fun CreditsView(
                     "Privacy Policy",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.fillMaxWidth().clickable { showPrivacy = true },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .accessibleAction(
+                            description = "Privacy Policy",
+                            actionLabel = "Open privacy policy",
+                            onClick = { showPrivacy = true },
+                        ),
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
                     "Terms of Service",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.fillMaxWidth().clickable { showTerms = true },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .accessibleAction(
+                            description = "Terms of Service",
+                            actionLabel = "Open terms of service",
+                            onClick = { showTerms = true },
+                        ),
                 )
                 Spacer(Modifier.height(8.dp))
                 CreditRow(
@@ -240,6 +262,21 @@ fun CreditsView(
     }
 }
 
+private fun Modifier.accessibleAction(
+    description: String,
+    actionLabel: String,
+    onClick: () -> Unit,
+): Modifier = this
+    .defaultMinSize(minHeight = 48.dp)
+    .semantics(mergeDescendants = true) {
+        contentDescription = description
+    }
+    .clickable(
+        role = Role.Button,
+        onClickLabel = actionLabel,
+        onClick = onClick,
+    )
+
 @Composable
 private fun SectionHeader(text: String) {
     Text(
@@ -254,7 +291,14 @@ private fun SectionHeader(text: String) {
 @Composable
 private fun CreditRow(title: String, detail: String, url: String, openUrl: (String) -> Unit) {
     Row(
-        modifier = Modifier.fillMaxWidth().clickable { openUrl(url) }.padding(vertical = 6.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .accessibleAction(
+                description = "$title. $detail",
+                actionLabel = "Open $title",
+                onClick = { openUrl(url) },
+            )
+            .padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = Modifier.weight(1f)) {
@@ -276,8 +320,22 @@ private fun CreditRow(title: String, detail: String, url: String, openUrl: (Stri
 
 @Composable
 private fun SupporterRow(supporter: BlueskyProfile, openUrl: (String) -> Unit) {
+    val displayName = supporter.displayName?.takeIf(String::isNotBlank)
+    val accessibilityDescription = if (displayName != null) {
+        "$displayName. @${supporter.handle}"
+    } else {
+        "@${supporter.handle}"
+    }
+
     Row(
-        modifier = Modifier.fillMaxWidth().clickable { openUrl("https://bsky.app/profile/${supporter.handle}") }.padding(vertical = 6.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .accessibleAction(
+                description = accessibilityDescription,
+                actionLabel = "Open supporter profile",
+                onClick = { openUrl("https://bsky.app/profile/${supporter.handle}") },
+            )
+            .padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (supporter.avatar != null) {
@@ -298,7 +356,7 @@ private fun SupporterRow(supporter: BlueskyProfile, openUrl: (String) -> Unit) {
         Spacer(Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                supporter.displayName?.ifEmpty { null } ?: "@${supporter.handle}",
+                displayName ?: "@${supporter.handle}",
                 style = MaterialTheme.typography.bodyMedium,
                 maxLines = 1,
             )
@@ -320,7 +378,14 @@ private fun SupporterRow(supporter: BlueskyProfile, openUrl: (String) -> Unit) {
 @Composable
 private fun SupportRow(onClick: () -> Unit) {
     Row(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 6.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .accessibleAction(
+                description = "Support Inkwell",
+                actionLabel = "Open support options",
+                onClick = onClick,
+            )
+            .padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
