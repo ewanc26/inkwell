@@ -1,6 +1,7 @@
 package uk.ewancroft.inkwell.ui.reader
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,9 +27,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,6 +41,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -50,10 +56,6 @@ import uk.ewancroft.inkwell.data.model.atproto.PublicationTheme
 import uk.ewancroft.inkwell.ui.theme.LocalForceDarkTheme
 import uk.ewancroft.inkwell.util.AccessibilityPreferences
 import uk.ewancroft.inkwell.util.CustomisationPreferences
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun PostCard(
@@ -74,6 +76,8 @@ fun PostCard(
     onReportAccount: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
+    val density = LocalDensity.current
+    val usesAccessibilityTextLayout = density.fontScale >= 1.5f
     val isDarkTheme = LocalForceDarkTheme.current ?: isSystemInDarkTheme()
     val publicationThemeIsPresent = publicationTheme != null || publicationBasicTheme != null
     val readerTheme = remember(publicationTheme, publicationBasicTheme, isDarkTheme) {
@@ -177,7 +181,7 @@ fun PostCard(
                         title,
                         style = MaterialTheme.typography.titleMedium,
                         color = foreground,
-                        maxLines = 2,
+                        maxLines = if (usesAccessibilityTextLayout) Int.MAX_VALUE else 2,
                         overflow = TextOverflow.Ellipsis,
                     )
 
@@ -186,57 +190,95 @@ fun PostCard(
                             description,
                             style = MaterialTheme.typography.bodySmall,
                             color = secondaryForeground,
-                            maxLines = 3,
+                            maxLines = if (usesAccessibilityTextLayout) Int.MAX_VALUE else 3,
                             overflow = TextOverflow.Ellipsis,
                         )
                     }
 
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    ) {
-                        Text(
-                            date,
-                            style = MaterialTheme.typography.labelSmall,
-                            color = secondaryForeground,
-                        )
-                        if (isCached) {
+                    if (usesAccessibilityTextLayout) {
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text(
-                                "Cached",
+                                date,
                                 style = MaterialTheme.typography.labelSmall,
                                 color = secondaryForeground,
                             )
-                        }
-                        if (publicationName != null) {
-                            Text(
-                                "·",
-                                color = secondaryForeground,
-                            )
-                            Text(
-                                publicationName,
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.SemiBold,
-                                color = accent,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                            if (isVerified == true) {
-                                Spacer(Modifier.width(4.dp))
-                                Icon(
-                                    Icons.Filled.Verified,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(14.dp),
-                                    tint = accent,
+                            if (isCached) {
+                                Text(
+                                    "Cached",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = secondaryForeground,
                                 )
                             }
+                            if (publicationName != null) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                ) {
+                                    Text(
+                                        publicationName,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = accent,
+                                    )
+                                    if (isVerified == true) {
+                                        Icon(
+                                            Icons.Filled.Verified,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(14.dp),
+                                            tint = accent,
+                                        )
+                                    }
+                                }
+                            }
                         }
-                        Spacer(Modifier.weight(1f))
-                        Icon(
-                            Icons.AutoMirrored.Outlined.ArrowForward,
-                            contentDescription = null,
-                            tint = secondaryForeground.copy(alpha = 0.55f),
-                            modifier = Modifier.size(16.dp),
-                        )
+                    } else {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        ) {
+                            Text(
+                                date,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = secondaryForeground,
+                            )
+                            if (isCached) {
+                                Text(
+                                    "Cached",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = secondaryForeground,
+                                )
+                            }
+                            if (publicationName != null) {
+                                Text(
+                                    "·",
+                                    color = secondaryForeground,
+                                )
+                                Text(
+                                    publicationName,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = accent,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                                if (isVerified == true) {
+                                    Spacer(Modifier.width(4.dp))
+                                    Icon(
+                                        Icons.Filled.Verified,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(14.dp),
+                                        tint = accent,
+                                    )
+                                }
+                            }
+                            Spacer(Modifier.weight(1f))
+                            Icon(
+                                Icons.AutoMirrored.Outlined.ArrowForward,
+                                contentDescription = null,
+                                tint = secondaryForeground.copy(alpha = 0.55f),
+                                modifier = Modifier.size(16.dp),
+                            )
+                        }
                     }
                 }
             }
