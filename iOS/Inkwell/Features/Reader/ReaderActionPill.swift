@@ -21,6 +21,8 @@ struct ReaderActionPill: View {
     let activeForeground: Color
     let action: () -> Void
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
         Button(action: action) {
             HStack(spacing: 6) {
@@ -28,6 +30,8 @@ struct ReaderActionPill: View {
                     ProgressView()
                         .scaleEffect(0.7)
                         .tint(isActive ? activeForeground : tint)
+                } else if reduceMotion {
+                    Image(systemName: icon)
                 } else {
                     Image(systemName: icon)
                         .symbolEffect(.bounce, value: isActive)
@@ -50,7 +54,7 @@ struct ReaderActionPill: View {
             )
         }
         .buttonStyle(.plain)
-        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isActive)
+        .animation(reduceMotion ? nil : InkwellMotion.micro, value: isActive)
         .accessibilityLabel(label)
         .accessibilityHint(isActive ? "Tap to remove" : "Tap to add")
         .accessibilityAddTraits(isActive ? [.isButton, .isSelected] : .isButton)
