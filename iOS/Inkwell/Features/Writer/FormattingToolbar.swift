@@ -145,7 +145,7 @@ private struct FormatButton: View {
         Button(action: action) {
             Image(systemName: icon)
                 .font(.system(size: 15, weight: .medium))
-                .frame(width: 36, height: 32)
+                .frame(width: 44, height: 44)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
