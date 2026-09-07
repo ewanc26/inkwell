@@ -1,122 +1,196 @@
-# AGENTS.md
+#AGENTS.md
 
-Guidance for agents working on Inkwell, a native reader and writer for the Standard.site publishing ecosystem on AT Protocol. This monorepo contains all three clients: iOS (`iOS/`), Android (`Android/`), and the marketing/legal site (`website/`).
+Guidance for AI coding agents working in this repository. Human contributors
+may find it useful too, but the audience is agents.
 
-## Principles
+## Project overview
 
-1. **KMP-first architecture** — all code that can be shared between platforms MUST be written in Kotlin in the `shared/` KMP module. iOS consumes shared code via thin Swift wrappers in `SharedKMP.swift` over the `InkwellShared.xcframework`. Only code that is fundamentally unable to be ported — platform UI (SwiftUI views, Compose composables), platform security storage (Keychain, EncryptedSharedPreferences), and platform-specific system integrations (OAuth browser flows, background task scheduling, notification managers) — stays native to its platform. Before writing any business logic, data transformation, format conversion, markdown parsing, facet handling, content model, or network orchestration in Swift, ask whether it can go in shared KMP instead. If it can, it must.
-2. **Platform fidelity** — each platform's native UI conventions, accessibility, and UX come first. Don't port iOS UI patterns to Android or vice versa without explicit adaptation. The KMP boundary is logic, not presentation.
-3. **Protocol truth over README claims** — if the README says something the code doesn't actually do, the code is right and the README is wrong. Update both together.
-4. **Honest stubs** — unimplemented features say so explicitly in the UI, return errors, or are gated behind runtime checks. Never silent no-ops or fabricated successes.
-5. **Security material stays put** — OAuth tokens, DPoP keys, PKCE state, and session secrets belong in platform secure storage (Keychain / EncryptedSharedPreferences) only. Never in UserDefaults, SharedPreferences, logs, or git.
-6. **AT Protocol correctness** — cross-reference the atproto spec and upstream reference implementations for wire formats (DAG-CBOR, MST, XRPC, DID documents). Don't infer protocol behavior from observation.
-7. **No duplication** — if a piece of logic already exists in the codebase, reuse it. Two independent implementations of the same rule silently drift apart. This applies doubly across the KMP boundary: never reimplement shared KMP logic in platform-native code.
-8. **Modular file structure** — every file owns one clear responsibility. Each feature lives in its own folder containing its ViewModel, View, and helpers as separate files. Reusable UI components (toolbars, pickers, rendering views) get their own files. Keep files under ~400 lines; split before exceeding. The former offenders (`LoginStateManager.swift`, `ContentProvider.swift`, `PdsRepository.kt`, `PostDetailScreen.kt`) were split along responsibility lines in 2.0 and are no longer exempt — hold new code to the same limit.
+A native C/C++23 Minecraft: Java Edition server focused on predictable, low RAM
+usage. Zincfox is an experimental clean-room server implementation: the goal is
+not to clone the vanilla server architecture in C++, but to build the protocol,
+simulation, world and persistence layers around explicit ownership, bounded
+queues and measurable memory budgets from the start.
 
-## Current state
+- **Language:** C17 is available for small leaf components where it reduces
+  runtime/dependency surface; C++23 is the default for protocol, server,
+  storage, and world state. `snake_case` for functions and variables,
+  `PascalCase` for types.
+- **Build:** CMake, C17/C++23 strict by target, `-Wall -Wextra -Wpedantic
+  -Wconversion -Wsign-conversion`. Tests are per-file executables run through `ctest`,
+  following the account's other native repos (`clay/`, `wolfram/`, `keepsake/`).
+- **Target:** macOS and Linux desktop. Windows is untested (as elsewhere in this
+  account).
 
-- **iOS** (`uk.ewancroft.Inkwell`): primary SwiftUI client, marketing version `2.6.1` build `60`. OAuth with DPoP complete. Reader, Discover, Writer tabs functional. Leaflet blocks, Markpub/Offprint/pckt rendering. Markdown parsing/serialization, facet conversion, verification URL building, link scanning, and constellation deduplication delegated to shared KMP via `SharedKMP.swift`. Live foreground document notifications with background polling fallback. Comments, subscriptions, recommends, publication/document verification, blob handling, and native report tooling implemented. Writer: split-pane editor with live markdown preview, formatting toolbar, image upload, loss reporting, and document editing. AltStore distribution with live screenshots.
-- **Android** (`uk.ewancroft.inkwell`): Kotlin/Compose client, version `2.6.1` versionCode `14`. OAuth complete. Reader, Discover, Writer functional. Reader publication theming (Leaflet rich theme, legacy palette, basicTheme cascade). Leaflet blocks with rich-text facets. Markpub markdown rendering with headings, lists, code blocks, blockquotes, images, task lists, horizontal rules, and inline formatting. pckt/Offprint block arrays converted to markdown with facet-aware inline formatting via shared KMP. Bluesky post embeds with live fetching and author/image/link/quote rendering. Standard.site post embeds with document fetch and cover image. Comments, subscriptions, recommends, and interactions (likes/reposts/replies) implemented. Live foreground document notifications with WorkManager background polling fallback. Verification URL/link-scan logic delegated to shared KMP; Constellation pagination/deduplication delegated to shared KMP. Writer: formatting toolbar, live preview toggle, loss reporting banner, and document editing. F-Droid self-hosted repo with fastlane screenshots. Native report tooling implemented.
-- **Website** (`inkwell.ewancroft.uk`): SvelteKit/Vercel marketing, legal, and OAuth-metadata site. Hosts live `/client-metadata.json`, AltStore `source.json`, F-Droid repo index, and web-optimized screenshots for both platforms.
+## Repository layout
 
-## Roadmap
-
-Public kanban board: https://github.com/users/ewanc26/projects/3
-
-Use the kanban board to track work across columns: **Backlog** → **Todo** →
-**In Progress** → **Done**. When picking up a task, move it to **In
-Progress**; when finished and released, move it to **Done**. Add new items
-for upcoming work with `gh project item-create 3 --owner ewanc26 --title
-"..." --body "..."`. Link related PRs or issues with `gh project item-add 3
---owner ewanc26 --url <url>`. View in browser with `gh project view 3
---owner ewanc26 --web`.
-
-## Commits
-
-Conventional commits, scoped by area:
 ```
-feat(ios): add post-detail screenshot to AltStore
-fix(android): correct F-Droid repo URLs to monorepo
-docs(website): update OAuth contract for comment scope
-chore(fdroid): regenerate signed index with screenshots
+include/zincfox/       public/internal C/C++ interfaces
+src/protocol/          VarInt, framing, packet/state codecs
+src/server/            connection lifecycle and dispatch
+src/world/             world/chunk state (future)
+src/entity/            entity/player storage (future)
+src/storage/           region/persistence backends (future)
+test/                  unit and protocol regression tests
+docs/                  design notes and compatibility records
 ```
 
-Never mix unrelated changes in a single commit. AI-assisted contributions are welcome; add `Co-authored-by:` trailers crediting AI agents when they materially contributed, so attribution stays honest.
+Dependency direction is inward from higher-level game/server code to small
+protocol/net abstractions. Do not let world/entity code call raw socket APIs.
 
-## Things that look wrong but are not
+## Module boundaries — read before editing
 
-- **Android's `ContentUnion` is intentionally incomplete** — it would silently lose unmodelled formats if round-tripped, so the partial set is deliberate.
-- **iOS `UserDefaults` stores only non-secret hints** (handle/PDS hints, notification state, seen URIs) — credentials and proof material stay in Keychain.
-- **Website links to self-hosted AltStore and F-Droid** rather than App Store / Play Store listings — those stores do not have published listings yet.
+- **Protocol code owns all wire-format parsing.** `src/protocol/` must stay
+  free of server lifecycle concerns;
+`src / server /` must stay free of game -
+        state concerns
+            .The boundary is the `protocol::handle_packet` dispatch interface.-
+        **Version -
+        specific packet definitions stay in `src /
+            protocol /`.**Transport and game systems must not accumulate packet
+                              IDs or
+    version checks.Put version tables /
+            codecs behind the protocol layer so supporting another Minecraft
+                release does not fork the whole server.-
+        **Connection state is owned by `src /
+            server /`.**The protocol layer sees only
+                            borrowed `std::span` payloads; it must not retain decoded packet objects
+  after dispatch.
+- **No global mutable server state.** A subsystem that owns a thread must
+  expose shutdown/join semantics and memory/queue bounds.
 
-Platform-specific guidance lives in:
-- [`iOS/AGENTS.md`](iOS/AGENTS.md) — iOS app source boundaries, Keychain/DPoP rules, and Xcode build/test workflow
-- [`Android/AGENTS.md`](Android/AGENTS.md) — Android app source boundaries, EncryptedSharedPreferences, and Gradle workflow
-- [`website/AGENTS.md`](website/AGENTS.md) — SvelteKit site authority, legal/oauth accuracy, and Vercel deployment
+## Build and run
 
-## Read First and Source Boundaries
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+cmake --build build -j
+ctest --test-dir build --output-on-failure
+./build/zincfox [--port 1-65535]
+```
 
-- Read `README.md`, platform-specific build files, and all source in the touched flow.
-- **Shared KMP** (`shared/src/commonMain/`) is the canonical home for all shared business logic. New format converters, markdown parsers, facet engines, content models, and data transformations belong here in Kotlin. iOS consumes via `SharedKMP.swift`; Android consumes directly. Check `shared/` before writing any logic in either platform's app code.
-- **Modular structure:** each feature lives in its own folder with ViewModel, View, and helpers as separate files. The `iOS/Inkwell/Features/Writer/` folder (ViewModel, View, FormattingToolbar) and `Android/.../ui/writer/` folder (ViewModel, Screen, FormattingToolbar, MarkdownConverter) are the exemplars. Follow this pattern for all new features. Reusable UI components get their own files. Keep files under ~400 lines.
-- **iOS:** `iOS/` is authoritative; `.letta/worktrees/` contains local shadow checkouts and must not be edited as product source.
-  - `iOS/Inkwell/SharedKMP.swift` is the thin Swift wrapper around the shared KMP core. All shared logic calls flow through here.
-  - `iOS/Inkwell/Authentication/LoginStateManager.swift` is the central boundary for OAuth/DPoP, PDS resolution, public and authenticated XRPC, records, blobs, subscriptions, recommends, Leaflet comments, profiles, and caches. It is now a thin core plus `LoginStateManager+*.swift` extensions, one per concern; add new methods to the matching extension rather than the core.
-  - `iOS/Inkwell/Protocols/StandardSite/` and `iOS/Inkwell/Protocols/ContentFormats/` define tolerant wire models and association/verification rules. `iOS/Inkwell/Rendering/` handles Markpub Markdown, Leaflet block/blob pages, pckt, Offprint, Bluesky embeds, polls, and themes.
-  - `iOS/Inkwell/Features/` owns Read/Discover/Write and background subscription polling. `iOS/InkwellTests/` is a focused twelve-test unit suite across `StandardSiteTests.swift` and `BSkyListModelsTests.swift`, not end-to-end OAuth/editor/rendering coverage.
-- **Android:** `Android/` is the Android client. Key boundaries:
-  - `Android/app/src/main/java/uk/ewancroft/inkwell/data/repository/PdsRepository.kt` performs public/authenticated XRPC, records, blobs, subscriptions, recommends, and comments.
-  - `Android/app/src/main/java/uk/ewancroft/inkwell/data/model` defines partial Standard.site/Leaflet shapes. `Android/app/src/main/java/uk/ewancroft/inkwell/data/remote/ConstellationClient.kt` queries backlinks. `Android/app/src/main/java/uk/ewancroft/inkwell/data/remote/BSkyPostFetcher.kt` fetches Bluesky posts for embed rendering.
-  - Hilt modules construct OAuth/network services. ViewModels own `StateFlow`; Compose screens and `NavGraph` own UI/navigation. `InkwellNotificationManager.kt` and `InkwellNotificationWorker.kt` implement foreground Jetstream-backed local notifications with WorkManager background polling fallback.
-  - `Android/app/src/main/java/uk/ewancroft/inkwell/data/remote/StandardSiteVerifier.kt` implements publication/document verification.
-- **Website:** `website/` is the SvelteKit/Vercel marketing, legal, and OAuth-metadata site shared by both apps.
-  - `website/src/routes/+page.svelte` is the landing page; `/privacy` and `/terms` are substantive legal promises; `/client-metadata.json` is a live OAuth client identity consumed by PDS servers.
-  - `website/src/lib/config.ts` owns install-source URLs, site metadata, and nav links.
-- **Legal docs (KMP-first):** `legal/privacy.md` and `legal/terms.md` (plus `legal/meta.json` for the legal document's own version/effective date) are the single source for the Privacy Policy and Terms of Service, rendered natively in-app on both iOS and Android (not a website hand-off) plus on the website. `node tools/legal/render.mjs` compiles them into `shared/src/commonMain/kotlin/uk/ewancroft/inkwell/shared/legal/LegalDocuments.kt` — the one shared-KMP source of truth — and into the website's `website/src/routes/{privacy,terms}/+page.svelte` between their `GENERATED-LEGAL` markers (the website isn't part of the KMP module, so it gets its own generated HTML from the same `legal/*.md`). Never hand-edit either generated target; edit the source and regenerate. Android reads `LegalDocuments.privacyMarkdown`/`.termsMarkdown` directly; iOS reads them through the `SharedLegalDocuments` wrapper in `SharedKMP.swift`. Both render with their platform's `MarkdownRendererView` (the same one used for reading Standard.site content), so in-app links are real and tappable on both — keep any cross-references in the source as absolute URLs, not site-relative paths, so they resolve from a bare browser intent too. Changing `LegalDocuments.kt` requires rebuilding `InkwellShared.xcframework` like any other shared/ change (see below). The iOS/Android app version strings quoted in the text are read directly from `iOS/Inkwell.xcodeproj/project.pbxproj` and `Android/app/build.gradle.kts` at generation time, not hand-typed, so they can't drift from what's actually shipped. CI's `legal-sync` job runs `node tools/legal/render.mjs --check` and fails if the generated Kotlin or Svelte copies (or the quoted versions) are stale. Regenerate **before** building any release artifact — see the Releases section for why.
+"Verified" means: clean build (zero warnings under the strict flags), `ctest`
+green, and — for anything touching the network path — a real client connection
+path for the claimed states with automated regression fixtures retained where
+licensing permits.
 
-## OAuth and Data Invariants
+## Configuration
 
-- **iOS:** OAuth tokens and the P-256 DPoP private key belong in Keychain. `UserDefaults` stores non-secret handle/PDS hints plus notification state and seen URIs; never move credentials, tokens, auth codes, or proof material there or into logs. Keep client ID, custom callback scheme, scopes, metadata hosted at `inkwell.ewancroft.uk`, Info.plist URL type, and runtime credentials identical. Preserve issuer/subject/PDS validation, PKCE/authenticator state, DPoP key continuity, nonce retry behavior, refresh rotation, and logout deletion. See `iOS/AGENTS.md` for iOS-specific OAuth details.
-- **Android:** OAuth sessions are JSON in `EncryptedSharedPreferences` backed by a MasterKey. Keep tokens, refresh state, PKCE/DPoP material, and authorization URLs out of logs and ordinary preferences. The manifest accepts every URI using the custom scheme, while `Android/app/src/main/java/uk/ewancroft/inkwell/MainActivity.kt` checks `/callback`. Preserve state validation inside the OAuth library, reject unrelated/deceptive callbacks, and test cold/warm `singleTask` delivery. Authentication changes do not automatically rebuild an existing Navigation Compose graph merely because `startDestination` changes. See `Android/AGENTS.md` for Android-specific networking rules.
-- **Both:** Keep handles, DIDs, PDS origins, AT URIs, CIDs, rkeys, revisions, canonical site URLs, and verification proofs distinct. Public cross-repo reads must resolve the owning DID's PDS rather than assume the signed-in service.
+- **All configurable behavior belongs in the global `zincfox.conf` file.** Do
+  not add hidden environment flags, command-only switches, or per-module
+  configuration files for server behavior. A new setting must have a bounded
+  type/range, a documented default, load/save coverage, and an explanation of
+  its retained-memory or resource effect when relevant.
+- Configuration must never make an unbounded queue, cache, world, or player
+  store possible. Dynamic choices must resolve to one of documented finite
+  limits and select the safe lower limit when host information is unavailable.
 
-## Content, Concurrency, and Lifecycle
+## Versioning
 
-- AT Protocol open unions and unknown/malformed records must degrade without corrupting valid siblings. Always retain portable `textContent`; preserve format-specific Leaflet/pckt/Offprint/Markpub data unless the user explicitly converts it.
-- Facet byte offsets are UTF-8 offsets, not platform character indices. Blob MIME/size/ref, record `$type`, `site`, `path`, timestamps, themes, and publication association must round-trip exactly.
-- **iOS:** `LoginStateManager`, notification/background managers, and UI state are `@MainActor`; network calls are async but much orchestration still runs on the main actor. Do not introduce blocking I/O, shared DPoP nonce races, detached unsafe mutation, or uncancelled view tasks. Background refresh identifiers, Info.plist permitted identifiers, scheduling, expiry handlers, notification permission, first-poll baseline, 50-item display retention, and 500-URI seen retention form one contract.
-- **Android:** Compose state must remain lifecycle-aware and process-recreatable. Avoid writes in composition/effects, duplicate OAuth callbacks, stale concurrent feed loads, and uncancelled requests. Validate back stack, rotation, process death, deep links, and logout. Use structured concurrency and `Dispatchers.IO` for synchronous OkHttp. URL-encode every XRPC query value.
-- **Website:** `website/src/routes/+page.svelte` and `website/src/routes/+layout.svelte` must remain server-rendered and static where possible. The OAuth endpoint (`/client-metadata.json`) must remain dynamic. Do not globally prerender without verifying deployment semantics.
-- **Both apps:** Preserve native accessibility, Dynamic Type, dark/light behavior, reduced motion, safe-area behavior, and platform-appropriate mark/wordmark coordinates.
+- Releases use strict semantic versioning `v<major>.<minor>.<patch>`.
+- The version lives only in the `VERSION` line of `CMakeLists.txt`; derive any
+  runtime version string from that single source of truth, not a separate file.
+- **No version jumps**: bump from the immediately previous released version.
+  Never skip a patch, minor, or major number; do not backfill gaps with phantom
+  tags or releases.
+- **Substantial changes require a release cut**: a user-visible protocol or
+  gameplay behavior, persistence/world-format change, compatibility claim,
+  public interface change, or material resource-budget change must not be
+  allowed to accumulate indefinitely after a release. Before merging the next
+  substantial tranche, audit the commits since the latest tag and cut the next
+  sequential version when the tranche is ready. Documentation-only, test-only,
+  formatting, and internal refactors do not require a version cut unless they
+  change the published contract.
+- **Release procedure follows Wolfram**: change the single `VERSION` line,
+  create a signed annotated `v<major>.<minor>.<patch>` tag on that same commit
+  (falling back to an annotated tag only when signing is unavailable), push the
+  commit and tag, and create the matching GitHub release with generated notes.
+  For pre-1.0 releases, publish source only; attach built artifacts starting at
+  `v1.0.0`.
 
-## Build, Tests, and Distribution
+## Code style
 
-- **iOS:** The checked-in project uses Swift 5 mode, app and test deployment target iOS 18.0 (kept as low as the codebase's SwiftUI APIs allow — iOS 26+-only APIs like `tabBarMinimizeBehavior`/`safeAreaBar` are gated behind `if #available(iOS 26.0, *)` with a pre-26 fallback, not raised as the floor), bundle `uk.ewancroft.Inkwell`, marketing version `2.6.1`, and build `60`. Resolve Swift packages through Xcode and build the `Inkwell` scheme on an installed compatible simulator.
-  - Run `xcodebuild -project iOS/Inkwell.xcodeproj -scheme Inkwell -destination 'platform=iOS Simulator,name=<available iOS 18+ device>' build test`, adapting only the destination to installed runtimes.
-  - `InkwellUITests` has no source files (pre-existing) and fails to load its test bundle if run — skip it with `-skip-testing:InkwellUITests` or run just the `InkwellTests` unit test target.
-  - Unit tests cover the Inkwell NSID namespace, AT-URI rejection of malformed values, association/canonical URLs, verification endpoint paths, wire keys, search v2 decoding, notification JSON, and tolerant record pages. Nine tests in one file — this target does **not** exercise the shared KMP core.
-  - `iOS/altstore/source.json` must match bundle/version/build, privacy/permissions, hosted icon/IPA, byte size, and release notes. See `iOS/AGENTS.md` for iOS-specific distribution requirements.
-- **Android:** Target facts: compile/target SDK 36, minimum SDK 26, Java/Kotlin JVM 17, release minification enabled, app ID `uk.ewancroft.inkwell`, debug ID suffix `.debug`, version `2.6.0`, versionCode `13`. Run `./gradlew clean assembleDebug lint test` from `Android/` with a valid local Android SDK/JDK. For release work also run `./gradlew assembleRelease` and inspect R8 output. See `Android/AGENTS.md` for Android-specific capability gaps.
-  - App-level coverage is two files: `StandardSiteVerifierTest` (13 tests) and `SearchModelsTest` (2). No instrumentation tests. Three verifier tests hit the real `blog.ewancroft.uk` standard.site publication over the network and fail offline. Never report a green `./gradlew test` as behavioural coverage of the app beyond those two files.
-- **Shared core:** `Android/` is the only Gradle root, and it maps `:shared` to `../shared`. The module holds the bulk of the repo's automated coverage — 135 tests across ten files in `shared/src/commonTest/`, covering AT-URI parsing, markdown parsing and inline scanning, facet schema/conversion, content-format conversion, URL utilities, reader themes, and the tip-prompt/notification policies.
-  - `./gradlew test` does **not** run them: the KMP `jvm()` target exposes `jvmTest`, not `test`, so the aggregate `test` task skips `:shared`. Run `./gradlew :shared:jvmTest` explicitly, or `:shared:allTests` to include the Kotlin/Native iOS targets (much slower).
-  - Any change under `shared/` must be verified with `:shared:jvmTest`. Neither the Android `test` task nor the iOS `xcodebuild ... test` invocation will catch a regression there.
-- **Website:** pnpm is authoritative (`pnpm-lock.yaml` and `pnpm-workspace.yaml`; no npm lock). Vercel installs with `pnpm install` on Node 22. Run `pnpm install --frozen-lockfile`, `pnpm check`, and `pnpm build`. There is no `lint` or test script; use `pnpm exec prettier --check --ignore-unknown .` for formatting checks. See `website/AGENTS.md` for website-specific design/accessibility constraints.
-- **Testing mode:** both apps take a launch flag — `-testing` (iOS) and `--ez testing true` (Android) — that keeps the real signed-in session and real network reads while intercepting every write. A blocked write raises a "Testing mode" notice, hoisted above the navigation layer so it doesn't read as a genuine failure. This is the mode used for screenshot capture, so captures require being logged in.
-  - It deliberately substitutes **no** mock data and fakes **no** session. The fixture-based mode it replaced hid two real bugs (a subscribed/unsubscribed bell state that never rendered, and a feed card with no author) because the only thing anyone ever looked at was the fake.
-  - Writes throw rather than returning a plausible reference: callers read those references back, so a fabricated success would break the next step and invent state the PDS doesn't have. See principle 4.
-  - Enforcement lives at the choke points, not the call sites — iOS `LoginStateManager` (`createRecord`/`updateRecord`/`deleteRecord`/`uploadBlob`, plus `submitFeedback`) and Android `PdsRepository` (the same four; `submitFeedback` routes through `createRecord`). Add new mutations behind these and they're covered automatically.
-  - The flag also suppresses the notification permission prompt and the Ko-fi tip prompt, which steal focus mid-capture.
-- **All:** Manually exercise fresh/cancelled OAuth, bad state/issuer/nonce, restore/refresh/revocation/logout, every reader format, Unicode facets, blobs, create/edit/delete, subscriptions/recommends/comments, verification, pagination, offline errors, and background/local notifications.
-- Never commit `local.properties`, `.idea/`, `.gradle/`, `app/build/`, signing material, OAuth sessions, or real credentials.
-- **Releases:** whenever a platform's version is bumped as a semver `x.y.z` (not just a build/versionCode increment), tag and publish one GitHub release per platform for that bump. Tag as `ios-vX.Y.Z` and `android-vX.Y.Z` (the two platforms version independently) — never a bare combined tag like `v2.3.0`. The release must include the built artifact alongside the standard source archive — the `.ipa` for iOS, the `.apk` for Android — plus release notes describing what changed for that platform.
-  - **Cut releases from committed state only.** The botched v2.3.0 release was built from un-pushed working-tree bumps: the artifacts shipped, but the tree they were built from didn't exist on the remote, and the release had to be redone. Land the bump commit first, then build.
-  - **Commit structure:** one shared `chore(ios,android): release X.Y.Z (build N)` commit carrying both platforms' version bumps, the regenerated legal docs, and the rebuilt xcframework; both platform tags point at it. Per-channel artifact commits (`chore(android,fdroid): …`, `chore(ios): …`) follow after.
-  - **Bump every build configuration.** The iOS app target has Debug and Release copies of `CURRENT_PROJECT_VERSION`; bump both. A half-bumped pair (Debug 55 / Release 56) makes every tool that parses `project.pbxproj` read the stale value.
-  - **Order matters: legal regen → xcframework rebuild → build artifacts.** The quoted app versions are compiled into both apps via `LegalDocuments.kt`, so an APK/IPA built before `node tools/legal/render.mjs` ships last release's version string in its in-app Privacy/Terms screens. CI's `legal-sync` job only catches source drift, never stale artifacts.
-  - **Assets are device builds with canonical names** — `Inkwell-X.Y.Z.ipa` / `Inkwell-X.Y.Z.apk`. A simulator-slice IPA cannot install through AltStore; a generic `app-release.apk` name breaks the F-Droid index's expectations.
-- **Publishing to live distribution channels is a required part of every version-bump release, not an optional follow-up:**
-  - **iOS → AltStore Classic:** export an unsigned `.ipa` from the Xcode archive, update `iOS/altstore/source.json` (`version`, `buildVersion`, `size`, a new `versions` entry with release notes), and upload `source.json`/`icon.png`/the `.ipa` to `inkwell.ewancroft.uk/altstore/`. See `iOS/altstore/README.md`.
-  - **Android → F-Droid (self-hosted repo):** build a signed release APK (`./gradlew assembleRelease`, signed with `Android/inkwell-release.keystore`), copy it into `Android/fdroid-repo/repo/` as `Inkwell-<versionName>.apk`, update `Android/fdroid-repo/metadata/uk.ewancroft.inkwell.yml`'s `CurrentVersion`/`CurrentVersionCode`, regenerate the signed index with `fdroid update --clean` (uses `Android/fdroid-repo/keystore.p12`), then copy the regenerated `repo/` into `website/static/fdroid/repo` and deploy the website. See `Android/fdroid-repo/README.md`.
-  - Neither app has a live Apple App Store or Google Play Store listing — "the live app stores" for Inkwell means AltStore Classic and F-Droid, not Apple/Google's stores.
-  - **`node tools/release/publish.mjs`** automates the steps above rather than replacing this checklist — read it first regardless. `status` (read-only) compares the version each platform's source declares against every channel and reports gaps; `android [--yes] [--push]` builds, signs, and publishes the F-Droid update plus the GitHub release; `ios --ipa <path> [--yes] [--push]` does the AltStore/GitHub side once you've exported the `.ipa` yourself (Xcode archiving needs an interactive keychain unlock, so the script can't do that part). Defaults to a dry-run plan; `--yes` performs it; `--push` (requires `--yes`) also pushes the resulting commit to `origin/main` — without `--push` the commit is local so it can be reviewed with `git show` first. Safe to run `status` any time, including in agent sessions with no signing access, since it never mutates anything.
+- Header guards (`ZINCFOX_PROTOCOL_<FILE>_HPP`), not `#pragma once` — matches
+  the convention in `wolfram/include/wolfram/` and `clay/include/clay/`.
+- `.clang-format` in this repo (LLVM base, 4-space indent, 80 columns,
+  attached braces) — run `clang-format -i` on changed files.
+- Comments explain *why*, sparingly; never narrate obvious code.
+- No C++ exceptions for expected protocol/server states. Use explicit
+  result/error types. Reserve exceptions/aborts for genuine programmer errors.
+- Avoid RTTI-heavy or virtual object hierarchies for packets/entities when
+  tagged values or tables are simpler.
+
+## Memory invariants
+
+The initial scaffold deliberately chooses simple fixed bounds:
+
+- 32 connection slots;
+- one 8 KiB receive buffer per slot;
+- one 128 KiB transmit buffer per slot (sized for one columnar 24-section
+  chunk frame with full sky light);
+- one small protocol / session record per slot;
+- one `pollfd` table for the listener plus those slots.
+
+The fixed socket-buffer payload is therefore **4.25 MiB** at maximum connection
+capacity (32 slots x 136 KiB), plus small connection/poller metadata and
+operating-system socket buffers. This is not a promise that the process RSS is
+4.25 MiB, but it is the first explicit retained-memory budget owned by Zincfox
+itself.
+
+When adding a subsystem, document its steady-state and worst-case retained
+memory in the PR when practical.
+
+Every long-lived subsystem should answer four questions:
+
+1. What owns this memory?
+2. What is the normal retained size?
+3. What is the maximum retained size or eviction/backpressure rule?
+4. What input can cause the subsystem to grow?
+
+## Commits and pull requests
+
+Matches the convention in `wolfram/AGENTS.md` / `keepsake/AGENTS.md`.
+
+- **Atomic conventional commits**: every commit is exactly one logical change.
+  Scope by module — `feat(protocol)`, `feat(server)`, `fix(net)`,
+  `test(protocol)`, etc. Never combine a code change with a docs update, or
+  changes to two unrelated modules, in one commit. Write the message to explain
+  the reasoning, not just restate the file list. Split multi-concern work into
+  sequential commits instead.
+- **Metadata files may be updated directly on `main`.** This covers project-level
+  metadata and documentation such as `AGENTS.md`, `README.md`, `docs/**`, and
+  similar non-code files that guide how the repository is maintained.
+- **All other work lands via feature branches and pull requests.** Code,
+  tests, build scripts, and any behavioral change must be developed on a
+  dedicated `feat/<area>` or `fix/<area>` branch and merged through a PR so
+  review and CI run before it reaches `main`.
+- **Honest attribution**: commits may carry a `Co-authored-by:` trailer crediting
+  an AI agent, and may reference the specific model used, in the commit message,
+  a PR, or code comments — attribution should reflect who/what actually did the
+  work.
+- **No commented-out code** left in place; delete dead code or move it to a
+  test.
+
+## Issue tracking
+
+- **Track every discovered issue**: a bug, protocol mismatch, portability
+  defect, missing test, documentation inconsistency, or deferred compatibility
+  problem found during development or review must have a GitHub issue unless it
+  is fixed in the same atomic change and leaves no follow-up work.
+- Create issues with the repository templates under
+  `.github/ISSUE_TEMPLATE/` (`bug_report.yml` for defects and
+  `feature_request.yml` for requested behavior). Include the exact version or
+  commit, reproduction or evidence, affected protocol state, and relevant
+  test/CI output. Do not substitute private notes or an untracked TODO for a
+  reportable issue.
+- Link the issue from the implementing pull request and close it only when the
+  fix or explicitly scoped follow-up has been verified. Release audits must
+  review open issues before declaring a tranche complete.
+
+## Do not do these without explicit human sign-off
+
+- Add a JVM/Paper/Spigot server as the actual backend.
+- Copy Mojang proprietary server source or decompiled implementation code.
+- Add an unbounded network/task/chunk queue.
+- Replace protocol validation with permissive "best effort" parsing.
+- Introduce a dependency-heavy game/server framework.
+- Claim vanilla compatibility for a release without client/protocol tests.
+- Weaken warnings, sanitizers or tests merely to get CI green.
