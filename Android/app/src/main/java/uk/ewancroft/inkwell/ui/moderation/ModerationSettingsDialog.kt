@@ -35,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -252,16 +253,31 @@ private fun LabelModeRow(
     onModeSelected: (LabelMode) -> Unit,
     showTitle: Boolean = true,
 ) {
+    val useVerticalLayout = LocalDensity.current.fontScale >= 1.5f
+
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         if (showTitle) Text(title, style = MaterialTheme.typography.bodyLarge)
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-            LabelMode.entries.forEach { candidate ->
-                FilterChip(
-                    selected = mode == candidate,
-                    onClick = { onModeSelected(candidate) },
-                    label = { Text(candidate.displayName) },
-                    modifier = Modifier.weight(1f),
-                )
+        if (useVerticalLayout) {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth()) {
+                LabelMode.entries.forEach { candidate ->
+                    FilterChip(
+                        selected = mode == candidate,
+                        onClick = { onModeSelected(candidate) },
+                        label = { Text(candidate.displayName) },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            }
+        } else {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                LabelMode.entries.forEach { candidate ->
+                    FilterChip(
+                        selected = mode == candidate,
+                        onClick = { onModeSelected(candidate) },
+                        label = { Text(candidate.displayName) },
+                        modifier = Modifier.weight(1f),
+                    )
+                }
             }
         }
     }
