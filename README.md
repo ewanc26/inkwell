@@ -154,3 +154,13 @@ Inkwell is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0) 
 The exception allows otherwise AGPL-compliant builds to be distributed through the Apple App Store, Google Play, and comparable stores whose terms would otherwise conflict with the AGPL. It does not remove the AGPL's source-availability or copyleft requirements.
 
 Inkwell is not currently distributed through the App Store or Google Play. The existing free AltStore Classic and F-Droid distribution channels remain available, including if paid mainstream-store builds are introduced later.
+
+## Star History
+
+<a href="https://www.star-history.com/?repos=ewanc26%2Finkwell&type=date&legend=bottom-right">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=ewanc26/inkwell&type=date&theme=dark&legend=bottom-right" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=ewanc26/inkwell&type=date&legend=bottom-right" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=ewanc26/inkwell&type=date&legend=bottom-right" />
+ </picture>
+</a>
