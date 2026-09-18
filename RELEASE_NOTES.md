@@ -128,7 +128,7 @@ Historical platform tags: `ios-v2.0.0` and `android-v2.0.0`.
 
 ## 1.3.1 — 2026-08-16
 
-[GitHub release](https://github.com/ewanc26/inkwell/releases/tag/v1.3.1) · Android only
+**Android only.**
 
 A small Android follow-up release after the repositories were consolidated into the Inkwell monorepo.
 
@@ -140,7 +140,7 @@ Historical platform tag: `android-v1.3.1`.
 
 ## 1.3.0 — 2026-08-16
 
-[GitHub release](https://github.com/ewanc26/inkwell/releases/tag/v1.3.0) · Android only
+**Android only.**
 
 This was a short-lived Android release that brought the post/feed-card styling closer to iOS, including colours, chevrons, outlines, and the splash screen. It was published through the self-hosted F-Droid repository and then replaced by 1.3.1 later the same day.
 
@@ -150,7 +150,7 @@ Historical platform tag: `android-v1.3.0`.
 
 ## 1.2.0 — 2026-08-16
 
-[GitHub release](https://github.com/ewanc26/inkwell/releases/tag/v1.2.0) · Android only
+**Android only.**
 
 This release got the early Android app back into a healthier state: reader/writer compilation errors were fixed, the ViewModels and data layer were tightened up, navigation and Discover were improved, and the reader/feed-card styling moved closer to iOS.
 
@@ -162,7 +162,7 @@ Historical platform tag: `android-v1.2.0`.
 
 ## 1.1.0 — 2026-08-16
 
-[GitHub release](https://github.com/ewanc26/inkwell/releases/tag/v1.1.0) · Android only
+**Android only.**
 
 This is where the Android reader became substantially more than a basic document viewer.
 
@@ -174,7 +174,7 @@ Historical platform tag: `android-v1.1.0`.
 
 ## 1.0.1 — 2026-08-15
 
-[GitHub release](https://github.com/ewanc26/inkwell/releases/tag/v1.0.1) · Android only
+**Android only.**
 
 A small Android patch release.
 
