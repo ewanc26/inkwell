@@ -15,6 +15,7 @@ import uk.ewancroft.inkwell.shared.AtUri
 import uk.ewancroft.inkwell.data.remote.StandardSiteVerifier
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 import uk.ewancroft.inkwell.shared.text.StringUtils
+import uk.ewancroft.inkwell.shared.validation.StandardSiteValidation
 import uk.ewancroft.inkwell.shared.verification.VerificationResult
 import uk.ewancroft.inkwell.data.repository.PdsRepository
 import uk.ewancroft.inkwell.data.repository.createPublication
@@ -133,6 +134,15 @@ class WriterViewModel @Inject constructor(
         val state = uiStateInternal.value
         if (state.createUrl.isBlank() || state.createName.isBlank()) {
             uiStateInternal.value = state.copy(createError = "URL and Name are required")
+            return
+        }
+        val validationError = StandardSiteValidation.validatePublication(
+            url = state.createUrl,
+            name = state.createName,
+            description = state.createDescription,
+        ).firstOrNull()
+        if (validationError != null) {
+            uiStateInternal.value = state.copy(createError = "${validationError.field}: ${validationError.message}")
             return
         }
 
