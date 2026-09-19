@@ -113,29 +113,38 @@ object ArticleStatePreferences {
 
     /** Validates and timestamp-merges an export atomically from the caller's perspective. */
     fun importJson(context: Context, raw: String): ImportResult {
-        val envelope = runCatching { json.decodeFromString<ReadingDataExport>(raw) }.getOrNull()
+        val envelope = decodeAndValidate(raw)
             ?: return ImportResult.Invalid
         if (envelope.format != "uk.ewancroft.inkwell.reading-data") return ImportResult.Invalid
         if (envelope.version != 1) return ImportResult.UnsupportedVersion
-        if (envelope.articles.size > 10_000) return ImportResult.Invalid
-        if (envelope.articles.any { !atUriPattern.matches(it.articleId) || it.title.length > 500 || runCatching { Instant.parse(it.timestamp) }.getOrNull()?.isAfter(Instant.now()) == true }) {
-            return ImportResult.Invalid
-        }
-        val incoming = envelope.articles.mapNotNull { article ->
-            val timestamp = runCatching { Instant.parse(article.timestamp) }.getOrNull() ?: return@mapNotNull null
-            article.articleId to (article to timestamp)
-        }
-        if (incoming.size != envelope.articles.size) return ImportResult.Invalid
         val current = readAll(context).toMutableMap()
         var changes = 0
-        incoming.forEach { (id, pair) ->
-            val (article, timestamp) = pair
-            if (current[id]?.updatedAt?.let { Instant.ofEpochMilli(it) >= timestamp } == true) return@forEach
-            current[id] = ArticleState(article.title, article.isRead, article.isBookmarked, timestamp.toEpochMilli())
+        envelope.articles.forEach { article ->
+            val timestamp = Instant.parse(article.timestamp)
+            if (current[article.articleId]?.updatedAt?.let { Instant.ofEpochMilli(it) >= timestamp } == true) return@forEach
+            current[article.articleId] = ArticleState(article.title, article.isRead, article.isBookmarked, timestamp.toEpochMilli())
             changes++
         }
         writeAll(context, current)
         return ImportResult.Success(changes)
+    }
+
+    fun previewImportJson(context: Context, raw: String): ImportResult {
+        val envelope = decodeAndValidate(raw)
+            ?: return ImportResult.Invalid
+        if (envelope.format != "uk.ewancroft.inkwell.reading-data") return ImportResult.Invalid
+        if (envelope.version != 1) return ImportResult.UnsupportedVersion
+        val current = readAll(context)
+        val changes = envelope.articles.count { article ->
+            current[article.articleId]?.updatedAt?.let { Instant.ofEpochMilli(it) >= Instant.parse(article.timestamp) } != true
+        }
+        return ImportResult.Success(changes)
+    }
+
+    private fun decodeAndValidate(raw: String): ReadingDataExport? {
+        val envelope = runCatching { json.decodeFromString<ReadingDataExport>(raw) }.getOrNull() ?: return null
+        if (envelope.articles.size > 10_000 || envelope.articles.any { !atUriPattern.matches(it.articleId) || it.title.length > 500 || runCatching { Instant.parse(it.timestamp) }.getOrNull()?.isAfter(Instant.now()) == true }) return null
+        return envelope
     }
 
     private val atUriPattern = Regex("^at://[^/]+/[^/]+/[^/]+$")

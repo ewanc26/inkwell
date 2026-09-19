@@ -103,18 +103,7 @@ final class ArticleStateStore {
     /// validated, so malformed files cannot partially update the store.
     @discardableResult
     func importJSON(_ data: Data) throws -> Int {
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
-        let envelope = try decoder.decode(ReadingDataExport.self, from: data)
-        guard envelope.format == "uk.ewancroft.inkwell.reading-data" else { throw ImportError.invalidEnvelope }
-        guard envelope.version == 1 else { throw ImportError.unsupportedVersion }
-        guard envelope.articles.count <= 10_000 else { throw ImportError.invalidArticle }
-
-        for article in envelope.articles {
-            guard parseAtUri(article.articleId) != nil,
-                  article.title.count <= 500,
-                  article.timestamp <= Date() else { throw ImportError.invalidArticle }
-        }
+        let envelope = try validatedImport(data)
 
         var merged = states
         var changes = 0
@@ -131,6 +120,28 @@ final class ArticleStateStore {
         states = merged
         persist()
         return changes
+    }
+
+    /// Returns the number of local records that would change, without mutating state.
+    func previewImportJSON(_ data: Data) throws -> Int {
+        try validatedImport(data).articles.reduce(into: 0) { count, article in
+            if states[article.articleId]?.updatedAt ?? .distantPast < article.timestamp { count += 1 }
+        }
+    }
+
+    private func validatedImport(_ data: Data) throws -> ReadingDataExport {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let envelope = try decoder.decode(ReadingDataExport.self, from: data)
+        guard envelope.format == "uk.ewancroft.inkwell.reading-data" else { throw ImportError.invalidEnvelope }
+        guard envelope.version == 1 else { throw ImportError.unsupportedVersion }
+        guard envelope.articles.count <= 10_000 else { throw ImportError.invalidArticle }
+        for article in envelope.articles {
+            guard parseAtUri(article.articleId) != nil, article.title.count <= 500, article.timestamp <= Date() else {
+                throw ImportError.invalidArticle
+            }
+        }
+        return envelope
     }
 
     private func persist() {
