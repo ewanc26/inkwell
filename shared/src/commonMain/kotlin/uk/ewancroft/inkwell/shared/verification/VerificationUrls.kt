@@ -56,9 +56,13 @@ object VerificationUrls {
 
     private fun normalizeHttpsUrl(urlString: String): UrlParts? {
         val trimmed = urlString.trim()
-        val authorityText = trimmed.substringAfter("://", "").substringBefore('/').substringBefore('?').substringBefore('#')
+        val scheme = trimmed.substringBefore("://", "").lowercase()
+        if (scheme != "https") return null
+        val remainder = trimmed.substringAfter("://", "")
+        if (remainder.isEmpty()) return null
+        val authorityText = remainder.substringBefore('/').substringBefore('?').substringBefore('#')
         if ('@' in authorityText) return null
-        val parsed = runCatching { Url(trimmed) }.getOrNull() ?: return null
+        val parsed = runCatching { Url("https://$remainder") }.getOrNull() ?: return null
         if (parsed.protocol.name.lowercase() != "https" || parsed.host.isEmpty()) return null
         return UrlParts(
             scheme = "https",
