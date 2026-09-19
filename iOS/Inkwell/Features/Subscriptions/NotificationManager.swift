@@ -104,7 +104,15 @@ final class NotificationManager {
         var seen = lastSeenURIs
         guard !seen.contains(document.uri) else { return }
 
-        await recordNewDocuments([(doc: document, pub: publication, sensitive: false)])
+        let labels = (document.record.labels?.values.map { ModerationLabel(value: $0.value, source: nil) } ?? [])
+            + (publication?.record.labels?.values.map { ModerationLabel(value: $0.value, source: nil) } ?? [])
+        let sensitive = shouldRedactNotification(
+            title: document.record.title,
+            description: document.record.description,
+            textContent: document.record.textContent,
+            labels: labels
+        )
+        await recordNewDocuments([(doc: document, pub: publication, sensitive: sensitive)])
         seen.insert(document.uri)
         saveLastSeenURIs(seen)
         if let publicationURI = publication?.uri {
