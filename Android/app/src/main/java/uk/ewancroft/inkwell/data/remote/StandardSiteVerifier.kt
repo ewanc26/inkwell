@@ -149,13 +149,12 @@ internal open class SiteVerifier(
                     VerificationFailure.InvalidPublicationURL(publication.url)
                 )
 
-            try {
-                val response = httpClient.get(endpoint)
-                    .also { if (it.statusCode !in 200..299) {
-                        return@withContext VerificationResult.Failed(
-                            VerificationFailure.EndpointUnreachable(it.statusCode)
-                        )
-                    } }
+            val response = httpClient.get(endpoint)
+                .also { if (it.statusCode !in 200..299) {
+                    return@withContext VerificationResult.Failed(
+                        VerificationFailure.EndpointUnreachable(it.statusCode)
+                    )
+                } }
 
                     val body = response.body?.trim()
                     if (body.isNullOrEmpty() || !body.startsWith("at://")) {
@@ -168,13 +167,7 @@ internal open class SiteVerifier(
                         )
                     }
 
-                    VerificationResult.Verified
-                }
-            } catch (e: IOException) {
-                VerificationResult.Failed(VerificationFailure.EndpointUnreachable(statusCode = null))
-            } catch (e: Exception) {
-                VerificationResult.Failed(VerificationFailure.Unexpected(e.message))
-            }
+            VerificationResult.Verified
         }.getOrElse { VerificationResult.Failed(VerificationFailure.Unexpected(it.message)) }
 
         mutex.withLock {
@@ -201,31 +194,24 @@ internal open class SiteVerifier(
                     VerificationFailure.InvalidDocumentURL(document.site)
                 )
 
-            try {
-                val response = httpClient.get(url)
-                    .also { if (it.statusCode !in 200..299) {
-                        return@withContext VerificationResult.Failed(
-                            VerificationFailure.EndpointUnreachable(it.statusCode)
-                        )
-                    } }
+            val response = httpClient.get(url)
+                .also { if (it.statusCode !in 200..299) {
+                    return@withContext VerificationResult.Failed(
+                        VerificationFailure.EndpointUnreachable(it.statusCode)
+                    )
+                } }
 
                     val html = response.body
                     if (html.isNullOrEmpty()) {
                         return@withContext VerificationResult.Failed(VerificationFailure.MalformedResponse)
                     }
 
-                    if (DocumentLinkScanner.containsDocumentLink(html, documentURI)) {
-                        VerificationResult.Verified
-                    } else {
-                        VerificationResult.Failed(
-                            VerificationFailure.DocumentLinkMissing(expected = documentURI)
-                        )
-                    }
-                }
-            } catch (e: IOException) {
-                VerificationResult.Failed(VerificationFailure.EndpointUnreachable(statusCode = null))
-            } catch (e: Exception) {
-                VerificationResult.Failed(VerificationFailure.Unexpected(e.message))
+            if (DocumentLinkScanner.containsDocumentLink(html, documentURI)) {
+                VerificationResult.Verified
+            } else {
+                VerificationResult.Failed(
+                    VerificationFailure.DocumentLinkMissing(expected = documentURI)
+                )
             }
         }.getOrElse { VerificationResult.Failed(VerificationFailure.Unexpected(it.message)) }
 
