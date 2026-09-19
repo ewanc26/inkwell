@@ -67,20 +67,24 @@ internal suspend fun PostDetailViewModel.parseContent(
     return ParseResult(DocumentContent.Empty)
 }
 
-private fun collectPlaintext(element: JsonElement, out: StringBuilder) {
+private const val MAX_PLAINTEXT_DEPTH = 32
+private const val MAX_PLAINTEXT_CHARS = 200_000
+
+private fun collectPlaintext(element: JsonElement, out: StringBuilder, depth: Int = 0) {
+    if (depth > MAX_PLAINTEXT_DEPTH || out.length >= MAX_PLAINTEXT_CHARS) return
     when (element) {
         is JsonObject -> {
             val text = element["plaintext"]?.jsonPrimitive?.contentOrNull
             if (!text.isNullOrBlank()) {
                 if (out.isNotEmpty()) out.append("\n\n")
-                out.append(text)
+                out.append(text.take(MAX_PLAINTEXT_CHARS - out.length))
             }
             for ((key, child) in element) {
                 if (key == "plaintext") continue
-                collectPlaintext(child, out)
+                collectPlaintext(child, out, depth + 1)
             }
         }
-        is JsonArray -> element.forEach { collectPlaintext(it, out) }
+        is JsonArray -> element.forEach { collectPlaintext(it, out, depth + 1) }
         else -> {}
     }
 }
