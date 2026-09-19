@@ -137,7 +137,7 @@ class PdsRepository @Inject constructor(
         }
         val session = sessionStore.load() ?: throw Exception("Not authenticated")
         val authClient = atOAuth.createClient()
-        return authClient.procedure(
+        val response = authClient.procedure(
             nsid = "com.atproto.repo.createRecord",
             params = Unit,
             paramsSerializer = Unit.serializer(),
@@ -225,7 +225,7 @@ class PdsRepository @Inject constructor(
 
         val contentType = io.ktor.http.ContentType.parse(mimeType)
 
-        return authClient.procedure(
+        val response = authClient.procedure(
             nsid = "com.atproto.repo.uploadBlob",
             params = Unit,
             paramsSerializer = Unit.serializer(),
@@ -233,6 +233,18 @@ class PdsRepository @Inject constructor(
             contentType,
             JsonObject.serializer(),
         )
+        val blob = response["blob"]?.jsonObject
+            ?: throw IllegalStateException("Blob upload response did not contain a blob")
+        check(blob["mimeType"]?.jsonPrimitive?.content == mimeType) {
+            "Blob upload response MIME type did not match request"
+        }
+        check(blob["size"]?.jsonPrimitive?.long == bytes.size.toLong()) {
+            "Blob upload response size did not match request"
+        }
+        check(blob["ref"]?.jsonObject?.get("\$link")?.jsonPrimitive?.content?.isNotBlank() == true) {
+            "Blob upload response did not contain a CID"
+        }
+        return response
     }
 
     suspend fun deleteRecord(collection: String, rkey: String) {
