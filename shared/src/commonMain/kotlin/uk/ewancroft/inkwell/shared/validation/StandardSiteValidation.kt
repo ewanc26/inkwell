@@ -15,7 +15,8 @@ object StandardSiteValidation {
 
     fun validateDocument(input: DocumentInput): List<Error> = buildList {
         if (input.site.isBlank()) add(Error("site", "Site is required"))
-        checkText("title", input.title, 500, 5_000)
+        if (input.title.isBlank()) add(Error("title", "Title is required"))
+        else checkText("title", input.title, 500, 5_000)
         checkOptionalText("description", input.description, 3_000, 30_000)
         input.tags.orEmpty().forEachIndexed { index, tag ->
             checkText("tags[$index]", tag, 128, 1_280)
