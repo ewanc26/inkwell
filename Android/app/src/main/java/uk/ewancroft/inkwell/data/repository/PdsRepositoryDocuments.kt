@@ -4,11 +4,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import okhttp3.ResponseBody
 import okhttp3.Request
 import uk.ewancroft.inkwell.data.model.bluesky.BlueskyProfile
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 import uk.ewancroft.inkwell.shared.util.HandleUtils
 import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
+
+private const val MAX_READER_BLOB_BYTES = 10L * 1024 * 1024
 
 suspend fun PdsRepository.fetchDocuments(did: String, pdsUrl: String? = null): List<JsonObject> =
     fetchDocumentEntries(did, pdsUrl).map { it.value }
@@ -39,6 +42,18 @@ suspend fun PdsRepository.downloadBlob(cid: String, fromDID: String): ByteArray 
         if (!response.isSuccessful) {
             throw java.io.IOException("Blob download failed: HTTP ${response.code}")
         }
-        response.body?.bytes() ?: throw java.io.IOException("Blob response had no body")
+        val body = response.body ?: throw java.io.IOException("Blob response had no body")
+        readBoundedBlob(body)
     }
+}
+
+private fun readBoundedBlob(body: ResponseBody): ByteArray {
+    if (body.contentLength() > MAX_READER_BLOB_BYTES) {
+        throw java.io.IOException("Blob response exceeds the reader size limit")
+    }
+    val bytes = body.source().readByteArray(MAX_READER_BLOB_BYTES + 1)
+    if (bytes.size.toLong() > MAX_READER_BLOB_BYTES) {
+        throw java.io.IOException("Blob response exceeds the reader size limit")
+    }
+    return bytes
 }
