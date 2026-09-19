@@ -129,12 +129,12 @@ object ArticleStatePreferences {
         return ImportResult.Success(changes)
     }
 
-    fun previewImportJson(context: Context, raw: String): ImportResult {
+    fun previewImportJson(context: Context?, raw: String): ImportResult {
         val envelope = decodeAndValidate(raw)
             ?: return ImportResult.Invalid
         if (envelope.format != "uk.ewancroft.inkwell.reading-data") return ImportResult.Invalid
         if (envelope.version != 1) return ImportResult.UnsupportedVersion
-        val current = readAll(context)
+        val current = context?.let(::readAll) ?: emptyMap()
         val changes = envelope.articles.count { article ->
             current[article.articleId]?.updatedAt?.let { Instant.ofEpochMilli(it) >= Instant.parse(article.timestamp) } != true
         }

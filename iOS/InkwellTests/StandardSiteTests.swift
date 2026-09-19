@@ -182,6 +182,27 @@ final class StandardSiteTests: XCTestCase {
         XCTAssertEqual(page.records.first?.uri, "at://did:plc:alice/site.standard.document/valid")
     }
 
+    func testReadingDataImportPreviewAcceptsVersionOneEnvelope() throws {
+        let data = Data(#"""
+        {"format":"uk.ewancroft.inkwell.reading-data","version":1,
+         "exportedAt":"2026-09-19T00:00:00Z","articles":[
+           {"articleId":"at://did:plc:alice/site.standard.document/one",
+            "title":"Example","isRead":true,"isBookmarked":false,
+            "timestamp":"2026-09-19T00:00:00Z","futureField":"ignored"}
+         ]}
+        """#.utf8)
+
+        XCTAssertGreaterThanOrEqual(try ArticleStateStore.shared.previewImportJSON(data), 0)
+    }
+
+    func testReadingDataImportRejectsUnsupportedVersionAndMalformedArticle() {
+        let unsupported = Data(#"{"format":"uk.ewancroft.inkwell.reading-data","version":2,"exportedAt":"2026-09-19T00:00:00Z","articles":[]}"#.utf8)
+        XCTAssertThrowsError(try ArticleStateStore.shared.previewImportJSON(unsupported))
+
+        let malformed = Data(#"{"format":"uk.ewancroft.inkwell.reading-data","version":1,"exportedAt":"2026-09-19T00:00:00Z","articles":[{"articleId":"https://example.com","title":"bad","isRead":false,"isBookmarked":false,"timestamp":"2026-09-19T00:00:00Z"}]}"#.utf8)
+        XCTAssertThrowsError(try ArticleStateStore.shared.previewImportJSON(malformed))
+    }
+
     private func document(
         site: String,
         path: String? = nil
