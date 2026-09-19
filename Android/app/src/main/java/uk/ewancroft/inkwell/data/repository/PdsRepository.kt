@@ -223,20 +223,13 @@ class PdsRepository @Inject constructor(
         val session = sessionStore.load() ?: throw Exception("Not authenticated")
         val authClient = atOAuth.createClient()
 
-        val boundary = "inkwell-upload-${System.currentTimeMillis()}"
-        val contentType = io.ktor.http.ContentType.parse("multipart/form-data; boundary=$boundary")
-
-        val body = buildString {
-            append("--").append(boundary).append("\r\n")
-            append("Content-Disposition: form-data; name=\"upload\"; filename=\"blob\"\r\n")
-            append("Content-Type: ").append(mimeType).append("\r\n\r\n")
-        }.toByteArray(Charsets.UTF_8) + bytes + "\r\n--$boundary--\r\n".toByteArray(Charsets.UTF_8)
+        val contentType = io.ktor.http.ContentType.parse(mimeType)
 
         return authClient.procedure(
             nsid = "com.atproto.repo.uploadBlob",
             params = Unit,
             paramsSerializer = Unit.serializer(),
-            body,
+            bytes,
             contentType,
             JsonObject.serializer(),
         )
