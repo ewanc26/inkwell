@@ -8,6 +8,10 @@ import OSLog
 import OAuthenticator
 import ATResolve
 
+private struct RetryableHTTPError: Error {
+    let retryAfter: TimeInterval?
+}
+
 extension LoginStateManager {
     // MARK: - XRPC Helpers
 
@@ -95,7 +99,11 @@ extension LoginStateManager {
         request.setValue("application/json", forHTTPHeaderField: "Accept")
 
         let (data, response) = try await withRetry {
-            try await URLSession.shared.data(for: request)
+            let result = try await URLSession.shared.data(for: request)
+            if let http = result.1 as? HTTPURLResponse, http.statusCode == 429 {
+                throw RetryableHTTPError(retryAfter: Self.retryAfter(from: http))
+            }
+            return result
         }
 
         guard let http = response as? HTTPURLResponse,
@@ -137,10 +145,29 @@ extension LoginStateManager {
                 guard attempt < maxAttempts else { throw lastError! }
                 let delay = Double(1 << min(attempt, 4)) * 0.1
                 try? await Task.sleep(for: .seconds(delay))
+            } catch let error as RetryableHTTPError {
+                attempt += 1
+                lastError = LoginError.httpError(status: 429)
+                guard attempt < maxAttempts else { throw lastError! }
+                let fallback = min(60.0, Double(1 << min(attempt, 4)) * 0.1)
+                try await Task.sleep(for: .seconds(min(error.retryAfter ?? fallback, 60.0)))
             }
         }
 
         throw lastError ?? LoginError.httpError(status: 0)
+    }
+
+    private static func retryAfter(from response: HTTPURLResponse) -> TimeInterval? {
+        guard let value = response.value(forHTTPHeaderField: "Retry-After")?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !value.isEmpty else { return nil }
+        if let seconds = TimeInterval(value), seconds >= 0 {
+            return min(seconds, 60.0)
+        }
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss z"
+        return formatter.date(from: value).map { max(0, min($0.timeIntervalSinceNow, 60.0)) }
     }
 
     // MARK: - PDS Resolution
