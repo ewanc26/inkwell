@@ -7,6 +7,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
+import uk.ewancroft.inkwell.shared.validation.StandardSiteValidation
 
 fun WriterViewModel.publish() {
     val state = uiStateInternal.value
@@ -14,6 +15,21 @@ fun WriterViewModel.publish() {
 
     if (state.title.isBlank()) {
         uiStateInternal.value = state.copy(publishError = "Title is required")
+        return
+    }
+
+    val validationError = StandardSiteValidation.validateDocument(
+        StandardSiteValidation.DocumentInput(
+            site = pub.uri,
+            title = state.title,
+            description = state.description.takeIf(String::isNotBlank),
+            tags = null,
+            path = state.path.trim().ifBlank { null },
+            publishedAt = "pending",
+        ),
+    ).firstOrNull()
+    if (validationError != null) {
+        uiStateInternal.value = state.copy(publishError = "${validationError.field}: ${validationError.message}")
         return
     }
 
