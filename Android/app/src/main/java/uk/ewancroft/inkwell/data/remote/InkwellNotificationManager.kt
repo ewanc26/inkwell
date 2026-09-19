@@ -53,6 +53,7 @@ class InkwellNotificationManager @Inject constructor(
         const val WORK_NAME = "inkwell_notification_poll"
         const val LAST_SEEN_KEY = "last_seen_uris"
         const val LAST_POLL_KEY = "last_poll_time"
+        const val INITIALIZED_PUBLICATIONS_KEY = "initialized_publications"
         const val NOTIFICATIONS_KEY = "notifications"
         const val UNREAD_COUNT_KEY = "unread_count"
         const val NOTIFICATIONS_ENABLED_KEY = "notifications_enabled"
@@ -105,6 +106,8 @@ class InkwellNotificationManager @Inject constructor(
 
         var newDocs = mutableListOf<NewDocument>()
         var allSeenURIs = loadLastSeenURIs().toMutableSet()
+        val initializedPublications = prefs.getStringSet(INITIALIZED_PUBLICATIONS_KEY, emptySet())
+            ?.toMutableSet() ?: mutableSetOf()
 
         for (sub in subs) {
             val pubUri = AtUri.parse(sub.publicationUri) ?: continue
@@ -114,12 +117,20 @@ class InkwellNotificationManager @Inject constructor(
                 // Cross-repo records are served by their author's PDS, not
                 // necessarily by the signed-in reader's PDS.
                 pdsRepository.fetchDocumentEntries(pubDid)
-            } catch (_: Exception) { emptyList() }
+            } catch (_: Exception) {
+                // A failed scan is not an empty repository and must not
+                // advance this publication's checkpoint.
+                continue
+            }
 
             val pubRecord = try {
                 pdsRepository.getRecord(sub.publicationUri)
             } catch (_: Exception) { null }
             val pubUrl = pubRecord?.get("value")?.jsonObject?.get("url")?.jsonPrimitive?.contentOrNull
+
+            if (pubRecord == null) continue
+
+            val wasInitialized = sub.publicationUri in initializedPublications
 
             for ((uri, doc) in docs) {
                 if (allSeenURIs.contains(uri)) continue
@@ -138,14 +149,21 @@ class InkwellNotificationManager @Inject constructor(
                 val pubName = pubRecord
                     ?.get("value")?.jsonObject?.get("name")?.jsonPrimitive?.contentOrNull
 
-                newDocs.add(NewDocument(uri, title, pubName, publishedAt))
+                if (wasInitialized) {
+                    newDocs.add(NewDocument(uri, title, pubName, publishedAt))
+                }
                 allSeenURIs.add(uri)
             }
+
+            // The first successful scan establishes a baseline, including an
+            // honestly empty repository, without notifying historical records.
+            initializedPublications.add(sub.publicationUri)
         }
 
         recordNewDocuments(newDocs)
 
         saveLastSeenURIs(allSeenURIs)
+        prefs.edit().putStringSet(INITIALIZED_PUBLICATIONS_KEY, initializedPublications).apply()
         prefs.edit().putLong(LAST_POLL_KEY, System.currentTimeMillis()).apply()
     }
 
