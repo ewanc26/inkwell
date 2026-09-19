@@ -1,8 +1,10 @@
 package uk.ewancroft.inkwell.ui.writer
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,6 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class WriterViewModel @Inject constructor(
     internal val pdsRepository: PdsRepository,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     internal val uiStateInternal = MutableStateFlow(WriterUiState())

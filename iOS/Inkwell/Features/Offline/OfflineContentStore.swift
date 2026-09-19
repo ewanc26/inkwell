@@ -107,6 +107,11 @@ final class OfflineContentStore {
         try? await feedCache.clear()
     }
 
+    func remove(uri: String) async {
+        try? await cache.remove(uri: uri)
+        try? await feedCache.remove(uri: uri)
+    }
+
     private func encoded<T: Encodable>(_ record: T) throws -> String {
         let data = try JSONEncoder().encode(record)
         guard let string = String(data: data, encoding: .utf8) else {
