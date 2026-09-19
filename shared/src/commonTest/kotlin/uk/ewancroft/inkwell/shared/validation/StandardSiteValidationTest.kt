@@ -7,7 +7,7 @@ import kotlin.test.assertTrue
 class StandardSiteValidationTest {
     @Test
     fun enforcesUtf8BytesSeparatelyFromGraphemes() {
-        val errors = StandardSiteValidation.validatePublication("https://example.com", "é".repeat(2_501), null)
+        val errors = StandardSiteValidation.validatePublication("https://example.com", ("e\u0301".repeat(500)).replace("\u0301", "\u0301".repeat(11)), null)
         assertTrue(errors.any { it.field == "name" && it.message.contains("UTF-8") })
         assertTrue(errors.none { it.field == "name" && it.message.contains("characters") })
     }

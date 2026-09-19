@@ -1,7 +1,5 @@
 package uk.ewancroft.inkwell.shared.verification
 
-import io.ktor.http.Url
-
 object VerificationUrls {
 
     /**
@@ -62,13 +60,30 @@ object VerificationUrls {
         if (remainder.isEmpty()) return null
         val authorityText = remainder.substringBefore('/').substringBefore('?').substringBefore('#')
         if ('@' in authorityText) return null
-        val parsed = runCatching { Url("https://$remainder") }.getOrNull() ?: return null
-        if (parsed.protocol.name.lowercase() != "https" || parsed.host.isEmpty()) return null
+        val authority = authorityText.lowercase()
+        val host: String
+        val port: Int
+        if (authority.startsWith("[")) {
+            val closing = authority.indexOf(']')
+            if (closing < 0) return null
+            host = authority.substring(0, closing + 1)
+            port = authority.substring(closing + 1).removePrefix(":").toIntOrNull() ?: 443
+        } else {
+            val separator = authority.lastIndexOf(':')
+            if (separator >= 0) {
+                host = authority.substring(0, separator)
+                port = authority.substring(separator + 1).toIntOrNull() ?: return null
+            } else {
+                host = authority
+                port = 443
+            }
+        }
+        if (host.isEmpty() || port !in 1..65535) return null
         return UrlParts(
             scheme = "https",
-            host = parsed.host,
-            path = parsed.encodedPath,
-            port = parsed.port,
+            host = host,
+            path = remainder.substringBefore('?').substringBefore('#').substringAfter(authorityText, ""),
+            port = port,
         )
     }
 }
