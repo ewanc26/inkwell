@@ -1,8 +1,6 @@
 package uk.ewancroft.inkwell.shared.offline
 
 import java.io.File
-import java.nio.file.Files
-import java.nio.file.StandardCopyOption
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -48,17 +46,14 @@ class OfflineSyncQueueAndroid(durableDirPath: String, legacyCacheDirPath: String
         queueFile.parentFile?.mkdirs()
         val temporary = File(queueFile.parentFile, "$QUEUE_FILENAME.tmp")
         temporary.writeText(json.encodeToString(entries))
-        try {
-            Files.move(temporary.toPath(), queueFile.toPath(), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
-        } catch (_: java.nio.file.AtomicMoveNotSupportedException) {
-            Files.move(temporary.toPath(), queueFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
-        }
+        queueFile.delete()
+        check(temporary.renameTo(queueFile)) { "Unable to replace offline sync queue" }
     }
 
     private fun migrateLegacyIfNeeded() {
         if (!queueFile.exists() && legacyQueueFile.exists()) {
             queueFile.parentFile?.mkdirs()
-            Files.move(legacyQueueFile.toPath(), queueFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            check(legacyQueueFile.renameTo(queueFile)) { "Unable to migrate offline sync queue" }
         }
     }
 
