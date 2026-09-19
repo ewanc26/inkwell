@@ -52,7 +52,7 @@ private struct InAppLinkHandler: ViewModifier {
 
     private static func isAllowedContentURL(_ url: URL) -> Bool {
         guard let scheme = url.scheme?.lowercased(),
-              !url.absoluteString.unicodeScalars.contains(where: { $0.properties.isControl }),
+              !url.absoluteString.unicodeScalars.contains(where: CharacterSet.controlCharacters.contains),
               url.absoluteString == url.absoluteString.trimmingCharacters(in: .whitespacesAndNewlines),
               ["http", "https", "mailto", "tel"].contains(scheme) else { return false }
         if scheme == "http" || scheme == "https" { return url.host != nil }

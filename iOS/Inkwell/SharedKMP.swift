@@ -68,10 +68,11 @@ func shouldRedactNotification(
         disabledLabelers: settings.disabledLabelers,
         hiddenKeywords: settings.hiddenKeywords
     )
-    return NotificationContentPolicy.shared.shouldRedact(
+    let decision = ContentFilterEngine.shared.evaluate(
         content: FilterableContent(title: title, description: description, textContent: textContent, labels: labels),
         policy: policy
     )
+    return !(decision is ContentFilterDecisionShow)
 }
 
 @MainActor
