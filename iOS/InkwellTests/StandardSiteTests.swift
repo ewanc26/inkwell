@@ -31,6 +31,29 @@ final class StandardSiteTests: XCTestCase {
         XCTAssertNil(parseAtUri("at://did:plc:alice/site.standard.document"))
     }
 
+    func testOAuthIssuerPolicyRequiresNormalizedHTTPSOriginEquality() {
+        XCTAssertTrue(OAuthIssuerPolicy.sameHTTPSOrigin(
+            "HTTPS://PDS.EXAMPLE:443",
+            "https://pds.example"
+        ))
+        XCTAssertTrue(OAuthIssuerPolicy.sameHTTPSOrigin(
+            "https://pds.example:8443",
+            "https://PDS.EXAMPLE:8443/"
+        ))
+        XCTAssertFalse(OAuthIssuerPolicy.sameHTTPSOrigin(
+            "https://evil.example/pds.example",
+            "https://pds.example"
+        ))
+        XCTAssertFalse(OAuthIssuerPolicy.sameHTTPSOrigin(
+            "https://user:p@pds.example",
+            "https://pds.example"
+        ))
+        XCTAssertFalse(OAuthIssuerPolicy.sameHTTPSOrigin(
+            "http://pds.example",
+            "https://pds.example"
+        ))
+    }
+
     func testPublicationAssociationPrefersATURIAndAcceptsNormalizedURL() {
         let publication = PublicationEntry(
             uri: "at://did:plc:alice/site.standard.publication/3pub",
