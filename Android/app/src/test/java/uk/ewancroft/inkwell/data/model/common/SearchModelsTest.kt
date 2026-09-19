@@ -80,7 +80,7 @@ class SearchModelsTest {
     }
 
     @Test
-    fun `publications mode response decodes to publication results`() {
+    fun `keyword response can carry native publication results`() {
         val body = """
             {
               "results": [
@@ -95,7 +95,7 @@ class SearchModelsTest {
               ],
               "total": null,
               "hasMore": false,
-              "mode": "publications"
+              "mode": "keyword"
             }
         """.trimIndent()
 

@@ -128,6 +128,15 @@ final class StandardSiteTests: XCTestCase {
         XCTAssertTrue(response.results.first?.isStandardSiteDocument == true)
     }
 
+    func testSearchV2PublicationResultKeepsATURIIdentity() throws {
+        let data = Data(#"{"results":[{"type":"publication","uri":"at://did:plc:alice/site.standard.publication/blog","did":"did:plc:alice","title":"My Blog"}],"total":null,"hasMore":false}"#.utf8)
+        let response = try JSONDecoder().decode(ReaderSearchResponse.self, from: data)
+        let result = try XCTUnwrap(response.results.first)
+
+        XCTAssertTrue(result.isPublication)
+        XCTAssertEqual(result.uri, "at://did:plc:alice/site.standard.publication/blog")
+    }
+
     func testNotificationRoundTripsThroughJSON() throws {
         let notification = StandardSiteNotification(
             documentURI: "at://did:plc:alice/site.standard.document/3doc",
