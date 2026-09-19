@@ -46,7 +46,9 @@ class InkwellNotificationManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val pdsRepository: PdsRepository,
 ) {
-    private val prefs = context.getSharedPreferences("inkwell_notifications", Context.MODE_PRIVATE)
+    // This placeholder is never populated with account data. Once a session
+    // is known, activateAccount switches to a DID-specific preferences file.
+    private var prefs = context.getSharedPreferences("inkwell_notifications_unscoped", Context.MODE_PRIVATE)
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
     private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     /** A live event and a periodic poll can discover the same document at
@@ -94,6 +96,8 @@ class InkwellNotificationManager @Inject constructor(
      *  Jetstream connection. Background delivery remains WorkManager's job. */
     suspend fun recordLiveDocument(document: NewDocument) = withContext(Dispatchers.IO) {
         documentLock.withLock {
+            val session = pdsRepository.getSession() ?: return@withLock
+            activateAccount(session.did)
             val seen = loadLastSeenURIs().toMutableSet()
             if (document.uri in seen) return@withLock
 
@@ -106,6 +110,7 @@ class InkwellNotificationManager @Inject constructor(
 
     private suspend fun pollForNewDocumentsLocked() {
         val session = pdsRepository.getSession() ?: return
+        activateAccount(session.did)
         val subs = try { pdsRepository.fetchSubscriptions(session.did, session.pdsUrl) } catch (_: Exception) { emptyList() }
         if (subs.isEmpty()) return
 
@@ -343,6 +348,11 @@ class InkwellNotificationManager @Inject constructor(
         disabledLabelers = uk.ewancroft.inkwell.util.ModerationPreferences.disabledLabelers(context),
         hiddenKeywords = uk.ewancroft.inkwell.util.ModerationPreferences.hiddenKeywords(context)
     )
+
+    private fun activateAccount(did: String) {
+        val safeDID = did.replace(Regex("[^A-Za-z0-9._-]"), "_")
+        prefs = context.getSharedPreferences("inkwell_notifications_$safeDID", Context.MODE_PRIVATE)
+    }
 }
 
 @Serializable
