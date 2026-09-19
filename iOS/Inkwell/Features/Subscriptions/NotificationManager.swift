@@ -24,6 +24,7 @@
 //
 
 import Foundation
+import ATProtoKit
 import InkwellShared
 import OSLog
 import UserNotifications
@@ -103,11 +104,11 @@ final class NotificationManager {
         var seen = lastSeenURIs
         guard !seen.contains(document.uri) else { return }
 
-        await recordNewDocuments([(doc: document, pub: publication)])
+        await recordNewDocuments([(doc: document, pub: publication, sensitive: false)])
         seen.insert(document.uri)
         saveLastSeenURIs(seen)
         if let publicationURI = publication?.uri {
-            saveInitializedPublications(initializedPublications.union([publicationURI]))
+            saveInitializedPublications(self.initializedPublications().union([publicationURI]))
         }
         defaults.set(Date(), forKey: lastPollKey)
     }
@@ -193,7 +194,7 @@ final class NotificationManager {
 
     /// Applies the identical first-run, grouping and history policy to
     /// foreground Jetstream events and background polling results.
-    private func recordNewDocuments(_ newDocs: [(doc: DocumentEntry, pub: PublicationEntry?)]) async {
+    private func recordNewDocuments(_ newDocs: [(doc: DocumentEntry, pub: PublicationEntry?, sensitive: Bool)]) async {
         guard !newDocs.isEmpty else { return }
 
         // Only send notifications if this isn't the first poll (first
