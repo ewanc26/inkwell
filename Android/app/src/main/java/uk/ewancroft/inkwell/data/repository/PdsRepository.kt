@@ -247,7 +247,7 @@ class PdsRepository @Inject constructor(
         return response
     }
 
-    suspend fun deleteRecord(collection: String, rkey: String) {
+    suspend fun deleteRecord(collection: String, rkey: String, swapRecord: String? = null) {
         if (TestingConfig.enabled) {
             TestingConfig.report("Delete $collection record")
             throw TestingModeException("Delete $collection record")
@@ -262,6 +262,7 @@ class PdsRepository @Inject constructor(
                 put("repo", session.did)
                 put("collection", collection)
                 put("rkey", rkey)
+                swapRecord?.let { put("swapRecord", it) }
             },
             inputSerializer = JsonObject.serializer(),
             responseSerializer = JsonObject.serializer(),
