@@ -53,7 +53,8 @@ object StandardSiteValidation {
         var count = 0
         var joinNext = false
         value.forEach { character ->
-            val combining = character in '\u0300'..'\u036f' || character in '\ufe00'..'\ufe0f' || character in '\u1f3fb'..'\u1f3ff'
+            val code = character.code
+            val combining = code in 0x0300..0x036f || code in 0xfe00..0xfe0f || code in 0x1f3fb..0x1f3ff
             if (!combining && !joinNext) count++
             joinNext = character == '\u200d'
         }
