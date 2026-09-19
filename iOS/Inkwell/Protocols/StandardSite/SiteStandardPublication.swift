@@ -108,9 +108,9 @@ extension SiteStandardLexicon {
             // to add it separately.
             try container.encode(SiteStandardLexicon.PublicationRecord.type, forKey: .type)
             try container.encode(self.url, forKey: .url)
-            try container.truncatedEncode(self.name, forKey: .name, upToCharacterLength: 500)
+            try container.encode(self.name, forKey: .name)
             try container.encodeIfPresent(self.icon, forKey: .icon)
-            try container.truncatedEncodeIfPresent(self.description, forKey: .description, upToCharacterLength: 3_000)
+            try container.encodeIfPresent(self.description, forKey: .description)
             try container.encodeIfPresent(self.basicTheme, forKey: .basicTheme)
             try container.encodeIfPresent(self.theme, forKey: .theme)
             try container.encodeIfPresent(self.labels, forKey: .labels)
