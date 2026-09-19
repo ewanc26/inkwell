@@ -312,6 +312,7 @@ extension LoginStateManager {
 
     /// Signs the user out, clearing all stored tokens and state.
     func signOut() {
+        NotificationManager.shared.deactivate()
         clearSession(clearStoredAccount: true)
         errorMessage = nil
         Task {
