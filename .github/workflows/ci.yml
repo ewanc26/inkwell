@@ -194,6 +194,9 @@ jobs:
       - name: Check the served AltStore manifest matches the working copy
         run: diff iOS/altstore/source.json website/static/altstore/source.json
 
+      - name: Validate current AltStore IPA metadata
+        run: node tools/release/validate-altstore.mjs --hosted
+
       - name: Check the served F-Droid repo matches the release repo
         run: diff -r Android/fdroid-repo/repo website/static/fdroid/repo
 
