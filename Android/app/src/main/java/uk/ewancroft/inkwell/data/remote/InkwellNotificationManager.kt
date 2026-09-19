@@ -195,7 +195,8 @@ class InkwellNotificationManager @Inject constructor(
                         sendNotification(
                             title = if (doc.sensitive) "New document from a subscribed publication" else (doc.publicationName ?: "New Document"),
                             body = if (doc.sensitive) "Open Inkwell to view this document" else doc.title,
-                            documentURI = doc.uri
+                            documentURI = doc.uri,
+                            sensitive = doc.sensitive
                         )
                     }
                 }
@@ -205,7 +206,8 @@ class InkwellNotificationManager @Inject constructor(
                         sendNotification(
                             title = "${style.count} New Documents",
                             body = if (newest.sensitive) "Open Inkwell to view your new documents" else "Latest: ${newest.title} from ${newest.publicationName ?: "a publication"}",
-                            documentURI = newest.uri
+                            documentURI = newest.uri,
+                            sensitive = newDocs.any { it.sensitive }
                         )
                     }
                 }
@@ -264,7 +266,7 @@ class InkwellNotificationManager @Inject constructor(
         }
     }
 
-    private fun sendNotification(title: String, body: String, documentURI: String) {
+    private fun sendNotification(title: String, body: String, documentURI: String, sensitive: Boolean) {
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             putExtra("documentURI", documentURI)
@@ -288,6 +290,19 @@ class InkwellNotificationManager @Inject constructor(
             .setContentText(body)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
+            .setVisibility(if (sensitive) NotificationCompat.VISIBILITY_PRIVATE else NotificationCompat.VISIBILITY_PUBLIC)
+            .apply {
+                if (sensitive) {
+                    setPublicVersion(
+                        NotificationCompat.Builder(context, CHANNEL_ID)
+                            .setSmallIcon(android.R.drawable.ic_dialog_info)
+                            .setContentTitle("New document")
+                            .setContentText("Open Inkwell to view this document")
+                            .setAutoCancel(true)
+                            .build()
+                    )
+                }
+            }
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .build()
 
