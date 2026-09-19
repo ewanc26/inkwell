@@ -39,6 +39,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -91,9 +93,24 @@ fun SettingsDialog(
     var isConfirmingSignOut by remember { mutableStateOf(false) }
     var showMutedBlocked by remember { mutableStateOf(false) }
     var showModerationSettings by remember { mutableStateOf(false) }
+    var importMessage by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val haptics = rememberInkwellHaptics()
+    val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        importMessage = runCatching {
+            context.contentResolver.openInputStream(uri)?.use { input ->
+                ArticleStatePreferences.importJson(context, input.bufferedReader().readText())
+            } ?: ArticleStatePreferences.ImportResult.Invalid
+        }.getOrElse { ArticleStatePreferences.ImportResult.Invalid }.let { result ->
+            when (result) {
+                is ArticleStatePreferences.ImportResult.Success -> "Imported ${result.changes} change${if (result.changes == 1) "" else "s"}."
+                ArticleStatePreferences.ImportResult.UnsupportedVersion -> "This reading-data export uses an unsupported version."
+                ArticleStatePreferences.ImportResult.Invalid -> "This file is not a valid Inkwell reading-data export."
+            }
+        }
+    }
 
     var accentColorHex by remember { mutableStateOf(CustomisationPreferences.getAccentColorHex(context)) }
     var fontFamilyOverride by remember { mutableStateOf(CustomisationPreferences.getFontFamilyOverride(context)) }
@@ -534,12 +551,24 @@ fun SettingsDialog(
                             context.startActivity(Intent.createChooser(shareIntent, "Export Reading Data"))
                         },
                     )
+                    SettingsRow(
+                        title = "Import Data",
+                        onClick = { importLauncher.launch(arrayOf("application/json", "text/json")) },
+                    )
                     Text(
                         "Exports your locally tracked read and bookmarked articles as a versioned JSON file. This never leaves your device unless you choose to share it.",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     )
+                    importMessage?.let { message ->
+                        AlertDialog(
+                            onDismissRequest = { importMessage = null },
+                            title = { Text("Import Data") },
+                            text = { Text(message) },
+                            confirmButton = { TextButton(onClick = { importMessage = null }) { Text("OK") } },
+                        )
+                    }
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 

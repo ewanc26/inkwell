@@ -11,6 +11,7 @@
 
 import SwiftUI
 import UIKit
+import UniformTypeIdentifiers
 
 struct SettingsView: View {
     @Environment(LoginStateManager.self) private var loginStateManager
@@ -41,6 +42,8 @@ struct SettingsView: View {
 
     @State private var articleState = ArticleStateStore.shared
     @State private var exportFileURL: URL?
+    @State private var isImportingData = false
+    @State private var importMessage: String?
 
     var body: some View {
         NavigationStack {
@@ -231,6 +234,7 @@ struct SettingsView: View {
                     } else {
                         Button("Export Data") { prepareExport() }
                     }
+                    Button("Import Data") { isImportingData = true }
                 } header: {
                     Text("Data")
                 } footer: {
@@ -271,6 +275,19 @@ struct SettingsView: View {
             .sheet(isPresented: $showAbout) {
                 CreditsView()
             }
+            .fileImporter(isPresented: $isImportingData, allowedContentTypes: [.json]) { result in
+                switch result {
+                case .success(let url):
+                    do {
+                        let changes = try articleState.importJSON(Data(contentsOf: url))
+                        importMessage = "Imported \(changes) change\(changes == 1 ? "" : "s")."
+                    } catch {
+                        importMessage = error.localizedDescription
+                    }
+                case .failure(let error):
+                    importMessage = error.localizedDescription
+                }
+            }
             .confirmationDialog(
                 "Sign out of Inkwell?",
                 isPresented: $isConfirmingSignOut,
@@ -291,6 +308,11 @@ struct SettingsView: View {
                 }
             } message: {
                 Text("These overrides are free for everyone. If you find them useful, consider a tip to support ongoing development.")
+            }
+            .alert("Import Data", isPresented: Binding(get: { importMessage != nil }, set: { if !$0 { importMessage = nil } })) {
+                Button("OK", role: .cancel) { importMessage = nil }
+            } message: {
+                Text(importMessage ?? "")
             }
         }
     }
