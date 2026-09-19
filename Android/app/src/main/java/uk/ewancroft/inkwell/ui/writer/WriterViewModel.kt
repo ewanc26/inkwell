@@ -225,4 +225,8 @@ class WriterViewModel @Inject constructor(
             }
         }
     }
+
+    fun setPublishError(message: String) {
+        uiStateInternal.value = uiStateInternal.value.copy(publishError = message)
+    }
 }

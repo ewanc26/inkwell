@@ -85,10 +85,11 @@ fun WriterScreen(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri ?: return@rememberLauncherForActivityResult
-        val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg"
         val bytes = context.contentResolver.openInputStream(uri)?.readBytes()
         if (bytes != null) {
-            viewModel.uploadImage(bytes, mimeType)
+            runCatching { ImageUploadSanitizer.sanitize(bytes) }
+                .onSuccess { viewModel.uploadImage(it.bytes, it.mimeType) }
+                .onFailure { viewModel.setPublishError(it.localizedMessage ?: "The image could not be prepared for upload.") }
         }
     }
 
