@@ -1,4 +1,4 @@
 package uk.ewancroft.inkwell.shared.offline
 
-actual fun createOfflineSyncQueue(cacheDirPath: String): OfflineSyncQueue =
-    OfflineSyncQueueIos(cacheDirPath)
+actual fun createOfflineSyncQueue(durableDirPath: String, legacyCacheDirPath: String): OfflineSyncQueue =
+    OfflineSyncQueueIos(durableDirPath, legacyCacheDirPath)

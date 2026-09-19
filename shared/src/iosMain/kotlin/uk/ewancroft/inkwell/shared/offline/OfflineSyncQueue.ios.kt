@@ -20,10 +20,11 @@ import platform.posix.time
 
 /** iOS JSON-file implementation of the pending mutation queue. */
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
-class OfflineSyncQueueIos(cacheDirPath: String) : OfflineSyncQueue {
+class OfflineSyncQueueIos(durableDirPath: String, legacyCacheDirPath: String) : OfflineSyncQueue {
     private val json = Json { ignoreUnknownKeys = true; prettyPrint = false }
     private val mutex = Mutex()
-    private val queueFilePath = "$cacheDirPath/$QUEUE_FILENAME"
+    private val queueFilePath = "$durableDirPath/$QUEUE_FILENAME"
+    private val legacyQueueFilePath = "$legacyCacheDirPath/$QUEUE_FILENAME"
 
     override suspend fun load(): List<SyncQueueEntry> = withContext(Dispatchers.Default) {
         mutex.withLock {
@@ -45,6 +46,7 @@ class OfflineSyncQueueIos(cacheDirPath: String) : OfflineSyncQueue {
     }
 
     private fun readInternal(): List<SyncQueueEntry> {
+        migrateLegacyIfNeeded()
         if (!NSFileManager.defaultManager.fileExistsAtPath(queueFilePath)) return emptyList()
         return runCatching {
             val content = NSString.stringWithContentsOfFile(
@@ -53,17 +55,44 @@ class OfflineSyncQueueIos(cacheDirPath: String) : OfflineSyncQueue {
                 error = null,
             ) ?: return emptyList()
             json.decodeFromString<List<SyncQueueEntry>>(content)
-        }.getOrDefault(emptyList())
+        }.getOrThrow()
     }
 
     private fun writeInternal(entries: List<SyncQueueEntry>) {
         val bytes = json.encodeToString(entries).encodeToByteArray()
+        val temporaryPath = "$queueFilePath.tmp"
         bytes.usePinned {
             val data = NSData.create(bytes = it.addressOf(0), length = bytes.size.toULong())
             NSFileManager.defaultManager.createFileAtPath(
-                path = queueFilePath,
+                path = temporaryPath,
                 contents = data,
                 attributes = null,
+            )
+        }
+        NSFileManager.defaultManager.replaceItemAtURL(
+            destinationURL = platform.Foundation.NSURL.fileURLWithPath(queueFilePath),
+            withItemAtURL = platform.Foundation.NSURL.fileURLWithPath(temporaryPath),
+            backupItemName = null,
+            options = 0u,
+            resultingItemURL = null,
+            error = null,
+        )
+    }
+
+    private fun migrateLegacyIfNeeded() {
+        if (!NSFileManager.defaultManager.fileExistsAtPath(queueFilePath) &&
+            NSFileManager.defaultManager.fileExistsAtPath(legacyQueueFilePath)
+        ) {
+            NSFileManager.defaultManager.createDirectoryAtPath(
+                path = queueFilePath.substringBeforeLast('/'),
+                withIntermediateDirectories = true,
+                attributes = null,
+                error = null,
+            )
+            NSFileManager.defaultManager.moveItemAtPath(
+                srcPath = legacyQueueFilePath,
+                toPath = queueFilePath,
+                error = null,
             )
         }
     }

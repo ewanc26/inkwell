@@ -32,8 +32,13 @@ final class OfflineMutationStore {
     private(set) var isSyncing = false
 
     private init() {
-        let directory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
-        queue = CreateOfflineSyncQueue_iosKt.createOfflineSyncQueue(cacheDirPath: directory.path)
+        let durableDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
+        try? FileManager.default.createDirectory(at: durableDirectory, withIntermediateDirectories: true)
+        queue = CreateOfflineSyncQueue_iosKt.createOfflineSyncQueue(
+            durableDirPath: durableDirectory.path,
+            legacyCacheDirPath: cacheDirectory.path
+        )
     }
 
     func refresh(accountDID: String?) async {

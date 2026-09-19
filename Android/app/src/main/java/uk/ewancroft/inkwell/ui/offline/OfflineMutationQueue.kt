@@ -43,8 +43,10 @@ object OfflineMutationQueue {
     private val queues = ConcurrentHashMap<String, OfflineSyncQueue>()
 
     private fun queue(context: Context): OfflineSyncQueue {
-        val cachePath = context.applicationContext.cacheDir.absolutePath
-        return queues.getOrPut(cachePath) { createOfflineSyncQueue(cachePath) }
+        val appContext = context.applicationContext
+        val durablePath = appContext.filesDir.absolutePath
+        val cachePath = appContext.cacheDir.absolutePath
+        return queues.getOrPut(durablePath) { createOfflineSyncQueue(durablePath, cachePath) }
     }
 
     suspend fun enqueue(
