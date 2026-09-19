@@ -59,8 +59,7 @@ final class ArticleStateStore {
         persist()
     }
 
-    /// Pretty-printed JSON array of `{articleId, title, isRead, isBookmarked,
-    /// timestamp}` for the Settings → Export Data action.
+    /// Versioned portable envelope for the Settings → Export Data action.
     func exportJSON() -> Data? {
         let items = states.map { key, value in
             ExportedArticleState(
@@ -73,16 +72,29 @@ final class ArticleStateStore {
         }
         .sorted { $0.timestamp > $1.timestamp }
 
+        let envelope = ReadingDataExport(
+            format: "uk.ewancroft.inkwell.reading-data",
+            version: 1,
+            exportedAt: Date(),
+            articles: items
+        )
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         encoder.dateEncodingStrategy = .iso8601
-        return try? encoder.encode(items)
+        return try? encoder.encode(envelope)
     }
 
     private func persist() {
         guard let data = try? JSONEncoder().encode(states) else { return }
         defaults.set(data, forKey: storageKey)
     }
+}
+
+private struct ReadingDataExport: Codable {
+    let format: String
+    let version: Int
+    let exportedAt: Date
+    let articles: [ExportedArticleState]
 }
 
 private struct ExportedArticleState: Codable {

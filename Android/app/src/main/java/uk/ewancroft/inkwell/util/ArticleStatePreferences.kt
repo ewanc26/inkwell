@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.time.Instant
 
 /**
  * Local (device-only) read/bookmark tracking, keyed by document AT-URI.
@@ -65,15 +66,23 @@ object ArticleStatePreferences {
     }
 
     @Serializable
+    private data class ReadingDataExport(
+        val format: String,
+        val version: Int,
+        val exportedAt: String,
+        val articles: List<ExportedArticleState>,
+    )
+
+    @Serializable
     private data class ExportedArticleState(
         val articleId: String,
         val title: String,
         val isRead: Boolean,
         val isBookmarked: Boolean,
-        val timestamp: Long,
+        val timestamp: String,
     )
 
-    /** Pretty-printed JSON array for the Settings -> Export Data action. */
+    /** Versioned portable envelope for the Settings -> Export Data action. */
     fun exportJson(context: Context): String {
         val items = readAll(context).map { (id, state) ->
             ExportedArticleState(
@@ -81,11 +90,18 @@ object ArticleStatePreferences {
                 title = state.title,
                 isRead = state.isRead,
                 isBookmarked = state.isBookmarked,
-                timestamp = state.updatedAt,
+                timestamp = Instant.ofEpochMilli(state.updatedAt).toString(),
             )
         }.sortedByDescending { it.timestamp }
 
         val prettyJson = Json { prettyPrint = true }
-        return prettyJson.encodeToString(items)
+        return prettyJson.encodeToString(
+            ReadingDataExport(
+                format = "uk.ewancroft.inkwell.reading-data",
+                version = 1,
+                exportedAt = Instant.now().toString(),
+                articles = items,
+            )
+        )
     }
 }
