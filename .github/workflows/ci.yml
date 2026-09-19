@@ -52,6 +52,7 @@ jobs:
             android:
               - 'Android/**'
               - 'shared/**'
+              - '.github/workflows/ci.yml'
             website:
               - 'website/**'
               - '.github/workflows/ci.yml'
