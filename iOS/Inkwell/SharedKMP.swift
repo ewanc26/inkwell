@@ -54,6 +54,27 @@ func contentModerationPresentation(
 }
 
 @MainActor
+func shouldRedactNotification(
+    title: String?,
+    description: String?,
+    textContent: String?,
+    labels: [ModerationLabel],
+    settings: ModerationSettings? = nil
+) -> Bool {
+    let settings = settings ?? ModerationSettings.shared
+    let policy = ModerationPolicy(
+        hiddenLabels: settings.hiddenLabels,
+        warningLabels: settings.warningLabels,
+        disabledLabelers: settings.disabledLabelers,
+        hiddenKeywords: settings.hiddenKeywords
+    )
+    return NotificationContentPolicy.shared.shouldRedact(
+        content: FilterableContent(title: title, description: description, textContent: textContent, labels: labels),
+        policy: policy
+    )
+}
+
+@MainActor
 func contentModerationPresentation(
     title: String?,
     description: String?,

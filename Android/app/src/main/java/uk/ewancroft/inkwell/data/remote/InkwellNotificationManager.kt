@@ -31,11 +31,10 @@ import uk.ewancroft.inkwell.shared.AtUri
 import uk.ewancroft.inkwell.shared.content.PublicationMatcher
 import uk.ewancroft.inkwell.shared.policy.NotificationPolicy
 import uk.ewancroft.inkwell.shared.policy.NotificationStyle
-import uk.ewancroft.inkwell.shared.moderation.ContentFilterDecision
-import uk.ewancroft.inkwell.shared.moderation.ContentFilterEngine
 import uk.ewancroft.inkwell.shared.moderation.FilterableContent
 import uk.ewancroft.inkwell.shared.moderation.ModerationLabel
 import uk.ewancroft.inkwell.shared.moderation.ModerationPolicy
+import uk.ewancroft.inkwell.shared.moderation.NotificationContentPolicy
 import uk.ewancroft.inkwell.data.repository.PdsRepository
 import uk.ewancroft.inkwell.data.repository.fetchDocumentEntries
 import uk.ewancroft.inkwell.data.repository.fetchSubscriptions
@@ -155,13 +154,13 @@ class InkwellNotificationManager @Inject constructor(
                 val pubName = pubRecord
                     ?.get("value")?.jsonObject?.get("name")?.jsonPrimitive?.contentOrNull
 
-                val sensitive = ContentFilterEngine.evaluate(
+                val sensitive = NotificationContentPolicy.shouldRedact(
                     FilterableContent(
                         title = title,
                         labels = doc.moderationLabels() + pubRecord.moderationLabels()
                     ),
                     moderationPolicy()
-                ) !is ContentFilterDecision.Show
+                )
 
                 if (wasInitialized) {
                     newDocs.add(NewDocument(uri, title, pubName, publishedAt, sensitive))
