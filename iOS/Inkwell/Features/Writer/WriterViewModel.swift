@@ -48,6 +48,7 @@ final class WriterViewModel {
     var editingDocumentURI: String?
     var editingDocumentRevision: String?
     var isEditing: Bool { editingDocumentURI != nil }
+    var showDeleteConfirmation = false
 
     // MARK: - Publishing
 
@@ -222,6 +223,36 @@ final class WriterViewModel {
         markdown = ""
         lostFeatures = []
         selectedProviderId = ProviderRegistry.defaultProvider.id
+    }
+
+    func deleteDocument() {
+        guard let documentURI = editingDocumentURI,
+              let revision = editingDocumentRevision,
+              let parsed = parseAtUri(documentURI) else {
+            publishError = "This document is no longer available to delete."
+            return
+        }
+
+        isPublishing = true
+        publishError = nil
+        Task {
+            do {
+                try await loginStateManager.deleteRecord(
+                    collection: SiteStandardLexicon.DocumentRecord.type,
+                    recordKey: parsed.recordKey,
+                    swapRecord: revision
+                )
+                cancelEditing()
+                publishSuccess = "Document deleted."
+                InkwellHaptics.success()
+            } catch {
+                let message = error.localizedDescription
+                publishError = message.localizedCaseInsensitiveContains("swap")
+                    ? "This document changed elsewhere. Reload it before deleting."
+                    : "Failed to delete document: \(message)"
+            }
+            isPublishing = false
+        }
     }
 
     // MARK: - Publishing

@@ -138,6 +138,15 @@ struct WriteView: View {
                                 .foregroundStyle(.secondary)
                             }
                         }
+
+                        Section {
+                            Button("Delete Document", role: .destructive) {
+                                viewModel.showDeleteConfirmation = true
+                            }
+                            .disabled(viewModel.isPublishing)
+                        } footer: {
+                            Text("This permanently removes the document from your repository. Attached images are managed by your PDS.")
+                        }
                     }
 
                     // MARK: - Document picker
@@ -284,6 +293,18 @@ struct WriteView: View {
                     Button("OK", role: .cancel) { viewModel.publishError = nil }
                 } message: {
                     Text(viewModel.publishError ?? "")
+                }
+                .confirmationDialog(
+                    "Delete \(viewModel.title)?",
+                    isPresented: $viewModel.showDeleteConfirmation,
+                    titleVisibility: .visible
+                ) {
+                    Button("Delete Document", role: .destructive) {
+                        viewModel.deleteDocument()
+                    }
+                    Button("Cancel", role: .cancel) {}
+                } message: {
+                    Text("This cannot be undone. The current record version will be checked before deletion.")
                 }
                 .onChange(of: selectedPhoto) { _, newItem in
                     guard let newItem else { return }
