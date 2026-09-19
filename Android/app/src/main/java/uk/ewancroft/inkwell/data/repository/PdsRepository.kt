@@ -5,6 +5,7 @@ import io.github.kikin81.atproto.oauth.OAuthSessionStore
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
@@ -26,6 +27,8 @@ import uk.ewancroft.inkwell.shared.model.UserLexicon
 import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
 import uk.ewancroft.inkwell.shared.policy.RecordListPolicy
 import java.net.URLEncoder
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -69,12 +72,38 @@ class PdsRepository @Inject constructor(
      *  or a missing body instead of decoding an error payload as success. */
     internal suspend fun executeGet(urlStr: String): String = withContext(Dispatchers.IO) {
         val request = Request.Builder().url(urlStr).get().build()
-        publicHttpClient.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) {
-                throw java.io.IOException("PDS request failed: HTTP ${response.code}")
+        var attempt = 0
+        while (true) {
+            val response = publicHttpClient.newCall(request).execute()
+            if (response.code == 429 && attempt < MAX_RATE_LIMIT_ATTEMPTS - 1) {
+                val delayMs = retryAfterMillis(response.header("Retry-After"), attempt)
+                response.close()
+                delay(delayMs)
+                attempt += 1
+                continue
             }
-            response.body?.string() ?: throw java.io.IOException("PDS request returned no body")
+            response.use {
+                if (!response.isSuccessful) {
+                    throw java.io.IOException("PDS request failed: HTTP ${response.code}")
+                }
+                response.body?.string() ?: throw java.io.IOException("PDS request returned no body")
+            }
         }
+    }
+
+    private fun retryAfterMillis(header: String?, attempt: Int): Long {
+        val value = header?.trim().orEmpty()
+        value.toLongOrNull()?.takeIf { it >= 0 }?.let { return (it * 1000).coerceAtMost(MAX_RATE_LIMIT_DELAY_MS) }
+        runCatching {
+            ZonedDateTime.parse(value, DateTimeFormatter.RFC_1123_DATE_TIME)
+                .toInstant().toEpochMilli() - System.currentTimeMillis()
+        }.getOrNull()?.takeIf { it >= 0 }?.let { return it.coerceAtMost(MAX_RATE_LIMIT_DELAY_MS) }
+        return (100L shl attempt).coerceAtMost(MAX_RATE_LIMIT_DELAY_MS)
+    }
+
+    private companion object {
+        const val MAX_RATE_LIMIT_ATTEMPTS = 3
+        const val MAX_RATE_LIMIT_DELAY_MS = 60_000L
     }
 
     suspend fun listRecords(
