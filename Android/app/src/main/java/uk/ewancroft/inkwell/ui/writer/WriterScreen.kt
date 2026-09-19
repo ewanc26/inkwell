@@ -43,6 +43,7 @@ fun WriterScreen(
     onNavigateToPost: (String, String?, String?, String?, String?) -> Unit = { _, _, _, _, _ -> },
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var showDeleteConfirmation by rememberSaveable { mutableStateOf(false) }
     var pubExpanded by remember { mutableStateOf(false) }
     var formatExpanded by remember { mutableStateOf(false) }
     var showCredits by remember { mutableStateOf(false) }
@@ -222,6 +223,12 @@ fun WriterScreen(
                         )
                         TextButton(onClick = { viewModel.cancelEditing() }) {
                             Text("Cancel", style = MaterialTheme.typography.bodySmall)
+                        }
+                        IconButton(
+                            onClick = { showDeleteConfirmation = true },
+                            enabled = !uiState.isPublishing,
+                        ) {
+                            Icon(Icons.Outlined.Delete, contentDescription = "Delete document")
                         }
                     }
                 }
@@ -410,6 +417,26 @@ fun WriterScreen(
                         }
                     }
                 }
+            }
+
+            if (showDeleteConfirmation) {
+                AlertDialog(
+                    onDismissRequest = { showDeleteConfirmation = false },
+                    title = { Text("Delete ${uiState.title}?") },
+                    text = { Text("This permanently removes the document from your repository. The current record version will be checked first.") },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                showDeleteConfirmation = false
+                                viewModel.deleteDocument()
+                            },
+                            colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                        ) { Text("Delete") }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showDeleteConfirmation = false }) { Text("Cancel") }
+                    },
+                )
             }
 
             Button(
