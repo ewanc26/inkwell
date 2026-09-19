@@ -44,6 +44,8 @@ struct SettingsView: View {
     @State private var exportFileURL: URL?
     @State private var isImportingData = false
     @State private var importMessage: String?
+    @State private var pendingImportData: Data?
+    @State private var pendingImportCount = 0
 
     var body: some View {
         NavigationStack {
@@ -279,8 +281,9 @@ struct SettingsView: View {
                 switch result {
                 case .success(let url):
                     do {
-                        let changes = try articleState.importJSON(Data(contentsOf: url))
-                        importMessage = "Imported \(changes) change\(changes == 1 ? "" : "s")."
+                        let data = try Data(contentsOf: url)
+                        pendingImportCount = try articleState.previewImportJSON(data)
+                        pendingImportData = data
                     } catch {
                         importMessage = error.localizedDescription
                     }
@@ -313,6 +316,19 @@ struct SettingsView: View {
                 Button("OK", role: .cancel) { importMessage = nil }
             } message: {
                 Text(importMessage ?? "")
+            }
+            .confirmationDialog("Import reading data?", isPresented: Binding(get: { pendingImportData != nil }, set: { if !$0 { pendingImportData = nil } }), titleVisibility: .visible) {
+                Button("Import (pendingImportCount) change\(pendingImportCount == 1 ? "" : "s")") {
+                    guard let data = pendingImportData else { return }
+                    do {
+                        let changes = try articleState.importJSON(data)
+                        importMessage = "Imported \(changes) change\(changes == 1 ? "" : "s")."
+                    } catch { importMessage = error.localizedDescription }
+                    pendingImportData = nil
+                }
+                Button("Cancel", role: .cancel) { pendingImportData = nil }
+            } message: {
+                Text("Only newer local choices will be changed.")
             }
         }
     }
