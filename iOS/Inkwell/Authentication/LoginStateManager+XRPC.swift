@@ -59,7 +59,7 @@ extension LoginStateManager {
         guard let http = response as? HTTPURLResponse,
               (200...299).contains(http.statusCode) else {
             let status = (response as? HTTPURLResponse)?.statusCode ?? 0
-            logger.error("[authenticatedData] HTTP \(status) for \(url.absoluteString)")
+            logger.error("[authenticatedData] HTTP \(status)")
             throw LoginError.httpError(status: status)
         }
 
@@ -101,7 +101,7 @@ extension LoginStateManager {
         guard let http = response as? HTTPURLResponse,
               (200...299).contains(http.statusCode) else {
             let status = (response as? HTTPURLResponse)?.statusCode ?? 0
-            logger.error("[unauthenticatedData] HTTP \(status) for \(url.absoluteString)")
+            logger.error("[unauthenticatedData] HTTP \(status)")
             throw LoginError.httpError(status: status)
         }
 
