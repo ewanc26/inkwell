@@ -88,6 +88,14 @@ class InkwellNotificationManager @Inject constructor(
         )
     }
 
+    suspend fun activateCurrentAccount() {
+        pdsRepository.getSession()?.did?.let(::activateAccount)
+    }
+
+    fun deactivateAccount() {
+        prefs = context.getSharedPreferences("inkwell_notifications_unscoped", Context.MODE_PRIVATE)
+    }
+
     suspend fun pollForNewDocuments() = withContext(Dispatchers.IO) {
         documentLock.withLock { pollForNewDocumentsLocked() }
     }

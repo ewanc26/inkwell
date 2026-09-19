@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.kikin81.atproto.oauth.AtOAuth
 import io.github.kikin81.atproto.oauth.OAuthSessionStore
+import uk.ewancroft.inkwell.data.remote.InkwellNotificationManager
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -26,6 +27,7 @@ sealed interface AuthUiState {
 class AuthViewModel @Inject constructor(
     private val oauth: AtOAuth,
     private val sessionStore: OAuthSessionStore,
+    private val notificationManager: InkwellNotificationManager,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Loading)
@@ -41,6 +43,7 @@ class AuthViewModel @Inject constructor(
     private fun checkExistingSession() {
         viewModelScope.launch {
             val session = sessionStore.load()
+            if (session != null) notificationManager.activateCurrentAccount()
             _uiState.value = if (session != null) {
                 AuthUiState.LoggedIn(
                     handle = session.handle ?: session.did.orEmpty(),
@@ -71,6 +74,7 @@ class AuthViewModel @Inject constructor(
             runCatching { oauth.completeLogin(redirectUri) }
                 .onSuccess {
                     val session = sessionStore.load()
+                    if (session != null) notificationManager.activateCurrentAccount()
                     if (session != null) {
                         _uiState.value = AuthUiState.LoggedIn(
                             handle = session.handle ?: session.did.orEmpty(),
@@ -94,6 +98,7 @@ class AuthViewModel @Inject constructor(
     fun logout() {
         viewModelScope.launch {
             oauth.logout()
+            notificationManager.deactivateAccount()
             _uiState.value = AuthUiState.LoggedOut()
         }
     }
