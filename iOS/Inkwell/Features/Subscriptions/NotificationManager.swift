@@ -165,13 +165,13 @@ final class NotificationManager {
                     if wasInitialized {
                         let labels = (doc.record.labels?.values.map { ModerationLabel(value: $0.value, source: nil) } ?? [])
                             + (pubEntry?.record.labels?.values.map { ModerationLabel(value: $0.value, source: nil) } ?? [])
-                        let moderation = contentModerationPresentation(
+                        let sensitive = shouldRedactNotification(
                             title: doc.record.title,
                             description: doc.record.description,
                             textContent: doc.record.textContent,
                             labels: labels
                         )
-                        newDocs.append((doc, pubEntry, moderation != .visible))
+                        newDocs.append((doc, pubEntry, sensitive))
                     }
                     allSeenURIs.insert(doc.uri)
                 }
