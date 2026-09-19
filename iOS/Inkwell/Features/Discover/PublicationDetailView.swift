@@ -129,9 +129,7 @@ struct PublicationDetailView: View {
         // Search results only identify a publication by domain. Prefer the
         // authoritative `site.standard.publication` record for its display
         // name once the author's PDS records have been loaded.
-        resolvedPublication = publications.first { entry in
-            normalizedHost(for: entry.record.url) == normalizedHost(for: publication.domain)
-        }
+            resolvedPublication = publications.first { $0.uri == publication.uri }
 
         let publicationURLMap = Dictionary(
             uniqueKeysWithValues: publications.map { ($0.uri, $0.record.url) }

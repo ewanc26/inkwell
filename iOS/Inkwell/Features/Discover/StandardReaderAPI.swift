@@ -73,13 +73,14 @@ struct ReaderSearchActorResponse: Decodable {
 /// publication is reconstructed by grouping results that share an author DID
 /// and `basePath` (the publication's origin domain).
 struct PublicationResult: Identifiable, Hashable {
+    let uri: String
     let name: String
     let domain: String
     let url: URL?
     let did: String
     let coverImage: String?
 
-    var id: String { domain }
+    var id: String { uri }
 
     /// Collapses document search results into distinct publications: results
     /// from the same author DID and `basePath` are one publication.
@@ -89,6 +90,7 @@ struct PublicationResult: Identifiable, Hashable {
             guard let domain = items.first?.basePath, !domain.isEmpty else { return nil }
             let first = items.first!
             return PublicationResult(
+                uri: first.uri,
                 name: domain,
                 domain: domain,
                 url: URL(string: "https://\(domain)"),
