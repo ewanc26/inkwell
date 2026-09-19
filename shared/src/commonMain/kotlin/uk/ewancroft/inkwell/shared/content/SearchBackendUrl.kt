@@ -7,6 +7,12 @@ object SearchBackendUrl {
     /** Returns keyword-indexed documents/articles. */
     const val KEYWORD_MODE = "keyword"
 
-    /** Returns `type=publication` records only. */
+    /**
+     * Retained for source compatibility only. The backend does not support a
+     * publications search mode; clients must filter native publication
+     * results returned by the documented keyword/semantic/hybrid modes.
+     */
+    @Deprecated("The pub-search API has no publications mode")
     const val PUBLICATIONS_MODE = "publications"
+
 }

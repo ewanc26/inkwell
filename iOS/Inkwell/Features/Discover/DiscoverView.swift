@@ -156,13 +156,18 @@ struct DiscoverView: View {
 
         do {
             if scope == .publications {
-                let response = try await StandardReaderAPI.shared.search(
-                    query: trimmed,
-                    mode: "publications"
-                )
+                let response = try await StandardReaderAPI.shared.search(query: trimmed)
                 results = response.results
                 actors = []
-                publications = PublicationResult.aggregate(response.results)
+                publications = response.results.filter { $0.isPublication }.map { result in
+                    PublicationResult(
+                        name: result.title,
+                        domain: result.uri,
+                        url: result.webURL,
+                        did: result.did,
+                        coverImage: result.coverImage
+                    )
+                }
             } else {
                 async let documents = StandardReaderAPI.shared.search(query: trimmed).results
                 async let actors = StandardReaderAPI.shared.searchActors(query: trimmed)
