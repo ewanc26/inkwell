@@ -87,6 +87,11 @@ struct InkwellApp: App {
                     BackgroundRefreshManager.shared.schedule()
                 }
             .preferredColorScheme(customisation.appearanceOverride)
+            .onOpenURL { url in
+                if let documentURI = ContentDeepLinkPolicy.documentURI(from: url) {
+                    notificationNavigation.enqueue(documentURI: documentURI)
+                }
+            }
         }
     }
 }
