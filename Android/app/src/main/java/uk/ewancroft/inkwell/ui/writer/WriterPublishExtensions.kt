@@ -2,12 +2,16 @@ package uk.ewancroft.inkwell.ui.writer
 
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 import uk.ewancroft.inkwell.shared.validation.StandardSiteValidation
+
+private const val MAX_DOCUMENT_RECORD_BYTES = 900 * 1024
 
 fun WriterViewModel.publish() {
     val state = uiStateInternal.value
@@ -81,6 +85,8 @@ fun WriterViewModel.publish() {
                     }
                 }
 
+                ensureDocumentRecordFits(record)
+
                 val result = pdsRepository.updateRecord(
                     uri = state.editingDocumentUri,
                     record = record,
@@ -112,6 +118,8 @@ fun WriterViewModel.publish() {
                     }
                 }
 
+                ensureDocumentRecordFits(record)
+
                 val result = pdsRepository.createRecord(
                      collection = CollectionNsids.DOCUMENT,
                     record = record,
@@ -135,6 +143,13 @@ fun WriterViewModel.publish() {
                 publishError = "Failed to publish: ${e.message}"
             )
         }
+    }
+}
+
+private fun ensureDocumentRecordFits(record: JsonObject) {
+    val encodedBytes = Json.encodeToString(JsonObject.serializer(), record).encodeToByteArray().size
+    check(encodedBytes <= MAX_DOCUMENT_RECORD_BYTES) {
+        "Document is too large to publish (${encodedBytes} bytes; limit is $MAX_DOCUMENT_RECORD_BYTES bytes). Use a shorter document or a blob-backed format."
     }
 }
 
