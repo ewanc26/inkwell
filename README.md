@@ -128,7 +128,7 @@ xcodebuild -project iOS/Inkwell.xcodeproj -scheme Inkwell \
 ./gradlew test
 ```
 
-This runs the app's two unit test sources only: `StandardSiteVerifierTest` (13 tests) and `SearchModelsTest` (2). Three of the verifier tests hit the real `blog.ewancroft.uk` standard.site publication over the network and fail offline. There are no instrumentation tests.
+This runs the app's two unit test sources only: `StandardSiteVerifierTest` (13 hermetic tests) and `SearchModelsTest` (3). There are no instrumentation tests.
 
 ## Dependencies
 

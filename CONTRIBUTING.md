@@ -79,7 +79,7 @@ For release work:
 
 Inspect R8 output and ensure the signed APK is produced.
 
-App-level coverage is thin: `StandardSiteVerifierTest` (13 tests) and `SearchModelsTest` (2) are the only unit test sources, and there are no instrumentation tests. Three verifier tests hit the real `blog.ewancroft.uk` standard.site publication over the network and fail offline. Don't treat a green `./gradlew test` as behavioural coverage of the app beyond those two files — and note it skips `:shared` entirely (see above).
+App-level coverage is thin: `StandardSiteVerifierTest` (13 hermetic tests) and `SearchModelsTest` (3) are the only unit test sources, and there are no instrumentation tests. Don't treat a green `./gradlew test` as behavioural coverage of the app beyond those two files — and note it skips `:shared` entirely (see above).
 
 ### Website
 
