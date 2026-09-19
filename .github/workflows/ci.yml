@@ -154,7 +154,11 @@ jobs:
 
       - name: Build, lint, and test
         working-directory: Android
-        run: ./gradlew clean assembleDebug lint test :shared:jvmTest
+        run: ./gradlew clean assembleDebug assembleRelease lint test :shared:jvmTest
+
+      - name: Assert release permission allowlist
+        working-directory: Android
+        run: bash tools/check-release-permissions.sh
 
   website:
     name: Website check + build
