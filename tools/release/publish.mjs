@@ -59,6 +59,7 @@ import {
 import { execFileSync, execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { createHash } from "node:crypto";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..", "..");
@@ -110,6 +111,12 @@ function quiet(cmd) {
   } catch {
     return null;
   }
+}
+
+function sha256File(filePath) {
+  const hash = createHash("sha256");
+  hash.update(readFileSync(filePath));
+  return hash.digest("hex");
 }
 
 // ── Version sources ──────────────────────────────────────────────
@@ -413,7 +420,10 @@ async function publishIos() {
 
   const destIpaName = `Inkwell-${name}.ipa`;
   const destIpaPath = path.join(root, "website", "static", "altstore", destIpaName);
-  const sourceJsonPath = path.join(root, "website", "static", "altstore", "source.json");
+  const sourceJsonPaths = [
+    path.join(root, "iOS", "altstore", "source.json"),
+    path.join(root, "website", "static", "altstore", "source.json"),
+  ];
 
   if (!YES) {
     console.log("Would run:");
@@ -427,8 +437,12 @@ async function publishIos() {
 
   cpSync(ipaPath, destIpaPath);
   const size = statSync(destIpaPath).size;
+  const sha256 = sha256File(destIpaPath);
+  if (size !== statSync(ipaPath).size || sha256 !== sha256File(ipaPath)) {
+    fail("The copied IPA differs from the supplied artifact; refusing to publish metadata.");
+  }
 
-  const data = JSON.parse(readFileSync(sourceJsonPath, "utf8"));
+  const data = JSON.parse(readFileSync(sourceJsonPaths[0], "utf8"));
   const app = data.apps[0];
   const downloadURL = `https://inkwell.ewancroft.uk/altstore/${destIpaName}`;
   const notes = resolveNotes("iOS/", `ios-v${previousIosTagGuess(name)}`);
@@ -437,6 +451,7 @@ async function publishIos() {
   app.buildVersion = String(build);
   app.versionDate = new Date().toISOString().slice(0, 10);
   app.size = size;
+  app.sha256 = sha256;
   app.downloadURL = downloadURL;
   app.versions = app.versions ?? [];
   app.versions.unshift({
@@ -445,10 +460,15 @@ async function publishIos() {
     localizedDescription: notes.slice(0, 4000),
     downloadURL,
     size,
+    sha256,
     buildVersion: String(build),
     minOSVersion: app.minOSVersion,
   });
-  writeFileSync(sourceJsonPath, JSON.stringify(data, null, 2) + "\n");
+  const serializedSource = JSON.stringify(data, null, 2) + "\n";
+  for (const sourceJsonPath of sourceJsonPaths) writeFileSync(sourceJsonPath, serializedSource);
+  if (readFileSync(sourceJsonPaths[0], "utf8") !== readFileSync(sourceJsonPaths[1], "utf8")) {
+    fail("AltStore source manifests are not byte-for-byte aligned after generation.");
+  }
 
   const notesPath = path.join(root, ".release-notes-ios.md");
   writeFileSync(notesPath, notes);
@@ -467,7 +487,7 @@ async function publishIos() {
   rmSync(notesPath);
 
   commitAndMaybePush(
-    ["website/static/altstore"],
+    ["iOS/altstore/source.json", "website/static/altstore"],
     `chore(ios): release ${name} (build ${build})`,
   );
 
