@@ -54,21 +54,13 @@ extension LoginStateManager {
             throw LoginError.notAuthenticated
         }
 
-        let boundary = "inkwell-upload-\(Int(Date().timeIntervalSince1970 * 1000))"
         let url = pdsURL.appendingPathComponent(sharedXrpcRepoUploadBlob())
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        request.setValue(mimeType, forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-
-        var body = Data()
-        body.append("--\(boundary)\r\n".data(using: .utf8)!)
-        body.append("Content-Disposition: form-data; name=\"upload\"; filename=\"blob\"\r\n".data(using: .utf8)!)
-        body.append("Content-Type: \(mimeType)\r\n\r\n".data(using: .utf8)!)
-        body.append(data)
-        body.append("\r\n--\(boundary)--\r\n".data(using: .utf8)!)
-        request.httpBody = body
+        request.httpBody = data
 
         let (responseData, response) = try await authenticator.response(for: request)
 
