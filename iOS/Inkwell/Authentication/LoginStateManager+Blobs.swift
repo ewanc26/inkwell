@@ -7,6 +7,16 @@ import Foundation
 import ATProtoKit
 import OAuthenticator
 
+private let maxReaderBlobBytes = 10 * 1024 * 1024
+
+private enum BlobDownloadError: LocalizedError {
+    case oversized
+
+    var errorDescription: String? {
+        "This document's blob is too large to display safely."
+    }
+}
+
 extension LoginStateManager {
     // MARK: - Blob Download
 
@@ -23,15 +33,17 @@ extension LoginStateManager {
         let pdsURL = try await repositoryPDSURL(for: did)
 
         if did == currentDID {
-            return try await authenticatedData(
+            let data = try await authenticatedData(
                 path: sharedXrpcSyncGetBlob(),
                 queryItems: [
                     URLQueryItem(name: "did", value: did),
                     URLQueryItem(name: "cid", value: cid),
                 ]
             )
+            guard data.count <= maxReaderBlobBytes else { throw BlobDownloadError.oversized }
+            return data
         } else {
-            return try await unauthenticatedData(
+            let data = try await unauthenticatedData(
                 pdsURL: pdsURL,
                 path: sharedXrpcSyncGetBlob(),
                 queryItems: [
@@ -39,6 +51,8 @@ extension LoginStateManager {
                     URLQueryItem(name: "cid", value: cid),
                 ]
             )
+            guard data.count <= maxReaderBlobBytes else { throw BlobDownloadError.oversized }
+            return data
         }
     }
 
