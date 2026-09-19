@@ -15,6 +15,7 @@ struct PostNavButton: View {
     let direction: Direction
     let title: String
     let theme: ReaderTheme
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         HStack(spacing: 8) {
@@ -28,7 +29,8 @@ struct PostNavButton: View {
                     Text(title)
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(theme.foreground)
-                        .lineLimit(1)
+                        .lineLimit(dynamicTypeSize.isAccessibilitySize ? 3 : 2)
+                        .multilineTextAlignment(.leading)
                 }
             }
             Spacer(minLength: 0)
@@ -40,13 +42,15 @@ struct PostNavButton: View {
                     Text(title)
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(theme.foreground)
-                        .lineLimit(1)
+                        .lineLimit(dynamicTypeSize.isAccessibilitySize ? 3 : 2)
+                        .multilineTextAlignment(.trailing)
                 }
                 Image(systemName: "chevron.right")
                     .font(.caption.weight(.semibold))
             }
         }
         .padding(12)
+        .frame(minHeight: 52, alignment: .center)
         .frame(maxWidth: .infinity, alignment: direction == .previous ? .leading : .trailing)
         .background(theme.foreground.opacity(0.04))
         .clipShape(RoundedRectangle(cornerRadius: 10))

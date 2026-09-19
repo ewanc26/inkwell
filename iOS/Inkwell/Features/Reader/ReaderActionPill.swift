@@ -37,13 +37,14 @@ struct ReaderActionPill: View {
                         .symbolEffect(.bounce, value: isActive)
                 }
                 Text(label)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
             }
             .font(.subheadline.weight(.semibold))
             .foregroundStyle(isActive ? activeForeground : tint)
             .padding(.horizontal, 14)
             .padding(.vertical, 8)
+            .frame(minHeight: 44)
             .background(
                 Capsule()
                     .fill(isActive ? tint : tint.opacity(0.12))
