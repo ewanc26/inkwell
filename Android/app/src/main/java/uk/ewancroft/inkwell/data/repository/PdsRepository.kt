@@ -52,6 +52,7 @@ class PdsRepository @Inject constructor(
         .build()
 
     private val ktorHttpClient = HttpClient(CIO)
+    private val rateLimitCooldowns = mutableMapOf<String, Long>()
 
     suspend fun getSession(): UserSessionInfo? {
         val session = sessionStore.load() ?: return null
@@ -72,12 +73,21 @@ class PdsRepository @Inject constructor(
      *  or a missing body instead of decoding an error payload as success. */
     internal suspend fun executeGet(urlStr: String): String = withContext(Dispatchers.IO) {
         val request = Request.Builder().url(urlStr).get().build()
+        val origin = "${request.url.scheme}://${request.url.host}:${request.url.port}"
         var attempt = 0
         while (true) {
+            val cooldown = synchronized(rateLimitCooldowns) {
+                (rateLimitCooldowns[origin] ?: 0L) - System.currentTimeMillis()
+            }
+            if (cooldown > 0) delay(cooldown)
             val response = publicHttpClient.newCall(request).execute()
             if (response.code == 429 && attempt < MAX_RATE_LIMIT_ATTEMPTS - 1) {
                 val delayMs = retryAfterMillis(response.header("Retry-After"), attempt)
                 response.close()
+                synchronized(rateLimitCooldowns) {
+                    val until = System.currentTimeMillis() + delayMs
+                    rateLimitCooldowns[origin] = maxOf(rateLimitCooldowns[origin] ?: 0L, until)
+                }
                 delay(delayMs)
                 attempt += 1
                 continue
