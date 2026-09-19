@@ -12,6 +12,7 @@ import uk.ewancroft.inkwell.data.model.content.LeafletContent
 import uk.ewancroft.inkwell.data.model.content.LeafletPage
 import uk.ewancroft.inkwell.data.repository.downloadBlob
 import uk.ewancroft.inkwell.shared.content.ContentFormatDetector
+import uk.ewancroft.inkwell.shared.validation.JsonSafety
 
 private val contentParsingJson = Json { ignoreUnknownKeys = true; isLenient = true }
 
@@ -23,6 +24,9 @@ internal suspend fun PostDetailViewModel.parseContent(
     authorDid: String,
     documentUri: String,
 ): ParseResult {
+    if (contentObj != null && !JsonSafety.isSafe(contentObj)) {
+        return ParseResult(DocumentContent.Unsupported(contentObj["\$type"]?.jsonPrimitive?.contentOrNull))
+    }
     if (contentObj != null) {
         val formatType = contentObj["\$type"]?.jsonPrimitive?.contentOrNull
 
