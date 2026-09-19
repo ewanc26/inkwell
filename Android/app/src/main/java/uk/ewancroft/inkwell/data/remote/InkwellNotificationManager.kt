@@ -22,6 +22,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -30,6 +31,11 @@ import uk.ewancroft.inkwell.shared.AtUri
 import uk.ewancroft.inkwell.shared.content.PublicationMatcher
 import uk.ewancroft.inkwell.shared.policy.NotificationPolicy
 import uk.ewancroft.inkwell.shared.policy.NotificationStyle
+import uk.ewancroft.inkwell.shared.moderation.ContentFilterDecision
+import uk.ewancroft.inkwell.shared.moderation.ContentFilterEngine
+import uk.ewancroft.inkwell.shared.moderation.FilterableContent
+import uk.ewancroft.inkwell.shared.moderation.ModerationLabel
+import uk.ewancroft.inkwell.shared.moderation.ModerationPolicy
 import uk.ewancroft.inkwell.data.repository.PdsRepository
 import uk.ewancroft.inkwell.data.repository.fetchDocumentEntries
 import uk.ewancroft.inkwell.data.repository.fetchSubscriptions
@@ -149,8 +155,16 @@ class InkwellNotificationManager @Inject constructor(
                 val pubName = pubRecord
                     ?.get("value")?.jsonObject?.get("name")?.jsonPrimitive?.contentOrNull
 
+                val sensitive = ContentFilterEngine.evaluate(
+                    FilterableContent(
+                        title = title,
+                        labels = doc.moderationLabels() + pubRecord.moderationLabels()
+                    ),
+                    moderationPolicy()
+                ) !is ContentFilterDecision.Show
+
                 if (wasInitialized) {
-                    newDocs.add(NewDocument(uri, title, pubName, publishedAt))
+                    newDocs.add(NewDocument(uri, title, pubName, publishedAt, sensitive))
                 }
                 allSeenURIs.add(uri)
             }
@@ -180,8 +194,8 @@ class InkwellNotificationManager @Inject constructor(
                     val doc = newDocs[0]
                     if (isNotificationsEnabled()) {
                         sendNotification(
-                            title = doc.publicationName ?: "New Document",
-                            body = doc.title,
+                            title = if (doc.sensitive) "New document from a subscribed publication" else (doc.publicationName ?: "New Document"),
+                            body = if (doc.sensitive) "Open Inkwell to view this document" else doc.title,
                             documentURI = doc.uri
                         )
                     }
@@ -191,7 +205,7 @@ class InkwellNotificationManager @Inject constructor(
                     if (isNotificationsEnabled()) {
                         sendNotification(
                             title = "${style.count} New Documents",
-                            body = "Latest: ${newest.title} from ${newest.publicationName ?: "a publication"}",
+                            body = if (newest.sensitive) "Open Inkwell to view your new documents" else "Latest: ${newest.title} from ${newest.publicationName ?: "a publication"}",
                             documentURI = newest.uri
                         )
                     }
@@ -202,8 +216,8 @@ class InkwellNotificationManager @Inject constructor(
             val notificationEntries = newDocs.map {
                 InkwellNotification(
                     documentURI = it.uri,
-                    documentTitle = it.title,
-                    publicationName = it.publicationName,
+                    documentTitle = if (it.sensitive) "Hidden document" else it.title,
+                    publicationName = if (it.sensitive) null else it.publicationName,
                     publishedAt = it.publishedAt,
                     date = System.currentTimeMillis()
                 )
@@ -308,6 +322,13 @@ class InkwellNotificationManager @Inject constructor(
         val jsonStr = json.encodeToString(limited)
         prefs.edit().putString(NOTIFICATIONS_KEY, jsonStr).apply()
     }
+
+    private fun moderationPolicy() = ModerationPolicy(
+        hiddenLabels = uk.ewancroft.inkwell.util.ModerationPreferences.hiddenLabels(context),
+        warningLabels = uk.ewancroft.inkwell.util.ModerationPreferences.warningLabels(context),
+        disabledLabelers = uk.ewancroft.inkwell.util.ModerationPreferences.disabledLabelers(context),
+        hiddenKeywords = uk.ewancroft.inkwell.util.ModerationPreferences.hiddenKeywords(context)
+    )
 }
 
 @Serializable
@@ -323,5 +344,14 @@ data class NewDocument(
     val uri: String,
     val title: String,
     val publicationName: String?,
-    val publishedAt: String
+    val publishedAt: String,
+    val sensitive: Boolean = false
 )
+
+private fun JsonElement?.moderationLabels(): List<ModerationLabel> =
+    (this?.jsonObject?.get("value")?.jsonObject ?: this?.jsonObject)?.get("labels")?.jsonObject
+        ?.get("values")?.jsonArray.orEmpty().mapNotNull { value ->
+            value.jsonObject["val"]?.jsonPrimitive?.contentOrNull?.let { label ->
+                ModerationLabel(label, value.jsonObject["src"]?.jsonPrimitive?.contentOrNull)
+            }
+        }
