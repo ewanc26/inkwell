@@ -104,4 +104,39 @@ object ArticleStatePreferences {
             )
         )
     }
+
+    sealed class ImportResult {
+        data class Success(val changes: Int) : ImportResult()
+        data object Invalid : ImportResult()
+        data object UnsupportedVersion : ImportResult()
+    }
+
+    /** Validates and timestamp-merges an export atomically from the caller's perspective. */
+    fun importJson(context: Context, raw: String): ImportResult {
+        val envelope = runCatching { json.decodeFromString<ReadingDataExport>(raw) }.getOrNull()
+            ?: return ImportResult.Invalid
+        if (envelope.format != "uk.ewancroft.inkwell.reading-data") return ImportResult.Invalid
+        if (envelope.version != 1) return ImportResult.UnsupportedVersion
+        if (envelope.articles.size > 10_000) return ImportResult.Invalid
+        if (envelope.articles.any { !atUriPattern.matches(it.articleId) || it.title.length > 500 || runCatching { Instant.parse(it.timestamp) }.getOrNull()?.isAfter(Instant.now()) == true }) {
+            return ImportResult.Invalid
+        }
+        val incoming = envelope.articles.mapNotNull { article ->
+            val timestamp = runCatching { Instant.parse(article.timestamp) }.getOrNull() ?: return@mapNotNull null
+            article.articleId to (article to timestamp)
+        }
+        if (incoming.size != envelope.articles.size) return ImportResult.Invalid
+        val current = readAll(context).toMutableMap()
+        var changes = 0
+        incoming.forEach { (id, pair) ->
+            val (article, timestamp) = pair
+            if (current[id]?.updatedAt?.let { Instant.ofEpochMilli(it) >= timestamp } == true) return@forEach
+            current[id] = ArticleState(article.title, article.isRead, article.isBookmarked, timestamp.toEpochMilli())
+            changes++
+        }
+        writeAll(context, current)
+        return ImportResult.Success(changes)
+    }
+
+    private val atUriPattern = Regex("^at://[^/]+/[^/]+/[^/]+$")
 }
