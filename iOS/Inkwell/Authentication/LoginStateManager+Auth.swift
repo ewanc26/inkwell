@@ -242,6 +242,14 @@ extension LoginStateManager {
                 return
             }
 
+            guard let resolvedPDS = identity.serviceEndpoint.flatMap({ URL(string: $0) }),
+                  let resolvedHost = resolvedPDS.host,
+                  resolvedHost.caseInsensitiveCompare(pdsHost) == .orderedSame else {
+                logger.error("[RestoreSession] stored PDS does not match the handle's current PDS")
+                clearSession()
+                return
+            }
+
             let serverMetadata = try await ServerMetadata.load(for: pdsHost, provider: URLSession.defaultProvider)
 
             let tokenHandling = Bluesky.tokenHandling(
