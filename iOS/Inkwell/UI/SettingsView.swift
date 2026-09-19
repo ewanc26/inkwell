@@ -234,7 +234,7 @@ struct SettingsView: View {
                 } header: {
                     Text("Data")
                 } footer: {
-                    Text("Exports your locally tracked read and bookmarked articles as a JSON file. This never leaves your device unless you choose to share it.")
+                    Text("Exports your locally tracked read and bookmarked articles as a versioned JSON file. This never leaves your device unless you choose to share it.")
                 }
 
                 Section("Legal") {

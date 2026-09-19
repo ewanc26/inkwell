@@ -535,7 +535,7 @@ fun SettingsDialog(
                         },
                     )
                     Text(
-                        "Exports your locally tracked read and bookmarked articles as a JSON file. This never leaves your device unless you choose to share it.",
+                        "Exports your locally tracked read and bookmarked articles as a versioned JSON file. This never leaves your device unless you choose to share it.",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
