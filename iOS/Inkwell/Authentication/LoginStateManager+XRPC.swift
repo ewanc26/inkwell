@@ -138,13 +138,13 @@ extension LoginStateManager {
                 lastError = error
                 guard attempt < maxAttempts else { throw error }
                 let delay = Double(1 << min(attempt, 4)) * 0.1  // 0.1, 0.2, 0.4, 0.8s
-                try? await Task.sleep(for: .seconds(delay))
+                try await Task.sleep(for: .seconds(delay))
             } catch LoginError.httpError(let status) where (500...599).contains(status) {
                 attempt += 1
                 lastError = LoginError.httpError(status: status)
                 guard attempt < maxAttempts else { throw lastError! }
                 let delay = Double(1 << min(attempt, 4)) * 0.1
-                try? await Task.sleep(for: .seconds(delay))
+                try await Task.sleep(for: .seconds(delay))
             } catch let error as RetryableHTTPError {
                 attempt += 1
                 lastError = LoginError.httpError(status: 429)
