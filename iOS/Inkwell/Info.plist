@@ -14,6 +14,7 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>uk.ewancroft.inkwell</string>
+				<string>inkwell</string>
 			</array>
 		</dict>
 	</array>
