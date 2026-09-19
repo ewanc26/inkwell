@@ -242,6 +242,7 @@ final class WriterViewModel {
                     recordKey: parsed.recordKey,
                     swapRecord: revision
                 )
+                await OfflineContentStore.shared.remove(uri: documentURI)
                 cancelEditing()
                 publishSuccess = "Document deleted."
                 InkwellHaptics.success()

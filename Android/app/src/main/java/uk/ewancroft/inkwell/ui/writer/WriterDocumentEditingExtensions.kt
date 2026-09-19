@@ -12,6 +12,7 @@ import uk.ewancroft.inkwell.shared.content.ContentFormatDetector
 import uk.ewancroft.inkwell.shared.content.ContentFormatDispatcher
 import uk.ewancroft.inkwell.shared.content.JsonMapBridge
 import uk.ewancroft.inkwell.shared.markdown.MarkdownSerializer
+import uk.ewancroft.inkwell.util.OfflineContentCacheManager
 
 fun WriterViewModel.loadDocumentForEditing(uri: String) {
     viewModelScope.launch {
@@ -116,6 +117,7 @@ fun WriterViewModel.deleteDocument() {
                 rkey = parsed.recordKey,
                 swapRecord = revision,
             )
+            OfflineContentCacheManager.remove(context, uri)
             cancelEditing()
             uiStateInternal.value = uiStateInternal.value.copy(
                 isPublishing = false,

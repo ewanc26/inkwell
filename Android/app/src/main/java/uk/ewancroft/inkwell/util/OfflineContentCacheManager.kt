@@ -11,4 +11,10 @@ object OfflineContentCacheManager {
         createFeedCache(cachePath).clear()
         createOfflineContentCache(cachePath).clear()
     }
+
+    suspend fun remove(context: Context, uri: String) {
+        val cachePath = context.cacheDir.absolutePath
+        createFeedCache(cachePath).remove(uri)
+        createOfflineContentCache(cachePath).remove(uri)
+    }
 }
