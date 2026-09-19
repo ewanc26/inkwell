@@ -81,8 +81,14 @@ extension LoginStateManager {
                 guard let self else { return false }
                 guard let resolved = try? await self.resolver.resolveHandle(tokenResponse.sub),
                       let subPDSURL = resolved.serviceEndpoint.flatMap({ URL(string: $0) }),
-                      subPDSURL.absoluteString.caseInsensitiveCompare(issuer) == .orderedSame
-                        || issuer.contains(subPDSURL.host ?? "") else {
+                      resolved.did == tokenResponse.sub,
+                      let subPDSHost = subPDSURL.host,
+                      let subServerMetadata = try? await ServerMetadata.load(
+                        for: subPDSHost,
+                        provider: URLSession.defaultProvider
+                      ),
+                      OAuthIssuerPolicy.sameHTTPSOrigin(issuer, subServerMetadata.issuer),
+                      OAuthIssuerPolicy.sameHTTPSOrigin(issuer, serverMetadata.issuer) else {
                     return false
                 }
                 return true
