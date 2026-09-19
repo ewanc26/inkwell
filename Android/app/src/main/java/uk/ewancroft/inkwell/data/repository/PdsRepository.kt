@@ -14,6 +14,7 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.long
 import kotlinx.serialization.json.put
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -152,6 +153,7 @@ class PdsRepository @Inject constructor(
             inputSerializer = JsonObject.serializer(),
             responseSerializer = JsonObject.serializer(),
         )
+        return response
     }
 
     /**
