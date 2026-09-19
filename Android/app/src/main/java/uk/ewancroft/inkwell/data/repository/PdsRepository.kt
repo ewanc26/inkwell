@@ -27,6 +27,8 @@ import uk.ewancroft.inkwell.shared.model.UserLexicon
 import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
 import uk.ewancroft.inkwell.shared.policy.RecordListPolicy
 import java.net.URLEncoder
+import java.io.ByteArrayOutputStream
+import java.io.IOException
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
@@ -71,7 +73,7 @@ class PdsRepository @Inject constructor(
 
     /** Executes a GET and returns the raw body, throwing on non-2xx statuses
      *  or a missing body instead of decoding an error payload as success. */
-    internal suspend fun executeGet(urlStr: String): String = withContext(Dispatchers.IO) {
+    internal suspend fun executeGet(urlStr: String, maxBodyBytes: Int = DEFAULT_RESPONSE_BYTES): String = withContext(Dispatchers.IO) {
         val request = Request.Builder().url(urlStr).get().build()
         val origin = "${request.url.scheme}://${request.url.host}:${request.url.port}"
         var attempt = 0
@@ -95,7 +97,23 @@ class PdsRepository @Inject constructor(
                 if (!response.isSuccessful) {
                     throw java.io.IOException("PDS request failed: HTTP ${response.code}")
                 }
-                response.body?.string() ?: throw java.io.IOException("PDS request returned no body")
+                val body = response.body ?: throw IOException("PDS request returned no body")
+                if (body.contentLength() > maxBodyBytes) {
+                    throw IOException("PDS response exceeded the ${maxBodyBytes}-byte safety budget")
+                }
+                body.byteStream().use { input ->
+                    val output = ByteArrayOutputStream(minOf(maxBodyBytes, 64 * 1024))
+                    val buffer = ByteArray(16 * 1024)
+                    var total = 0
+                    while (true) {
+                        val read = input.read(buffer)
+                        if (read == -1) break
+                        total += read
+                        if (total > maxBodyBytes) throw IOException("PDS response exceeded the ${maxBodyBytes}-byte safety budget")
+                        output.write(buffer, 0, read)
+                    }
+                    output.toString(Charsets.UTF_8.name())
+                }
             }
         }
     }
@@ -113,6 +131,7 @@ class PdsRepository @Inject constructor(
     private companion object {
         const val MAX_RATE_LIMIT_ATTEMPTS = 3
         const val MAX_RATE_LIMIT_DELAY_MS = 60_000L
+        const val DEFAULT_RESPONSE_BYTES = 2 * 1024 * 1024
     }
 
     suspend fun listRecords(
@@ -130,7 +149,8 @@ class PdsRepository @Inject constructor(
             append("&limit=$limit")
             cursor?.let { append("&cursor=").append(enc(it)) }
         }
-        return json.decodeFromString(executeGet(urlStr))
+        val pageBudget = (DEFAULT_RESPONSE_BYTES + limit.coerceIn(1, 100) * 8 * 1024).coerceAtMost(8 * 1024 * 1024)
+        return json.decodeFromString(executeGet(urlStr, pageBudget))
     }
 
     suspend fun getRecord(uri: String, pdsUrl: String? = null): JsonObject {
