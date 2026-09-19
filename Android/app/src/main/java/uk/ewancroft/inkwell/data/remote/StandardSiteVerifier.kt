@@ -226,4 +226,4 @@ internal open class SiteVerifier(
 }
 
 /** Production singleton used by the app. Tests can instantiate [SiteVerifier] with a fake transport. */
-object StandardSiteVerifier : SiteVerifier()
+internal object StandardSiteVerifier : SiteVerifier()
