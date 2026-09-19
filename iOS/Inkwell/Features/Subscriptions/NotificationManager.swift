@@ -24,6 +24,7 @@
 //
 
 import Foundation
+import InkwellShared
 import OSLog
 import UserNotifications
 import Observation
@@ -124,7 +125,7 @@ final class NotificationManager {
         // is best-effort. The cache in LoginStateManager ensures subsequent
         // polls hit memory, not the network.
         let subs = (try? await loginStateManager.fetchSubscriptions()) ?? []
-        var newDocs: [(doc: DocumentEntry, pub: PublicationEntry?)] = []
+        var newDocs: [(doc: DocumentEntry, pub: PublicationEntry?, sensitive: Bool)] = []
         var allSeenURIs = Set<String>(lastSeenURIs)
         var initializedPublications = initializedPublications()
 
@@ -162,7 +163,15 @@ final class NotificationManager {
             for doc in pubDocs {
                 if !allSeenURIs.contains(doc.uri) {
                     if wasInitialized {
-                        newDocs.append((doc, pubEntry))
+                        let labels = (doc.record.labels?.values.map { ModerationLabel(value: $0.value, source: nil) } ?? [])
+                            + (pubEntry?.record.labels?.values.map { ModerationLabel(value: $0.value, source: nil) } ?? [])
+                        let moderation = contentModerationPresentation(
+                            title: doc.record.title,
+                            description: doc.record.description,
+                            textContent: doc.record.textContent,
+                            labels: labels
+                        )
+                        newDocs.append((doc, pubEntry, moderation != .visible))
                     }
                     allSeenURIs.insert(doc.uri)
                 }
@@ -201,8 +210,8 @@ final class NotificationManager {
                 let doc = sortedDocs[0]
                 if notificationsEnabled {
                     await sendNotification(
-                        title: doc.pub?.record.name ?? "New Document",
-                        body: doc.doc.record.title,
+                        title: doc.sensitive ? "New document from a subscribed publication" : (doc.pub?.record.name ?? "New Document"),
+                        body: doc.sensitive ? "Open Inkwell to view this document" : doc.doc.record.title,
                         documentURI: doc.doc.uri
                     )
                 }
@@ -211,7 +220,7 @@ final class NotificationManager {
                 if notificationsEnabled {
                     await sendNotification(
                         title: "\(count) New Documents",
-                        body: "Latest: \(newest.doc.record.title) from \(newest.pub?.record.name ?? "a publication")",
+                        body: newest.sensitive ? "Open Inkwell to view your new documents" : "Latest: \(newest.doc.record.title) from \(newest.pub?.record.name ?? "a publication")",
                         documentURI: newest.doc.uri
                     )
                 }
@@ -223,8 +232,8 @@ final class NotificationManager {
             let newNotifications = sortedDocs.map { doc in
                 StandardSiteNotification(
                     documentURI: doc.doc.uri,
-                    documentTitle: doc.doc.record.title,
-                    publicationName: doc.pub?.record.name,
+                    documentTitle: doc.sensitive ? "Hidden document" : doc.doc.record.title,
+                    publicationName: doc.sensitive ? nil : doc.pub?.record.name,
                     publishedAt: doc.doc.record.publishedAt,
                     date: Date()
                 )
