@@ -375,7 +375,7 @@ extension LoginStateManager {
         }
 
         let page = try JSONDecoder().decode(TolerantRecordPage.self, from: data)
-        logger.info("[listRecordsPage] \(collection): \(page.records.count) records (cursor: \(page.cursor ?? "nil"))")
+        logger.info("[listRecordsPage] \(collection): \(page.records.count) records")
         return (page.records, page.cursor)
     }
 }

@@ -172,7 +172,7 @@ final class OfflineMutationStore {
                 )
             } catch {
                 failedIDs.insert(entry.id)
-                print("[OfflineMutationStore] Could not replay \(entry.kind): \(error)")
+                print("[OfflineMutationStore] Could not replay \(entry.kind): \(type(of: error))")
             }
         }
 

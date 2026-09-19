@@ -39,7 +39,7 @@ extension LoginStateManager {
                 return false
             }
 
-            logger.info("[SignIn] resolved \(identity.handle) → DID \(identity.did), PDS \(pdsURL.absoluteString)")
+            logger.info("[SignIn] resolved handle and PDS identity")
 
             // 2. Load OAuth server metadata from the PDS
             let serverMetadata = try await ServerMetadata.load(for: pdsHost, provider: URLSession.defaultProvider)
@@ -104,8 +104,7 @@ extension LoginStateManager {
                         nonceCache.value = nonce
                     }
                     if http.statusCode >= 400 {
-                        let body = String(decoding: data, as: UTF8.self)
-                        logger.error("[SignIn] token endpoint returned HTTP \(http.statusCode): \(body)")
+                        logger.error("[SignIn] token endpoint returned HTTP \(http.statusCode)")
                     }
                 }
                 return (data, response)
