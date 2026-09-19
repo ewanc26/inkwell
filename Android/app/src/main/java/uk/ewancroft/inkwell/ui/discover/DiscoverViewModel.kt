@@ -72,18 +72,20 @@ class DiscoverViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSearching = true, error = null)
             try {
-                val mode = if (scope == DiscoverSearchScope.PUBLICATIONS) {
-                    SearchBackendUrl.PUBLICATIONS_MODE
-                } else {
-                    SearchBackendUrl.KEYWORD_MODE
-                }
+                // Publication records are returned by the normal corpus;
+                // the API supports keyword/semantic/hybrid modes, not a
+                // client-invented `publications` mode.
+                val mode = SearchBackendUrl.KEYWORD_MODE
                 val searchUrl = "${SearchBackendUrl.BASE}/search?q=${
                     java.net.URLEncoder.encode(query, "UTF-8")
                 }&mode=$mode&limit=40&format=v2"
 
                 val searchBody = withContext(Dispatchers.IO) {
                     val searchRequest = Request.Builder().url(searchUrl).get().build()
-                    client.newCall(searchRequest).execute().use { it.body!!.string() }
+                    client.newCall(searchRequest).execute().use {
+                        if (!it.isSuccessful) throw IllegalStateException("Search returned HTTP ${it.code}")
+                        it.body?.string() ?: throw IllegalStateException("Search returned an empty response")
+                    }
                 }
 
                 val searchResponse = withContext(Dispatchers.IO) {
@@ -97,7 +99,10 @@ class DiscoverViewModel @Inject constructor() : ViewModel() {
                     }&limit=10"
                     val actorsBody = withContext(Dispatchers.IO) {
                         val actorsRequest = Request.Builder().url(actorsUrl).get().build()
-                        client.newCall(actorsRequest).execute().use { it.body!!.string() }
+                        client.newCall(actorsRequest).execute().use {
+                            if (!it.isSuccessful) throw IllegalStateException("Actor search returned HTTP ${it.code}")
+                            it.body?.string() ?: throw IllegalStateException("Actor search returned an empty response")
+                        }
                     }
                     withContext(Dispatchers.IO) {
                         json.decodeFromString<SearchActorResponse>(actorsBody)
@@ -106,11 +111,16 @@ class DiscoverViewModel @Inject constructor() : ViewModel() {
                     SearchActorResponse()
                 }
 
-                // The backend indexes documents, not publications, so the
-                // Publications scope reconstructs distinct publications by
-                // grouping results that share an author and origin domain.
                 val publications = if (scope == DiscoverSearchScope.PUBLICATIONS) {
-                    aggregatePublications(searchResponse.results)
+                    searchResponse.results.filter { it.isPublication }.map {
+                        PublicationResult(
+                            name = it.title,
+                            domain = it.uri,
+                            url = it.webURL() ?: "",
+                            did = it.did,
+                            coverImage = it.coverImage,
+                        )
+                    }
                 } else {
                     emptyList()
                 }
@@ -130,24 +140,4 @@ class DiscoverViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    /**
-     * Collapses document search results into distinct publications. Results
-     * from the same author DID and `basePath` (origin domain) are one
-     * publication; the first cover image wins as the publication thumbnail.
-     */
-    private fun aggregatePublications(results: List<SearchResult>): List<PublicationResult> {
-        val grouped = results.groupBy { it.did to (it.basePath ?: "") }
-        return grouped.mapNotNull { (key, items) ->
-            val domain = key.second
-            if (domain.isBlank()) return@mapNotNull null
-            val first = items.first()
-            PublicationResult(
-                name = domain,
-                domain = domain,
-                url = "https://$domain",
-                did = key.first,
-                coverImage = items.firstNotNullOfOrNull { it.coverImage },
-            )
-        }.sortedBy { it.name }
-    }
 }
