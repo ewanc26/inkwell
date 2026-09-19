@@ -32,6 +32,7 @@
           "localizedDescription": "# Inkwell for iOS 2.6.1\n\n- Fixed Writer authentication: the editor now shares the active account session, so signed-in people can load their publications and publish documents.\n",
           "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.6.1.ipa",
           "size": 13022036,
+          "sha256": "5543693fee39880bffb313c0386703847d837546dd4409274051c650d3c72726",
           "buildVersion": "60"
         },
         {
@@ -131,6 +132,7 @@
       "buildVersion": "60",
       "versionDate": "2026-08-29",
       "size": 13022036,
+      "sha256": "5543693fee39880bffb313c0386703847d837546dd4409274051c650d3c72726",
       "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.6.1.ipa"
     }
   ],
