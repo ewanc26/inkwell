@@ -62,7 +62,9 @@
         Your OAuth session and DPoP private key are held in the
         platform's secure storage, not app-readable preferences: Apple's
         Keychain on iOS, and Android's EncryptedSharedPreferences backed
-        by a hardware-backed MasterKey on Android. Signing out or
+        by a hardware-backed MasterKey on Android. Android excludes the
+        OAuth session from backup and device transfer because the Keystore
+        key cannot be restored safely. Signing out or
         uninstalling removes them. Full detail — including backup
         behaviour on each platform — is in the
         <a href="/privacy">Privacy Policy</a>.

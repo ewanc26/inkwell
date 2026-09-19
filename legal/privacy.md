@@ -17,7 +17,7 @@ There are two narrow exceptions, described in sections 7 and 8: the optional in-
 ## 3. Data stored on your device
 
 - **iOS:** Your OAuth session (access and refresh tokens) and the P-256 DPoP private key are stored in Apple’s Keychain, with the `kSecAttrAccessibleAfterFirstUnlock` protection class. Your handle, PDS hints, notification state, reader preferences, and a local record of recently seen record URIs are stored in UserDefaults.
-- **Android:** Your OAuth session is stored in EncryptedSharedPreferences, backed by a hardware-backed MasterKey. Notification state, already-seen record URIs, and preferences are stored in ordinary app-private SharedPreferences.
+- **Android:** Your OAuth session is stored in EncryptedSharedPreferences, backed by a hardware-backed MasterKey, and is explicitly excluded from Android backup and device transfer because its Keystore key cannot be restored safely. Notification state, already-seen record URIs, and preferences are stored in ordinary app-private SharedPreferences.
 
 This data never leaves your device except as part of a device backup (see section 6). Uninstalling the app, or signing out, removes it.
 
@@ -31,7 +31,7 @@ On both iOS and Android, with your permission, Inkwell may show local notificati
 
 ## 6. Backup
 
-The Android build permits Android’s automatic cloud backup of app data, which may include your encrypted OAuth session. You can disable this in your device’s backup settings, or sign out before backing up.
+The Android build permits Android’s automatic cloud backup of non-session app data. The encrypted OAuth session is explicitly excluded from both cloud backup and device transfer because its Keystore key cannot be restored safely.
 
 On iOS, Keychain items are not synchronised to iCloud Keychain, because Inkwell does not mark them as synchronisable. However, because they use the `AfterFirstUnlock` protection class rather than a device-only class, they *can* be included in an encrypted iCloud or Finder backup and restored to a replacement device. Sign out before taking a backup if you do not want that.
 
