@@ -44,6 +44,7 @@ class MainActivity : ComponentActivity() {
 
     private val pendingIntent = mutableStateOf<Intent?>(null)
     private val pendingDocumentUri = mutableStateOf<String?>(null)
+    private var handledOAuthCallback: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,7 +69,11 @@ class MainActivity : ComponentActivity() {
             val intentToHandle = pendingIntent.value ?: intent
             LaunchedEffect(intentToHandle) {
                 intentToHandle?.data?.let { data ->
-                    if (data.scheme == "uk.ewancroft.inkwell" && data.path?.startsWith("/callback") == true) {
+                    val callback = data.toString()
+                    if (OAuthCallbackPolicy.isCallback(data) && callback != handledOAuthCallback) {
+                        handledOAuthCallback = callback
+                        // Consume this delivery before starting the async exchange.
+                        pendingIntent.value = null
                         viewModel.completeLogin(data.toString())
                     }
                 }
@@ -171,4 +176,9 @@ class MainActivity : ComponentActivity() {
         pendingIntent.value = intent
         pendingDocumentUri.value = intent.getStringExtra("documentURI")
     }
+}
+
+internal object OAuthCallbackPolicy {
+    fun isCallback(uri: android.net.Uri): Boolean =
+        uri.scheme == "uk.ewancroft.inkwell" && uri.path == "/callback"
 }
