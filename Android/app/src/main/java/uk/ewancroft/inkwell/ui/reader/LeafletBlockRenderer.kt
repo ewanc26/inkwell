@@ -373,7 +373,16 @@ fun IframeEmbedBlock(block: LeafletBlock) {
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(block.height?.dp ?: 300.dp)
+                .height(block.height?.dp ?: 300.dp),
+            onRelease = { webView ->
+                webView.stopLoading()
+                webView.webChromeClient = null
+                webView.webViewClient = WebViewClient()
+                webView.loadUrl("about:blank")
+                webView.clearHistory()
+                webView.removeAllViews()
+                webView.destroy()
+            }
         )
     }
 }
