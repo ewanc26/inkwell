@@ -36,6 +36,8 @@ import uk.ewancroft.inkwell.ui.navigation.InkwellNavHost
 import uk.ewancroft.inkwell.ui.theme.InkwellTheme
 import uk.ewancroft.inkwell.ui.theme.LocalForceDarkTheme
 import uk.ewancroft.inkwell.util.CustomisationPreferences
+import uk.ewancroft.inkwell.shared.AtUri
+import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 
 import uk.ewancroft.inkwell.util.TipPromptManager
 
@@ -52,7 +54,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         TestingConfig.enabled = intent.getBooleanExtra("testing", false)
         TestingConfig.tab = intent.getStringExtra("tab") ?: "reader"
-        pendingDocumentUri.value = intent.getStringExtra("documentURI")
+        pendingDocumentUri.value = ContentDeepLinkPolicy.documentUri(intent) ?: intent.getStringExtra("documentURI")
         setContent {
             val forceDarkTheme = when (CustomisationPreferences.getAppearanceOverride(this)) {
                 CustomisationPreferences.AppearanceOverride.LIGHT -> false
@@ -174,11 +176,21 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         pendingIntent.value = intent
-        pendingDocumentUri.value = intent.getStringExtra("documentURI")
+        pendingDocumentUri.value = ContentDeepLinkPolicy.documentUri(intent) ?: intent.getStringExtra("documentURI")
     }
 }
 
 internal object OAuthCallbackPolicy {
     fun isCallback(uri: android.net.Uri): Boolean =
         uri.scheme == "uk.ewancroft.inkwell" && uri.path == "/callback"
+}
+
+internal object ContentDeepLinkPolicy {
+    fun documentUri(intent: Intent): String? {
+        val data = intent.data ?: return null
+        if (data.scheme != "inkwell" || data.host != "document") return null
+        val raw = data.getQueryParameter("uri") ?: return null
+        val parsed = AtUri.parse(raw) ?: return null
+        return raw.takeIf { parsed.collection == CollectionNsids.DOCUMENT }
+    }
 }
