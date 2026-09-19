@@ -3,6 +3,7 @@ package uk.ewancroft.inkwell.ui.reader
 import android.content.Intent
 import android.net.Uri
 import android.webkit.WebView
+import android.webkit.WebChromeClient
 import android.webkit.WebViewClient
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -331,6 +332,9 @@ fun WebsiteEmbedBlock(block: LeafletBlock) {
 @Composable
 fun IframeEmbedBlock(block: LeafletBlock) {
     val url = block.url ?: return
+    val parsedUrl = Uri.parse(url)
+    if (!IframeSecurityPolicy.isAllowedInitial(parsedUrl)) return
+    val originHost = parsedUrl.host
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
@@ -338,8 +342,32 @@ fun IframeEmbedBlock(block: LeafletBlock) {
         AndroidView(
             factory = { context ->
                 WebView(context).apply {
-                    webViewClient = WebViewClient()
-                    settings.javaScriptEnabled = true
+                    settings.javaScriptEnabled = false
+                    settings.domStorageEnabled = false
+                    settings.allowFileAccess = false
+                    settings.allowContentAccess = false
+                    settings.allowFileAccessFromFileURLs = false
+                    settings.allowUniversalAccessFromFileURLs = false
+                    settings.mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_NEVER_ALLOW
+                    settings.safeBrowsingEnabled = true
+                    webChromeClient = object : WebChromeClient() {
+                        override fun onCreateWindow(
+                            view: WebView?,
+                            isDialog: Boolean,
+                            isUserGesture: Boolean,
+                            resultMsg: android.os.Message?
+                        ): Boolean = false
+
+                        override fun onPermissionRequest(request: android.webkit.PermissionRequest) {
+                            request.deny()
+                        }
+                    }
+                    webViewClient = object : WebViewClient() {
+                        override fun shouldOverrideUrlLoading(
+                            view: WebView?,
+                            request: android.webkit.WebResourceRequest
+                        ): Boolean = !IframeSecurityPolicy.isAllowedNavigation(originHost, request.url)
+                    }
                     loadUrl(url)
                 }
             },
