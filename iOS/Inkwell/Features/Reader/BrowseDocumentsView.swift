@@ -29,6 +29,7 @@ private struct ReaderProfileRoute: Hashable {
 struct BrowseDocumentsView: View {
     @Environment(LoginStateManager.self) private var loginStateManager
     @Environment(ConnectivityMonitor.self) private var connectivityMonitor
+    @Environment(NotificationNavigationCoordinator.self) private var notificationNavigation
     @State private var notificationManager = NotificationManager.shared
     @State private var store = ReaderFeedStore.shared
 
@@ -107,15 +108,18 @@ struct BrowseDocumentsView: View {
                     // appearance. This is a no-op in that case.
                     await store.loadData(loginStateManager: loginStateManager)
                     notificationManager.markAllAsRead()
+                    consumePendingNotificationDocument()
                 }
-                // Posted by NotificationDelegate when a tapped local
-                // notification names a document — pushes it onto this
-                // tab's own stack rather than replacing whatever's showing.
-                .onReceive(NotificationCenter.default.publisher(for: .inkwellOpenDocument)) { notification in
-                    guard let uri = notification.userInfo?[InkwellDocumentKey.uri] as? String else { return }
-                    path.append(uri)
+                .onChange(of: notificationNavigation.pendingDocumentURI) { _, _ in
+                    consumePendingNotificationDocument()
                 }
         }
+    }
+
+    private func consumePendingNotificationDocument() {
+        guard loginStateManager.isAuthenticated,
+              let uri = notificationNavigation.consumePendingDocumentURI() else { return }
+        path.append(uri)
     }
 
     @ViewBuilder

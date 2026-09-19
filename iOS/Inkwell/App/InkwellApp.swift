@@ -22,6 +22,7 @@ struct InkwellApp: App {
     @State private var splashOpacity: Double = 1.0
     @State private var customisation = CustomisationSettings.shared
     @State private var connectivityMonitor = ConnectivityMonitor()
+    @State private var notificationNavigation = NotificationNavigationCoordinator.shared
 
     var body: some Scene {
         WindowGroup {
@@ -29,6 +30,7 @@ struct InkwellApp: App {
                 ContentView()
                     .environment(loginStateManager)
                     .environment(connectivityMonitor)
+                    .environment(notificationNavigation)
 
                 // Splash overlay — matches UILaunchScreen exactly.
                 // Removed from hierarchy after fade, not just hidden.

@@ -10,6 +10,7 @@ import SwiftUI
 struct ContentView: View {
     @Environment(LoginStateManager.self) private var loginStateManager
     @Environment(ConnectivityMonitor.self) private var connectivityMonitor
+    @Environment(NotificationNavigationCoordinator.self) private var notificationNavigation
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var notificationManager = NotificationManager.shared
@@ -37,6 +38,9 @@ struct ContentView: View {
         .onAppear {
             if let tab = TestingMode.initialTab {
                 selectedTab = tab
+            }
+            if notificationNavigation.pendingDocumentURI != nil {
+                selectedTab = .reader
             }
         }
         .task {
@@ -103,6 +107,10 @@ struct ContentView: View {
                     selectedTab = tab
                 }
             }
+        }
+        .onChange(of: notificationNavigation.pendingDocumentURI) { _, pendingURI in
+            guard pendingURI != nil else { return }
+            selectedTab = .reader
         }
     }
 
