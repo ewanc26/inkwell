@@ -94,20 +94,28 @@ fun SettingsDialog(
     var showMutedBlocked by remember { mutableStateOf(false) }
     var showModerationSettings by remember { mutableStateOf(false) }
     var importMessage by remember { mutableStateOf<String?>(null) }
+    var pendingImportText by remember { mutableStateOf<String?>(null) }
+    var pendingImportCount by remember { mutableStateOf(0) }
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val haptics = rememberInkwellHaptics()
     val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
-        importMessage = runCatching {
+        val text = runCatching {
             context.contentResolver.openInputStream(uri)?.use { input ->
-                ArticleStatePreferences.importJson(context, input.bufferedReader().readText())
+                input.bufferedReader().readText()
             } ?: ArticleStatePreferences.ImportResult.Invalid
-        }.getOrElse { ArticleStatePreferences.ImportResult.Invalid }.let { result ->
-            when (result) {
-                is ArticleStatePreferences.ImportResult.Success -> "Imported ${result.changes} change${if (result.changes == 1) "" else "s"}."
+        }.getOrNull()
+        if (text == null) {
+            importMessage = "This file is not a valid Inkwell reading-data export."
+        } else when (val result = ArticleStatePreferences.previewImportJson(context, text)) {
+            is ArticleStatePreferences.ImportResult.Success -> {
+                pendingImportText = text
+                pendingImportCount = result.changes
+            }
+            else -> importMessage = when (result) {
                 ArticleStatePreferences.ImportResult.UnsupportedVersion -> "This reading-data export uses an unsupported version."
-                ArticleStatePreferences.ImportResult.Invalid -> "This file is not a valid Inkwell reading-data export."
+                else -> "This file is not a valid Inkwell reading-data export."
             }
         }
     }
@@ -567,6 +575,24 @@ fun SettingsDialog(
                             title = { Text("Import Data") },
                             text = { Text(message) },
                             confirmButton = { TextButton(onClick = { importMessage = null }) { Text("OK") } },
+                        )
+                    }
+                    pendingImportText?.let { text ->
+                        AlertDialog(
+                            onDismissRequest = { pendingImportText = null },
+                            title = { Text("Import reading data?") },
+                            text = { Text("${pendingImportCount} change${if (pendingImportCount == 1) "" else "s"} will be imported. Only newer local choices change.") },
+                            confirmButton = {
+                                TextButton(onClick = {
+                                    importMessage = when (val result = ArticleStatePreferences.importJson(context, text)) {
+                                        is ArticleStatePreferences.ImportResult.Success -> "Imported ${result.changes} change${if (result.changes == 1) "" else "s"}."
+                                        ArticleStatePreferences.ImportResult.UnsupportedVersion -> "This reading-data export uses an unsupported version."
+                                        ArticleStatePreferences.ImportResult.Invalid -> "This file is not a valid Inkwell reading-data export."
+                                    }
+                                    pendingImportText = null
+                                }) { Text("Import") }
+                            },
+                            dismissButton = { TextButton(onClick = { pendingImportText = null }) { Text("Cancel") } },
                         )
                     }
 
