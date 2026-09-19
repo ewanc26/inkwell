@@ -35,7 +35,10 @@ private struct InAppLinkHandler: ViewModifier {
     func body(content: Content) -> some View {
         content
             .environment(\.openURL, OpenURLAction { url in
-                guard linkPreferences.openLinksInApp, let scheme = url.scheme,
+                guard Self.isAllowedContentURL(url) else {
+                    return .discarded
+                }
+                guard linkPreferences.openLinksInApp, let scheme = url.scheme?.lowercased(),
                       scheme == "http" || scheme == "https" else {
                     return .systemAction
                 }
@@ -45,6 +48,15 @@ private struct InAppLinkHandler: ViewModifier {
             .sheet(item: $presentedURL) { item in
                 SafariView(url: item.url)
             }
+    }
+
+    private static func isAllowedContentURL(_ url: URL) -> Bool {
+        guard let scheme = url.scheme?.lowercased(),
+              !url.absoluteString.unicodeScalars.contains(where: { $0.properties.isControl }),
+              url.absoluteString == url.absoluteString.trimmingCharacters(in: .whitespacesAndNewlines),
+              ["http", "https", "mailto", "tel"].contains(scheme) else { return false }
+        if scheme == "http" || scheme == "https" { return url.host != nil }
+        return true
     }
 }
 

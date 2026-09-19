@@ -27,12 +27,34 @@ object LinkPreferences {
 
     /** Opens a content link per the current preference, falling back to the system browser on failure. */
     fun openContentUrl(context: Context, url: String) {
+        val parsed = ContentLinkPolicy.parse(url) ?: return
         try {
-            if (getOpenLinksInApp(context)) {
-                CustomTabsIntent.Builder().setShowTitle(true).build().launchUrl(context, Uri.parse(url))
+            if (parsed.scheme == "http" || parsed.scheme == "https") {
+                if (getOpenLinksInApp(context)) {
+                    CustomTabsIntent.Builder().setShowTitle(true).build().launchUrl(context, parsed.uri)
+                } else {
+                    context.startActivity(Intent(Intent.ACTION_VIEW, parsed.uri))
+                }
             } else {
-                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                // mailto/tel are intentionally never opened in a Custom Tab.
+                context.startActivity(Intent(Intent.ACTION_VIEW, parsed.uri))
             }
         } catch (_: Exception) {}
+    }
+}
+
+/** Allowlist for URLs originating in untrusted authored content. */
+internal object ContentLinkPolicy {
+    internal data class Parsed(val uri: Uri, val scheme: String)
+
+    internal fun parse(raw: String): Parsed? {
+        if (raw.any { it.isISOControl() } || raw != raw.trim()) return null
+        val uri = Uri.parse(raw)
+        val scheme = uri.scheme?.lowercase() ?: return null
+        if (scheme !in setOf("http", "https", "mailto", "tel")) return null
+        if (scheme == "http" || scheme == "https") {
+            if (uri.host.isNullOrBlank()) return null
+        }
+        return Parsed(uri, scheme)
     }
 }
