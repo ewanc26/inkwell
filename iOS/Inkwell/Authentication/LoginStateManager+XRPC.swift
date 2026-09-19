@@ -12,6 +12,8 @@ private struct RetryableHTTPError: Error {
     let retryAfter: TimeInterval?
 }
 
+private let maxXRPCResponseBytes = 2 * 1024 * 1024
+
 extension LoginStateManager {
     // MARK: - XRPC Helpers
 
@@ -67,6 +69,10 @@ extension LoginStateManager {
             throw LoginError.httpError(status: status)
         }
 
+        guard data.count <= maxXRPCResponseBytes else {
+            logger.error("[authenticatedData] response exceeded safety budget")
+            throw URLError(.dataLengthExceedsMaximum)
+        }
         return data
     }
 
@@ -113,6 +119,10 @@ extension LoginStateManager {
             throw LoginError.httpError(status: status)
         }
 
+        guard data.count <= maxXRPCResponseBytes else {
+            logger.error("[unauthenticatedData] response exceeded safety budget")
+            throw URLError(.dataLengthExceedsMaximum)
+        }
         return data
     }
 
