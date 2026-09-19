@@ -47,12 +47,12 @@ final class NotificationManager {
     // MARK: - Storage
 
     private let defaults = UserDefaults.standard
-    private let lastSeenKey = "standardSite.lastSeenDocumentURIs"
-    private let initializedPublicationsKey = "standardSite.initializedPublicationURIs"
-    private let lastPollKey = "standardSite.lastPollTime"
-    private let notificationsKey = "standardSite.notifications"
-    private let unreadCountKey = "standardSite.unreadCount"
-    private let notificationsEnabledKey = "standardSite.notificationsEnabled"
+    private let storagePrefix = "standardSite.account."
+    private var activeAccountDID: String?
+
+    private func key(_ name: String, for did: String) -> String {
+        "\(storagePrefix)\(did).\(name)"
+    }
 
     /// User-facing on/off switch, surfaced in SettingsView. Distinct from
     /// the OS permission: this gates whether a *banner* is sent, not
@@ -60,16 +60,28 @@ final class NotificationManager {
     /// badge keep working either way, since they reflect "new documents
     /// exist", not "you were interrupted about them".
     var notificationsEnabled: Bool {
-        get { defaults.object(forKey: notificationsEnabledKey) as? Bool ?? true }
-        set { defaults.set(newValue, forKey: notificationsEnabledKey) }
+        get { activeAccountDID.flatMap { defaults.object(forKey: key("notificationsEnabled", for: $0)) as? Bool } ?? true }
+        set { if let did = activeAccountDID { defaults.set(newValue, forKey: key("notificationsEnabled", for: did)) } }
     }
 
-    private init() {
-        if let data = defaults.data(forKey: notificationsKey),
+    private init() {}
+
+    func activate(accountDID did: String) {
+        guard activeAccountDID != did else { return }
+        activeAccountDID = did
+        if let data = defaults.data(forKey: key("notifications", for: did)),
            let stored = try? JSONDecoder().decode([StandardSiteNotification].self, from: data) {
             notifications = stored
+        } else {
+            notifications = []
         }
-        unreadCount = defaults.integer(forKey: unreadCountKey)
+        unreadCount = defaults.integer(forKey: key("unreadCount", for: did))
+    }
+
+    func deactivate() {
+        activeAccountDID = nil
+        notifications = []
+        unreadCount = 0
     }
 
     // MARK: - Permission
@@ -99,8 +111,10 @@ final class NotificationManager {
     /// in a second banner when the next refresh runs.
     func recordLiveDocument(
         _ document: DocumentEntry,
-        publication: PublicationEntry?
+        publication: PublicationEntry?,
+        accountDID: String
     ) async {
+        activate(accountDID: accountDID)
         var seen = lastSeenURIs
         guard !seen.contains(document.uri) else { return }
 
@@ -118,7 +132,7 @@ final class NotificationManager {
         if let publicationURI = publication?.uri {
             saveInitializedPublications(self.initializedPublications().union([publicationURI]))
         }
-        defaults.set(Date(), forKey: lastPollKey)
+        if let did = activeAccountDID { defaults.set(Date(), forKey: key("lastPollTime", for: did)) }
     }
 
     /// Polls subscribed publications for new documents and sends local
@@ -126,7 +140,11 @@ final class NotificationManager {
     ///
     /// - Parameter loginStateManager: The authenticated session manager.
     func pollForNewDocuments(loginStateManager: LoginStateManager) async {
-        guard loginStateManager.isAuthenticated else { return }
+        guard loginStateManager.isAuthenticated, let accountDID = loginStateManager.currentDID else {
+            deactivate()
+            return
+        }
+        activate(accountDID: accountDID)
 
         // Every fetch below uses try? so a DPoP nonce collision (e.g.
         // BrowseDocumentsView racing the same fetchSubscriptions call)
@@ -195,7 +213,7 @@ final class NotificationManager {
         // Update last-seen URIs and poll time.
         saveLastSeenURIs(allSeenURIs)
         saveInitializedPublications(initializedPublications)
-        defaults.set(Date(), forKey: lastPollKey)
+        if let did = activeAccountDID { defaults.set(Date(), forKey: key("lastPollTime", for: did)) }
     }
 
     // MARK: - Delivery
@@ -207,7 +225,8 @@ final class NotificationManager {
 
         // Only send notifications if this isn't the first poll (first
         // poll just establishes the baseline of existing documents).
-        let lastPoll = defaults.object(forKey: lastPollKey) as? Date
+        guard let did = activeAccountDID else { return }
+        let lastPoll = defaults.object(forKey: key("lastPollTime", for: did)) as? Date
         let isFirstPoll = isFirstPoll(lastPollEpochMillis: Int64(lastPoll?.timeIntervalSince1970 ?? -1))
 
         if !isFirstPoll {
@@ -295,27 +314,29 @@ final class NotificationManager {
     }
 
     private var lastSeenURIs: Set<String> {
-        Set(defaults.stringArray(forKey: lastSeenKey) ?? [])
+        guard let did = activeAccountDID else { return [] }
+        return Set(defaults.stringArray(forKey: key("lastSeenDocumentURIs", for: did)) ?? [])
     }
 
     private func saveLastSeenURIs(_ uris: Set<String>) {
         let limited = trimSeenUris(Array(uris))
-        defaults.set(limited, forKey: lastSeenKey)
+        if let did = activeAccountDID { defaults.set(limited, forKey: key("lastSeenDocumentURIs", for: did)) }
     }
 
     private func initializedPublications() -> Set<String> {
-        Set(defaults.stringArray(forKey: initializedPublicationsKey) ?? [])
+        guard let did = activeAccountDID else { return [] }
+        return Set(defaults.stringArray(forKey: key("initializedPublicationURIs", for: did)) ?? [])
     }
 
     private func saveInitializedPublications(_ uris: Set<String>) {
-        defaults.set(Array(uris), forKey: initializedPublicationsKey)
+        if let did = activeAccountDID { defaults.set(Array(uris), forKey: key("initializedPublicationURIs", for: did)) }
     }
 
     private func persistNotifications() {
         if let data = try? JSONEncoder().encode(notifications) {
-            defaults.set(data, forKey: notificationsKey)
+            if let did = activeAccountDID { defaults.set(data, forKey: key("notifications", for: did)) }
         }
-        defaults.set(unreadCount, forKey: unreadCountKey)
+        if let did = activeAccountDID { defaults.set(unreadCount, forKey: key("unreadCount", for: did)) }
     }
 }
 

@@ -320,10 +320,13 @@ final class ReaderFeedStore {
                         publication: publication,
                         isCached: false
                     ).document
-                    await NotificationManager.shared.recordLiveDocument(
-                        document,
-                        publication: publication
-                    )
+                    if let accountDID = loginStateManager.currentDID {
+                        await NotificationManager.shared.recordLiveDocument(
+                            document,
+                            publication: publication,
+                            accountDID: accountDID
+                        )
+                    }
                 }
                 let cachedItemForStorage = cachedItem.map {
                     $0.toReaderFeedItem(publication: publication, isCached: false).toCachedFeedItem()
