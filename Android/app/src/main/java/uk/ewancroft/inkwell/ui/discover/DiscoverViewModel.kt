@@ -4,12 +4,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import uk.ewancroft.inkwell.data.model.common.SearchActorResponse
@@ -18,6 +24,7 @@ import uk.ewancroft.inkwell.data.model.common.SearchResponse
 import uk.ewancroft.inkwell.data.model.common.SearchResult
 import uk.ewancroft.inkwell.data.model.common.PublicationResult
 import uk.ewancroft.inkwell.shared.content.SearchBackendUrl
+import uk.ewancroft.inkwell.data.repository.PdsRepository
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -39,7 +46,9 @@ data class DiscoverUiState(
 )
 
 @HiltViewModel
-class DiscoverViewModel @Inject constructor() : ViewModel() {
+class DiscoverViewModel @Inject constructor(
+    private val pdsRepository: PdsRepository,
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DiscoverUiState())
     val uiState: StateFlow<DiscoverUiState> = _uiState.asStateFlow()
@@ -112,15 +121,26 @@ class DiscoverViewModel @Inject constructor() : ViewModel() {
                 }
 
                 val publications = if (scope == DiscoverSearchScope.PUBLICATIONS) {
-                    searchResponse.results.filter { it.isPublication }.map {
-                        PublicationResult(
-                            uri = it.uri,
-                            name = it.title,
-                            domain = it.uri,
-                            url = it.webURL() ?: "",
-                            did = it.did,
-                            coverImage = it.coverImage,
-                        )
+                    coroutineScope {
+                        searchResponse.results.filter { it.isPublication }.map { result ->
+                            async(Dispatchers.IO) {
+                                runCatching {
+                                    val value = pdsRepository.getRecord(result.uri)["value"]?.jsonObject
+                                        ?: return@runCatching null
+                                    val url = value["url"]?.jsonPrimitive?.contentOrNull
+                                        ?: return@runCatching null
+                                    PublicationResult(
+                                        uri = result.uri,
+                                        name = value["name"]?.jsonPrimitive?.contentOrNull ?: result.title,
+                                        domain = url,
+                                        url = url,
+                                        did = result.did,
+                                        coverImage = value["icon"]?.jsonPrimitive?.contentOrNull
+                                            ?: result.coverImage,
+                                    )
+                                }.getOrNull()
+                            }
+                        }.awaitAll().filterNotNull()
                     }
                 } else {
                     emptyList()
