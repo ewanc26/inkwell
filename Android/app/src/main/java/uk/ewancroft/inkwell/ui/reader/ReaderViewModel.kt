@@ -700,6 +700,9 @@ class ReaderViewModel @Inject constructor(
                             followingPosts = currentPosts.filter { it.uri != deletedUri }
                         )
                         feedCache.remove(deletedUri)
+                        // A deleted record must not reappear through the
+                        // detail screen's offline fallback.
+                        offlineContentCache.remove(deletedUri)
                     }
                 }
         }
