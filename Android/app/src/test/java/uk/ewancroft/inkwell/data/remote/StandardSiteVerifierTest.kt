@@ -4,6 +4,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import java.util.concurrent.atomic.AtomicInteger
 import org.junit.Test
 import uk.ewancroft.inkwell.data.model.atproto.DocumentRecord
 import uk.ewancroft.inkwell.data.model.atproto.PublicationRecord
@@ -12,13 +13,8 @@ import uk.ewancroft.inkwell.shared.verification.VerificationResult
 import uk.ewancroft.inkwell.shared.verification.VerificationUrls
 
 /**
- * Unit and (network-dependent) integration tests for [StandardSiteVerifier].
- *
- * The `live*` tests hit `https://blog.ewancroft.uk`, a real standard.site publication
- * (Ewan Croft's blog — the app author's own site) confirmed by hand to serve a working
- * `.well-known/site.standard.publication` endpoint and per-document `<link
- * rel="site.standard.document">` tags. They require network access; everything else here
- * is pure logic and needs none.
+ * Hermetic unit tests for URL construction and verification outcomes. Network I/O is
+ * supplied by a small fake transport so this suite is safe to run offline.
  */
 class StandardSiteVerifierTest {
 
@@ -122,12 +118,13 @@ class StandardSiteVerifierTest {
     }
 
     @Test
-    fun `verifyPublication fails with EndpointUnreachable for a domain that does not exist`() = runBlocking {
+    fun `verifyPublication maps a non-success response`() = runBlocking {
         val publication = PublicationRecord(
-            url = "https://this-domain-should-not-resolve-inkwell-verify-test.invalid",
+            url = "https://example.com",
             name = "Example",
         )
-        val result = StandardSiteVerifier.verifyPublication(
+        val verifier = SiteVerifier { VerificationHttpResponse(503, "busy") }
+        val result = verifier.verifyPublication(
             publicationURI = "at://did:plc:alice/site.standard.publication/3pub",
             publication = publication,
         )
@@ -135,24 +132,22 @@ class StandardSiteVerifierTest {
         assertTrue((result as VerificationResult.Failed).failure is VerificationFailure.EndpointUnreachable)
     }
 
-    // ── Live network checks against a real standard.site publication ───
-
     @Test
-    fun `live verifyPublication succeeds for the real blog-ewancroft-uk publication`() = runBlocking {
-        // Confirmed by hand: https://blog.ewancroft.uk/.well-known/site.standard.publication
-        // returns exactly this AT-URI.
+    fun `verifyPublication accepts an exact endpoint response`() = runBlocking {
         val publicationURI = "at://did:plc:ofrbh253gwicbkc5nktqepol/site.standard.publication/3m3x4bgbsh22k"
-        val publication = PublicationRecord(url = "https://blog.ewancroft.uk", name = "Ewan's Blog")
+        val publication = PublicationRecord(url = "https://example.com", name = "Example")
+        val verifier = SiteVerifier { VerificationHttpResponse(200, publicationURI) }
 
-        val result = StandardSiteVerifier.verifyPublication(publicationURI, publication)
+        val result = verifier.verifyPublication(publicationURI, publication)
         assertEquals(VerificationResult.Verified, result)
     }
 
     @Test
-    fun `live verifyPublication reports MismatchedURI for the wrong AT-URI`() = runBlocking {
-        val publication = PublicationRecord(url = "https://blog.ewancroft.uk", name = "Ewan's Blog")
+    fun `verifyPublication reports a mismatched endpoint response`() = runBlocking {
+        val publication = PublicationRecord(url = "https://example.com", name = "Example")
+        val verifier = SiteVerifier { VerificationHttpResponse(200, "at://wrong") }
 
-        val result = StandardSiteVerifier.verifyPublication(
+        val result = verifier.verifyPublication(
             publicationURI = "at://did:plc:someoneelse/site.standard.publication/notreal",
             publication = publication,
         )
@@ -161,8 +156,8 @@ class StandardSiteVerifierTest {
     }
 
     @Test
-    fun `live verifyDocument succeeds for a real published document`() = runBlocking {
-        val publication = PublicationRecord(url = "https://blog.ewancroft.uk", name = "Ewan's Blog")
+    fun `verifyDocument accepts a matching discovery link`() = runBlocking {
+        val publication = PublicationRecord(url = "https://example.com", name = "Example")
         val documentURI = "at://did:plc:ofrbh253gwicbkc5nktqepol/site.standard.document/3msjlh4nqfc2l"
         val document = DocumentRecord(
             site = "at://did:plc:ofrbh253gwicbkc5nktqepol/site.standard.publication/3m3x4bgbsh22k",
@@ -171,7 +166,25 @@ class StandardSiteVerifierTest {
             path = "/3msjlh4nqfc2l",
         )
 
-        val result = StandardSiteVerifier.verifyDocument(documentURI, document, publication)
+        val html = "<link rel=\"site.standard.document\" href=\"$documentURI\">"
+        val verifier = SiteVerifier { VerificationHttpResponse(200, html) }
+        val result = verifier.verifyDocument(documentURI, document, publication)
         assertEquals(VerificationResult.Verified, result)
+    }
+
+    @Test
+    fun `document cache does not reuse verification for changed record inputs`() = runBlocking {
+        val documentURI = "at://did:plc:alice/site.standard.document/same"
+        val first = DocumentRecord(site = "https://example.com", title = "First", path = "/first")
+        val second = first.copy(path = "/second")
+        val calls = AtomicInteger(0)
+        val verifier = SiteVerifier {
+            calls.incrementAndGet()
+            VerificationHttpResponse(200, "<link rel=\"site.standard.document\" href=\"$documentURI\">")
+        }
+
+        assertEquals(VerificationResult.Verified, verifier.verifyDocument(documentURI, first))
+        assertEquals(VerificationResult.Verified, verifier.verifyDocument(documentURI, second))
+        assertEquals(2, calls.get())
     }
 }

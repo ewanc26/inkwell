@@ -41,12 +41,29 @@ private data class CachedVerification(
 
 private const val CACHE_TTL_MS = 5 * 60 * 1000
 
-object StandardSiteVerifier {
+internal data class VerificationHttpResponse(val statusCode: Int, val body: String?)
 
+internal fun interface VerificationHttpClient {
+    fun get(url: HttpUrl): VerificationHttpResponse
+}
+
+private class OkHttpVerificationClient : VerificationHttpClient {
     private val client = OkHttpClient.Builder()
         .connectTimeout(10, TimeUnit.SECONDS)
         .readTimeout(10, TimeUnit.SECONDS)
         .build()
+
+    override fun get(url: HttpUrl): VerificationHttpResponse {
+        val request = Request.Builder().url(url).get().build()
+        return client.newCall(request).execute().use { response ->
+            VerificationHttpResponse(response.code, response.body?.string())
+        }
+    }
+}
+
+internal open class SiteVerifier(
+    private val httpClient: VerificationHttpClient = OkHttpVerificationClient(),
+) {
 
     private val publicationCache = mutableMapOf<String, CachedVerification>()
     private val documentCache = mutableMapOf<String, CachedVerification>()
@@ -54,6 +71,21 @@ object StandardSiteVerifier {
 
     private fun isCacheValid(timestamp: Long): Boolean =
         (System.currentTimeMillis() - timestamp) < CACHE_TTL_MS
+
+    private fun publicationCacheKey(uri: String, publication: PublicationRecord): String =
+        listOf(uri, publication.url, publication.name).joinToString("\u001f")
+
+    private fun documentCacheKey(
+        uri: String,
+        document: DocumentRecord,
+        publication: PublicationRecord?,
+    ): String = listOf(
+        uri,
+        document.site,
+        document.path,
+        publication?.url.orEmpty(),
+        publication?.name.orEmpty(),
+    ).joinToString("\u001f")
 
     fun publicationVerificationUrl(publicationUrl: String): HttpUrl? {
         return VerificationUrls.publicationVerificationUrl(publicationUrl)?.toHttpUrlOrNull()
@@ -72,8 +104,9 @@ object StandardSiteVerifier {
         publicationURI: String,
         publication: PublicationRecord,
     ): VerificationResult = withContext(Dispatchers.IO) {
+        val cacheKey = publicationCacheKey(publicationURI, publication)
         mutex.withLock {
-            publicationCache[publicationURI]?.let { cached ->
+            publicationCache[cacheKey]?.let { cached ->
                 if (isCacheValid(cached.timestamp)) return@withContext cached.result
             }
         }
@@ -85,15 +118,14 @@ object StandardSiteVerifier {
                 )
 
             try {
-                val request = Request.Builder().url(endpoint).get().build()
-                client.newCall(request).execute().use { response ->
-                    if (!response.isSuccessful) {
+                val response = httpClient.get(endpoint)
+                    .also { if (it.statusCode !in 200..299) {
                         return@withContext VerificationResult.Failed(
-                            VerificationFailure.EndpointUnreachable(response.code)
+                            VerificationFailure.EndpointUnreachable(it.statusCode)
                         )
-                    }
+                    } }
 
-                    val body = response.body?.string()?.trim()
+                    val body = response.body?.trim()
                     if (body.isNullOrEmpty() || !body.startsWith("at://")) {
                         return@withContext VerificationResult.Failed(VerificationFailure.MalformedResponse)
                     }
@@ -114,7 +146,7 @@ object StandardSiteVerifier {
         }.getOrElse { VerificationResult.Failed(VerificationFailure.Unexpected(it.message)) }
 
         mutex.withLock {
-            publicationCache[publicationURI] = CachedVerification(result, System.currentTimeMillis())
+            publicationCache[cacheKey] = CachedVerification(result, System.currentTimeMillis())
         }
         result
     }
@@ -124,8 +156,9 @@ object StandardSiteVerifier {
         document: DocumentRecord,
         publication: PublicationRecord? = null,
     ): VerificationResult = withContext(Dispatchers.IO) {
+        val cacheKey = documentCacheKey(documentURI, document, publication)
         mutex.withLock {
-            documentCache[documentURI]?.let { cached ->
+            documentCache[cacheKey]?.let { cached ->
                 if (isCacheValid(cached.timestamp)) return@withContext cached.result
             }
         }
@@ -137,15 +170,14 @@ object StandardSiteVerifier {
                 )
 
             try {
-                val request = Request.Builder().url(url).get().build()
-                client.newCall(request).execute().use { response ->
-                    if (!response.isSuccessful) {
+                val response = httpClient.get(url)
+                    .also { if (it.statusCode !in 200..299) {
                         return@withContext VerificationResult.Failed(
-                            VerificationFailure.EndpointUnreachable(response.code)
+                            VerificationFailure.EndpointUnreachable(it.statusCode)
                         )
-                    }
+                    } }
 
-                    val html = response.body?.string()
+                    val html = response.body
                     if (html.isNullOrEmpty()) {
                         return@withContext VerificationResult.Failed(VerificationFailure.MalformedResponse)
                     }
@@ -166,7 +198,7 @@ object StandardSiteVerifier {
         }.getOrElse { VerificationResult.Failed(VerificationFailure.Unexpected(it.message)) }
 
         mutex.withLock {
-            documentCache[documentURI] = CachedVerification(result, System.currentTimeMillis())
+            documentCache[cacheKey] = CachedVerification(result, System.currentTimeMillis())
         }
         result
     }
@@ -174,3 +206,6 @@ object StandardSiteVerifier {
     fun discoveryLinkTag(forRecordUri: String, relation: String): String =
         VerificationUrls.discoveryLinkTag(forRecordUri, relation)
 }
+
+/** Production singleton used by the app. Tests can instantiate [SiteVerifier] with a fake transport. */
+object StandardSiteVerifier : SiteVerifier()
