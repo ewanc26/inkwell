@@ -46,6 +46,7 @@ final class NotificationManager {
 
     private let defaults = UserDefaults.standard
     private let lastSeenKey = "standardSite.lastSeenDocumentURIs"
+    private let initializedPublicationsKey = "standardSite.initializedPublicationURIs"
     private let lastPollKey = "standardSite.lastPollTime"
     private let notificationsKey = "standardSite.notifications"
     private let unreadCountKey = "standardSite.unreadCount"
@@ -104,6 +105,9 @@ final class NotificationManager {
         await recordNewDocuments([(doc: document, pub: publication)])
         seen.insert(document.uri)
         saveLastSeenURIs(seen)
+        if let publicationURI = publication?.uri {
+            saveInitializedPublications(initializedPublications.union([publicationURI]))
+        }
         defaults.set(Date(), forKey: lastPollKey)
     }
 
@@ -122,6 +126,7 @@ final class NotificationManager {
         let subs = (try? await loginStateManager.fetchSubscriptions()) ?? []
         var newDocs: [(doc: DocumentEntry, pub: PublicationEntry?)] = []
         var allSeenURIs = Set<String>(lastSeenURIs)
+        var initializedPublications = initializedPublications()
 
         for sub in subs {
             guard let pubURI = sub.publicationURI else { continue }
@@ -131,7 +136,13 @@ final class NotificationManager {
             let pubEntry = pubs.first(where: { $0.uri == sub.record.publication })
 
             // Fetch documents from the publication author's repo.
-            let docs: [DocumentEntry] = (try? await loginStateManager.fetchDocuments(fromDID: pubURI.did)) ?? []
+            guard let docs = try? await loginStateManager.fetchDocuments(fromDID: pubURI.did) else {
+                // A failed scan is not an empty repository. Leave this
+                // publication's checkpoint untouched for a later retry.
+                continue
+            }
+            let publicationURI = "at://\(pubURI.did)/\(pubURI.collection)/\(pubURI.recordKey)"
+            let wasInitialized = initializedPublications.contains(publicationURI)
 
             // Filter documents that belong to this publication.
             let pubDocs: [DocumentEntry]
@@ -150,16 +161,22 @@ final class NotificationManager {
             // Find documents we haven't seen before.
             for doc in pubDocs {
                 if !allSeenURIs.contains(doc.uri) {
-                    newDocs.append((doc, pubEntry))
+                    if wasInitialized {
+                        newDocs.append((doc, pubEntry))
+                    }
                     allSeenURIs.insert(doc.uri)
                 }
             }
+            // A successful empty scan is still authoritative and establishes
+            // a baseline for newly added subscriptions.
+            initializedPublications.insert(publicationURI)
         }
 
         await recordNewDocuments(newDocs)
 
         // Update last-seen URIs and poll time.
         saveLastSeenURIs(allSeenURIs)
+        saveInitializedPublications(initializedPublications)
         defaults.set(Date(), forKey: lastPollKey)
     }
 
@@ -266,6 +283,14 @@ final class NotificationManager {
     private func saveLastSeenURIs(_ uris: Set<String>) {
         let limited = trimSeenUris(Array(uris))
         defaults.set(limited, forKey: lastSeenKey)
+    }
+
+    private func initializedPublications() -> Set<String> {
+        Set(defaults.stringArray(forKey: initializedPublicationsKey) ?? [])
+    }
+
+    private func saveInitializedPublications(_ uris: Set<String>) {
+        defaults.set(Array(uris), forKey: initializedPublicationsKey)
     }
 
     private func persistNotifications() {
