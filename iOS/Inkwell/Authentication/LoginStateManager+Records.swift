@@ -62,7 +62,7 @@ extension LoginStateManager {
     }
 
     /// Deletes an AT Protocol record from the user's repository.
-    func deleteRecord(collection: String, recordKey: String) async throws {
+    func deleteRecord(collection: String, recordKey: String, swapRecord: String? = nil) async throws {
         if TestingMode.isEnabled {
             TestingModeNotice.shared.report("Delete \(collection) record")
             throw LoginError.testingMode
@@ -75,14 +75,15 @@ extension LoginStateManager {
             let repo: String
             let collection: String
             let rkey: String
+            let swapRecord: String?
 
             enum CodingKeys: String, CodingKey {
-                case repo, collection, rkey
+                case repo, collection, rkey, swapRecord
             }
         }
 
         let bodyData = try JSONEncoder().encode(
-            DeleteRecordBody(repo: did, collection: collection, rkey: recordKey)
+            DeleteRecordBody(repo: did, collection: collection, rkey: recordKey, swapRecord: swapRecord)
         )
 
         _ = try await authenticatedData(
