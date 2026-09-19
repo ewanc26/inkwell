@@ -38,7 +38,7 @@
   <h2>3. Data stored on your device</h2>
   <ul>
     <li><strong>iOS:</strong> Your OAuth session (access and refresh tokens) and the P-256 DPoP private key are stored in Apple’s Keychain, with the <code>kSecAttrAccessibleAfterFirstUnlock</code> protection class. Your handle, PDS hints, notification state, reader preferences, and a local record of recently seen record URIs are stored in UserDefaults.</li>
-    <li><strong>Android:</strong> Your OAuth session is stored in EncryptedSharedPreferences, backed by a hardware-backed MasterKey. Notification state, already-seen record URIs, and preferences are stored in ordinary app-private SharedPreferences.</li>
+    <li><strong>Android:</strong> Your OAuth session is stored in EncryptedSharedPreferences, backed by a hardware-backed MasterKey, and is explicitly excluded from Android backup and device transfer because its Keystore key cannot be restored safely. Notification state, already-seen record URIs, and preferences are stored in ordinary app-private SharedPreferences.</li>
   </ul>
   <p>This data never leaves your device except as part of a device backup (see section 6). Uninstalling the app, or signing out, removes it.</p>
   <h2>4. Authentication</h2>
@@ -46,7 +46,7 @@
   <h2>5. Notifications</h2>
   <p>On both iOS and Android, with your permission, Inkwell may show local notifications when a publication you subscribe to publishes a new document. Notifications are generated on-device by periodic background polling — background app refresh on iOS, WorkManager on Android. Inkwell does not use Apple Push Notification service, Firebase Cloud Messaging, or any other push provider, and no notification data is sent to the developer. Notification state and already-seen URIs are stored locally and pruned automatically.</p>
   <h2>6. Backup</h2>
-  <p>The Android build permits Android’s automatic cloud backup of app data, which may include your encrypted OAuth session. You can disable this in your device’s backup settings, or sign out before backing up.</p>
+  <p>The Android build permits Android’s automatic cloud backup of non-session app data. The encrypted OAuth session is explicitly excluded from both cloud backup and device transfer because its Keystore key cannot be restored safely.</p>
   <p>On iOS, Keychain items are not synchronised to iCloud Keychain, because Inkwell does not mark them as synchronisable. However, because they use the <code>AfterFirstUnlock</code> protection class rather than a device-only class, they <em>can</em> be included in an encrypted iCloud or Finder backup and restored to a replacement device. Sign out before taking a backup if you do not want that.</p>
   <h2>7. In-app feedback (optional)</h2>
   <p>If you use the “Send Feedback” feature, Inkwell creates an <code>app.userinput.discussion</code> record <strong>in your own repository</strong>, pointing at Inkwell’s feedback space on <a href="https://userinput.app">userinput.app</a>, which is operated by the developer. That record is public: it contains the title and body you wrote, the time you wrote it, and is attributable to your DID and handle. It is visible to anyone on the AT Protocol network and may be mirrored by third-party indexes and relays outside the developer’s control.</p>

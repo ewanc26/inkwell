@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- The Keystore key is not restorable with the encrypted session. -->
+    <exclude domain="sharedpref" path="inkwell_oauth_session.xml" />
+</full-backup-content>
