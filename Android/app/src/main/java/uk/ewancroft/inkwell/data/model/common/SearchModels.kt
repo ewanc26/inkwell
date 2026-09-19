@@ -54,6 +54,7 @@ data class SearchResponse(
  * and `basePath` (the publication's origin domain).
  */
 data class PublicationResult(
+    val uri: String,
     val name: String,
     val domain: String,
     val url: String,

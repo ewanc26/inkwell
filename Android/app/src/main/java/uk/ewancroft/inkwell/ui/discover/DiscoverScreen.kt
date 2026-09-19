@@ -169,7 +169,7 @@ fun DiscoverScreen(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     Spacer(Modifier.height(4.dp))
                                 }
-                                items(uiState.publications, key = { it.domain }) { publication ->
+                                items(uiState.publications, key = { it.uri }) { publication ->
                                     PublicationSearchRow(
                                         publication = publication,
                                         onClick = { openWebUrl(context, publication.url) },

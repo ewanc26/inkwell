@@ -114,6 +114,7 @@ class DiscoverViewModel @Inject constructor() : ViewModel() {
                 val publications = if (scope == DiscoverSearchScope.PUBLICATIONS) {
                     searchResponse.results.filter { it.isPublication }.map {
                         PublicationResult(
+                            uri = it.uri,
                             name = it.title,
                             domain = it.uri,
                             url = it.webURL() ?: "",

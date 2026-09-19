@@ -161,6 +161,7 @@ struct DiscoverView: View {
                 actors = []
                 publications = response.results.filter { $0.isPublication }.map { result in
                     PublicationResult(
+                        uri: result.uri,
                         name: result.title,
                         domain: result.uri,
                         url: result.webURL,
