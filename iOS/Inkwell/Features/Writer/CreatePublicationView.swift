@@ -16,6 +16,7 @@ struct CreatePublicationView: View {
     @State private var name = ""
     @State private var description = ""
     @State private var isCreating = false
+    @State private var validationError: String?
 
     var body: some View {
         NavigationStack {
@@ -31,6 +32,9 @@ struct CreatePublicationView: View {
                         .lineLimit(2...4)
                 } footer: {
                     Text("The site this publication lives at. You'll verify ownership of the domain before publishing to it.")
+                    if let validationError {
+                        Text(validationError).foregroundStyle(.red)
+                    }
                 }
             }
             .navigationTitle("New Publication")
@@ -55,6 +59,16 @@ struct CreatePublicationView: View {
         }
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedDesc = description.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if let error = StandardSiteInputValidation.firstPublicationError(
+            url: trimmedURL,
+            name: trimmedName,
+            description: trimmedDesc.isEmpty ? nil : trimmedDesc
+        ) {
+            validationError = error
+            isCreating = false
+            return
+        }
 
         onCreate(trimmedURL, trimmedName, trimmedDesc.isEmpty ? nil : trimmedDesc)
         isCreating = false

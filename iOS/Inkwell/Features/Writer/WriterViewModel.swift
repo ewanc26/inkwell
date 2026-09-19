@@ -238,6 +238,16 @@ final class WriterViewModel {
             return
         }
 
+        if let validationError = StandardSiteInputValidation.firstDocumentError(
+            site: pub.uri,
+            title: title,
+            description: description.isEmpty ? nil : description,
+            path: path.isEmpty ? nil : path
+        ) {
+            publishError = validationError
+            return
+        }
+
         guard verifiedPublicationURI == pub.uri else {
             publishError = "Verify the publication domain before publishing."
             return
