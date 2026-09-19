@@ -6,6 +6,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import java.util.concurrent.atomic.AtomicInteger
 import org.junit.Test
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import uk.ewancroft.inkwell.data.model.atproto.DocumentRecord
 import uk.ewancroft.inkwell.data.model.atproto.PublicationRecord
 import uk.ewancroft.inkwell.shared.verification.VerificationFailure
@@ -17,6 +18,13 @@ import uk.ewancroft.inkwell.shared.verification.VerificationUrls
  * supplied by a small fake transport so this suite is safe to run offline.
  */
 class StandardSiteVerifierTest {
+
+    @Test
+    fun `verification target policy rejects local hosts`() {
+        assertTrue(!VerificationTargetPolicy.isSafe("https://localhost/document".toHttpUrl()))
+        assertTrue(!VerificationTargetPolicy.isSafe("https://127.0.0.1/document".toHttpUrl()))
+        assertTrue(!VerificationTargetPolicy.isSafe("https://192.168.1.10/document".toHttpUrl()))
+    }
 
     // ── publicationVerificationUrl ──────────────────────────────────────
 

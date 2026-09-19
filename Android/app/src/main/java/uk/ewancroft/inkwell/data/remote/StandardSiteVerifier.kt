@@ -23,6 +23,7 @@ import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.net.InetAddress
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.sync.Mutex
@@ -40,6 +41,7 @@ private data class CachedVerification(
 )
 
 private const val CACHE_TTL_MS = 5 * 60 * 1000
+private const val MAX_VERIFICATION_BODY_BYTES = 256 * 1024L
 
 internal data class VerificationHttpResponse(val statusCode: Int, val body: String?)
 
@@ -51,13 +53,43 @@ private class OkHttpVerificationClient : VerificationHttpClient {
     private val client = OkHttpClient.Builder()
         .connectTimeout(10, TimeUnit.SECONDS)
         .readTimeout(10, TimeUnit.SECONDS)
+        .followRedirects(false)
+        .followSslRedirects(false)
         .build()
 
     override fun get(url: HttpUrl): VerificationHttpResponse {
+        if (!VerificationTargetPolicy.isSafe(url)) {
+            throw IOException("verification target is not a public web host")
+        }
         val request = Request.Builder().url(url).get().build()
         return client.newCall(request).execute().use { response ->
-            VerificationHttpResponse(response.code, response.body?.string())
+            val body = response.body?.let {
+                if (it.contentLength() > MAX_VERIFICATION_BODY_BYTES) {
+                    throw IOException("verification response exceeds size limit")
+                }
+                val bytes = it.source().readByteArray(MAX_VERIFICATION_BODY_BYTES + 1)
+                if (bytes.size.toLong() > MAX_VERIFICATION_BODY_BYTES) {
+                    throw IOException("verification response exceeds size limit")
+                }
+                bytes.toString(Charsets.UTF_8)
+            }
+            VerificationHttpResponse(response.code, body)
         }
+    }
+}
+
+internal object VerificationTargetPolicy {
+    fun isSafe(url: HttpUrl): Boolean {
+        val host = url.host.lowercase()
+        if (host == "localhost" || host.endsWith(".localhost") || host.endsWith(".local")) return false
+        return runCatching {
+            InetAddress.getAllByName(host).all { address ->
+                !address.isAnyLocalAddress &&
+                    !address.isLoopbackAddress &&
+                    !address.isLinkLocalAddress &&
+                    !address.isSiteLocalAddress
+            }
+        }.getOrDefault(false)
     }
 }
 
