@@ -32,6 +32,13 @@ struct IframeBlockView: UIViewRepresentable {
 
     func updateUIView(_ webView: WKWebView, context: Context) {}
 
+    func dismantleUIView(_ webView: WKWebView, coordinator: Coordinator) {
+        webView.stopLoading()
+        webView.navigationDelegate = nil
+        webView.uiDelegate = nil
+        webView.loadHTMLString("", baseURL: nil)
+    }
+
     func makeCoordinator() -> Coordinator { Coordinator(allowedHost: url.host) }
 
     class Coordinator: NSObject, WKNavigationDelegate, WKUIDelegate {
