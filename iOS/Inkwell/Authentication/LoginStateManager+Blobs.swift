@@ -59,6 +59,7 @@ extension LoginStateManager {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue(mimeType, forHTTPHeaderField: "Content-Type")
+        request.setValue(String(data.count), forHTTPHeaderField: "Content-Length")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.httpBody = data
 
@@ -70,6 +71,12 @@ extension LoginStateManager {
             throw LoginError.httpError(status: status)
         }
 
-        return try JSONDecoder().decode(ComAtprotoLexicon.Repository.UploadBlobOutput.self, from: responseData)
+        let blob = try JSONDecoder().decode(ComAtprotoLexicon.Repository.UploadBlobOutput.self, from: responseData)
+        guard blob.size == data.count,
+              blob.mimeType == mimeType,
+              !blob.reference.link.isEmpty else {
+            throw LoginError.httpError(status: 0)
+        }
+        return blob
     }
 }
