@@ -88,7 +88,6 @@ class PdsRepository @Inject constructor(
                     val until = System.currentTimeMillis() + delayMs
                     rateLimitCooldowns[origin] = maxOf(rateLimitCooldowns[origin] ?: 0L, until)
                 }
-                delay(delayMs)
                 attempt += 1
                 continue
             }
