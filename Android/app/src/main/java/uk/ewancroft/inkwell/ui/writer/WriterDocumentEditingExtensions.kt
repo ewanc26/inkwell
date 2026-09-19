@@ -96,3 +96,38 @@ fun WriterViewModel.cancelEditing() {
         lostFeatures = emptyList(),
     )
 }
+
+fun WriterViewModel.deleteDocument() {
+    val state = uiStateInternal.value
+    val uri = state.editingDocumentUri
+    val revision = state.editingDocumentRevision
+    if (uri == null || revision == null) {
+        uiStateInternal.value = state.copy(publishError = "Missing document revision")
+        return
+    }
+
+    viewModelScope.launch {
+        uiStateInternal.value = uiStateInternal.value.copy(isPublishing = true, publishError = null)
+        try {
+            val parsed = uk.ewancroft.inkwell.shared.AtUri.parse(uri)
+                ?: throw IllegalArgumentException("Invalid document URI")
+            pdsRepository.deleteRecord(
+                collection = parsed.collection,
+                rkey = parsed.recordKey,
+                swapRecord = revision,
+            )
+            cancelEditing()
+            uiStateInternal.value = uiStateInternal.value.copy(
+                isPublishing = false,
+                publishSuccess = "Document deleted.",
+            )
+        } catch (e: Exception) {
+            uiStateInternal.value = uiStateInternal.value.copy(
+                isPublishing = false,
+                publishError = if (e.message.orEmpty().contains("swap", ignoreCase = true))
+                    "This document changed elsewhere. Reload it before deleting."
+                else "Failed to delete document: ${e.message}",
+            )
+        }
+    }
+}
