@@ -288,10 +288,17 @@ struct WriteView: View {
                 .onChange(of: selectedPhoto) { _, newItem in
                     guard let newItem else { return }
                     Task {
-                        if let data = try? await newItem.loadTransferable(type: Data.self) {
-                            viewModel.uploadImage(data, mimeType: "image/jpeg")
+                        guard let data = try? await newItem.loadTransferable(type: Data.self) else {
+                            selectedPhoto = nil
+                            return
                         }
                         selectedPhoto = nil
+                        do {
+                            let output = try await ImageUploadSanitizer.sanitizeAsync(data)
+                            viewModel.uploadImage(output.data, mimeType: output.mimeType)
+                        } catch {
+                            viewModel.publishError = error.localizedDescription
+                        }
                     }
                 }
                 .task {
