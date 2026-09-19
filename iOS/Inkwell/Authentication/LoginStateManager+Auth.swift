@@ -262,7 +262,10 @@ extension LoginStateManager {
                 account: storedHandle,
                 server: serverMetadata,
                 jwtGenerator: DPoPJWTGenerator.generator(key: key),
-                validator: { _, _ in true } // Already validated during initial sign-in
+                validator: { tokenResponse, issuer in
+                    tokenResponse.sub == identity.did
+                        && OAuthIssuerPolicy.sameHTTPSOrigin(issuer, serverMetadata.issuer)
+                }
             )
 
             let config = Authenticator.Configuration(
