@@ -27,8 +27,9 @@ final class NotificationDelegate: NSObject, UNUserNotificationCenterDelegate {
         completionHandler([.banner, .sound, .badge])
     }
 
-    /// Routes a tapped notification to its document, via the same
-    /// NotificationCenter tab-switch mechanism App Intents use.
+    /// Stores the document until the authenticated reader navigation stack is
+    /// mounted. The delegate can receive a response before SwiftUI observers
+    /// exist during a cold launch.
     func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         didReceive response: UNNotificationResponse,
@@ -42,10 +43,8 @@ final class NotificationDelegate: NSObject, UNUserNotificationCenterDelegate {
             object: nil,
             userInfo: [InkwellTabKey.tab: InkwellTab.reader.rawValue]
         )
-        NotificationCenter.default.post(
-            name: .inkwellOpenDocument,
-            object: nil,
-            userInfo: [InkwellDocumentKey.uri: uri]
-        )
+        Task { @MainActor in
+            NotificationNavigationCoordinator.shared.enqueue(documentURI: uri)
+        }
     }
 }
