@@ -1,5 +1,7 @@
 package uk.ewancroft.inkwell.shared.verification
 
+import io.ktor.http.Url
+
 object VerificationUrls {
 
     /**
@@ -13,7 +15,7 @@ object VerificationUrls {
         val publicationPath = url.path.trim('/')
         val basePath = "/.well-known/site.standard.publication"
         val fullPath = if (publicationPath.isEmpty()) basePath else "$basePath/$publicationPath"
-        return "${url.scheme}://${url.host}$fullPath"
+        return "${url.scheme}://${url.authority}$fullPath"
     }
 
     /**
@@ -28,10 +30,11 @@ object VerificationUrls {
             documentSite
         }
         val base = normalizeHttpsUrl(baseString) ?: return null
-        val path = documentPath?.trim('/') ?: return base.toString()
+        val path = documentPath?.trim('/')
+            ?: return "${base.scheme}://${base.authority}/${base.path.trim('/')}".trimEnd('/')
         val basePath = base.path.trim('/')
         val fullPath = listOf(basePath, path).filter { it.isNotEmpty() }.joinToString("/")
-        return "${base.scheme}://${base.host}/$fullPath"
+        return "${base.scheme}://${base.authority}/$fullPath"
     }
 
     /**
@@ -41,16 +44,27 @@ object VerificationUrls {
     fun discoveryLinkTag(recordURI: String, relation: String): String =
         "<link rel=\"$relation\" href=\"$recordURI\" />"
 
-    private data class UrlParts(val scheme: String, val host: String, val path: String)
+    private data class UrlParts(
+        val scheme: String,
+        val host: String,
+        val path: String,
+        val port: Int,
+    ) {
+        val authority: String
+            get() = if (port == 443) host else "$host:$port"
+    }
 
     private fun normalizeHttpsUrl(urlString: String): UrlParts? {
         val trimmed = urlString.trim()
-        val lowerScheme = trimmed.substringBefore("://").lowercase()
-        val afterScheme = trimmed.substringAfter("://", "")
-        if (lowerScheme != "https" || afterScheme.isEmpty()) return null
-        val host = afterScheme.substringBefore("/").substringBefore("?").substringBefore("#")
-        if (host.isEmpty()) return null
-        val path = afterScheme.substringAfter(host, "")
-        return UrlParts(scheme = "https", host = host, path = path)
+        val authorityText = trimmed.substringAfter("://", "").substringBefore('/').substringBefore('?').substringBefore('#')
+        if ('@' in authorityText) return null
+        val parsed = runCatching { Url(trimmed) }.getOrNull() ?: return null
+        if (parsed.protocol.name.lowercase() != "https" || parsed.host.isEmpty()) return null
+        return UrlParts(
+            scheme = "https",
+            host = parsed.host,
+            path = parsed.encodedPath,
+            port = parsed.port,
+        )
     }
 }
