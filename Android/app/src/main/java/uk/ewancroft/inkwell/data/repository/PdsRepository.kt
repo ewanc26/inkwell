@@ -196,6 +196,7 @@ class PdsRepository @Inject constructor(
     private companion object {
         const val MAX_RATE_LIMIT_ATTEMPTS = 3
         const val DEFAULT_RESPONSE_BYTES = 2 * 1024 * 1024
+        const val MAX_RECORD_PAGES = 10_000
     }
 
     suspend fun listRecords(
@@ -401,11 +402,13 @@ class PdsRepository @Inject constructor(
         did: String,
         collection: String,
         pdsUrl: String? = null,
-        maxRecords: Int = RecordListPolicy.MAX_RECORDS,
+        maxRecords: Int = Int.MAX_VALUE,
     ): List<RawRecordEntry> {
         val all = mutableListOf<RawRecordEntry>()
         var cursor: String? = null
+        var pageCount = 0
         do {
+            check(pageCount++ < MAX_RECORD_PAGES) { "PDS pagination exceeded the safety page budget" }
             val response = listRecords(did = did, collection = collection, cursor = cursor, pdsUrl = pdsUrl)
             val records = response["records"]?.jsonArray.orEmpty()
             if (records.isEmpty()) break

@@ -273,15 +273,20 @@ extension LoginStateManager {
     func listAllRecords(
         from did: String,
         collection: String,
-        maximumCount: Int = sharedMaxRecordsPerList,
+        maximumCount: Int = Int.max,
         forceUnauthenticated: Bool = false
     ) async throws -> [RepositoryRecord] {
         let pdsURL = try await repositoryPDSURL(for: did)
 
         var allRecords: [RepositoryRecord] = []
         var cursor: String?
+        var pageCount = 0
 
         repeat {
+            guard pageCount < 10_000 else {
+                throw LoginError.paginationLimitExceeded
+            }
+            pageCount += 1
             var queryItems = [
                 URLQueryItem(name: "repo", value: did),
                 URLQueryItem(name: "collection", value: collection),
@@ -327,7 +332,9 @@ extension LoginStateManager {
             let withValues = page.records.filter { $0.value != nil }
             logger.info("[listAllRecords] \(collection): \(withValues.count)/\(page.records.count) records have non-nil value")
             allRecords.append(contentsOf: page.records)
-            cursor = page.cursor
+            let nextCursor = page.cursor
+            guard nextCursor == nil || nextCursor != cursor else { break }
+            cursor = nextCursor
         } while cursor != nil && allRecords.count < maximumCount
 
         return Array(allRecords.prefix(maximumCount))

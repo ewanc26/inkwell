@@ -14,6 +14,7 @@ enum LoginError: LocalizedError {
     case contentConversionFailed
     case recordTooLarge(bytes: Int, limit: Int)
     case pdsResolutionFailed
+    case paginationLimitExceeded
     case httpError(status: Int)
     /// Thrown by the write choke points when `-testing` is set. Carries the
     /// same wording as the root-level notice so a feature that surfaces its
@@ -34,6 +35,8 @@ enum LoginError: LocalizedError {
             return "This document is too large to publish (\(bytes) bytes; limit is \(limit)). Use a shorter document or a blob-backed format."
         case .pdsResolutionFailed:
             return "Could not resolve the repository's PDS. Check that the DID or handle is correct."
+        case .paginationLimitExceeded:
+            return "The PDS returned too many pages to load safely."
         case .httpError(let status):
             return httpErrorMessage(status: status)
         case .testingMode:
