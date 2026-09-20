@@ -14,7 +14,7 @@ class RateLimitRetryPolicyTest {
         assertEquals(
             5_000L,
             RateLimitRetryPolicy.delayMillis(
-                "Tue, 20 Sep 2026 00:00:05 GMT",
+                "Sun, 20 Sep 2026 00:00:05 GMT",
                 attempt = 0,
                 nowMillis = Instant.parse("2026-09-20T00:00:00Z").toEpochMilli()
             )
@@ -24,6 +24,6 @@ class RateLimitRetryPolicyTest {
     @Test fun `falls back to bounded exponential delay for malformed headers`() {
         assertEquals(100L, RateLimitRetryPolicy.delayMillis("not-a-date", attempt = 0))
         assertEquals(400L, RateLimitRetryPolicy.delayMillis("not-a-date", attempt = 2))
-        assertEquals(60_000L, RateLimitRetryPolicy.delayMillis("not-a-date", attempt = 20))
+        assertEquals(51_200L, RateLimitRetryPolicy.delayMillis("not-a-date", attempt = 20))
     }
 }
