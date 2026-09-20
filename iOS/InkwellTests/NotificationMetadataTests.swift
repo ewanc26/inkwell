@@ -50,4 +50,23 @@ final class NotificationMetadataTests: XCTestCase {
             settings: settings
         ))
     }
+
+    func testWarningLabelIsRedactedBeforeReaderReveal() {
+        let settings = ModerationSettings.shared
+        let oldHidden = settings.hiddenLabels
+        let oldWarnings = settings.warningLabels
+        defer {
+            settings.hiddenLabels = oldHidden
+            settings.warningLabels = oldWarnings
+        }
+
+        settings.warningLabels = ["spoiler"]
+        XCTAssertTrue(shouldRedactNotification(
+            title: "Spoiler title",
+            description: "Spoiler description",
+            textContent: nil,
+            labels: [ModerationLabel(value: "spoiler", source: "document")],
+            settings: settings
+        ))
+    }
 }
