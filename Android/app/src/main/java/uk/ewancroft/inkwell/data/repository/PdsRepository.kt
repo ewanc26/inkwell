@@ -6,6 +6,8 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
@@ -142,6 +144,7 @@ class PdsRepository @Inject constructor(
 
     private val ktorHttpClient = HttpClient(CIO)
     private val rateLimitCooldowns = mutableMapOf<String, Long>()
+    private val rateLimitLocks = mutableMapOf<String, Mutex>()
 
     suspend fun getSession(): UserSessionInfo? {
         val session = sessionStore.load() ?: return null
@@ -199,33 +202,38 @@ class PdsRepository @Inject constructor(
         return withContext(Dispatchers.IO) {
             val request = Request.Builder().url(urlStr).get().build()
             val origin = rateLimitOrigin(request.url)
-            var attempt = 0
-            var result: String? = null
-            while (result == null) {
-                val cooldown = synchronized(rateLimitCooldowns) {
-                    (rateLimitCooldowns[origin] ?: 0L) - System.currentTimeMillis()
-                }
-                if (cooldown > 0) delay(cooldown)
-                val response = publicHttpClient.newCall(request).execute()
-                if (response.code == 429 && attempt < MAX_RATE_LIMIT_ATTEMPTS - 1) {
-                    val delayMs = RateLimitRetryPolicy.delayMillis(response.header("Retry-After"), attempt)
-                    response.close()
-                    synchronized(rateLimitCooldowns) {
-                        val until = System.currentTimeMillis() + delayMs
-                        rateLimitCooldowns[origin] = maxOf(rateLimitCooldowns[origin] ?: 0L, until)
-                    }
-                    attempt += 1
-                    continue
-                }
-                result = response.use {
-                    if (!response.isSuccessful) {
-                        throw java.io.IOException("PDS request failed: HTTP ${response.code}")
-                    }
-                    val body = response.body ?: throw IOException("PDS request returned no body")
-                    PdsResponseBodyReader.read(body.byteStream(), body.contentLength(), maxBodyBytes)
-                }
+            val lock = synchronized(rateLimitLocks) {
+                rateLimitLocks.getOrPut(origin) { Mutex() }
             }
-            result ?: error("PDS request completed without a response body")
+            lock.withLock {
+                var attempt = 0
+                var result: String? = null
+                while (result == null) {
+                    val cooldown = synchronized(rateLimitCooldowns) {
+                        (rateLimitCooldowns[origin] ?: 0L) - System.currentTimeMillis()
+                    }
+                    if (cooldown > 0) delay(cooldown)
+                    val response = publicHttpClient.newCall(request).execute()
+                    if (response.code == 429 && attempt < MAX_RATE_LIMIT_ATTEMPTS - 1) {
+                        val delayMs = RateLimitRetryPolicy.delayMillis(response.header("Retry-After"), attempt)
+                        response.close()
+                        synchronized(rateLimitCooldowns) {
+                            val until = System.currentTimeMillis() + delayMs
+                            rateLimitCooldowns[origin] = maxOf(rateLimitCooldowns[origin] ?: 0L, until)
+                        }
+                        attempt += 1
+                        continue
+                    }
+                    result = response.use {
+                        if (!response.isSuccessful) {
+                            throw java.io.IOException("PDS request failed: HTTP ${response.code}")
+                        }
+                        val body = response.body ?: throw IOException("PDS request returned no body")
+                        PdsResponseBodyReader.read(body.byteStream(), body.contentLength(), maxBodyBytes)
+                    }
+                }
+                result ?: error("PDS request completed without a response body")
+            }
         }
     }
 
