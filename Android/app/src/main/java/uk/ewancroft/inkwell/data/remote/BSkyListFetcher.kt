@@ -4,11 +4,13 @@ import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromJsonElement
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import uk.ewancroft.inkwell.data.model.bluesky.BlueskyProfile
 import uk.ewancroft.inkwell.data.model.bluesky.GetListResponse
 import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
+import uk.ewancroft.inkwell.shared.validation.JsonSafety
 import java.util.concurrent.TimeUnit
 
 /**
@@ -52,7 +54,9 @@ object BSkyListFetcher {
                     }
 
                     val body = response.body?.readBoundedUtf8() ?: return@withContext members
-                    val page = json.decodeFromString<GetListResponse>(body)
+                    val element = json.parseToJsonElement(body)
+                    check(JsonSafety.isSafe(element)) { "Bluesky response exceeded structural safety limits" }
+                    val page = json.decodeFromJsonElement<GetListResponse>(element)
                     members += page.items.map { it.subject }
                     cursor = page.cursor
                 } while (cursor != null)
