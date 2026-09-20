@@ -260,6 +260,16 @@ final class StandardSiteTests: XCTestCase {
         XCTAssertEqual(Array(output.data.prefix(8)), [137, 80, 78, 71, 13, 10, 26, 10])
     }
 
+    func testImageSanitizerRejectsAnimatedGIF() {
+        let animatedGIF = Data(base64Encoded: "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7")!
+
+        XCTAssertThrowsError(try ImageUploadSanitizer.sanitize(animatedGIF)) { error in
+            guard case .animatedImage = error as? ImageUploadSanitizer.Failure else {
+                return XCTFail("Expected animated-image rejection, got \(error)")
+            }
+        }
+    }
+
     func testContentDeepLinkPolicyAcceptsEncodedDocumentURI() {
         let uri = "at://did:plc:alice/site.standard.document/café"
         let encoded = uri.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!

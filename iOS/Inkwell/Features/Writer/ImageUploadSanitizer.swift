@@ -8,6 +8,7 @@ enum ImageUploadSanitizer {
 
     enum Failure: LocalizedError {
         case invalidImage
+        case animatedImage
         case inputTooLarge
         case dimensionsTooLarge
         case encodingFailed
@@ -15,6 +16,7 @@ enum ImageUploadSanitizer {
         var errorDescription: String? {
             switch self {
             case .invalidImage: return "The selected file is not a supported image."
+            case .animatedImage: return "Animated images are not supported for upload. Choose a still image."
             case .inputTooLarge: return "That image file is too large to process safely."
             case .dimensionsTooLarge: return "That image is too large to upload safely."
             case .encodingFailed: return "The image could not be prepared for upload."
@@ -42,6 +44,9 @@ enum ImageUploadSanitizer {
               let height = properties[kCGImagePropertyPixelHeight] as? Int,
               width > 0, height > 0 else {
             throw Failure.invalidImage
+        }
+        guard CGImageSourceGetCount(source) <= 1 else {
+            throw Failure.animatedImage
         }
         guard width <= 8_192, height <= 8_192, width.multipliedReportingOverflow(by: height).overflow == false,
               width * height <= 40_000_000 else {
