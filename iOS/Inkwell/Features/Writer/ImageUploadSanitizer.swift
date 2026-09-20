@@ -24,7 +24,8 @@ enum ImageUploadSanitizer {
         }
     }
 
-    struct Output {
+    struct Output: Identifiable {
+        let id = UUID()
         let data: Data
         let mimeType: String
     }
