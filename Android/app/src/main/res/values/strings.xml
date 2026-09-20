@@ -92,6 +92,11 @@
     <string name="reader_tip_message">If you find Inkwell useful, consider buying me a coffee to support ongoing development.</string>
     <string name="reader_tip_confirm">Tip me</string>
     <string name="reader_tip_dismiss">Maybe later</string>
+    <string name="discover_title">Discover</string>
+    <string name="discover_about">About</string>
+    <string name="discover_search_hint">Search articles and documents</string>
+    <string name="discover_search">Search</string>
+    <string name="discover_searching">Searching the Standard.site network…</string>
     <string name="reader_posts">Posts</string>
     <string name="reader_all_posts">All posts</string>
     <string name="reader_unsupported_content">Unsupported content format</string>

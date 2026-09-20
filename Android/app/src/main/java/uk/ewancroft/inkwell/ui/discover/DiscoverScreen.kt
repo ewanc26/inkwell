@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
@@ -31,6 +32,7 @@ import uk.ewancroft.inkwell.ui.offline.rememberNetworkAvailable
 import uk.ewancroft.inkwell.data.model.common.SearchActorResult
 import uk.ewancroft.inkwell.data.model.common.SearchResult
 import uk.ewancroft.inkwell.data.model.common.PublicationResult
+import uk.ewancroft.inkwell.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,10 +51,10 @@ fun DiscoverScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Discover") },
+                title = { Text(stringResource(R.string.discover_title)) },
                 actions = {
                     IconButton(onClick = { showCredits = true }) {
-                        Icon(Icons.Outlined.Info, contentDescription = "About")
+                        Icon(Icons.Outlined.Info, contentDescription = stringResource(R.string.discover_about))
                     }
                 },
             )
@@ -66,7 +68,7 @@ fun DiscoverScreen(
                 value = uiState.query,
                 onValueChange = { viewModel.onQueryChanged(it) },
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
-                placeholder = { Text("Search articles and documents") },
+                placeholder = { Text(stringResource(R.string.discover_search_hint)) },
                 singleLine = true,
                 trailingIcon = {
                     if (uiState.query.isNotBlank()) {
@@ -99,7 +101,7 @@ fun DiscoverScreen(
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(Modifier.width(6.dp))
-                    Text("Search")
+                    Text(stringResource(R.string.discover_search))
                 }
             }
 
@@ -127,7 +129,7 @@ fun DiscoverScreen(
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             CircularProgressIndicator()
                             Spacer(Modifier.height(8.dp))
-                            Text("Searching the Standard.site network...", style = MaterialTheme.typography.bodySmall,
+                            Text(stringResource(R.string.discover_searching), style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
