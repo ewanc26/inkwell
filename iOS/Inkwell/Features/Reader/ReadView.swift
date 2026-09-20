@@ -199,20 +199,12 @@ struct ReadView: View {
 
                 // Cover Image
                 if let cover = document.coverImage, let did = authorDID ?? loginStateManager.currentDID {
-                    let urlString = "https://cdn.bsky.app/img/feed_thumbnail/plain/\(did)/\(cover.reference.link)"
-                    if let url = URL(string: urlString) {
-                        AsyncImage(url: url) { phase in
-                            switch phase {
-                            case .success(let image):
-                                image.resizable().scaledToFill()
-                            case .failure:
-                                foregroundColor.opacity(0.06)
-                                    .overlay { Image(systemName: "photo").foregroundStyle(foregroundColor.opacity(0.4)) }
-                            default:
-                                foregroundColor.opacity(0.06)
-                                    .overlay { ProgressView() }
-                            }
-                        }
+                    PDSBlobImage(
+                        did: did,
+                        cid: cover.reference.link,
+                        loginStateManager: loginStateManager,
+                        height: 240
+                    )
                         // Same fix as ReaderPostCard's cover thumbnail: bound
                         // the container to a sane aspect ratio with `.fit`
                         // before cropping the photo to fill it, rather than
@@ -223,7 +215,6 @@ struct ReadView: View {
                         .clipped()
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                         .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
-                    }
                 }
 
                 // Content Section
