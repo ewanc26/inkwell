@@ -54,12 +54,13 @@ class OfflineSyncQueueIos(durableDirPath: String, legacyCacheDirPath: String) : 
                 encoding = NSUTF8StringEncoding,
                 error = null,
             ) ?: return emptyList()
-            json.decodeFromString<List<SyncQueueEntry>>(content)
+            runCatching { json.decodeFromString<SyncQueueFile>(content).entries }
+                .getOrElse { json.decodeFromString<List<SyncQueueEntry>>(content) }
         }.getOrThrow()
     }
 
     private fun writeInternal(entries: List<SyncQueueEntry>) {
-        val bytes = json.encodeToString(entries).encodeToByteArray()
+        val bytes = json.encodeToString(SyncQueueFile(entries = entries)).encodeToByteArray()
         val temporaryPath = "$queueFilePath.tmp"
         bytes.usePinned {
             val data = NSData.create(bytes = it.addressOf(0), length = bytes.size.toULong())

@@ -40,14 +40,18 @@ class OfflineSyncQueueAndroid(durableDirPath: String, legacyCacheDirPath: String
     private fun readInternal(): List<SyncQueueEntry> = runCatching {
         migrateLegacyIfNeeded()
         if (!queueFile.exists()) emptyList()
-        else json.decodeFromString<List<SyncQueueEntry>>(queueFile.readText())
+        else decodeEntries(queueFile.readText())
     }.getOrThrow()
+
+    private fun decodeEntries(raw: String): List<SyncQueueEntry> = runCatching {
+        json.decodeFromString<SyncQueueFile>(raw).entries
+    }.getOrElse { json.decodeFromString<List<SyncQueueEntry>>(raw) }
 
     private fun writeInternal(entries: List<SyncQueueEntry>) {
         queueFile.parentFile?.mkdirs()
         val temporary = File(queueFile.parentFile, "$QUEUE_FILENAME.tmp")
         FileOutputStream(temporary).use { output ->
-            output.write(json.encodeToString(entries).toByteArray(Charsets.UTF_8))
+            output.write(json.encodeToString(SyncQueueFile(entries = entries)).toByteArray(Charsets.UTF_8))
             output.fd.sync()
         }
         val backup = File(queueFile.parentFile, "$QUEUE_FILENAME.bak")
