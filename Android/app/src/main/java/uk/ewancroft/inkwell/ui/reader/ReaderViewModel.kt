@@ -130,6 +130,7 @@ class ReaderViewModel @Inject constructor(
 
     /** Per-publication-DID cursors for the next page of documents. */
     private val followingCursors = mutableMapOf<String, String>()
+    private var followingSubscriptions: List<LiveSubscribedPublication> = emptyList()
 
     /** Resolved publication records keyed by their AT-URI. */
     private val publicationResolutionCache = mutableMapOf<String, CachedPublicationResolution>()
@@ -461,6 +462,14 @@ class ReaderViewModel @Inject constructor(
                             try {
                                 val docValue = docJson.jsonObject["value"]?.jsonObject ?: continue
                                 val docUri = docJson.jsonObject["uri"]?.jsonPrimitive?.content ?: continue
+                                val site = docValue["site"]?.jsonPrimitive?.content ?: continue
+                                if (followingSubscriptions.none { subscription ->
+                                        PublicationMatcher.documentBelongsToPublication(
+                                            documentSite = site,
+                                            publicationUri = subscription.uri,
+                                            publicationUrl = subscription.url,
+                                        )
+                                    }) continue
                                 posts.add(PostItem(
                                     uri = docUri,
                                     authorDid = did,
@@ -472,7 +481,7 @@ class ReaderViewModel @Inject constructor(
                                     publishedAt = docValue["publishedAt"]?.jsonPrimitive?.content ?: "",
                                     coverUrl = docValue["coverImage"]?.jsonObject?.get("link")?.jsonPrimitive?.content
                                         ?: docValue["coverImage"]?.jsonObject?.get("\$link")?.jsonPrimitive?.content,
-                                    site = docValue["site"]?.jsonPrimitive?.content ?: "",
+                                    site = site,
                                     path = docValue["path"]?.jsonPrimitive?.contentOrNull,
                                     authorDisplayName = profile?.displayName,
                                     authorAvatar = profile?.avatar,
@@ -579,6 +588,12 @@ class ReaderViewModel @Inject constructor(
                         try {
                             val docValue = docJson.jsonObject["value"]?.jsonObject ?: continue
                             val docUri = docJson.jsonObject["uri"]?.jsonPrimitive?.content ?: continue
+                            val site = docValue["site"]?.jsonPrimitive?.content ?: continue
+                            if (!PublicationMatcher.documentBelongsToPublication(
+                                    documentSite = site,
+                                    publicationUri = publication,
+                                    publicationUrl = publicationRecord?.url,
+                                )) continue
                             posts.add(PostItem(
                                 uri = docUri,
                                 authorDid = parsed.did,
@@ -591,7 +606,7 @@ class ReaderViewModel @Inject constructor(
                                 publishedAt = docValue["publishedAt"]?.jsonPrimitive?.content ?: "",
                                 coverUrl = docValue["coverImage"]?.jsonObject?.get("link")?.jsonPrimitive?.content
                                     ?: docValue["coverImage"]?.jsonObject?.get("\$link")?.jsonPrimitive?.content,
-                                site = docValue["site"]?.jsonPrimitive?.content ?: "",
+                                site = site,
                                 path = docValue["path"]?.jsonPrimitive?.contentOrNull,
                                 authorDisplayName = profile?.displayName,
                                 authorAvatar = profile?.avatar,
@@ -610,6 +625,8 @@ class ReaderViewModel @Inject constructor(
                     Log.w("ReaderViewModel", "Failed to fetch publication documents in following feed", e)
                 }
             }
+
+            followingSubscriptions = liveSubscriptions.distinctBy { it.uri }
 
             _uiState.value = _uiState.value.copy(
                 followingPosts = sortedByPreference(posts.distinctBy { it.uri }),
