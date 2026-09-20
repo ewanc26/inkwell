@@ -153,6 +153,7 @@ struct PollEmbedView: View {
     var accentColor: Color = .blue
 
     @Environment(LoginStateManager.self) private var loginStateManager
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var state = PollState()
 
     var body: some View {
@@ -232,7 +233,7 @@ struct PollEmbedView: View {
                 Text(option.text)
                     .font(.subheadline)
                     .foregroundStyle(foregroundColor)
-                    .lineLimit(3)
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 3)
 
                 Spacer()
 
