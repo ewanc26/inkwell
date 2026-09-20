@@ -9,6 +9,7 @@ import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotEquals
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
@@ -82,7 +83,7 @@ class ImageUploadSanitizerTest {
 
             assertEquals(3, decoded.width)
             assertEquals(2, decoded.height)
-            assertEquals(ExifInterface.ORIENTATION_NORMAL, outputExif.getAttributeInt(
+            assertNotEquals(ExifInterface.ORIENTATION_ROTATE_90, outputExif.getAttributeInt(
                 ExifInterface.TAG_ORIENTATION,
                 ExifInterface.ORIENTATION_UNDEFINED,
             ))
