@@ -14,6 +14,7 @@ Read the platform-specific `AGENTS.md` files before touching code. They are auth
 - [`iOS/AGENTS.md`](iOS/AGENTS.md) — Keychain/DPoP rules, Xcode workflow
 - [`Android/AGENTS.md`](Android/AGENTS.md) — EncryptedSharedPreferences, Gradle workflow
 - [`website/AGENTS.md`](website/AGENTS.md) — legal/oauth accuracy, Vercel deployment
+- [`LOCALIZATION.md`](LOCALIZATION.md) — source locale, terminology, translation workflow, and legal-version policy
 
 ## Repository structure
 
