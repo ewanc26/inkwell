@@ -39,6 +39,8 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
+private const val MAX_RECORD_PAGES = 10_000
+
 data class UserSessionInfo(
     val handle: String,
     val did: String,
@@ -230,7 +232,6 @@ class PdsRepository @Inject constructor(
     private companion object {
         const val MAX_RATE_LIMIT_ATTEMPTS = 3
         const val DEFAULT_RESPONSE_BYTES = 2 * 1024 * 1024
-        const val MAX_RECORD_PAGES = 10_000
     }
 
     suspend fun listRecords(
@@ -428,27 +429,9 @@ class PdsRepository @Inject constructor(
         pdsUrl: String? = null,
         maxRecords: Int = Int.MAX_VALUE,
     ): List<RawRecordEntry> {
-        val all = mutableListOf<RawRecordEntry>()
-        var cursor: String? = null
-        var pageCount = 0
-        do {
-            check(pageCount++ < MAX_RECORD_PAGES) { "PDS pagination exceeded the safety page budget" }
-            val response = listRecords(did = did, collection = collection, cursor = cursor, pdsUrl = pdsUrl)
-            val records = response["records"]?.jsonArray.orEmpty()
-            if (records.isEmpty()) break
-            for (r in records) {
-                val obj = r.jsonObject
-                val uri = obj["uri"]?.jsonPrimitive?.content ?: continue
-                val value = obj["value"]?.jsonObject ?: continue
-                all.add(RawRecordEntry(uri, value))
-            }
-            val nextCursor = response["cursor"]?.jsonPrimitive?.contentOrNull
-            // A PDS echoing the same cursor (no new page) would otherwise loop
-            // until maxRecords; treat it as the end of the list.
-            if (nextCursor == null || nextCursor == cursor) break
-            cursor = nextCursor
-        } while (all.size < maxRecords)
-        return all.take(maxRecords)
+        return paginateRecordPages(maxRecords) { cursor ->
+            listRecords(did = did, collection = collection, cursor = cursor, pdsUrl = pdsUrl)
+        }
     }
 
     internal suspend fun resolvePdsUrl(did: String): String {
@@ -461,6 +444,31 @@ class PdsRepository @Inject constructor(
             throw PdsResolutionException("Unable to resolve PDS for $did", error)
         }
     }
+}
+
+internal suspend fun paginateRecordPages(
+    maxRecords: Int = Int.MAX_VALUE,
+    fetchPage: suspend (String?) -> JsonObject,
+): List<PdsRepository.RawRecordEntry> {
+    val all = mutableListOf<PdsRepository.RawRecordEntry>()
+    var cursor: String? = null
+    var pageCount = 0
+    do {
+        check(pageCount++ < MAX_RECORD_PAGES) { "PDS pagination exceeded the safety page budget" }
+        val response = fetchPage(cursor)
+        val records = response["records"]?.jsonArray.orEmpty()
+        if (records.isEmpty()) break
+        for (r in records) {
+            val obj = r.jsonObject
+            val uri = obj["uri"]?.jsonPrimitive?.content ?: continue
+            val value = obj["value"]?.jsonObject ?: continue
+            all.add(PdsRepository.RawRecordEntry(uri, value))
+        }
+        val nextCursor = response["cursor"]?.jsonPrimitive?.contentOrNull
+        if (nextCursor == null || nextCursor == cursor) break
+        cursor = nextCursor
+    } while (all.size < maxRecords)
+    return all.take(maxRecords)
 }
 
 internal fun validateUploadBlobResponse(response: JsonObject, mimeType: String, byteCount: Long) {
