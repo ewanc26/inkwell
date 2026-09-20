@@ -5,6 +5,11 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ArticleStatePreferencesTest {
+    @Test fun `accepts version one envelope and ignores future fields`() {
+        val raw = """{"format":"uk.ewancroft.inkwell.reading-data","version":1,"exportedAt":"2026-09-19T00:00:00Z","articles":[{"articleId":"at://did:plc:alice/site.standard.document/one","title":"Example","isRead":true,"isBookmarked":false,"timestamp":"2026-09-19T00:00:00Z","futureField":"ignored"}]}"""
+        assertEquals(ArticleStatePreferences.ImportResult.Success(1), ArticleStatePreferences.previewImportJson(null, raw))
+    }
+
     @Test fun `rejects unsupported export versions before reading local state`() {
         val raw = """{"format":"uk.ewancroft.inkwell.reading-data","version":2,"exportedAt":"2026-09-19T00:00:00Z","articles":[]}"""
         assertEquals(ArticleStatePreferences.ImportResult.UnsupportedVersion, ArticleStatePreferences.previewImportJson(null, raw))
