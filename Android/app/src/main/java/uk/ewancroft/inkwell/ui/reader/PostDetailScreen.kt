@@ -24,6 +24,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -48,6 +49,7 @@ fun PostDetailScreen(
     onNavigateToProfile: (String) -> Unit = {},
     viewModel: PostDetailViewModel = hiltViewModel(),
 ) {
+    val accessibilityFontScale = LocalDensity.current.fontScale >= 1.5f
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val isDarkTheme = uk.ewancroft.inkwell.ui.theme.LocalForceDarkTheme.current
@@ -104,7 +106,7 @@ fun PostDetailScreen(
                 title = {
                     Text(
                         uiState.title ?: "Post",
-                        maxLines = 1,
+                        maxLines = if (accessibilityFontScale) 2 else 1,
                         overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                     )
                 },
