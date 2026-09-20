@@ -42,7 +42,7 @@ suspend fun PdsRepository.downloadBlob(
     expectedMimeType: String? = null
 ): ByteArray = withContext(Dispatchers.IO) {
     validateDeclaredBlobSize(declaredSize)
-    val pdsUrl = resolvePdsUrl(fromDID) ?: XrpcEndpoints.PUBLIC_BSKY_API
+    val pdsUrl = resolvePdsUrl(fromDID)
     val urlStr = "$pdsUrl${XrpcEndpoints.SYNC_GET_BLOB}?cid=${enc(cid)}&did=${enc(fromDID)}"
     val request = Request.Builder().url(urlStr).get().build()
     publicHttpClient.newCall(request).execute().use { response ->

@@ -30,6 +30,7 @@ import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
 import uk.ewancroft.inkwell.shared.policy.RecordListPolicy
 import uk.ewancroft.inkwell.shared.validation.JsonSafety
 import java.net.URLEncoder
+import java.net.URI
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.InputStream
@@ -44,6 +45,40 @@ data class UserSessionInfo(
     val did: String,
     val pdsUrl: String,
 )
+
+internal class PdsResolutionException(message: String, cause: Throwable? = null) : IOException(message, cause)
+
+internal fun didDocumentUrl(did: String): String {
+    return when {
+        did.startsWith("did:plc:") -> "https://plc.directory/${URLEncoder.encode(did, "UTF-8")}".replace("%3A", ":")
+        did.startsWith("did:web:") -> {
+            val parts = did.removePrefix("did:web:").split(':')
+            check(parts.isNotEmpty() && parts.first().isNotBlank()) { "Invalid did:web identifier" }
+            check(parts.none { it.isBlank() || it == "." || it == ".." }) { "Invalid did:web identifier" }
+            val host = parts.first().replace("%3A", ":", ignoreCase = true)
+            check(URI("https://$host").host != null) { "Invalid did:web host" }
+            if (parts.size == 1) "https://$host/.well-known/did.json"
+            else "https://$host/${parts.drop(1).joinToString("/")}/did.json"
+        }
+        else -> throw PdsResolutionException("Unsupported DID method: $did")
+    }
+}
+
+internal fun extractAtprotoPdsEndpoint(document: JsonObject, did: String): String {
+    val service = document["service"]?.jsonArray.orEmpty().firstOrNull { element ->
+        val obj = element.jsonObject
+        val id = obj["id"]?.jsonPrimitive?.contentOrNull
+        val type = obj["type"]?.jsonPrimitive?.contentOrNull
+        (id == "#atproto_pds" || id == "$did#atproto_pds") && type == "AtprotoPersonalDataServer"
+    }?.jsonObject ?: throw PdsResolutionException("DID document has no valid #atproto_pds service")
+    val endpoint = service["serviceEndpoint"]?.jsonPrimitive?.contentOrNull
+        ?: throw PdsResolutionException("#atproto_pds service has no endpoint")
+    val uri = runCatching { URI(endpoint) }.getOrNull()
+    check(uri?.scheme == "https" && !uri.isOpaque && uri.userInfo == null && uri.query == null && uri.fragment == null) {
+        "#atproto_pds endpoint must be an HTTPS URL"
+    }
+    return endpoint.trimEnd('/')
+}
 
 internal object RateLimitRetryPolicy {
     const val MAX_DELAY_MS = 60_000L
@@ -206,7 +241,7 @@ class PdsRepository @Inject constructor(
         cursor: String? = null,
         pdsUrl: String? = null,
     ): JsonObject {
-        val baseUrl = pdsUrl ?: resolvePdsUrl(did) ?: XrpcEndpoints.PUBLIC_BSKY_API
+        val baseUrl = pdsUrl ?: resolvePdsUrl(did)
         val urlStr = buildString {
             append("$baseUrl${XrpcEndpoints.REPO_LIST_RECORDS}")
             append("?repo=").append(enc(did))
@@ -220,7 +255,7 @@ class PdsRepository @Inject constructor(
 
     suspend fun getRecord(uri: String, pdsUrl: String? = null): JsonObject {
         val parsed = requireNotNull(AtUri.parse(uri))
-        val baseUrl = pdsUrl ?: resolvePdsUrl(parsed.did) ?: XrpcEndpoints.PUBLIC_BSKY_API
+        val baseUrl = pdsUrl ?: resolvePdsUrl(parsed.did)
         val urlStr = buildString {
             append("$baseUrl${XrpcEndpoints.REPO_GET_RECORD}")
             append("?repo=").append(enc(parsed.did))
@@ -417,18 +452,15 @@ class PdsRepository @Inject constructor(
         return all.take(maxRecords)
     }
 
-    internal suspend fun resolvePdsUrl(did: String): String? {
+    internal suspend fun resolvePdsUrl(did: String): String {
         return try {
-            val urlStr = "https://plc.directory/${enc(did)}"
-            val body = decodeSafe<JsonObject>(executeGet(urlStr))
-            val services = body["service"]?.jsonArray
-                ?: body["services"]?.jsonArray
-            services?.firstOrNull { service ->
-                val type = service.jsonObject["type"]?.jsonPrimitive?.content
-                type == "AtprotoPersonalDataServer" || type == "PersonalDataServer"
-            }?.jsonObject?.get("serviceEndpoint")?.jsonPrimitive?.content
-                ?: body["pdsUrl"]?.jsonPrimitive?.content
-        } catch (_: Exception) { null }
+            val body = decodeSafe<JsonObject>(executeGet(didDocumentUrl(did)))
+            extractAtprotoPdsEndpoint(body, did)
+        } catch (error: PdsResolutionException) {
+            throw error
+        } catch (error: Exception) {
+            throw PdsResolutionException("Unable to resolve PDS for $did", error)
+        }
     }
 }
 
