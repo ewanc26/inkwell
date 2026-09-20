@@ -15,6 +15,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
@@ -94,7 +95,7 @@ fun MarkdownRendererView(
                         4 -> MaterialTheme.typography.titleSmall
                         else -> MaterialTheme.typography.labelLarge
                     }
-                    Text(
+                    LinkAwareText(
                         text = renderInline(block.text, bodyColor, accentColor, uriHandler, underlineLinks),
                         style = style,
                         fontWeight = FontWeight.Bold,
@@ -103,7 +104,7 @@ fun MarkdownRendererView(
                 }
 
                 is MarkdownBlock.Paragraph -> {
-                    Text(
+                    LinkAwareText(
                         text = renderInline(block.text, bodyColor, accentColor, uriHandler, underlineLinks),
                         style = MaterialTheme.typography.bodyLarge.maybeBold(),
                         lineHeight = 24.sp,
@@ -165,7 +166,7 @@ fun MarkdownRendererView(
                                 .padding(start = 0.dp)
                                 .height(2.dp),
                         )
-                        Text(
+                        LinkAwareText(
                             text = renderInline(block.text, bodyColor, accentColor, uriHandler, underlineLinks),
                             style = MaterialTheme.typography.bodyLarge.copy(fontStyle = FontStyle.Italic).maybeBold(),
                             color = mutedColor,
@@ -267,7 +268,7 @@ private fun renderListItems(
                 }
 
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(
+                    LinkAwareText(
                         text = renderInline(item.text, bodyColor, accentColor, uriHandler, underlineLinks),
                         style = if (boldText) {
                             MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
@@ -312,7 +313,7 @@ private fun renderTaskList(
                     color = checkColor,
                     modifier = Modifier.padding(top = 2.dp),
                 )
-                Text(
+                LinkAwareText(
                     text = renderInline(item.text, bodyColor, accentColor, uriHandler, underlineLinks),
                     style = if (boldText) {
                         MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
@@ -369,5 +370,41 @@ private fun renderInline(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun LinkAwareText(
+    text: AnnotatedString,
+    style: TextStyle,
+    modifier: Modifier = Modifier,
+    color: Color = Color.Unspecified,
+    lineHeight: androidx.compose.ui.unit.TextUnit = androidx.compose.ui.unit.TextUnit.Unspecified,
+    fontWeight: FontWeight? = null,
+    textDecoration: TextDecoration? = null,
+) {
+    val uriHandler = LocalUriHandler.current
+    val links = remember(text) {
+        if (text.isEmpty()) emptyList()
+        else text.getStringAnnotations("URL", 0, text.length)
+    }
+    val resolvedStyle = style.copy(
+        color = if (color == Color.Unspecified) style.color else color,
+        lineHeight = if (lineHeight == androidx.compose.ui.unit.TextUnit.Unspecified) style.lineHeight else lineHeight,
+        fontWeight = fontWeight ?: style.fontWeight,
+        textDecoration = textDecoration ?: style.textDecoration,
+    )
+    if (links.isEmpty()) {
+        Text(text = text, style = resolvedStyle, modifier = modifier)
+    } else {
+        ClickableText(
+            text = text,
+            style = resolvedStyle,
+            modifier = modifier,
+            onClick = { offset ->
+                links.firstOrNull { offset >= it.start && offset < it.end }
+                    ?.let { uriHandler.openUri(it.item) }
+            },
+        )
     }
 }
