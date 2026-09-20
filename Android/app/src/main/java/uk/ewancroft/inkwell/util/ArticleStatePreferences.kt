@@ -144,7 +144,15 @@ object ArticleStatePreferences {
     private fun decodeAndValidate(raw: String): ReadingDataExport? {
         val envelope = runCatching { json.decodeFromString<ReadingDataExport>(raw) }.getOrNull() ?: return null
         val exportedAt = runCatching { Instant.parse(envelope.exportedAt) }.getOrNull() ?: return null
-        if (envelope.articles.size > 10_000 || exportedAt.isAfter(Instant.now()) || envelope.articles.any { !atUriPattern.matches(it.articleId) || it.title.length > 500 || runCatching { Instant.parse(it.timestamp) }.getOrNull()?.isAfter(Instant.now()) == true }) return null
+        val now = Instant.now()
+        if (envelope.articles.size > 10_000 || exportedAt.isAfter(now) || envelope.articles.any {
+                !atUriPattern.matches(it.articleId) ||
+                    it.title.length > 500 ||
+                    runCatching { Instant.parse(it.timestamp) }
+                        .getOrNull()
+                        ?.let { timestamp -> timestamp.isAfter(now) }
+                        ?: true
+            }) return null
         return envelope
     }
 
