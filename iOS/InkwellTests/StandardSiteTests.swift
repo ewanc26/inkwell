@@ -10,7 +10,9 @@
 //
 
 import Foundation
+import ImageIO
 import XCTest
+import UniformTypeIdentifiers
 @testable import Inkwell
 
 // MARK: - Standard.site Tests
@@ -270,6 +272,39 @@ final class StandardSiteTests: XCTestCase {
 
         XCTAssertEqual(output.mimeType, "image/png")
         XCTAssertEqual(Array(output.data.prefix(8)), [137, 80, 78, 71, 13, 10, 26, 10])
+    }
+
+    func testImageSanitizerRemovesLocationMetadataAndNormalizesOrientation() throws {
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        let context = CGContext(
+            data: nil,
+            width: 2,
+            height: 3,
+            bitsPerComponent: 8,
+            bytesPerRow: 0,
+            space: colorSpace,
+            bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue
+        )!
+        context.setFillColor(CGColor(red: 1, green: 0, blue: 0, alpha: 1))
+        context.fill(CGRect(x: 0, y: 0, width: 2, height: 3))
+        let image = context.makeImage()!
+        let input = NSMutableData()
+        let destination = CGImageDestinationCreateWithData(input, UTType.jpeg.identifier as CFString, 1, nil)!
+        CGImageDestinationAddImage(destination, image, [
+            kCGImagePropertyOrientation: 6,
+            kCGImagePropertyGPSDictionary: [
+                kCGImagePropertyGPSLatitude: 51.5,
+                kCGImagePropertyGPSLongitude: -0.1,
+            ],
+        ] as CFDictionary)
+        XCTAssertTrue(CGImageDestinationFinalize(destination))
+
+        let output = try ImageUploadSanitizer.sanitize(input as Data)
+        let source = CGImageSourceCreateWithData(output.data as CFData, nil)!
+        let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any]
+
+        XCTAssertNil(properties?[kCGImagePropertyGPSDictionary])
+        XCTAssertEqual(properties?[kCGImagePropertyOrientation] as? Int, 1)
     }
 
     func testImageSanitizerRejectsAnimatedGIF() {
