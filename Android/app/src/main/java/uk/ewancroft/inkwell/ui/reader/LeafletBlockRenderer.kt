@@ -31,6 +31,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -196,7 +198,9 @@ fun HeaderBlock(block: LeafletBlock, modifier: Modifier = Modifier, textAlign: T
         text = block.plaintext ?: "",
         facets = block.facets,
         style = level,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .semantics { heading() },
         textAlign = textAlign,
         onLinkClick = { url, ctx -> openUrl(ctx, url) }
     )
