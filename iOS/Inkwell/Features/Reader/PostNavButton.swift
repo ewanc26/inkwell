@@ -29,7 +29,7 @@ struct PostNavButton: View {
                     Text(title)
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(theme.foreground)
-                        .lineLimit(dynamicTypeSize.isAccessibilitySize ? 3 : 2)
+                        .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
                         .multilineTextAlignment(.leading)
                 }
             }
@@ -42,7 +42,7 @@ struct PostNavButton: View {
                     Text(title)
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(theme.foreground)
-                        .lineLimit(dynamicTypeSize.isAccessibilitySize ? 3 : 2)
+                        .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
                         .multilineTextAlignment(.trailing)
                 }
                 Image(systemName: "chevron.right")
