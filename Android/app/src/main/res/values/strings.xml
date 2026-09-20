@@ -2,4 +2,9 @@
 <resources>
     <!-- Application display name shown in the launcher and title bar. -->
     <string name="app_name">Inkwell</string>
+    <plurals name="poll_vote_count">
+        <item quantity="one">%d vote</item>
+        <item quantity="other">%d votes</item>
+    </plurals>
+    <string name="poll_no_votes">No votes yet</string>
 </resources>
