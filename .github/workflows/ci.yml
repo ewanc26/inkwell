@@ -162,7 +162,7 @@ jobs:
 
       - name: Assert release permission allowlist
         working-directory: Android
-        run: bash tools/check-release-permissions.sh
+        run: bash tools/check-release-permissions.sh app/build/outputs/apk/release/app-release.apk
 
   website:
     name: Website check + build
