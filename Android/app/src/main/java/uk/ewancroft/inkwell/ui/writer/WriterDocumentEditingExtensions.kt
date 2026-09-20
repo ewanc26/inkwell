@@ -66,6 +66,7 @@ fun WriterViewModel.loadDocumentForEditing(uri: String) {
                 editingDocumentPath = path,
                 editingDocumentMarkdown = markdownText,
                 editingDocumentRevision = cid,
+                editingDocumentRecord = value,
                 title = title,
                 description = description,
                 path = path,
@@ -99,6 +100,7 @@ fun WriterViewModel.cancelEditing() {
     uiStateInternal.value = uiStateInternal.value.copy(
         editingDocumentUri = null,
         editingDocumentRevision = null,
+        editingDocumentRecord = null,
         editingDocumentTitle = null,
         editingDocumentDescription = null,
         editingDocumentPath = null,

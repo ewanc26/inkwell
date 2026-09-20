@@ -68,7 +68,7 @@ fun WriterViewModel.publish() {
                     return@launch
                 }
 
-                val record = buildJsonObject {
+                val record = mergeExistingDocumentRecord(state.editingDocumentRecord) {
                      put("\$type", CollectionNsids.DOCUMENT)
                     put("site", pub.uri)
                     put("title", state.title.trim())
@@ -151,6 +151,14 @@ internal fun ensureDocumentRecordFits(record: JsonObject) {
     check(encodedBytes <= MAX_DOCUMENT_RECORD_BYTES) {
         "Document is too large to publish (${encodedBytes} bytes; limit is $MAX_DOCUMENT_RECORD_BYTES bytes). Use a shorter document or a blob-backed format."
     }
+}
+
+internal fun mergeExistingDocumentRecord(
+    existing: JsonObject?,
+    overrides: kotlinx.serialization.json.JsonObjectBuilder.() -> Unit,
+): JsonObject = buildJsonObject {
+    existing?.forEach { (key, value) -> put(key, value) }
+    overrides()
 }
 
 internal fun markdownToPlaintext(markdown: String): String {
