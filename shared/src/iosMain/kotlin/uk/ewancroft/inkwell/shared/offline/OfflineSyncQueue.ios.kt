@@ -69,7 +69,7 @@ class OfflineSyncQueueIos(durableDirPath: String, legacyCacheDirPath: String) : 
                 attributes = null,
             )
         }
-        NSFileManager.defaultManager.replaceItemAtURL(
+        val replaced = NSFileManager.defaultManager.replaceItemAtURL(
             destinationURL = platform.Foundation.NSURL.fileURLWithPath(queueFilePath),
             withItemAtURL = platform.Foundation.NSURL.fileURLWithPath(temporaryPath),
             backupItemName = null,
@@ -77,6 +77,7 @@ class OfflineSyncQueueIos(durableDirPath: String, legacyCacheDirPath: String) : 
             resultingItemURL = null,
             error = null,
         )
+        check(replaced) { "Unable to replace offline sync queue" }
     }
 
     private fun migrateLegacyIfNeeded() {

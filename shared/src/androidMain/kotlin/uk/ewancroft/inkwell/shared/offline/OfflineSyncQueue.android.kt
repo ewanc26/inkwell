@@ -1,6 +1,7 @@
 package uk.ewancroft.inkwell.shared.offline
 
 import java.io.File
+import java.io.FileOutputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -45,9 +46,17 @@ class OfflineSyncQueueAndroid(durableDirPath: String, legacyCacheDirPath: String
     private fun writeInternal(entries: List<SyncQueueEntry>) {
         queueFile.parentFile?.mkdirs()
         val temporary = File(queueFile.parentFile, "$QUEUE_FILENAME.tmp")
-        temporary.writeText(json.encodeToString(entries))
-        queueFile.delete()
-        check(temporary.renameTo(queueFile)) { "Unable to replace offline sync queue" }
+        FileOutputStream(temporary).use { output ->
+            output.write(json.encodeToString(entries).toByteArray(Charsets.UTF_8))
+            output.fd.sync()
+        }
+        val backup = File(queueFile.parentFile, "$QUEUE_FILENAME.bak")
+        if (queueFile.exists()) check(queueFile.renameTo(backup)) { "Unable to stage offline sync queue replacement" }
+        if (!temporary.renameTo(queueFile)) {
+            backup.takeIf { it.exists() }?.renameTo(queueFile)
+            error("Unable to replace offline sync queue")
+        }
+        backup.delete()
     }
 
     private fun migrateLegacyIfNeeded() {
