@@ -2,8 +2,11 @@ package uk.ewancroft.inkwell.shared.offline
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.nio.file.Files
 
 class OfflineSyncQueueRetentionTest {
     @Test
@@ -36,6 +39,41 @@ class OfflineSyncQueueRetentionTest {
 
         assertEquals(1, retained.size)
         assertEquals(SyncMutationKind.Unrecommend, retained.single().kind)
+    }
+
+    @Test
+    fun `legacy cache queue migrates into durable storage`() = runBlocking {
+        val root = Files.createTempDirectory("inkwell-queue-migration").toFile()
+        try {
+            val durable = root.resolve("files")
+            val legacy = root.resolve("cache").apply { mkdirs() }
+            legacy.resolve("offline_sync_queue.json").writeText(
+                Json.encodeToString(listOf(entry("legacy", 1)))
+            )
+
+            val queue = OfflineSyncQueueJvm(durable.path, legacy.path)
+            assertEquals(listOf("legacy"), queue.load().map(SyncQueueEntry::id))
+            assertEquals(true, durable.resolve("offline_sync_queue.json").exists())
+            assertEquals(false, legacy.resolve("offline_sync_queue.json").exists())
+        } finally {
+            root.deleteRecursively()
+        }
+    }
+
+    @Test
+    fun `corrupt queue is surfaced and retained for recovery`() = runBlocking {
+        val root = Files.createTempDirectory("inkwell-queue-corrupt").toFile()
+        try {
+            val durable = root.resolve("files").apply { mkdirs() }
+            durable.resolve("offline_sync_queue.json").writeText("{truncated")
+
+            val queue = OfflineSyncQueueJvm(durable.path, root.resolve("cache").path)
+            assertFailsWith<Exception> { queue.load() }
+            assertEquals(false, durable.resolve("offline_sync_queue.json").exists())
+            assertEquals(true, durable.listFiles()?.any { it.name.startsWith("offline_sync_queue.json.corrupt-") } == true)
+        } finally {
+            root.deleteRecursively()
+        }
     }
 
     private fun entry(id: String, createdAt: Long, kind: SyncMutationKind = SyncMutationKind.Recommend) =
