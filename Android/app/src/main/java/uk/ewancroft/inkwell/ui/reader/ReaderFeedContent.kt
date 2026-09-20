@@ -17,6 +17,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import uk.ewancroft.inkwell.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,12 +63,11 @@ internal fun FeedContent(
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    if (feedType == "following") "Nothing to read yet" else "No published posts",
+                    stringResource(if (feedType == "following") R.string.reader_empty_following_title else R.string.reader_empty_yours_title),
                     style = MaterialTheme.typography.titleMedium,
                 )
                 Text(
-                    if (feedType == "following") "Subscribe to publications to see their posts here."
-                    else "Posts you publish will appear here.",
+                    stringResource(if (feedType == "following") R.string.reader_empty_following_message else R.string.reader_empty_yours_message),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

@@ -36,6 +36,10 @@
     <string name="auth_sign_in_subtitle">Sign in with your AT Protocol account</string>
     <string name="auth_feature_read">Read long-form posts from any standard.site blog — directly from the AT Protocol network, no middleman.</string>
     <string name="auth_feature_subscribe">Subscribe to publications, leave comments, and recommend posts. Your data stays in your PDS.</string>
+    <string name="reader_empty_following_title">Nothing to read yet</string>
+    <string name="reader_empty_yours_title">No published posts</string>
+    <string name="reader_empty_following_message">Subscribe to publications to see their posts here.</string>
+    <string name="reader_empty_yours_message">Posts you publish will appear here.</string>
     <string name="auth_feature_write">Write and publish your own posts using the standard.site lexicon.</string>
     <string name="auth_handle">Handle</string>
     <string name="auth_continue">Continue</string>
