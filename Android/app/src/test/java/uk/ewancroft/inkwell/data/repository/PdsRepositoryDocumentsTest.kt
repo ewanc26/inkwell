@@ -104,6 +104,13 @@ class PdsRepositoryDocumentsTest {
     }
 
     @Test
+    fun `rejects a missing response MIME type when one is expected`() {
+        assertFailsWith<IOException> {
+            validateBlobContentType(null, "image/png")
+        }
+    }
+
+    @Test
     fun `delete input carries the expected record CID as swapRecord`() {
         val input = deleteRecordInput(
             repo = "did:plc:author",
