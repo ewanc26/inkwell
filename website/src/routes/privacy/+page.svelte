@@ -70,7 +70,7 @@
     <li><strong>AT Protocol identity services:</strong> DNS and <code>plc.directory</code> lookups to resolve handles and DIDs.</li>
     <li><strong>Leaflet Search (<code>leaflet-search-backend.fly.dev</code>):</strong> a cross-platform search index for Standard.site records. Your search terms are sent to it.</li>
     <li><strong>Constellation (<code>constellation.microcosm.blue</code>):</strong> to discover cross-repository backlinks and recommend counts.</li>
-    <li><strong>Bluesky CDN (<code>cdn.bsky.app</code>):</strong> to load images and cover art stored as blobs.</li>
+    <li><strong>Bluesky CDN (<code>cdn.bsky.app</code>):</strong> only for media supplied by Bluesky AppView responses; Standard.site blobs are fetched from their owning PDS.</li>
     <li><strong>Bluesky public API (<code>public.api.bsky.app</code>):</strong> to render embedded Bluesky posts, profiles, and lists that appear inside documents you read.</li>
     <li><strong>userinput.app:</strong> only if you use the optional feedback feature (section 7).</li>
     <li><strong>Ko-fi and GitHub Sponsors:</strong> only if you tap a support link, which opens them in your browser. Any payment is handled entirely by them under their own policies; the developer never receives your payment details through Inkwell.</li>
