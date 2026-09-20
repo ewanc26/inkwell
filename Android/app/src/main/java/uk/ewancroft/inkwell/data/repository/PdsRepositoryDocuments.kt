@@ -65,7 +65,7 @@ internal fun validateBlobContentType(actual: String?, expected: String?) {
 }
 
 internal fun validateDeclaredBlobSize(declaredSize: Long?) {
-    if (declaredSize != null && declaredSize > MAX_READER_BLOB_BYTES) {
+    if (declaredSize != null && (declaredSize < 0 || declaredSize > MAX_READER_BLOB_BYTES)) {
         throw java.io.IOException("Blob declaration exceeds the reader size limit")
     }
 }
