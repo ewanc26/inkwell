@@ -318,8 +318,8 @@ fun ReaderScreen(
                 showTipPrompt = false
                 uk.ewancroft.inkwell.util.TipPromptManager.markShown(appContext)
             },
-            title = { Text("Enjoying Inkwell?") },
-            text = { Text("If you find Inkwell useful, consider buying me a coffee to support ongoing development.") },
+            title = { Text(stringResource(R.string.reader_tip_title)) },
+            text = { Text(stringResource(R.string.reader_tip_message)) },
             confirmButton = {
                 TextButton(onClick = {
                     showTipPrompt = false
@@ -327,7 +327,7 @@ fun ReaderScreen(
                     val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, Uri.parse("https://ko-fi.com/ewancroft"))
                     appContext.startActivity(intent)
                 }) {
-                    Text("Tip me")
+                    Text(stringResource(R.string.reader_tip_confirm))
                 }
             },
             dismissButton = {
@@ -335,7 +335,7 @@ fun ReaderScreen(
                     showTipPrompt = false
                     uk.ewancroft.inkwell.util.TipPromptManager.markShown(appContext)
                 }) {
-                    Text("Maybe later")
+                    Text(stringResource(R.string.reader_tip_dismiss))
                 }
             },
         )

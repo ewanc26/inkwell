@@ -88,6 +88,10 @@
     <string name="reader_retry">Retry</string>
     <string name="reader_loading_recommendations">Loading recommendations…</string>
     <string name="reader_more_actions_for">More actions for %1$s</string>
+    <string name="reader_tip_title">Enjoying Inkwell?</string>
+    <string name="reader_tip_message">If you find Inkwell useful, consider buying me a coffee to support ongoing development.</string>
+    <string name="reader_tip_confirm">Tip me</string>
+    <string name="reader_tip_dismiss">Maybe later</string>
     <string name="reader_posts">Posts</string>
     <string name="reader_all_posts">All posts</string>
     <string name="reader_unsupported_content">Unsupported content format</string>
