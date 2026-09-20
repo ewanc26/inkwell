@@ -80,6 +80,7 @@ enum BSkyListFetcher {
                     logger.error("[BSkyListFetcher] Bad response fetching list \(listUri)")
                     return members
                 }
+                try JSONSafety.validateResponse(data)
                 let page = try JSONDecoder().decode(GetListResponse.self, from: data)
                 members.append(contentsOf: page.items.map(\.subject))
                 cursor = page.cursor

@@ -163,6 +163,7 @@ final class StandardReaderAPI {
               (200...299).contains(http.statusCode) else {
             throw URLError(.badServerResponse)
         }
+        try JSONSafety.validateResponse(data)
         return try JSONDecoder().decode(ReaderSearchActorResponse.self, from: data)
     }
 
@@ -178,6 +179,7 @@ final class StandardReaderAPI {
               (200...299).contains(http.statusCode) else {
             throw URLError(.badServerResponse)
         }
+        try JSONSafety.validateResponse(data)
         return try JSONDecoder().decode(ReaderSearchResponse.self, from: data)
     }
 }

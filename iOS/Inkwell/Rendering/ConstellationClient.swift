@@ -106,6 +106,7 @@ enum ConstellationClient {
             throw URLError(.badServerResponse)
         }
 
+        try JSONSafety.validateResponse(data)
         let decoded = try JSONDecoder().decode(GetBacklinksResponse.self, from: data)
         let backlinks = decoded.records ?? []
         logger.info("[Constellation] getBacklinks returned \(backlinks.count) backlinks, cursor=\(decoded.cursor ?? "nil")")
