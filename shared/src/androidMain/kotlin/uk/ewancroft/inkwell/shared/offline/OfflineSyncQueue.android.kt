@@ -51,6 +51,10 @@ class OfflineSyncQueueAndroid(durableDirPath: String, legacyCacheDirPath: String
     private fun preserveCorruptQueue() {
         val preserved = File(queueFile.parentFile, "$QUEUE_FILENAME.corrupt-${System.currentTimeMillis()}")
         runCatching { queueFile.copyTo(preserved, overwrite = false) }
+        // Leave the preserved artifact for recovery, but remove the active
+        // path so the next load can start from an empty queue instead of
+        // repeatedly failing on the same corrupt bytes.
+        queueFile.delete()
     }
 
     private fun decodeEntries(raw: String): List<SyncQueueEntry> = runCatching {
