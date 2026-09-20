@@ -73,6 +73,15 @@ class PdsRepositoryDocumentsTest {
     }
 
     @Test
+    fun `rejects a streamed blob that crosses the reader limit`() {
+        val bytes = ByteArray(10 * 1024 * 1024 + 1)
+
+        assertFailsWith<IOException> {
+            readBoundedBlob(bytes.toResponseBody())
+        }
+    }
+
+    @Test
     fun `rejects a declared blob size over the reader limit`() {
         assertFailsWith<IOException> {
             validateDeclaredBlobSize(10L * 1024 * 1024 + 1)
