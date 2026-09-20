@@ -15,6 +15,9 @@ final class NotificationNavigationCoordinator {
     private(set) var pendingDocumentURI: String?
 
     func enqueue(documentURI: String) {
+        guard parseAtUri(documentURI)?.collection == SiteStandardLexicon.DocumentRecord.type else {
+            return
+        }
         pendingDocumentURI = documentURI
     }
 

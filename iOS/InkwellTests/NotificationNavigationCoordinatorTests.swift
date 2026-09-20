@@ -31,4 +31,14 @@ final class NotificationNavigationCoordinatorTests: XCTestCase {
             "at://did:plc:test/site.standard.document/new"
         )
     }
+
+    func testMalformedOrNonDocumentPayloadDoesNotEnterNavigationQueue() {
+        let coordinator = NotificationNavigationCoordinator()
+
+        coordinator.enqueue(documentURI: "not-an-at-uri")
+        XCTAssertNil(coordinator.pendingDocumentURI)
+
+        coordinator.enqueue(documentURI: "at://did:plc:test/site.standard.publication/pub")
+        XCTAssertNil(coordinator.pendingDocumentURI)
+    }
 }
