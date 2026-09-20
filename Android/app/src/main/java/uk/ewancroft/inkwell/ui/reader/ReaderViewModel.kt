@@ -38,6 +38,7 @@ import uk.ewancroft.inkwell.shared.feed.toCachedFeedItem
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 import uk.ewancroft.inkwell.shared.jetstream.JetstreamConfig
 import uk.ewancroft.inkwell.shared.jetstream.createJetstreamClient
+import uk.ewancroft.inkwell.shared.jetstream.JetstreamRetryPolicy
 import uk.ewancroft.inkwell.shared.moderation.ReportReasonType
 import uk.ewancroft.inkwell.shared.moderation.ContentFilterDecision
 import uk.ewancroft.inkwell.shared.moderation.ContentFilterEngine
@@ -651,11 +652,11 @@ class ReaderViewModel @Inject constructor(
         )
 
         jetstreamJob = viewModelScope.launch {
-            jetstreamClient.connect(config)
-                .catch { e ->
-                    Log.w("ReaderViewModel", "Jetstream connection error", e)
-                }
-                .collect { payload ->
+            var attempt = 0
+            while (isActive) {
+                jetstreamClient.connect(config)
+                    .catch { e -> Log.w("ReaderViewModel", "Jetstream connection error", e) }
+                    .collect { payload ->
                     if (payload.collection != "site.standard.document") return@collect
 
                     // Parse the event into a CachedFeedItem.
@@ -704,7 +705,10 @@ class ReaderViewModel @Inject constructor(
                         // detail screen's offline fallback.
                         offlineContentCache.remove(deletedUri)
                     }
-                }
+                    }
+                if (!isActive) break
+                delay(JetstreamRetryPolicy.delayMillis(attempt++))
+            }
         }
     }
 
