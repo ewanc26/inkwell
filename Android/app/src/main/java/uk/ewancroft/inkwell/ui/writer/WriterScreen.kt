@@ -357,18 +357,18 @@ fun WriterScreen(
 
             OutlinedTextField(
                 value = uiState.title, onValueChange = { viewModel.onTitleChanged(it) },
-                label = { Text("Title") }, singleLine = true,
+                label = { Text(stringResource(R.string.writer_title)) }, singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
                 value = uiState.description, onValueChange = { viewModel.onDescriptionChanged(it) },
-                label = { Text("Description (optional)") }, maxLines = 3,
+                label = { Text(stringResource(R.string.writer_description_optional)) }, maxLines = 3,
                 modifier = Modifier.fillMaxWidth()
             )
 
             OutlinedTextField(
                 value = uiState.path, onValueChange = { viewModel.onPathChanged(it) },
-                label = { Text("Path (optional, e.g. my-post)") }, singleLine = true,
+                label = { Text(stringResource(R.string.writer_path_optional)) }, singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -431,7 +431,7 @@ fun WriterScreen(
             // Content editor
             OutlinedTextField(
                 value = markdownField, onValueChange = ::updateMarkdownField,
-                label = { Text("Content (Markdown)") },
+                label = { Text(stringResource(R.string.writer_content_markdown)) },
                 modifier = Modifier.fillMaxWidth().heightIn(min = 240.dp),
                 minLines = 10
             )
