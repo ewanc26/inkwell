@@ -290,13 +290,13 @@ fun WriterScreen(
                             modifier = Modifier.weight(1f),
                         )
                         TextButton(onClick = { viewModel.cancelEditing() }) {
-                            Text("Cancel", style = MaterialTheme.typography.bodySmall)
+                            Text(stringResource(R.string.reader_cancel), style = MaterialTheme.typography.bodySmall)
                         }
                         IconButton(
                             onClick = { showDeleteConfirmation = true },
                             enabled = !uiState.isPublishing,
                         ) {
-                            Icon(Icons.Outlined.Delete, contentDescription = "Delete document")
+                            Icon(Icons.Outlined.Delete, contentDescription = stringResource(R.string.writer_delete_document))
                         }
                     }
                 }
@@ -502,7 +502,7 @@ fun WriterScreen(
                         ) { Text(stringResource(R.string.writer_delete)) }
                     },
                     dismissButton = {
-                        TextButton(onClick = { showDeleteConfirmation = false }) { Text("Cancel") }
+                        TextButton(onClick = { showDeleteConfirmation = false }) { Text(stringResource(R.string.reader_cancel)) }
                     },
                 )
             }

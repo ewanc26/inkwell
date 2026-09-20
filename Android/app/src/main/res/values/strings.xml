@@ -122,6 +122,7 @@
     <string name="writer_delete_title">Delete %1$s?</string>
     <string name="writer_delete_message">This permanently removes the document from your repository. The current record version will be checked first.</string>
     <string name="writer_delete">Delete</string>
+    <string name="writer_delete_document">Delete document</string>
     <string name="writer_title">Title</string>
     <string name="writer_description_optional">Description (optional)</string>
     <string name="writer_path_optional">Path (optional, e.g. my-post)</string>
