@@ -185,13 +185,14 @@ class MainActivity : ComponentActivity() {
 
 internal object OAuthCallbackPolicy {
     fun isCallback(uri: android.net.Uri): Boolean =
-        uri.scheme == "uk.ewancroft.inkwell" && uri.path == "/callback"
+        uri.scheme?.equals("uk.ewancroft.inkwell", ignoreCase = true) == true && uri.path == "/callback"
 }
 
 internal object ContentDeepLinkPolicy {
     fun documentUri(intent: Intent): String? {
         val data = intent.data ?: return null
-        if (data.scheme != "inkwell" || data.host != "document") return null
+        if (!data.scheme.equals("inkwell", ignoreCase = true) ||
+            !data.host.equals("document", ignoreCase = true)) return null
         val raw = data.getQueryParameter("uri") ?: return null
         val parsed = AtUri.parse(raw) ?: return null
         return raw.takeIf { parsed.collection == CollectionNsids.DOCUMENT }
