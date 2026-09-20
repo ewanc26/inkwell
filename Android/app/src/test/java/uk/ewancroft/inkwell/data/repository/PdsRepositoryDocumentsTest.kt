@@ -28,6 +28,13 @@ class PdsRepositoryDocumentsTest {
     }
 
     @Test
+    fun `rejects a negative declared blob size`() {
+        assertFailsWith<IOException> {
+            validateDeclaredBlobSize(-1)
+        }
+    }
+
+    @Test
     fun `accepts matching response MIME type and rejects a mismatch`() {
         validateBlobContentType("application/json; charset=utf-8", "application/json")
         assertFailsWith<IOException> {

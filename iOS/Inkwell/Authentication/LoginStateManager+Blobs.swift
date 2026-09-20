@@ -97,7 +97,7 @@ extension LoginStateManager {
 }
 
 func validateDeclaredBlobSize(_ declaredSize: Int?) throws {
-    if let declaredSize, declaredSize > maxReaderBlobBytes {
+    if let declaredSize, declaredSize < 0 || declaredSize > maxReaderBlobBytes {
         throw BlobDownloadError.oversized
     }
 }

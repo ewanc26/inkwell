@@ -9,4 +9,8 @@ final class BlobDownloadTests: XCTestCase {
     func testDeclaredBlobSizeOverLimitIsRejected() {
         XCTAssertThrowsError(try validateDeclaredBlobSize(10 * 1024 * 1024 + 1))
     }
+
+    func testNegativeDeclaredBlobSizeIsRejected() {
+        XCTAssertThrowsError(try validateDeclaredBlobSize(-1))
+    }
 }
