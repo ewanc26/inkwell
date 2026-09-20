@@ -209,12 +209,9 @@ struct SettingsView: View {
                 }
 
                 Section {
-                    LabeledContent(
-                        "Saved changes",
-                        value: offlineMutationStore.pendingCount == 1
-                            ? "1 waiting to sync"
-                            : "\(offlineMutationStore.pendingCount) waiting to sync"
-                    )
+                    LabeledContent("Saved changes") {
+                        Text("^[\(offlineMutationStore.pendingCount) change](inflect: true) waiting to sync")
+                    }
                     if offlineMutationStore.pendingCount > 0 {
                         Button("Sync Saved Changes Now") {
                             Task {
