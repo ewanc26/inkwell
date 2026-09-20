@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,12 +44,14 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import uk.ewancroft.inkwell.data.model.content.LeafletBlock
 import uk.ewancroft.inkwell.shared.AtUri
-import uk.ewancroft.inkwell.shared.content.CdnUrls
 import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
 import uk.ewancroft.inkwell.util.formatPublishedDate
 
 @Composable
-fun StandardSitePostBlock(block: LeafletBlock) {
+fun StandardSitePostBlock(
+    block: LeafletBlock,
+    onLoadImage: suspend (String, String) -> ByteArray? = { _, _ -> null },
+) {
     val subjectUri = block.standardSitePostSubject ?: block.subject?.uri ?: return
     val size = block.size
 
@@ -92,7 +95,7 @@ fun StandardSitePostBlock(block: LeafletBlock) {
                 }
             }
             document != null -> {
-                StandardSitePostContent(doc = document!!, isSmall = size == "small")
+                StandardSitePostContent(doc = document!!, isSmall = size == "small", onLoadImage = onLoadImage)
             }
         }
     }
@@ -175,12 +178,25 @@ private suspend fun fetchStandardSitePost(uri: String): StandardSitePostData? {
 }
 
 @Composable
-private fun StandardSitePostContent(doc: StandardSitePostData, isSmall: Boolean) {
+private fun StandardSitePostContent(
+    doc: StandardSitePostData,
+    isSmall: Boolean,
+    onLoadImage: suspend (String, String) -> ByteArray?,
+) {
+    val coverCid = doc.coverImageCid
+    val coverBytes = if (!isSmall && coverCid != null) {
+        produceState<ByteArray?>(initialValue = null, doc.authorDid, coverCid) {
+            value = onLoadImage(doc.authorDid, coverCid)
+        }.value
+    } else {
+        null
+    }
+
     Column {
         // Cover image
         if (!isSmall && doc.coverImageCid != null) {
             AsyncImage(
-                model = CdnUrls.bskyThumbnail(doc.authorDid, doc.coverImageCid ?: ""),
+                model = coverBytes,
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
