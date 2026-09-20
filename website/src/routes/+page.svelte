@@ -98,17 +98,17 @@
     style="--i: 4"
     aria-label="Project badges"
   >
-    <a href="https://github.com/ewanc26/inkwell/releases/latest?q=ios-v">
+    <a href="https://github.com/ewanc26/inkwell/releases/latest">
       <img
-        src="https://img.shields.io/github/v/release/ewanc26/inkwell?filter=ios-v*&label=iOS&logo=apple&logoColor=white"
-        alt="Latest iOS release"
+        src="https://img.shields.io/github/v/release/ewanc26/inkwell?label=iOS&logo=apple&logoColor=white"
+        alt="Latest Inkwell release for iOS"
         height="20"
       />
     </a>
-    <a href="https://github.com/ewanc26/inkwell/releases/latest?q=android-v">
+    <a href="https://github.com/ewanc26/inkwell/releases/latest">
       <img
-        src="https://img.shields.io/github/v/release/ewanc26/inkwell?filter=android-v*&label=Android&logo=android&logoColor=white"
-        alt="Latest Android release"
+        src="https://img.shields.io/github/v/release/ewanc26/inkwell?label=Android&logo=android&logoColor=white"
+        alt="Latest Inkwell release for Android"
         height="20"
       />
     </a>

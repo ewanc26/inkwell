@@ -151,9 +151,18 @@ function readIosVersion() {
 
 // ── Published-state readers ──────────────────────────────────────
 
-function ghReleaseExists(tag) {
-  const out = quiet(`gh release view ${tag} --repo ewanc26/inkwell --json tagName 2>/dev/null`);
-  return out !== null;
+function ghRelease(tag) {
+  const out = quiet(`gh release view ${tag} --repo ewanc26/inkwell --json tagName,assets 2>/dev/null`);
+  if (!out) return null;
+  try {
+    return JSON.parse(out);
+  } catch {
+    return null;
+  }
+}
+
+function ghReleaseHasAsset(tag, assetName) {
+  return ghRelease(tag)?.assets?.some((asset) => asset.name === assetName) ?? false;
 }
 
 function gitTagExists(tag) {
@@ -185,8 +194,8 @@ function status() {
   console.log(`  iOS      ${ios.name} (build ${ios.build})`);
   console.log(`  Android  ${android.name} (versionCode ${android.code})\n`);
 
-  const iosTag = `ios-v${ios.name}`;
-  const androidTag = `android-v${android.name}`;
+  const releaseTag = `v${ios.name}`;
+  const release = ghRelease(releaseTag);
 
   const rows = [];
 
@@ -198,8 +207,10 @@ function status() {
   ]);
   rows.push([
     "iOS · GitHub Release",
-    ghReleaseExists(iosTag),
-    ghReleaseExists(iosTag) ? iosTag : `${iosTag} missing`,
+    release && ghReleaseHasAsset(releaseTag, `Inkwell-${ios.name}.ipa`),
+    release
+      ? (ghReleaseHasAsset(releaseTag, `Inkwell-${ios.name}.ipa`) ? releaseTag : `${releaseTag} missing iOS asset`)
+      : `${releaseTag} missing`,
   ]);
 
   const fdroid = fdroidLatest();
@@ -210,8 +221,10 @@ function status() {
   ]);
   rows.push([
     "Android · GitHub Release",
-    ghReleaseExists(androidTag),
-    ghReleaseExists(androidTag) ? androidTag : `${androidTag} missing`,
+    release && ghReleaseHasAsset(releaseTag, `Inkwell-${android.name}.apk`),
+    release
+      ? (ghReleaseHasAsset(releaseTag, `Inkwell-${android.name}.apk`) ? releaseTag : `${releaseTag} missing Android asset`)
+      : `${releaseTag} missing`,
   ]);
 
   let allCurrent = true;
@@ -263,10 +276,11 @@ function resolveNotes(platformDir, sinceTag) {
 
 async function publishAndroid() {
   const { name, code } = readAndroidVersion();
-  const tag = `android-v${name}`;
+  const tag = `v${name}`;
+  const apkName = `Inkwell-${name}.apk`;
 
-  if (ghReleaseExists(tag)) {
-    const msg = `${tag} is already published on GitHub.`;
+  if (ghReleaseHasAsset(tag, apkName)) {
+    const msg = `${tag} already contains ${apkName} on GitHub.`;
     if (SKIP_EXISTING) {
       console.log(`${msg} --skip-existing set, nothing to do.`);
       return;
@@ -276,7 +290,6 @@ async function publishAndroid() {
 
   console.log(`Publishing Android ${name} (versionCode ${code})${YES ? "" : " [dry run]"}\n`);
 
-  const apkName = `Inkwell-${name}.apk`;
   const fdroidRepoDir = path.join(root, "Android", "fdroid-repo");
   const builtApk = path.join(root, "Android", "app", "build", "outputs", "apk", "release", "app-release.apk");
   const repoApk = path.join(fdroidRepoDir, "repo", apkName);
@@ -291,7 +304,7 @@ async function publishAndroid() {
     console.log(`  4. bump metadata/uk.ewancroft.inkwell.yml to ${name} / ${code}`);
     console.log("  5. fdroid update --clean   (in Android/fdroid-repo/)");
     console.log("  6. mirror the regenerated repo/ into website/static/fdroid/repo");
-    console.log(`  7. gh release create ${tag} <apk> --title ... --notes ...`);
+    console.log(`  7. create or upload ${apkName} to unified GitHub release ${tag}`);
     console.log("  8. git commit the resulting changes" + (PUSH ? " and push" : " (local only, pass --push to push)"));
     console.log("\nRe-run with --yes to actually do this.");
     return;
@@ -339,18 +352,14 @@ async function publishAndroid() {
   const notesPath = path.join(root, ".release-notes-android.md");
   writeFileSync(notesPath, notes);
 
-  run("gh", [
-    "release",
-    "create",
-    tag,
-    repoApk,
-    "--repo",
-    "ewanc26/inkwell",
-    "--title",
-    `Inkwell for Android ${name} (versionCode ${code})`,
-    "--notes-file",
-    notesPath,
-  ]);
+  if (ghRelease(tag)) {
+    run("gh", ["release", "upload", tag, repoApk, "--repo", "ewanc26/inkwell", "--clobber"]);
+  } else {
+    run("gh", [
+      "release", "create", tag, repoApk, "--repo", "ewanc26/inkwell",
+      "--title", `Inkwell ${name}`, "--notes-file", notesPath,
+    ]);
+  }
   rmSync(notesPath);
 
   commitAndMaybePush(
@@ -394,11 +403,12 @@ function compareSemver(a, b) {
 
 async function publishIos() {
   const { name, build } = readIosVersion();
-  const tag = `ios-v${name}`;
+  const tag = `v${name}`;
   const ipaArg = option("ipa");
+  const destIpaName = `Inkwell-${name}.ipa`;
 
-  if (ghReleaseExists(tag)) {
-    const msg = `${tag} is already published on GitHub.`;
+  if (ghReleaseHasAsset(tag, destIpaName)) {
+    const msg = `${tag} already contains ${destIpaName} on GitHub.`;
     if (SKIP_EXISTING) {
       console.log(`${msg} --skip-existing set, nothing to do.`);
       return;
@@ -418,7 +428,6 @@ async function publishIos() {
 
   console.log(`Publishing iOS ${name} (build ${build})${YES ? "" : " [dry run]"}\n`);
 
-  const destIpaName = `Inkwell-${name}.ipa`;
   const destIpaPath = path.join(root, "website", "static", "altstore", destIpaName);
   const sourceJsonPaths = [
     path.join(root, "iOS", "altstore", "source.json"),
@@ -429,7 +438,7 @@ async function publishIos() {
     console.log("Would run:");
     console.log(`  1. copy ${ipaArg} to website/static/altstore/${destIpaName}`);
     console.log(`  2. prepend a new versions[] entry to source.json (version ${name}, build ${build})`);
-    console.log(`  3. gh release create ${tag} <ipa> --title ... --notes ...`);
+    console.log(`  3. create or upload ${destIpaName} to unified GitHub release ${tag}`);
     console.log("  4. git commit the resulting changes" + (PUSH ? " and push" : " (local only, pass --push to push)"));
     console.log("\nRe-run with --yes to actually do this.");
     return;
@@ -472,18 +481,14 @@ async function publishIos() {
 
   const notesPath = path.join(root, ".release-notes-ios.md");
   writeFileSync(notesPath, notes);
-  run("gh", [
-    "release",
-    "create",
-    tag,
-    destIpaPath,
-    "--repo",
-    "ewanc26/inkwell",
-    "--title",
-    `Inkwell for iOS ${name} (build ${build})`,
-    "--notes-file",
-    notesPath,
-  ]);
+  if (ghRelease(tag)) {
+    run("gh", ["release", "upload", tag, destIpaPath, "--repo", "ewanc26/inkwell", "--clobber"]);
+  } else {
+    run("gh", [
+      "release", "create", tag, destIpaPath, "--repo", "ewanc26/inkwell",
+      "--title", `Inkwell ${name}`, "--notes-file", notesPath,
+    ]);
+  }
   rmSync(notesPath);
 
   commitAndMaybePush(
