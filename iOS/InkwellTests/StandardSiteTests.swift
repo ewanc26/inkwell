@@ -84,6 +84,44 @@ final class StandardSiteTests: XCTestCase {
         ))
     }
 
+    func testDIDWebUsesItsAuthoritativeDocumentPath() {
+        XCTAssertEqual(
+            didDocumentURL(for: "did:web:example.com")?.absoluteString,
+            "https://example.com/.well-known/did.json"
+        )
+        XCTAssertEqual(
+            didDocumentURL(for: "did:web:example.com:users:alice")?.absoluteString,
+            "https://example.com/users/alice/did.json"
+        )
+        XCTAssertEqual(
+            didDocumentURL(for: "did:plc:alice")?.absoluteString,
+            "https://plc.directory/did:plc:alice"
+        )
+    }
+
+    func testDIDDocumentRequiresTheAtprotoPDSService() {
+        let document: [String: Any] = [
+            "service": [[
+                "id": "did:web:example.com#atproto_pds",
+                "type": "AtprotoPersonalDataServer",
+                "serviceEndpoint": "https://pds.example/"
+            ]]
+        ]
+        XCTAssertEqual(
+            atprotoPDSURL(from: document, did: "did:web:example.com")?.absoluteString,
+            "https://pds.example/"
+        )
+
+        let invalid: [String: Any] = [
+            "service": [[
+                "id": "#atproto_pds",
+                "type": "Other",
+                "serviceEndpoint": "http://pds.example"
+            ]]
+        ]
+        XCTAssertNil(atprotoPDSURL(from: invalid, did: "did:web:example.com"))
+    }
+
     func testPublicationAssociationPrefersATURIAndAcceptsNormalizedURL() {
         let publication = PublicationEntry(
             uri: "at://did:plc:alice/site.standard.publication/3pub",
