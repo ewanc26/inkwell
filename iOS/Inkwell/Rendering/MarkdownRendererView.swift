@@ -54,6 +54,7 @@ struct MarkdownRendererView: View {
                 .font(theme.headingFont(style, weight: .bold))
                 .foregroundStyle(foregroundColor)
                 .padding(.top, level == 1 ? 8 : 4)
+                .accessibilityAddTraits(.isHeader)
 
         case .paragraph(let text):
             Text(renderInline(text))
