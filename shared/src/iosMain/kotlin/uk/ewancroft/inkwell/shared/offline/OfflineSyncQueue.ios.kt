@@ -85,7 +85,7 @@ class OfflineSyncQueueIos(durableDirPath: String, legacyCacheDirPath: String) : 
             )
         }
         val replaced = NSFileManager.defaultManager.replaceItemAtURL(
-            destinationURL = platform.Foundation.NSURL.fileURLWithPath(queueFilePath),
+            originalItemURL = platform.Foundation.NSURL.fileURLWithPath(queueFilePath),
             withItemAtURL = platform.Foundation.NSURL.fileURLWithPath(temporaryPath),
             backupItemName = null,
             options = 0u,
