@@ -274,6 +274,9 @@ class ReaderViewModel @Inject constructor(
                 throw error
             } catch (error: Exception) {
                 Log.w("ReaderViewModel", "Could not replay saved offline changes", error)
+                _uiState.value = _uiState.value.copy(
+                    pendingSyncMessage = "Saved changes need recovery. The damaged queue was preserved for diagnosis."
+                )
             } finally {
                 isSyncingPendingMutations = false
                 _uiState.value = _uiState.value.copy(isSyncingPendingChanges = false)
@@ -284,8 +287,15 @@ class ReaderViewModel @Inject constructor(
     fun refreshPendingMutationCount() {
         viewModelScope.launch {
             val session = pdsRepository.getSession()
-            val count = session?.let { OfflineMutationQueue.pendingCount(context, it.did) } ?: 0
-            _uiState.value = _uiState.value.copy(pendingSyncCount = count)
+            try {
+                val count = session?.let { OfflineMutationQueue.pendingCount(context, it.did) } ?: 0
+                _uiState.value = _uiState.value.copy(pendingSyncCount = count)
+            } catch (error: Exception) {
+                Log.w("ReaderViewModel", "Could not read saved offline changes", error)
+                _uiState.value = _uiState.value.copy(
+                    pendingSyncMessage = "Saved changes need recovery. The damaged queue was preserved for diagnosis."
+                )
+            }
         }
     }
 
