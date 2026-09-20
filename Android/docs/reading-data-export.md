@@ -30,5 +30,6 @@ compatibility. The complete file is validated before anything is written.
 
 Import is a timestamp-aware merge. A record replaces local state only when its
 timestamp is newer; an older export cannot silently overwrite newer local
-choices. The UI previews the number of changes and requires confirmation
-before applying the merge.
+choices. If an export contains duplicate entries for one article, the newest
+entry wins before preview and merge, regardless of file order. The UI previews
+the number of changes and requires confirmation before applying the merge.
