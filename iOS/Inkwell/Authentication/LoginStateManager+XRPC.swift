@@ -87,6 +87,9 @@ extension LoginStateManager {
             logger.error("[authenticatedData] response exceeded safety budget")
             throw URLError(.dataLengthExceedsMaximum)
         }
+        if (response as? HTTPURLResponse)?.value(forHTTPHeaderField: "Content-Type")?.localizedCaseInsensitiveContains("json") == true {
+            try JSONSafety.validate(data)
+        }
         return data
     }
 
@@ -140,6 +143,9 @@ extension LoginStateManager {
         guard data.count <= maxXRPCResponseBytes else {
             logger.error("[unauthenticatedData] response exceeded safety budget")
             throw URLError(.dataLengthExceedsMaximum)
+        }
+        if (response as? HTTPURLResponse)?.value(forHTTPHeaderField: "Content-Type")?.localizedCaseInsensitiveContains("json") == true {
+            try JSONSafety.validate(data)
         }
         return data
     }

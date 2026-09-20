@@ -1,0 +1,32 @@
+import Foundation
+
+enum JSONSafety {
+    static let maxDepth = 32
+    static let maxContainerElements = 131_072
+    static let maxStringBytes = 1_048_576
+
+    static func validate(_ data: Data) throws {
+        let object = try JSONSerialization.jsonObject(with: data, options: [.fragmentsAllowed])
+        var containers = 0
+
+        func visit(_ value: Any, depth: Int) throws {
+            guard depth <= maxDepth else { throw URLError(.cannotParseResponse) }
+            if let dictionary = value as? [String: Any] {
+                containers += dictionary.count
+                guard containers <= maxContainerElements else { throw URLError(.cannotParseResponse) }
+                for (key, child) in dictionary {
+                    guard key.utf8.count <= maxStringBytes else { throw URLError(.cannotParseResponse) }
+                    try visit(child, depth: depth + 1)
+                }
+            } else if let array = value as? [Any] {
+                containers += array.count
+                guard containers <= maxContainerElements else { throw URLError(.cannotParseResponse) }
+                for child in array { try visit(child, depth: depth + 1) }
+            } else if let string = value as? String {
+                guard string.utf8.count <= maxStringBytes else { throw URLError(.cannotParseResponse) }
+            }
+        }
+
+        try visit(object, depth: 0)
+    }
+}
