@@ -86,6 +86,7 @@ extension LoginStateManager {
             throw LoginError.httpError(status: status)
         }
 
+        try JSONSafety.validateResponse(responseData)
         let blob = try JSONDecoder().decode(ComAtprotoLexicon.Repository.UploadBlobOutput.self, from: responseData)
         guard blob.size == data.count,
               blob.mimeType == mimeType,
