@@ -27,7 +27,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -315,7 +317,9 @@ private fun renderTaskList(
                     text = checkChar,
                     style = MaterialTheme.typography.bodyLarge,
                     color = checkColor,
-                    modifier = Modifier.padding(top = 2.dp),
+                    modifier = Modifier
+                        .padding(top = 2.dp)
+                        .clearAndSetSemantics {},
                 )
                 LinkAwareText(
                     text = renderInline(item.text, bodyColor, accentColor, uriHandler, underlineLinks),
@@ -326,7 +330,11 @@ private fun renderTaskList(
                     },
                     color = bodyColor,
                     textDecoration = if (item.checked == true) TextDecoration.LineThrough else TextDecoration.None,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .semantics(mergeDescendants = true) {
+                            stateDescription = if (item.checked == true) "Completed" else "Not completed"
+                        },
                 )
             }
         }
