@@ -358,9 +358,13 @@ class InkwellNotificationManager @Inject constructor(
     )
 
     private fun activateAccount(did: String) {
-        val safeDID = did.replace(Regex("[^A-Za-z0-9._-]"), "_")
-        prefs = context.getSharedPreferences("inkwell_notifications_$safeDID", Context.MODE_PRIVATE)
+        prefs = context.getSharedPreferences(notificationPreferencesName(did), Context.MODE_PRIVATE)
     }
+}
+
+internal fun notificationPreferencesName(did: String): String {
+    val safeDID = did.replace(Regex("[^A-Za-z0-9._-]"), "_")
+    return "inkwell_notifications_$safeDID"
 }
 
 @Serializable
