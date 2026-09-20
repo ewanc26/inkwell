@@ -120,6 +120,15 @@ final class StandardSiteTests: XCTestCase {
             ]]
         ]
         XCTAssertNil(atprotoPDSURL(from: invalid, did: "did:web:example.com"))
+
+        let pathBearing: [String: Any] = [
+            "service": [[
+                "id": "#atproto_pds",
+                "type": "AtprotoPersonalDataServer",
+                "serviceEndpoint": "https://pds.example/xrpc"
+            ]]
+        ]
+        XCTAssertNil(atprotoPDSURL(from: pathBearing, did: "did:web:example.com"))
     }
 
     func testPublicationAssociationPrefersATURIAndAcceptsNormalizedURL() {
