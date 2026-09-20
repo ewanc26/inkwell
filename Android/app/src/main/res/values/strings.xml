@@ -33,4 +33,13 @@
     <string name="reader_bookmark">Bookmark</string>
     <string name="reader_remove_bookmark">Remove bookmark</string>
     <string name="reader_bookmarked">Bookmarked</string>
+    <string name="auth_sign_in_subtitle">Sign in with your AT Protocol account</string>
+    <string name="auth_feature_read">Read long-form posts from any standard.site blog — directly from the AT Protocol network, no middleman.</string>
+    <string name="auth_feature_subscribe">Subscribe to publications, leave comments, and recommend posts. Your data stays in your PDS.</string>
+    <string name="auth_feature_write">Write and publish your own posts using the standard.site lexicon.</string>
+    <string name="auth_handle">Handle</string>
+    <string name="auth_continue">Continue</string>
+    <string name="auth_oauth_note">Inkwell uses OAuth to sign in to your PDS securely.</string>
+    <string name="auth_browser_note">Your browser will open so you can approve access — no app password needed.</string>
+    <string name="auth_about">About Inkwell</string>
 </resources>
