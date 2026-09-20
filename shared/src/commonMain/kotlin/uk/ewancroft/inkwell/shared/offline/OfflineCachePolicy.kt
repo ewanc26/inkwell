@@ -145,19 +145,20 @@ interface OfflineSyncQueue {
     suspend fun remove(ids: Set<String>)
 }
 
-/** Bounded retention for locally pending, user-initiated mutations. */
+/** Retention for locally pending, user-initiated mutations.
+ *
+ * Pending mutations are not cache entries: expiry or a count cap would silently
+ * discard user-authored work. They remain until replay succeeds or the caller
+ * explicitly removes them.
+ */
 object OfflineSyncQueueRetention {
-    const val maxEntries: Int = 500
-    const val maxAgeMillis: Long = 30L * 24 * 60 * 60 * 1_000
-
+    @Suppress("UNUSED_PARAMETER")
     fun retain(entries: Collection<SyncQueueEntry>, nowMillis: Long): List<SyncQueueEntry> {
         val latestById = linkedMapOf<String, SyncQueueEntry>()
         entries.forEach { latestById[it.id] = it }
         return latestById.values
             .asSequence()
-            .filter { nowMillis - it.createdAtMillis < maxAgeMillis }
             .sortedWith(compareBy<SyncQueueEntry> { it.createdAtMillis }.thenBy { it.id })
             .toList()
-            .takeLast(maxEntries)
     }
 }

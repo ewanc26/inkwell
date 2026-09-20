@@ -17,14 +17,14 @@ class OfflineSyncQueueRetentionTest {
         assertEquals(listOf(entry), decoded.entries)
     }
     @Test
-    fun `retention removes stale mutations and keeps chronological order`() {
-        val now = OfflineSyncQueueRetention.maxAgeMillis + 1
+    fun `retention preserves stale mutations and keeps chronological order`() {
+        val now = 30L * 24 * 60 * 60 * 1_000 + 1
         val retained = OfflineSyncQueueRetention.retain(
             entries = listOf(entry("stale", 0), entry("later", now - 1), entry("first", now - 2)),
             nowMillis = now,
         )
 
-        assertEquals(listOf("first", "later"), retained.map(SyncQueueEntry::id))
+        assertEquals(listOf("stale", "first", "later"), retained.map(SyncQueueEntry::id))
     }
 
     @Test
