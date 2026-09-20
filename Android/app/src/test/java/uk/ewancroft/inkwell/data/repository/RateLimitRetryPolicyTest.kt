@@ -26,4 +26,15 @@ class RateLimitRetryPolicyTest {
         assertEquals(400L, RateLimitRetryPolicy.delayMillis("not-a-date", attempt = 2))
         assertEquals(51_200L, RateLimitRetryPolicy.delayMillis("not-a-date", attempt = 20))
     }
+
+    @Test fun `expired HTTP date uses bounded exponential fallback`() {
+        assertEquals(
+            400L,
+            RateLimitRetryPolicy.delayMillis(
+                "Sun, 20 Sep 2026 00:00:05 GMT",
+                attempt = 2,
+                nowMillis = Instant.parse("2026-09-20T00:01:00Z").toEpochMilli()
+            )
+        )
+    }
 }
