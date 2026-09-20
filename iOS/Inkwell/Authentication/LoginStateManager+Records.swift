@@ -65,6 +65,7 @@ extension LoginStateManager {
             body: bodyData
         )
 
+        try JSONSafety.validateResponse(data)
         return try JSONDecoder().decode(ComAtprotoLexicon.Repository.StrongReference.self, from: data)
     }
 
@@ -145,6 +146,7 @@ extension LoginStateManager {
             body: bodyData
         )
 
+        try JSONSafety.validateResponse(data)
         return try JSONDecoder().decode(ComAtprotoLexicon.Repository.StrongReference.self, from: data)
     }
 
@@ -251,6 +253,7 @@ extension LoginStateManager {
             let cid: String?
             let value: UnknownType?
         }
+        try JSONSafety.validateResponse(data)
         let output = try JSONDecoder().decode(GetRecordOutput.self, from: data)
         return (output.uri, output.cid, output.value)
     }
@@ -325,6 +328,7 @@ extension LoginStateManager {
                 )
             }
 
+            try JSONSafety.validateResponse(data)
             let page = try JSONDecoder().decode(TolerantRecordPage.self, from: data)
             logger.info("[listAllRecords] \(collection): raw JSON returned \(page.records.count) records (cursor: \(page.cursor ?? "nil"))")
             let withValues = page.records.filter { $0.value != nil }
@@ -389,6 +393,7 @@ extension LoginStateManager {
             )
         }
 
+        try JSONSafety.validateResponse(data)
         let page = try JSONDecoder().decode(TolerantRecordPage.self, from: data)
         logger.info("[listRecordsPage] \(collection): \(page.records.count) records")
         return (page.records, page.cursor)
