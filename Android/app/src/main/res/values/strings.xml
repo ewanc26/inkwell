@@ -187,4 +187,16 @@
     <string name="settings_underline_links">Underline Links</string>
     <string name="settings_haptics">Haptics</string>
     <string name="settings_reset_defaults">Reset to Defaults</string>
+    <string name="notification_new_document_from_subscription">New document from a subscribed publication</string>
+    <string name="notification_new_document">New document</string>
+    <string name="notification_open_to_view_document">Open Inkwell to view this document</string>
+    <string name="notification_open_to_view_documents">Open Inkwell to view your new documents</string>
+    <string name="notification_latest_document">Latest: %1$s from %2$s</string>
+    <string name="notification_a_publication">a publication</string>
+    <string name="notification_channel_name">New Documents</string>
+    <string name="notification_channel_description">Notifications for new documents from subscribed publications</string>
+    <plurals name="notification_new_documents">
+        <item quantity="one">1 new document</item>
+        <item quantity="other">%d new documents</item>
+    </plurals>
 </resources>

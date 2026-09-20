@@ -27,6 +27,7 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import uk.ewancroft.inkwell.MainActivity
+import uk.ewancroft.inkwell.R
 import uk.ewancroft.inkwell.shared.AtUri
 import uk.ewancroft.inkwell.shared.content.PublicationMatcher
 import uk.ewancroft.inkwell.shared.policy.NotificationPolicy
@@ -206,8 +207,8 @@ class InkwellNotificationManager @Inject constructor(
                     val doc = newDocs[0]
                     if (isNotificationsEnabled()) {
                         sendNotification(
-                            title = if (doc.sensitive) "New document from a subscribed publication" else (doc.publicationName ?: "New Document"),
-                            body = if (doc.sensitive) "Open Inkwell to view this document" else doc.title,
+                            title = if (doc.sensitive) context.getString(R.string.notification_new_document_from_subscription) else (doc.publicationName ?: context.getString(R.string.notification_new_document)),
+                            body = if (doc.sensitive) context.getString(R.string.notification_open_to_view_document) else doc.title,
                             documentURI = doc.uri,
                             sensitive = doc.sensitive
                         )
@@ -217,8 +218,8 @@ class InkwellNotificationManager @Inject constructor(
                     val newest = newDocs[0]
                     if (isNotificationsEnabled()) {
                         sendNotification(
-                            title = "${style.count} New Documents",
-                            body = if (newest.sensitive) "Open Inkwell to view your new documents" else "Latest: ${newest.title} from ${newest.publicationName ?: "a publication"}",
+                            title = context.resources.getQuantityString(R.plurals.notification_new_documents, style.count, style.count),
+                            body = if (newest.sensitive) context.getString(R.string.notification_open_to_view_documents) else context.getString(R.string.notification_latest_document, newest.title, newest.publicationName ?: context.getString(R.string.notification_a_publication)),
                             documentURI = newest.uri,
                             sensitive = newDocs.any { it.sensitive }
                         )
@@ -264,10 +265,10 @@ class InkwellNotificationManager @Inject constructor(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "New Documents",
+                context.getString(R.string.notification_channel_name),
                 NotificationManager.IMPORTANCE_DEFAULT
             ).apply {
-                description = "Notifications for new documents from subscribed publications"
+                description = context.getString(R.string.notification_channel_description)
             }
             notificationManager.createNotificationChannel(channel)
         }
@@ -303,8 +304,8 @@ class InkwellNotificationManager @Inject constructor(
                     setPublicVersion(
                         NotificationCompat.Builder(context, CHANNEL_ID)
                             .setSmallIcon(android.R.drawable.ic_dialog_info)
-                            .setContentTitle("New document")
-                            .setContentText("Open Inkwell to view this document")
+                            .setContentTitle(context.getString(R.string.notification_new_document))
+                            .setContentText(context.getString(R.string.notification_open_to_view_document))
                             .setAutoCancel(true)
                             .build()
                     )
