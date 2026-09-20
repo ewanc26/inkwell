@@ -37,11 +37,21 @@ class OfflineSyncQueueAndroid(durableDirPath: String, legacyCacheDirPath: String
         }
     }
 
-    private fun readInternal(): List<SyncQueueEntry> = runCatching {
+    private fun readInternal(): List<SyncQueueEntry> {
         migrateLegacyIfNeeded()
-        if (!queueFile.exists()) emptyList()
-        else decodeEntries(queueFile.readText())
-    }.getOrThrow()
+        if (!queueFile.exists()) return emptyList()
+        return try {
+            decodeEntries(queueFile.readText())
+        } catch (error: Throwable) {
+            preserveCorruptQueue()
+            throw error
+        }
+    }
+
+    private fun preserveCorruptQueue() {
+        val preserved = File(queueFile.parentFile, "$QUEUE_FILENAME.corrupt-${System.currentTimeMillis()}")
+        runCatching { queueFile.copyTo(preserved, overwrite = false) }
+    }
 
     private fun decodeEntries(raw: String): List<SyncQueueEntry> = runCatching {
         json.decodeFromString<SyncQueueFile>(raw).entries
