@@ -294,16 +294,22 @@ final class ReaderFeedStore {
         jetstreamTask?.cancel()
         guard !dids.isEmpty else { return }
 
-        let config = createJetstreamConfig(dids: dids)
         let client = jetstreamClient
         let cache = feedCache
 
         jetstreamTask = Task { [weak self] in
             var attempt = 0
+            var resumeCursor: Int64?
             while !Task.isCancelled {
+                let config = createJetstreamConfig(dids: dids, cursor: resumeCursor)
                 for await payload in streamJetstreamPayloads(client: client, config: config) {
                 guard !Task.isCancelled else { break }
                 attempt = 0
+                if let cursor = payload.cursor {
+                    let cursorValue = cursor.int64Value
+                    if let resumeCursor, cursorValue <= resumeCursor { continue }
+                    resumeCursor = cursorValue
+                }
                 guard payload.collection == "site.standard.document" else { continue }
 
                 // Parse the event into a CachedFeedItem.
