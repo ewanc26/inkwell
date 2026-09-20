@@ -1,6 +1,7 @@
 package uk.ewancroft.inkwell.ui.reader
 
 import android.content.Context
+import uk.ewancroft.inkwell.R
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -291,7 +292,8 @@ class ReaderViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(pendingSyncMessage = null)
     }
 
-    private fun pluralChanges(count: Int): String = if (count == 1) "change" else "changes"
+    private fun pluralChanges(count: Int): String =
+        context.resources.getQuantityString(R.plurals.reader_pending_change_count, count)
 
     fun dismissError() {
         _uiState.value = _uiState.value.copy(error = null)
