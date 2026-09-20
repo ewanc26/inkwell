@@ -48,7 +48,7 @@ object BSkyPostFetcher {
                     return@withContext null
                 }
 
-                val body = response.body?.string() ?: return@withContext null
+                val body = response.body?.readBoundedUtf8() ?: return@withContext null
                 val result = json.decodeFromString<GetPostsResponse>(body)
                 val post = result.posts.firstOrNull()
 

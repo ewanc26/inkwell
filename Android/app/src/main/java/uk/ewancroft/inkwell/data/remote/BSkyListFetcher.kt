@@ -51,7 +51,7 @@ object BSkyListFetcher {
                         return@withContext members
                     }
 
-                    val body = response.body?.string() ?: return@withContext members
+                    val body = response.body?.readBoundedUtf8() ?: return@withContext members
                     val page = json.decodeFromString<GetListResponse>(body)
                     members += page.items.map { it.subject }
                     cursor = page.cursor
