@@ -16,6 +16,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.platform.LocalContext
 import android.net.Uri
+import java.io.ByteArrayOutputStream
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextRange
@@ -23,6 +24,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import uk.ewancroft.inkwell.ui.components.CreditsView
 import androidx.hilt.navigation.compose.hiltViewModel
+
+private const val MAX_IMAGE_UPLOAD_BYTES = 10 * 1024 * 1024
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
@@ -86,8 +89,24 @@ fun WriterScreen(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri ?: return@rememberLauncherForActivityResult
-        val bytes = context.contentResolver.openInputStream(uri)?.readBytes()
+        val bytes = context.contentResolver.openInputStream(uri)?.use { input ->
+            val output = ByteArrayOutputStream()
+            val buffer = ByteArray(16 * 1024)
+            var total = 0
+            while (true) {
+                val read = input.read(buffer)
+                if (read == -1) break
+                total += read
+                output.write(buffer, 0, read)
+                if (total > MAX_IMAGE_UPLOAD_BYTES) break
+            }
+            output.toByteArray()
+        }
         if (bytes != null) {
+            if (bytes.size > MAX_IMAGE_UPLOAD_BYTES) {
+                viewModel.setPublishError("Image is too large. Choose an image no larger than 10 MiB.")
+                return@rememberLauncherForActivityResult
+            }
             runCatching { ImageUploadSanitizer.sanitize(bytes) }
                 .onSuccess { viewModel.uploadImage(it.bytes, it.mimeType) }
                 .onFailure { viewModel.setPublishError(it.localizedMessage ?: "The image could not be prepared for upload.") }
