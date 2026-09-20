@@ -177,4 +177,14 @@
     <string name="settings_newest_first">Newest First</string>
     <string name="settings_oldest_first">Oldest First</string>
     <string name="settings_sort_order_description">Controls the order documents appear in your reader feed.</string>
+    <string name="settings_content_warnings_keywords">Content warnings and keywords</string>
+    <string name="settings_manage">Manage</string>
+    <string name="settings_content_filters_description">Choose how content labels appear, manage custom labelers, and hide matching keywords.</string>
+    <string name="settings_accessibility">Accessibility</string>
+    <string name="settings_text_size">Text Size</string>
+    <string name="settings_bold_text">Bold Text</string>
+    <string name="settings_increase_contrast">Increase Contrast</string>
+    <string name="settings_underline_links">Underline Links</string>
+    <string name="settings_haptics">Haptics</string>
+    <string name="settings_reset_defaults">Reset to Defaults</string>
 </resources>

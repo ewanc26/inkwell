@@ -298,14 +298,14 @@ fun SettingsDialog(
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-                    SectionHeader("Content Filters")
+                    SectionHeader(stringResource(R.string.moderation_content_filters))
                     SettingsRow(
-                        title = "Content warnings and keywords",
+                        title = stringResource(R.string.settings_content_warnings_keywords),
                         onClick = { showModerationSettings = true },
-                        trailing = { Text("Manage", color = MaterialTheme.colorScheme.primary) },
+                        trailing = { Text(stringResource(R.string.settings_manage), color = MaterialTheme.colorScheme.primary) },
                     )
                     Text(
-                        "Choose how content labels appear, manage custom labelers, and hide matching keywords.",
+                        stringResource(R.string.settings_content_filters_description),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -313,9 +313,9 @@ fun SettingsDialog(
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-                    SectionHeader("Accessibility")
+                    SectionHeader(stringResource(R.string.settings_accessibility))
                     Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
-                        Text("Text Size", style = MaterialTheme.typography.bodyLarge)
+                        Text(stringResource(R.string.settings_text_size), style = MaterialTheme.typography.bodyLarge)
                         Slider(
                             value = fontSizeScale,
                             onValueChange = {
@@ -327,7 +327,7 @@ fun SettingsDialog(
                         )
                     }
                     SettingsRow(
-                        title = "Bold Text",
+                        title = stringResource(R.string.settings_bold_text),
                         trailing = {
                             Switch(
                                 checked = boldText,
@@ -339,7 +339,7 @@ fun SettingsDialog(
                         },
                     )
                     SettingsRow(
-                        title = "Increase Contrast",
+                        title = stringResource(R.string.settings_increase_contrast),
                         trailing = {
                             Switch(
                                 checked = increaseContrast,
@@ -351,7 +351,7 @@ fun SettingsDialog(
                         },
                     )
                     SettingsRow(
-                        title = "Underline Links",
+                        title = stringResource(R.string.settings_underline_links),
                         trailing = {
                             Switch(
                                 checked = underlineLinks,
@@ -363,7 +363,7 @@ fun SettingsDialog(
                         },
                     )
                     SettingsRow(
-                        title = "Haptics",
+                        title = stringResource(R.string.settings_haptics),
                         trailing = {
                             Switch(
                                 checked = hapticsEnabled,
@@ -375,7 +375,7 @@ fun SettingsDialog(
                         },
                     )
                     SettingsRow(
-                        title = "Reset to Defaults",
+                        title = stringResource(R.string.settings_reset_defaults),
                         titleColor = MaterialTheme.colorScheme.error,
                         onClick = {
                             fontSizeScale = 1.0f
