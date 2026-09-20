@@ -38,7 +38,8 @@ suspend fun PdsRepository.getProfile(did: String): BlueskyProfile {
 suspend fun PdsRepository.downloadBlob(
     cid: String,
     fromDID: String,
-    declaredSize: Long? = null
+    declaredSize: Long? = null,
+    expectedMimeType: String? = null
 ): ByteArray = withContext(Dispatchers.IO) {
     validateDeclaredBlobSize(declaredSize)
     val pdsUrl = resolvePdsUrl(fromDID) ?: XrpcEndpoints.PUBLIC_BSKY_API
@@ -49,7 +50,17 @@ suspend fun PdsRepository.downloadBlob(
             throw java.io.IOException("Blob download failed: HTTP ${response.code}")
         }
         val body = response.body ?: throw java.io.IOException("Blob response had no body")
+        validateBlobContentType(body.contentType()?.toString(), expectedMimeType)
         readBoundedBlob(body)
+    }
+}
+
+internal fun validateBlobContentType(actual: String?, expected: String?) {
+    if (actual == null || expected == null) return
+    val actualType = actual.substringBefore(';').trim().lowercase()
+    val expectedType = expected.substringBefore(';').trim().lowercase()
+    if (actualType != expectedType) {
+        throw java.io.IOException("Blob response MIME type $actualType does not match expected $expectedType")
     }
 }
 
