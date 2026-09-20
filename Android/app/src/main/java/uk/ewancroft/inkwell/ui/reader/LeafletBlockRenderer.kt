@@ -25,7 +25,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.LinkInteractionListener
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -151,15 +154,27 @@ private fun FacetedText(
     val context = androidx.compose.ui.platform.LocalContext.current
 
     if (hasLinks && onLinkClick != null) {
-        androidx.compose.foundation.text.ClickableText(
-            text = annotated,
+        val linkedText = remember(annotated, onLinkClick) {
+            AnnotatedString.Builder(annotated).apply {
+                annotated.getStringAnnotations("URL", 0, annotated.length).forEach { annotation ->
+                    addLink(
+                        LinkAnnotation.Url(
+                            annotation.item,
+                            TextLinkStyles(SpanStyle(textDecoration = TextDecoration.Underline)),
+                            LinkInteractionListener { link ->
+                                onLinkClick((link as LinkAnnotation.Url).url, context)
+                            },
+                        ),
+                        annotation.start,
+                        annotation.end,
+                    )
+                }
+            }.toAnnotatedString()
+        }
+        Text(
+            text = linkedText,
             style = style.copy(textAlign = textAlign),
             modifier = modifier,
-            onClick = { offset ->
-                val links = annotated.getStringAnnotations("URL", 0, annotated.length)
-                links.firstOrNull { offset >= it.start && offset < it.end }
-                    ?.let { onLinkClick(it.item, context) }
-            }
         )
     } else {
         Text(
