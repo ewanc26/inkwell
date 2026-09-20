@@ -58,6 +58,7 @@ import uk.ewancroft.inkwell.shared.verification.VerificationResult
 import uk.ewancroft.inkwell.util.ReaderPreferences
 import uk.ewancroft.inkwell.util.ModerationPreferences
 import uk.ewancroft.inkwell.util.formatPublishedDate
+import uk.ewancroft.inkwell.util.JetstreamCursorPreferences
 import javax.inject.Inject
 
 private const val PUBLICATION_RESOLUTION_CACHE_TTL_MS = 5 * 60 * 1000L
@@ -669,7 +670,7 @@ class ReaderViewModel @Inject constructor(
 
         jetstreamJob = viewModelScope.launch {
             var attempt = 0
-            var resumeCursor: Long? = null
+            var resumeCursor: Long? = JetstreamCursorPreferences.get(context, dids)
             while (isActive) {
                 val config = JetstreamConfig(
                     collections = listOf("site.standard.document"),
@@ -683,6 +684,7 @@ class ReaderViewModel @Inject constructor(
                     payload.cursor?.let { cursor ->
                         if (resumeCursor != null && cursor <= resumeCursor!!) return@collect
                         resumeCursor = cursor
+                        JetstreamCursorPreferences.put(context, dids, cursor)
                     }
                     if (payload.collection != "site.standard.document") return@collect
 
