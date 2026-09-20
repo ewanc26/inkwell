@@ -523,8 +523,11 @@ fun SettingsDialog(
                         title = "Saved Changes",
                         trailing = {
                             Text(
-                                if (pendingSyncCount == 1) "1 waiting to sync"
-                                else "$pendingSyncCount waiting to sync",
+                                pluralStringResource(
+                                    R.plurals.settings_pending_sync_count,
+                                    pendingSyncCount,
+                                    pendingSyncCount,
+                                ),
                             )
                         },
                     )
@@ -584,11 +587,23 @@ fun SettingsDialog(
                         AlertDialog(
                             onDismissRequest = { pendingImportText = null },
                             title = { Text("Import reading data?") },
-                            text = { Text("${pendingImportCount} change${if (pendingImportCount == 1) "" else "s"} will be imported. Only newer local choices change.") },
+                            text = {
+                                Text(
+                                    context.resources.getQuantityString(
+                                        R.plurals.settings_pending_import_message,
+                                        pendingImportCount,
+                                        pendingImportCount,
+                                    ),
+                                )
+                            },
                             confirmButton = {
                                 TextButton(onClick = {
                                     importMessage = when (val result = ArticleStatePreferences.importJson(context, text)) {
-                                        is ArticleStatePreferences.ImportResult.Success -> "Imported ${result.changes} change${if (result.changes == 1) "" else "s"}."
+                                        is ArticleStatePreferences.ImportResult.Success -> context.resources.getQuantityString(
+                                            R.plurals.settings_imported_change_count,
+                                            result.changes,
+                                            result.changes,
+                                        )
                                         ArticleStatePreferences.ImportResult.UnsupportedVersion -> "This reading-data export uses an unsupported version."
                                         ArticleStatePreferences.ImportResult.Invalid -> "This file is not a valid Inkwell reading-data export."
                                     }
