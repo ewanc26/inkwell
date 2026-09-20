@@ -123,7 +123,7 @@ struct ReaderPostCard: View {
                 Text(publicationName)
                     .fontWeight(.semibold)
                     .foregroundStyle(accent)
-                    .lineLimit(1)
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? 2 : 1)
             }
             Spacer(minLength: 8)
             Image(systemName: "arrow.up.right")
