@@ -61,18 +61,22 @@ struct ConvertResult {
 func harvestImageBlobs(from content: UnknownType?) -> [String: ComAtprotoLexicon.Repository.UploadBlobOutput] {
     guard let content else { return [:] }
     var out: [String: ComAtprotoLexicon.Repository.UploadBlobOutput] = [:]
-    harvestImageBlobs(from: content, into: &out, depth: 0)
+    var nodesRemaining = maxImageHarvestNodes
+    harvestImageBlobs(from: content, into: &out, depth: 0, nodesRemaining: &nodesRemaining)
     return out
 }
 
 private let maxImageHarvestDepth = 32
+private let maxImageHarvestNodes = 131_072
 
 private func harvestImageBlobs(
     from value: Any,
     into out: inout [String: ComAtprotoLexicon.Repository.UploadBlobOutput],
-    depth: Int
+    depth: Int,
+    nodesRemaining: inout Int
 ) {
-    guard depth <= maxImageHarvestDepth else { return }
+    guard depth <= maxImageHarvestDepth, nodesRemaining > 0 else { return }
+    nodesRemaining -= 1
     let mirror = Mirror(reflecting: value)
     // Walk the struct/class properties looking for blobs.
     for child in mirror.children {
@@ -81,11 +85,11 @@ private func harvestImageBlobs(
             let cid = blob.reference.link
             if !cid.isEmpty { out[cid] = blob }
         } else if let dict = child.value as? [String: Any] {
-            for (_, v) in dict { harvestImageBlobs(from: v, into: &out, depth: depth + 1) }
+            for (_, v) in dict { harvestImageBlobs(from: v, into: &out, depth: depth + 1, nodesRemaining: &nodesRemaining) }
         } else if let array = child.value as? [Any] {
-            for v in array { harvestImageBlobs(from: v, into: &out, depth: depth + 1) }
+            for v in array { harvestImageBlobs(from: v, into: &out, depth: depth + 1, nodesRemaining: &nodesRemaining) }
         } else if child.value is CustomReflectable || Mirror(reflecting: child.value).children.count > 0 {
-            harvestImageBlobs(from: child.value, into: &out, depth: depth + 1)
+            harvestImageBlobs(from: child.value, into: &out, depth: depth + 1, nodesRemaining: &nodesRemaining)
         }
     }
 }
