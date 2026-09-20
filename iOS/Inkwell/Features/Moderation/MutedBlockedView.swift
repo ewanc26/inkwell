@@ -16,8 +16,8 @@ struct MutedBlockedView: View {
     var body: some View {
         VStack(spacing: 0) {
             Picker("Moderation List", selection: $selectedTab) {
-                Text("Muted (\(viewModel.mutedActors.count))").tag(ModerationTab.muted)
-                Text("Blocked (\(viewModel.blockedActors.count))").tag(ModerationTab.blocked)
+                Text("Muted: ^[\(viewModel.mutedActors.count) account](inflect: true)").tag(ModerationTab.muted)
+                Text("Blocked: ^[\(viewModel.blockedActors.count) account](inflect: true)").tag(ModerationTab.blocked)
             }
             .pickerStyle(.segmented)
             .padding()
