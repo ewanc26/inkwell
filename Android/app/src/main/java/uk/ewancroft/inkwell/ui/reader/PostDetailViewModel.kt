@@ -136,6 +136,7 @@ class PostDetailViewModel @Inject constructor(
                 val title = value["title"]?.jsonPrimitive?.contentOrNull
                 val description = value["description"]?.jsonPrimitive?.contentOrNull
                 val publishedAt = value["publishedAt"]?.jsonPrimitive?.contentOrNull
+                val updatedAt = value["updatedAt"]?.jsonPrimitive?.contentOrNull
                 val path = value["path"]?.jsonPrimitive?.contentOrNull
                 val site = value["site"]?.jsonPrimitive?.contentOrNull
                 val coverUrl = value["coverImage"]?.jsonObject?.get("link")?.jsonPrimitive?.contentOrNull
@@ -210,6 +211,7 @@ class PostDetailViewModel @Inject constructor(
                     recordCid = recordCid,
                     description = description,
                     publishedAt = publishedAt,
+                    updatedAt = updatedAt,
                     path = path,
                     coverUrl = coverUrl,
                     content = parseResult.content,
