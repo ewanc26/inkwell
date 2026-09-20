@@ -12,7 +12,9 @@ private struct RetryableHTTPError: Error {
     let retryAfter: TimeInterval?
 }
 
-private let maxXRPCResponseBytes = 2 * 1024 * 1024
+private enum XRPCResponseLimits {
+    nonisolated static let maxResponseBytes = 2 * 1024 * 1024
+}
 
 extension LoginStateManager {
     // MARK: - XRPC Helpers
@@ -34,7 +36,7 @@ extension LoginStateManager {
         queryItems: [URLQueryItem]? = nil,
         proxy: String? = nil,
         expectJSON: Bool = true,
-        maxResponseBytes: Int = maxXRPCResponseBytes
+        maxResponseBytes: Int = XRPCResponseLimits.maxResponseBytes
     ) async throws -> Data {
         guard let authenticator, let pdsURL = resolvedPDSURL else {
             throw LoginError.notAuthenticated
@@ -108,7 +110,7 @@ extension LoginStateManager {
         body: Data? = nil,
         queryItems: [URLQueryItem]? = nil,
         expectJSON: Bool = true,
-        maxResponseBytes: Int = maxXRPCResponseBytes
+        maxResponseBytes: Int = XRPCResponseLimits.maxResponseBytes
     ) async throws -> Data {
         var components = URLComponents(
             url: pdsURL.appendingPathComponent(path),
