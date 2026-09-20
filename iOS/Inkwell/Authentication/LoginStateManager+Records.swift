@@ -30,7 +30,7 @@ extension LoginStateManager {
     func createRecord(
         collection: String,
         record: UnknownType,
-        shouldValidate: Bool = false
+        shouldValidate: Bool? = nil
     ) async throws -> ComAtprotoLexicon.Repository.StrongReference {
         if TestingMode.isEnabled {
             TestingModeNotice.shared.report("Create \(collection) record")
@@ -44,7 +44,7 @@ extension LoginStateManager {
             let repo: String
             let collection: String
             let record: UnknownType
-            let validate: Bool
+            let validate: Bool?
 
             enum CodingKeys: String, CodingKey {
                 case repo, collection, record, validate
