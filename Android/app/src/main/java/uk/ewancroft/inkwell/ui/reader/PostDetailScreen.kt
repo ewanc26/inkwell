@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import uk.ewancroft.inkwell.shared.text.StringUtils
+import uk.ewancroft.inkwell.data.repository.downloadBlob
 import uk.ewancroft.inkwell.ui.moderation.ReportDialog
 
 private data class PostReportTarget(
@@ -220,6 +221,9 @@ fun PostDetailScreen(
                     pollData = viewModel.pollData,
                     onLoadPoll = { pollRef -> viewModel.loadPoll(pollRef) },
                     onCastVote = { pollUri, options -> viewModel.castVote(pollUri, options) },
+                    onLoadImage = { authorDid, cid ->
+                        runCatching { viewModel.pdsRepository.downloadBlob(cid = cid, fromDID = authorDid) }.getOrNull()
+                    },
                     modifier = Modifier,
                 )
             }
