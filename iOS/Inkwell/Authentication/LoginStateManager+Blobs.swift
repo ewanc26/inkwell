@@ -21,15 +21,16 @@ extension LoginStateManager {
     // MARK: - Blob Download
 
     /// Downloads raw bytes of a blob by its CID from the user's PDS.
-    func downloadBlob(cid: String) async throws -> Data {
+    func downloadBlob(cid: String, declaredSize: Int? = nil) async throws -> Data {
         guard let did = currentDID else {
             throw LoginError.notAuthenticated
         }
-        return try await downloadBlob(cid: cid, fromDID: did)
+        return try await downloadBlob(cid: cid, fromDID: did, declaredSize: declaredSize)
     }
 
     /// Downloads a blob from the PDS hosting the specified repository.
-    func downloadBlob(cid: String, fromDID did: String) async throws -> Data {
+    func downloadBlob(cid: String, fromDID did: String, declaredSize: Int? = nil) async throws -> Data {
+        try validateDeclaredBlobSize(declaredSize)
         let pdsURL = try await repositoryPDSURL(for: did)
 
         if did == currentDID {
@@ -92,5 +93,11 @@ extension LoginStateManager {
             throw LoginError.httpError(status: 0)
         }
         return blob
+    }
+}
+
+func validateDeclaredBlobSize(_ declaredSize: Int?) throws {
+    if let declaredSize, declaredSize > maxReaderBlobBytes {
+        throw BlobDownloadError.oversized
     }
 }

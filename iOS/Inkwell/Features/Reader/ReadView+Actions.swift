@@ -270,10 +270,14 @@ extension ReadView {
                     if let authorDID {
                         data = try await loginStateManager.downloadBlob(
                             cid: blobPages.reference.link,
-                            fromDID: authorDID
+                            fromDID: authorDID,
+                            declaredSize: blobPages.size
                         )
                     } else {
-                        data = try await loginStateManager.downloadBlob(cid: blobPages.reference.link)
+                        data = try await loginStateManager.downloadBlob(
+                            cid: blobPages.reference.link,
+                            declaredSize: blobPages.size
+                        )
                     }
                     pages = try JSONDecoder().decode([LeafletPage].self, from: data)
                     isLoading = false
