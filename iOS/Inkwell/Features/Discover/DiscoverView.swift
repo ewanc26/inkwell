@@ -159,16 +159,21 @@ struct DiscoverView: View {
                 let response = try await StandardReaderAPI.shared.search(query: trimmed)
                 results = response.results
                 actors = []
-                publications = response.results.filter { $0.isPublication }.map { result in
-                    PublicationResult(
-                        uri: result.uri,
-                        name: result.title,
-                        domain: result.uri,
-                        url: result.webURL,
-                        did: result.did,
+                var hydratedPublications: [PublicationResult] = []
+                for result in response.results where result.isPublication {
+                    guard let entry = try? await loginStateManager.fetchPublication(uri: result.uri) else {
+                        continue
+                    }
+                    hydratedPublications.append(PublicationResult(
+                        uri: entry.uri,
+                        name: entry.record.name,
+                        domain: entry.record.url,
+                        url: URL(string: entry.record.url),
+                        did: entry.authorDID,
                         coverImage: result.coverImage
-                    )
+                    ))
                 }
+                publications = hydratedPublications
             } else {
                 async let documents = StandardReaderAPI.shared.search(query: trimmed).results
                 async let actors = StandardReaderAPI.shared.searchActors(query: trimmed)
