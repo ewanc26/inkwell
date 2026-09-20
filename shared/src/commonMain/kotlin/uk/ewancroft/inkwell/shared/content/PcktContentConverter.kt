@@ -20,6 +20,8 @@ import uk.ewancroft.inkwell.shared.markdown.MarkdownSerializer
  */
 object PcktContentConverter {
 
+    private const val MAX_LIST_DEPTH = 32
+
     private val schema = FacetSchema.pckt
     private val lossLabels = BlockLossLabels.pckt
 
@@ -132,7 +134,8 @@ object PcktContentConverter {
         }
     }
 
-    private fun listItemToMarkdown(item: Map<String, Any?>, ordered: Boolean, isTask: Boolean = false): MarkdownListItem {
+    private fun listItemToMarkdown(item: Map<String, Any?>, ordered: Boolean, isTask: Boolean = false, depth: Int = 0): MarkdownListItem? {
+        if (depth > MAX_LIST_DEPTH) return null
         var text = ""
         var children: List<MarkdownListItem>? = null
 
@@ -163,7 +166,7 @@ object PcktContentConverter {
                                 children = subItems.mapNotNull { subEl ->
                                     val subObj = subEl as? Map<*, *> ?: return@mapNotNull null
                                     @Suppress("UNCHECKED_CAST")
-                                    listItemToMarkdown(subObj as Map<String, Any?>, isSubOrdered)
+                                    listItemToMarkdown(subObj as Map<String, Any?>, isSubOrdered, depth = depth + 1)
                                 }
                             }
                         }
@@ -186,7 +189,7 @@ object PcktContentConverter {
             children = childrenFromField.mapNotNull { el ->
                 val obj = el as? Map<*, *> ?: return@mapNotNull null
                 @Suppress("UNCHECKED_CAST")
-                listItemToMarkdown(obj as Map<String, Any?>, false)
+                listItemToMarkdown(obj as Map<String, Any?>, false, depth = depth + 1)
             }
         }
 

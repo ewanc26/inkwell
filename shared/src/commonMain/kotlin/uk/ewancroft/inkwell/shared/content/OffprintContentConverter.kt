@@ -20,6 +20,8 @@ import uk.ewancroft.inkwell.shared.markdown.MarkdownSerializer
  */
 object OffprintContentConverter {
 
+    private const val MAX_LIST_DEPTH = 32
+
     private val schema = FacetSchema.offprint
     private val lossLabels = BlockLossLabels.offprint
 
@@ -133,7 +135,8 @@ object OffprintContentConverter {
         }
     }
 
-    private fun listItemToMarkdown(item: Map<String, Any?>): MarkdownListItem {
+    private fun listItemToMarkdown(item: Map<String, Any?>, depth: Int = 0): MarkdownListItem? {
+        if (depth > MAX_LIST_DEPTH) return null
         var text = ""
         val content = item["content"] as? Map<String, Any?>
         if (content != null && content["\$type"] == LeafletTypes.BLOCKS_TEXT) {
@@ -146,7 +149,7 @@ object OffprintContentConverter {
             children = childrenList.mapNotNull { el ->
                 val obj = el as? Map<*, *> ?: return@mapNotNull null
                 @Suppress("UNCHECKED_CAST")
-                listItemToMarkdown(obj as Map<String, Any?>)
+                listItemToMarkdown(obj as Map<String, Any?>, depth + 1)
             }
         }
 
