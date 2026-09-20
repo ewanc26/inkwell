@@ -334,7 +334,6 @@ fun IframeEmbedBlock(block: LeafletBlock) {
     val url = block.url ?: return
     val parsedUrl = Uri.parse(url)
     if (!IframeSecurityPolicy.isAllowedInitial(parsedUrl)) return
-    val originHost = parsedUrl.host
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
@@ -366,7 +365,7 @@ fun IframeEmbedBlock(block: LeafletBlock) {
                         override fun shouldOverrideUrlLoading(
                             view: WebView?,
                             request: android.webkit.WebResourceRequest
-                        ): Boolean = !IframeSecurityPolicy.isAllowedNavigation(originHost, request.url)
+                        ): Boolean = !IframeSecurityPolicy.isAllowedNavigation(parsedUrl, request.url)
                     }
                     loadUrl(url)
                 }
