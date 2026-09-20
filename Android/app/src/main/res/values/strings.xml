@@ -156,4 +156,7 @@
     <string name="feedback_subject">Title</string>
     <string name="feedback_details_optional">Details (optional)</string>
     <string name="feedback_send">Send</string>
+    <string name="moderation_reason">Reason</string>
+    <string name="moderation_comment_optional">Comment (optional)</string>
+    <string name="moderation_report">Report</string>
 </resources>

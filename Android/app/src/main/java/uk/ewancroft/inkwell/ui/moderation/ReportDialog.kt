@@ -25,6 +25,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import uk.ewancroft.inkwell.R
 import uk.ewancroft.inkwell.shared.moderation.ReportReasonType
 
 @Composable
@@ -41,13 +43,15 @@ fun ReportDialog(
 
     AlertDialog(
         onDismissRequest = { if (!isSubmitting) onDismiss() },
-        title = { Text(if (subject.startsWith("did:")) "Report Account" else "Report Post") },
+        title = {
+            Text(stringResource(if (subject.startsWith("did:")) R.string.reader_report_account else R.string.reader_report_post))
+        },
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.verticalScroll(rememberScrollState()),
             ) {
-                Text("Reason", style = MaterialTheme.typography.titleSmall)
+                Text(stringResource(R.string.moderation_reason), style = MaterialTheme.typography.titleSmall)
                 reasons.forEach { reason ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -64,7 +68,7 @@ fun ReportDialog(
                 OutlinedTextField(
                     value = comment,
                     onValueChange = { comment = it },
-                    label = { Text("Comment (optional)") },
+                    label = { Text(stringResource(R.string.moderation_comment_optional)) },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 2,
                     maxLines = 4,
@@ -81,7 +85,7 @@ fun ReportDialog(
                 },
                 enabled = !isSubmitting,
             ) {
-                Text("Report")
+                Text(stringResource(R.string.moderation_report))
             }
         },
         dismissButton = {
@@ -89,7 +93,7 @@ fun ReportDialog(
                 onClick = onDismiss,
                 enabled = !isSubmitting,
             ) {
-                Text("Cancel")
+                Text(stringResource(R.string.reader_cancel))
             }
         },
     )
