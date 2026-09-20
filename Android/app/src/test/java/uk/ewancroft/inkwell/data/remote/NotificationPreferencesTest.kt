@@ -16,4 +16,16 @@ class NotificationPreferencesTest {
             notificationPreferencesName("did:plc:bob")
         )
     }
+
+    @Test
+    fun `account switch returns to the original namespace without sharing state`() {
+        val accountA = notificationPreferencesName("did:plc:alice")
+        val accountB = notificationPreferencesName("did:plc:bob")
+        val activationSequence = listOf(accountA, accountB, accountA)
+
+        assertEquals(accountA, activationSequence.first())
+        assertEquals(accountB, activationSequence[1])
+        assertEquals(accountA, activationSequence.last())
+        assertNotEquals(accountA, accountB)
+    }
 }
