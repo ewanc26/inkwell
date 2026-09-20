@@ -6,6 +6,8 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromJsonElement
+import uk.ewancroft.inkwell.shared.validation.JsonSafety
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import uk.ewancroft.inkwell.data.model.bluesky.BSkyPostView
@@ -49,7 +51,9 @@ object BSkyPostFetcher {
                 }
 
                 val body = response.body?.readBoundedUtf8() ?: return@withContext null
-                val result = json.decodeFromString<GetPostsResponse>(body)
+                val element = json.parseToJsonElement(body)
+                check(JsonSafety.isSafe(element)) { "Bluesky response exceeded structural safety limits" }
+                val result = json.decodeFromJsonElement<GetPostsResponse>(element)
                 val post = result.posts.firstOrNull()
 
                 post?.let { cache[uri] = it }
