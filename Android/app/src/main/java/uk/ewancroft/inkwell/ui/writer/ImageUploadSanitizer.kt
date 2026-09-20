@@ -50,11 +50,11 @@ object ImageUploadSanitizer {
         if (packed and 0x80 != 0) offset += 3 * (1 shl ((packed and 0x07) + 1))
         if (offset > bytes.size) return false
 
+        var imageCount = 0
         while (offset < bytes.size) {
             when (bytes[offset].toInt() and 0xff) {
                 0x21 -> {
                     if (offset + 1 >= bytes.size) return false
-                    if ((bytes[offset + 1].toInt() and 0xff) == 0xf9) return true
                     offset += 2
                     while (offset < bytes.size) {
                         val length = bytes[offset].toInt() and 0xff
@@ -62,7 +62,23 @@ object ImageUploadSanitizer {
                         if (length == 0) break
                     }
                 }
-                0x2c -> return false
+                0x2c -> {
+                    imageCount += 1
+                    if (imageCount > 1) return true
+                    if (offset + 9 >= bytes.size) return false
+                    val imagePacked = bytes[offset + 9].toInt() and 0xff
+                    offset += 10
+                    if (imagePacked and 0x80 != 0) {
+                        offset += 3 * (1 shl ((imagePacked and 0x07) + 1))
+                    }
+                    if (offset >= bytes.size) return false
+                    offset += 1 // LZW minimum code size
+                    while (offset < bytes.size) {
+                        val length = bytes[offset].toInt() and 0xff
+                        offset += 1 + length
+                        if (length == 0) break
+                    }
+                }
                 0x3b -> return false
                 else -> return false
             }
