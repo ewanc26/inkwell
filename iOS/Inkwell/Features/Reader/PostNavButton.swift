@@ -32,6 +32,7 @@ struct PostNavButton: View {
                         .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
                         .multilineTextAlignment(.leading)
                 }
+                .layoutPriority(1)
             }
             Spacer(minLength: 0)
             if direction == .next {
@@ -45,6 +46,7 @@ struct PostNavButton: View {
                         .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
                         .multilineTextAlignment(.trailing)
                 }
+                .layoutPriority(1)
                 Image(systemName: "chevron.right")
                     .font(.caption.weight(.semibold))
             }
