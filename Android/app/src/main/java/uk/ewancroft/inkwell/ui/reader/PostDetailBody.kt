@@ -22,6 +22,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
 import uk.ewancroft.inkwell.R
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -360,17 +361,13 @@ private fun RecommendRow(uiState: PostDetailUiState, onToggleRecommend: () -> Un
 
         if (uiState.isLoadingRecommendState) {
             Text(
-                "Loading recommendations…",
+                stringResource(R.string.reader_loading_recommendations),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         } else {
             Text(
-                when (uiState.recommendCount) {
-                    0 -> "No recommendations yet"
-                    1 -> "1 recommendation"
-                    else -> "${uiState.recommendCount} recommendations"
-                },
+                pluralStringResource(R.plurals.reader_recommendation_count, uiState.recommendCount, uiState.recommendCount),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

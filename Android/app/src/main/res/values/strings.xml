@@ -6,6 +6,11 @@
         <item quantity="one">%d vote</item>
         <item quantity="other">%d votes</item>
     </plurals>
+    <plurals name="reader_recommendation_count">
+        <item quantity="zero">No recommendations yet</item>
+        <item quantity="one">%d recommendation</item>
+        <item quantity="other">%d recommendations</item>
+    </plurals>
     <string name="poll_no_votes">No votes yet</string>
     <string name="poll_load_failed">Poll could not be loaded</string>
     <string name="poll_submitting">Submitting vote</string>
@@ -65,6 +70,7 @@
     <string name="reader_reveal_article">Reveal article</string>
     <string name="reader_load_failed">Couldn\'t load this post</string>
     <string name="reader_retry">Retry</string>
+    <string name="reader_loading_recommendations">Loading recommendations…</string>
     <string name="reader_more_actions_for">More actions for %1$s</string>
     <string name="reader_posts">Posts</string>
     <string name="reader_all_posts">All posts</string>
