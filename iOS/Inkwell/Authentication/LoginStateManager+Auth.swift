@@ -294,7 +294,6 @@ extension LoginStateManager {
             self.resolvedPDSURL = resolvedPDS
             self.currentHandle = identity.handle
             self.currentDID = storedDID
-            self.isAuthenticated = true
             self.errorMessage = nil
 
             logger.info("[RestoreSession] session restored for \(identity.handle)")
@@ -312,6 +311,10 @@ extension LoginStateManager {
                 clearSession()
                 return
             }
+
+            // Do not expose LoggedIn state until the restored token has been
+            // accepted by the current PDS.
+            self.isAuthenticated = true
 
             Task { [weak self] in
                 guard let self else { return }
