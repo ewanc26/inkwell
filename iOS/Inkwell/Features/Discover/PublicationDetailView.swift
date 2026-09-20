@@ -203,12 +203,8 @@ struct PublicationDetailView: View {
 }
 
 private struct PublicationDetailHeader: View {
+    @Environment(LoginStateManager.self) private var loginStateManager
     let publication: PublicationEntry
-
-    private var iconURL: String? {
-        guard let icon = publication.record.icon else { return nil }
-        return "https://cdn.bsky.app/img/feed_thumbnail/plain/\(publication.authorDID)/\(icon.reference.link)"
-    }
 
     private var domain: String {
         URL(string: publication.record.url)?.host ?? publication.record.url
@@ -216,8 +212,10 @@ private struct PublicationDetailHeader: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 14) {
-            SearchResultThumbnail(
-                urlString: iconURL,
+            PDSBlobThumbnail(
+                did: publication.authorDID,
+                cid: publication.record.icon?.reference.link,
+                loginStateManager: loginStateManager,
                 placeholderSystemImage: "building.2.crop.left.right.fill",
                 size: 64,
                 cornerRadius: 16
@@ -250,17 +248,15 @@ private struct PublicationDetailHeader: View {
 }
 
 struct PublicationDocumentRow: View {
+    @Environment(LoginStateManager.self) private var loginStateManager
     let document: DocumentEntry
-
-    private var coverURL: URL? {
-        guard let cover = document.record.coverImage else { return nil }
-        return URL(string: "https://cdn.bsky.app/img/feed_thumbnail/plain/\(document.authorDID)/\(cover.reference.link)")
-    }
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
-            SearchResultThumbnail(
-                urlString: coverURL?.absoluteString,
+            PDSBlobThumbnail(
+                did: document.authorDID,
+                cid: document.record.coverImage?.reference.link,
+                loginStateManager: loginStateManager,
                 placeholderSystemImage: "doc.text.image"
             )
 
@@ -281,6 +277,48 @@ struct PublicationDocumentRow: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.vertical, 4)
+    }
+}
+
+private struct PDSBlobThumbnail: View {
+    let did: String
+    let cid: String?
+    let loginStateManager: LoginStateManager
+    let placeholderSystemImage: String
+    var size: CGFloat = 52
+    var cornerRadius: CGFloat = 10
+
+    @State private var image: Image?
+
+    var body: some View {
+        Group {
+            if let image {
+                image.resizable().scaledToFill()
+            } else if cid != nil {
+                ProgressView().controlSize(.small)
+            } else {
+                placeholder
+            }
+        }
+        .frame(width: size, height: size)
+        .background(Color(uiColor: .tertiarySystemFill))
+        .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+        .accessibilityHidden(true)
+        .task(id: "\(did):\(cid ?? "")") {
+            guard let cid else { return }
+            do {
+                let data = try await loginStateManager.downloadBlob(cid: cid, fromDID: did, declaredSize: nil)
+                guard let uiImage = UIImage(data: data) else { return }
+                image = Image(uiImage: uiImage)
+            } catch {
+                image = nil
+            }
+        }
+    }
+
+    private var placeholder: some View {
+        Image(systemName: placeholderSystemImage)
+            .foregroundStyle(.secondary)
     }
 }
 
