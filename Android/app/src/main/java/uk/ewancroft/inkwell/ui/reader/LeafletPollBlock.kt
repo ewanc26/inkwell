@@ -85,7 +85,8 @@ internal fun PollBlock(
                 options.forEach { option ->
                     val count = data.voteCounts[option.text] ?: 0
                     val fraction = if (totalVotes > 0) count.toFloat() / totalVotes else 0f
-                    val isSelected = selectedOptions.contains(option.text)
+                    val isSelected = selectedOptions.contains(option.text) ||
+                        (hasVoted && data.myVote?.contains(option.text) == true)
                     val isVoted = hasVoted
 
                     OutlinedButton(
