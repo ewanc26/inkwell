@@ -296,10 +296,11 @@ final class ReaderFeedStore {
 
         let client = jetstreamClient
         let cache = feedCache
+        let cursorKey = "jetstream.cursor." + dids.sorted().joined(separator: ",")
 
         jetstreamTask = Task { [weak self] in
             var attempt = 0
-            var resumeCursor: Int64?
+            var resumeCursor: Int64? = (UserDefaults.standard.object(forKey: cursorKey) as? NSNumber)?.int64Value
             while !Task.isCancelled {
                 let config = createJetstreamConfig(dids: dids, cursor: resumeCursor)
                 for await payload in streamJetstreamPayloads(client: client, config: config) {
@@ -309,6 +310,7 @@ final class ReaderFeedStore {
                     let cursorValue = cursor.int64Value
                     if let resumeCursor, cursorValue <= resumeCursor { continue }
                     resumeCursor = cursorValue
+                    UserDefaults.standard.set(cursorValue, forKey: cursorKey)
                 }
                 guard payload.collection == "site.standard.document" else { continue }
 
