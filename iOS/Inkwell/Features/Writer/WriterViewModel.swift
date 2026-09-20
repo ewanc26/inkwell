@@ -324,6 +324,8 @@ final class WriterViewModel {
                         textContent: plainText
                     )
 
+                    try loginStateManager.ensureDocumentRecordFits(UnknownType.record(document))
+
                     try await loginStateManager.updateRecord(
                         collection: SiteStandardLexicon.DocumentRecord.type,
                         recordKey: parsed.recordKey,

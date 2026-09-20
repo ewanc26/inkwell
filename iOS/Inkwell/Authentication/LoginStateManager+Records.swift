@@ -14,8 +14,17 @@ import ATProtoKit
 /// to the shared constants.
 private let userLexiconNSID = "uk.ewancroft.inkwell.user"
 private let userLexiconAppURI = "https://inkwell.ewancroft.uk"
+private let maxDocumentRecordBytes = 900 * 1024
 
 extension LoginStateManager {
+    /// Checks the encoded record before it reaches an XRPC write endpoint.
+    func ensureDocumentRecordFits(_ record: UnknownType) throws {
+        let bytes = try JSONEncoder().encode(record).count
+        guard bytes <= maxDocumentRecordBytes else {
+            throw LoginError.recordTooLarge(bytes: bytes, limit: maxDocumentRecordBytes)
+        }
+    }
+
     // MARK: - Record CRUD
 
     /// Creates an AT Protocol record in the user's repository.
