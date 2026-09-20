@@ -29,6 +29,7 @@ import uk.ewancroft.inkwell.shared.policy.RecordListPolicy
 import java.net.URLEncoder
 import java.io.ByteArrayOutputStream
 import java.io.IOException
+import java.io.InputStream
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
@@ -52,6 +53,29 @@ internal object RateLimitRetryPolicy {
                 .toInstant().toEpochMilli() - nowMillis
         }.getOrNull()?.takeIf { it >= 0 }?.let { return it.coerceAtMost(MAX_DELAY_MS) }
         return (100L shl attempt.coerceIn(0, 9)).coerceAtMost(MAX_DELAY_MS)
+    }
+}
+
+internal object PdsResponseBodyReader {
+    fun read(input: InputStream, contentLength: Long?, maxBodyBytes: Int): String {
+        if (contentLength != null && contentLength > maxBodyBytes) {
+            throw IOException("PDS response exceeded the ${maxBodyBytes}-byte safety budget")
+        }
+        input.use {
+            val output = ByteArrayOutputStream(minOf(maxBodyBytes, 64 * 1024))
+            val buffer = ByteArray(16 * 1024)
+            var total = 0
+            while (true) {
+                val read = it.read(buffer)
+                if (read == -1) break
+                total += read
+                if (total > maxBodyBytes) {
+                    throw IOException("PDS response exceeded the ${maxBodyBytes}-byte safety budget")
+                }
+                output.write(buffer, 0, read)
+            }
+            return output.toString(Charsets.UTF_8.name())
+        }
     }
 }
 
@@ -114,22 +138,7 @@ class PdsRepository @Inject constructor(
                         throw java.io.IOException("PDS request failed: HTTP ${response.code}")
                     }
                     val body = response.body ?: throw IOException("PDS request returned no body")
-                    if (body.contentLength() > maxBodyBytes) {
-                        throw IOException("PDS response exceeded the ${maxBodyBytes}-byte safety budget")
-                    }
-                    body.byteStream().use { input ->
-                        val output = ByteArrayOutputStream(minOf(maxBodyBytes, 64 * 1024))
-                        val buffer = ByteArray(16 * 1024)
-                        var total = 0
-                        while (true) {
-                            val read = input.read(buffer)
-                            if (read == -1) break
-                            total += read
-                            if (total > maxBodyBytes) throw IOException("PDS response exceeded the ${maxBodyBytes}-byte safety budget")
-                            output.write(buffer, 0, read)
-                        }
-                        output.toString(Charsets.UTF_8.name())
-                    }
+                    PdsResponseBodyReader.read(body.byteStream(), body.contentLength(), maxBodyBytes)
                 }
             }
             result ?: error("PDS request completed without a response body")
