@@ -127,7 +127,7 @@ data class SyncQueueFile(
 ) {
     init { require(version in 1..CURRENT_VERSION) { "Unsupported offline queue version: $version" } }
 
-    private companion object { const val CURRENT_VERSION = 1 }
+    internal companion object { const val CURRENT_VERSION = 1 }
 }
 
 /** Storage contract for platform-specific offline content caches. */

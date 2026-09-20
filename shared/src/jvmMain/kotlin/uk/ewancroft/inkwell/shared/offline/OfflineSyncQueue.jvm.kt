@@ -40,7 +40,16 @@ class OfflineSyncQueueJvm(durableDirPath: String, legacyCacheDirPath: String) : 
         migrateLegacyIfNeeded()
         if (!queueFile.exists()) emptyList()
         else decodeEntries(queueFile.readText())
-    }.getOrThrow()
+    }.getOrElse { error ->
+        preserveCorruptQueue()
+        throw error
+    }
+
+    private fun preserveCorruptQueue() {
+        val preserved = File(queueFile.parentFile, "$QUEUE_FILENAME.corrupt-${System.currentTimeMillis()}")
+        runCatching { queueFile.copyTo(preserved, overwrite = false) }
+        queueFile.delete()
+    }
 
     private fun decodeEntries(raw: String): List<SyncQueueEntry> = runCatching {
         json.decodeFromString<SyncQueueFile>(raw).entries
