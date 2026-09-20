@@ -203,6 +203,15 @@ final class StandardSiteTests: XCTestCase {
         XCTAssertThrowsError(try ArticleStateStore.shared.previewImportJSON(malformed))
     }
 
+    func testReadingDataImportRejectsOversizedTitleAndFutureTimestamp() {
+        let oversizedTitle = String(repeating: "x", count: 501)
+        let oversized = Data(("{\"format\":\"uk.ewancroft.inkwell.reading-data\",\"version\":1,\"exportedAt\":\"2026-09-19T00:00:00Z\",\"articles\":[{\"articleId\":\"at://did:plc:alice/site.standard.document/one\",\"title\":\"" + oversizedTitle + "\",\"isRead\":false,\"isBookmarked\":false,\"timestamp\":\"2026-09-19T00:00:00Z\"}]}" ).utf8)
+        let future = Data(#"{"format":"uk.ewancroft.inkwell.reading-data","version":1,"exportedAt":"2026-09-19T00:00:00Z","articles":[{"articleId":"at://did:plc:alice/site.standard.document/one","title":"ok","isRead":false,"isBookmarked":false,"timestamp":"2999-01-01T00:00:00Z"}]}"#.utf8)
+
+        XCTAssertThrowsError(try ArticleStateStore.shared.previewImportJSON(oversized))
+        XCTAssertThrowsError(try ArticleStateStore.shared.previewImportJSON(future))
+    }
+
     func testNotificationNavigationConsumesAQueuedDocumentExactlyOnce() {
         let coordinator = NotificationNavigationCoordinator.shared
         coordinator.enqueue(documentURI: "at://did:plc:alice/site.standard.document/queued")
