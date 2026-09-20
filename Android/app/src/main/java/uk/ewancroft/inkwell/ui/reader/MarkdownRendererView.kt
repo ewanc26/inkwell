@@ -262,14 +262,18 @@ private fun renderListItems(
                         text = "$num.",
                         style = MaterialTheme.typography.bodyLarge,
                         color = accentColor,
-                        modifier = Modifier.padding(top = 2.dp),
+                        modifier = Modifier
+                            .padding(top = 2.dp)
+                            .clearAndSetSemantics {},
                     )
                 } else {
                     Text(
                         text = "\u2022",
                         style = MaterialTheme.typography.titleMedium,
                         color = accentColor,
-                        modifier = Modifier.padding(top = 2.dp),
+                        modifier = Modifier
+                            .padding(top = 2.dp)
+                            .clearAndSetSemantics {},
                     )
                 }
 
@@ -282,6 +286,9 @@ private fun renderListItems(
                             MaterialTheme.typography.bodyLarge
                         },
                         color = bodyColor,
+                        modifier = Modifier.semantics {
+                            stateDescription = "Item ${index + 1} of ${items.size}"
+                        },
                     )
                     if (!item.children.isNullOrEmpty()) {
                         renderListItems(item.children, ordered = false, startIndex = null, bodyColor, accentColor, uriHandler, boldText, underlineLinks)
