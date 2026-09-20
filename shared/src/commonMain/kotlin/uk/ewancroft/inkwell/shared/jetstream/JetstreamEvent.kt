@@ -4,6 +4,12 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 
+/** Independent cap for untrusted WebSocket text frames before JSON decoding. */
+const val MAX_JETSTREAM_FRAME_BYTES = 2 * 1024 * 1024
+
+internal fun isSafeJetstreamFrame(bytes: ByteArray): Boolean =
+    bytes.size <= MAX_JETSTREAM_FRAME_BYTES
+
 /**
  * Top-level envelope received from the Jetstream WebSocket.
  *

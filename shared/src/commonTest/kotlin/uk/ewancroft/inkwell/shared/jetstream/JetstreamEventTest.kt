@@ -5,6 +5,7 @@ import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import kotlin.test.assertEquals
 
 class JetstreamEventTest {
     private val json = Json { ignoreUnknownKeys = true }
@@ -20,6 +21,12 @@ class JetstreamEventTest {
             rkey = "post",
             record = JsonObject(emptyMap()),
         )
+
+    @Test fun `jetstream frames have an independent byte budget`() {
+        assertTrue(isSafeJetstreamFrame(ByteArray(MAX_JETSTREAM_FRAME_BYTES)))
+        assertFalse(isSafeJetstreamFrame(ByteArray(MAX_JETSTREAM_FRAME_BYTES + 1)))
+        assertEquals(2 * 1024 * 1024, MAX_JETSTREAM_FRAME_BYTES)
+    }
 
     @Test fun `create update and delete are valid commit operations`() {
         assertTrue(payload("create").isValidCommitOperation())

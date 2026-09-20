@@ -45,6 +45,7 @@ class JetstreamClientAndroid : uk.ewancroft.inkwell.shared.jetstream.JetstreamCl
                 val frame = wsSession.incoming.receive()
                 when (frame) {
                     is Frame.Text -> {
+                        if (!isSafeJetstreamFrame(frame.data)) continue
                         val text = frame.readText()
                         try {
                             val event = json.decodeFromString<JetstreamEvent>(text)
