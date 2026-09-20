@@ -48,7 +48,7 @@ class JetstreamClientAndroid : uk.ewancroft.inkwell.shared.jetstream.JetstreamCl
                         val text = frame.readText()
                         try {
                             val event = json.decodeFromString<JetstreamEvent>(text)
-                            if (event.payload.operation == "commit") {
+                            if (event.payload.isValidCommitOperation()) {
                                 emit(event.payload)
                             }
                         } catch (_: Exception) {

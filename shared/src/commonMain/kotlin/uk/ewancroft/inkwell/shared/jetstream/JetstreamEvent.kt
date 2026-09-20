@@ -36,3 +36,7 @@ data class JetstreamPayload(
     val record: JsonObject? = null,
     val cursor: Long? = null
 )
+
+internal fun JetstreamPayload.isValidCommitOperation(): Boolean =
+    type == "network.bsky.jetstream.subscribeEvents#commit" &&
+        operation in setOf("create", "update", "delete")
