@@ -37,6 +37,7 @@ data class WriterUiState(
     val editingDocumentMarkdown: String? = null,
     val editingDocumentFormat: String? = null,
     val editingDocumentRevision: String? = null,
+    val editingDocumentRecord: JsonObject? = null,
     val isEditing: Boolean = false,
     val uploadedBlobs: Map<String, JsonObject> = emptyMap(),
     val lostFeatures: List<String> = emptyList(),
