@@ -26,7 +26,7 @@ Run on API 26+ device or emulator.
 ./gradlew test
 ```
 
-Runs the app's two unit test sources only — `StandardSiteVerifierTest` (13 tests) and `SearchModelsTest` (2). Three verifier tests hit the real `blog.ewancroft.uk` standard.site publication over the network and fail offline. There are no instrumentation tests.
+Runs the app's two unit test sources only — `StandardSiteVerifierTest` (13 hermetic tests) and `SearchModelsTest` (2). The verifier tests use a fake HTTP transport and do not require public internet access. There are no instrumentation tests.
 
 This Gradle root also owns the shared KMP module (`:shared`, mapped to `../shared`), which holds the bulk of the automated coverage — 135 tests in `shared/src/commonTest/`. The aggregate `test` task does **not** reach them, because the KMP `jvm()` target exposes `jvmTest` rather than `test`:
 
