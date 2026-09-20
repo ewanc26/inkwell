@@ -117,6 +117,34 @@ class PdsRepository @Inject constructor(
         )
     }
 
+    /**
+     * Revalidates a restored OAuth session against the PDS before the UI uses
+     * it. The DID returned by the authenticated endpoint is authoritative;
+     * the mutable stored handle is never used as the account identity.
+     */
+    suspend fun validateRestoredSession(): UserSessionInfo? {
+        val stored = sessionStore.load() ?: return null
+        val did = stored.did ?: return null
+        val pdsUrl = stored.pdsUrl ?: return null
+        val response = atOAuth.createClient().query(
+            nsid = "com.atproto.server.getSession",
+            params = Unit,
+            paramsSerializer = Unit.serializer(),
+            responseSerializer = JsonObject.serializer(),
+        )
+        val returnedDid = response["did"]?.jsonPrimitive?.contentOrNull
+        check(restoredSessionMatches(storedDid = did, returnedDid = returnedDid)) {
+            "OAuth session subject did not match the stored account"
+        }
+        return UserSessionInfo(
+            handle = response["handle"]?.jsonPrimitive?.contentOrNull
+                ?: stored.handle
+                ?: did,
+            did = did,
+            pdsUrl = pdsUrl,
+        )
+    }
+
     /** URL-encodes a query param value — DIDs/AT-URIs can contain `:`, `/`,
      *  `.`, and other characters that must not be interpolated raw into a
      *  query string. */
@@ -410,6 +438,9 @@ class PdsRepository @Inject constructor(
         } catch (_: Exception) { null }
     }
 }
+
+internal fun restoredSessionMatches(storedDid: String, returnedDid: String?): Boolean =
+    returnedDid != null && returnedDid == storedDid
 
 internal fun deleteRecordInput(
     repo: String,
