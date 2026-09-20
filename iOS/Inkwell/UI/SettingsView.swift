@@ -44,6 +44,7 @@ struct SettingsView: View {
     @State private var exportFileURL: URL?
     @State private var isImportingData = false
     @State private var importMessage: String?
+    @State private var importedChangeCount: Int?
     @State private var pendingImportData: Data?
     @State private var pendingImportCount = 0
 
@@ -312,19 +313,29 @@ struct SettingsView: View {
             } message: {
                 Text("These overrides are free for everyone. If you find them useful, consider a tip to support ongoing development.")
             }
-            .alert("Import Data", isPresented: Binding(get: { importMessage != nil }, set: { if !$0 { importMessage = nil } })) {
+            .alert("Import Data", isPresented: Binding(get: { importMessage != nil || importedChangeCount != nil }, set: { if !$0 { importMessage = nil; importedChangeCount = nil } })) {
                 Button("OK", role: .cancel) { importMessage = nil }
             } message: {
-                Text(importMessage ?? "")
+                if let importedChangeCount {
+                    Text("Imported ") + Text("^[\(importedChangeCount) change](inflect: true)") + Text(".")
+                } else {
+                    Text(importMessage ?? "")
+                }
             }
             .confirmationDialog("Import reading data?", isPresented: Binding(get: { pendingImportData != nil }, set: { if !$0 { pendingImportData = nil } }), titleVisibility: .visible) {
-                Button("Import (pendingImportCount) change\(pendingImportCount == 1 ? "" : "s")") {
+                Button {
                     guard let data = pendingImportData else { return }
                     do {
                         let changes = try articleState.importJSON(data)
-                        importMessage = "Imported \(changes) change\(changes == 1 ? "" : "s")."
-                    } catch { importMessage = error.localizedDescription }
+                        importedChangeCount = changes
+                        importMessage = nil
+                    } catch {
+                        importedChangeCount = nil
+                        importMessage = error.localizedDescription
+                    }
                     pendingImportData = nil
+                } label: {
+                    Text("Import ") + Text("^[\(pendingImportCount) change](inflect: true)")
                 }
                 Button("Cancel", role: .cancel) { pendingImportData = nil }
             } message: {
