@@ -247,6 +247,16 @@ final class StandardSiteTests: XCTestCase {
         XCTAssertNil(ContentDeepLinkPolicy.documentURI(from: oauth))
     }
 
+    func testIframeSecurityPolicyRequiresSameHTTPSOrigin() {
+        let origin = URL(string: "https://embed.example:8443/frame")!
+        XCTAssertTrue(IframeSecurityPolicy.isAllowedInitial(origin))
+        XCTAssertTrue(IframeSecurityPolicy.isAllowedNavigation(from: origin, to: URL(string: "https://EMBED.example:8443/next")!))
+        XCTAssertFalse(IframeSecurityPolicy.isAllowedNavigation(from: origin, to: URL(string: "https://embed.example/next")!))
+        XCTAssertFalse(IframeSecurityPolicy.isAllowedNavigation(from: origin, to: URL(string: "https://other.example:8443/next")!))
+        XCTAssertFalse(IframeSecurityPolicy.isAllowedInitial(URL(string: "http://embed.example/frame")!))
+        XCTAssertFalse(IframeSecurityPolicy.isAllowedInitial(URL(string: "javascript:alert(1)")!))
+    }
+
     private func document(
         site: String,
         path: String? = nil

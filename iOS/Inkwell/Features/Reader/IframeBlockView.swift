@@ -26,7 +26,9 @@ struct IframeBlockView: UIViewRepresentable {
         webView.backgroundColor = .clear
         webView.navigationDelegate = context.coordinator
         webView.uiDelegate = context.coordinator
-        webView.load(URLRequest(url: url))
+        if IframeSecurityPolicy.isAllowedInitial(url) {
+            webView.load(URLRequest(url: url))
+        }
         return webView
     }
 
@@ -39,13 +41,13 @@ struct IframeBlockView: UIViewRepresentable {
         webView.loadHTMLString("", baseURL: nil)
     }
 
-    func makeCoordinator() -> Coordinator { Coordinator(allowedHost: url.host) }
+    func makeCoordinator() -> Coordinator { Coordinator(origin: url) }
 
     class Coordinator: NSObject, WKNavigationDelegate, WKUIDelegate {
-        private let allowedHost: String?
+        private let origin: URL
 
-        init(allowedHost: String?) {
-            self.allowedHost = allowedHost
+        init(origin: URL) {
+            self.origin = origin
         }
 
         func webView(
@@ -54,8 +56,7 @@ struct IframeBlockView: UIViewRepresentable {
             decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
         ) {
             guard let candidate = navigationAction.request.url,
-                  candidate.scheme == "https",
-                  candidate.host == allowedHost else {
+                  IframeSecurityPolicy.isAllowedNavigation(from: origin, to: candidate) else {
                 decisionHandler(.cancel)
                 return
             }
