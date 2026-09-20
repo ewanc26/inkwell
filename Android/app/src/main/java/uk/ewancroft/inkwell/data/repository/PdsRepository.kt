@@ -92,7 +92,8 @@ class PdsRepository @Inject constructor(
             val request = Request.Builder().url(urlStr).get().build()
             val origin = "${request.url.scheme}://${request.url.host}:${request.url.port}"
             var attempt = 0
-            while (true) {
+            var result: String? = null
+            while (result == null) {
                 val cooldown = synchronized(rateLimitCooldowns) {
                     (rateLimitCooldowns[origin] ?: 0L) - System.currentTimeMillis()
                 }
@@ -108,7 +109,7 @@ class PdsRepository @Inject constructor(
                     attempt += 1
                     continue
                 }
-                return response.use {
+                result = response.use {
                     if (!response.isSuccessful) {
                         throw java.io.IOException("PDS request failed: HTTP ${response.code}")
                     }
@@ -131,6 +132,7 @@ class PdsRepository @Inject constructor(
                     }
                 }
             }
+            result ?: error("PDS request completed without a response body")
         }
     }
 
