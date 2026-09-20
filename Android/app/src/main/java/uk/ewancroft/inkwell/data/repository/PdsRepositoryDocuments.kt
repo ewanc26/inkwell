@@ -56,7 +56,10 @@ suspend fun PdsRepository.downloadBlob(
 }
 
 internal fun validateBlobContentType(actual: String?, expected: String?) {
-    if (actual == null || expected == null) return
+    if (expected == null) return
+    if (actual == null) {
+        throw java.io.IOException("Blob response omitted the expected MIME type $expected")
+    }
     val actualType = actual.substringBefore(';').trim().lowercase()
     val expectedType = expected.substringBefore(';').trim().lowercase()
     if (actualType != expectedType) {
