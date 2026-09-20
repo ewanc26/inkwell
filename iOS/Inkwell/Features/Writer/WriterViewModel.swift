@@ -47,6 +47,7 @@ final class WriterViewModel {
 
     var editingDocumentURI: String?
     var editingDocumentRevision: String?
+    var editingDocumentRawRecord: UnknownType?
     var isEditing: Bool { editingDocumentURI != nil }
     var showDeleteConfirmation = false
 
@@ -188,6 +189,10 @@ final class WriterViewModel {
             editingDocumentRevision = cid
 
             let document = entry.record
+            let rawRecord = try? await loginStateManager.getRepositoryRecord(
+                from: parsed.did, collection: parsed.collection, recordKey: parsed.recordKey
+            )
+            editingDocumentRawRecord = rawRecord?.value
             title = document.title
             description = document.description ?? ""
             path = document.path ?? ""
@@ -217,6 +222,7 @@ final class WriterViewModel {
     func cancelEditing() {
         editingDocumentURI = nil
         editingDocumentRevision = nil
+        editingDocumentRawRecord = nil
         title = ""
         description = ""
         path = ""
@@ -323,10 +329,14 @@ final class WriterViewModel {
 
                     try loginStateManager.ensureDocumentRecordFits(UnknownType.record(document))
 
+                    let updatedRecord = preservingUnknownFields(
+                        from: editingDocumentRawRecord,
+                        with: UnknownType.record(document)
+                    )
                     try await loginStateManager.updateRecord(
                         collection: SiteStandardLexicon.DocumentRecord.type,
                         recordKey: parsed.recordKey,
-                        record: UnknownType.record(document),
+                        record: updatedRecord,
                         revision: revision
                     )
                     publishSuccess = "Document updated."
@@ -371,4 +381,15 @@ private func unknownTypeToDict(_ value: UnknownType) -> [String: Any] {
         return [:]
     }
     return dict
+}
+
+func preservingUnknownFields(from existing: UnknownType?, with updated: UnknownType) -> UnknownType {
+    guard let existing,
+          let existingFields = try? existing.asCodableValue(),
+          let updatedFields = try? updated.asCodableValue() else {
+        return updated
+    }
+    var merged = existingFields
+    updatedFields.forEach { merged[$0.key] = $0.value }
+    return .unknown(merged)
 }
