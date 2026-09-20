@@ -226,6 +226,11 @@ final class StandardSiteTests: XCTestCase {
         XCTAssertNil(coordinator.consumePendingDocumentURI())
     }
 
+    func testImageSanitizerRejectsOversizedEncodedInputBeforeDecoding() {
+        let oversized = Data(repeating: 0, count: 10 * 1024 * 1024 + 1)
+        XCTAssertThrowsError(try ImageUploadSanitizer.sanitize(oversized))
+    }
+
     private func document(
         site: String,
         path: String? = nil
