@@ -195,6 +195,8 @@ struct MarkdownRendererView: View {
                         }
                     }
                 }
+                .accessibilityElement(children: .combine)
+                .accessibilityValue(Text("Item \(index + 1) of \(items.count)"))
             }
         }
         .padding(.leading, 4))
@@ -214,6 +216,8 @@ struct MarkdownRendererView: View {
                         .foregroundStyle(foregroundColor)
                         .strikethrough(item.checked == true)
                 }
+                .accessibilityElement(children: .combine)
+                .accessibilityValue(Text(item.checked == true ? "Completed" : "Not completed"))
             }
         }
         .padding(.leading, 4)
