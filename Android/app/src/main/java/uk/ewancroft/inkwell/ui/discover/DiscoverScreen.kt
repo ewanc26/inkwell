@@ -33,6 +33,7 @@ import uk.ewancroft.inkwell.data.model.common.SearchActorResult
 import uk.ewancroft.inkwell.data.model.common.SearchResult
 import uk.ewancroft.inkwell.data.model.common.PublicationResult
 import uk.ewancroft.inkwell.R
+import uk.ewancroft.inkwell.util.bidiIsolated
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -387,7 +388,7 @@ private fun PublicationSearchRow(
         modifier = Modifier
             .fillMaxWidth()
             .semantics(mergeDescendants = true) {
-                contentDescription = "Publication: ${publication.name}. ${publication.domain}"
+                contentDescription = "Publication: ${publication.name.bidiIsolated()}. ${publication.domain.bidiIsolated()}"
             }
             .clickable(
                 role = Role.Button,
