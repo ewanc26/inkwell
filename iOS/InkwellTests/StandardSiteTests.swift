@@ -203,6 +203,29 @@ final class StandardSiteTests: XCTestCase {
         XCTAssertThrowsError(try ArticleStateStore.shared.previewImportJSON(malformed))
     }
 
+    func testNotificationNavigationConsumesAQueuedDocumentExactlyOnce() {
+        let coordinator = NotificationNavigationCoordinator.shared
+        coordinator.enqueue(documentURI: "at://did:plc:alice/site.standard.document/queued")
+
+        XCTAssertEqual(
+            coordinator.consumePendingDocumentURI(),
+            "at://did:plc:alice/site.standard.document/queued"
+        )
+        XCTAssertNil(coordinator.consumePendingDocumentURI())
+    }
+
+    func testNotificationNavigationReplacesStalePendingRoute() {
+        let coordinator = NotificationNavigationCoordinator.shared
+        coordinator.enqueue(documentURI: "at://did:plc:alice/site.standard.document/old")
+        coordinator.enqueue(documentURI: "at://did:plc:alice/site.standard.document/new")
+
+        XCTAssertEqual(
+            coordinator.consumePendingDocumentURI(),
+            "at://did:plc:alice/site.standard.document/new"
+        )
+        XCTAssertNil(coordinator.consumePendingDocumentURI())
+    }
+
     private func document(
         site: String,
         path: String? = nil
