@@ -482,7 +482,9 @@ func sharedOAuthScopeRepoPublication() -> String { OAuthScopes.shared.REPO_PUBLI
 func sharedOAuthScopeRepoDocument() -> String { OAuthScopes.shared.REPO_DOCUMENT }
 func sharedOAuthScopeRepoSubscription() -> String { OAuthScopes.shared.REPO_SUBSCRIPTION }
 func sharedOAuthScopeRepoRecommend() -> String { OAuthScopes.shared.REPO_RECOMMEND }
-func sharedOAuthScopeRepoLeafletComment() -> String { OAuthScopes.shared.REPO_LEAFLET_COMMENT }
+// Keep this literal until the checked-in XCFramework exports the new shared
+// constant; the value must still stay synchronized with OAuthScopes.kt.
+func sharedOAuthScopeRepoLeafletComment() -> String { "repo:pub.leaflet.comment" }
 func sharedOAuthScopeRepoUserInputDiscussion() -> String { OAuthScopes.shared.REPO_USERINPUT_DISCUSSION }
 func sharedOAuthScopeAuthFull() -> String { OAuthScopes.shared.AUTH_FULL }
 func sharedOAuthScopeAuthSocial() -> String { OAuthScopes.shared.AUTH_SOCIAL }
