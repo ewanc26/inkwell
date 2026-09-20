@@ -25,6 +25,7 @@ import uk.ewancroft.inkwell.data.model.common.SearchResult
 import uk.ewancroft.inkwell.data.model.common.PublicationResult
 import uk.ewancroft.inkwell.shared.content.SearchBackendUrl
 import uk.ewancroft.inkwell.data.repository.PdsRepository
+import uk.ewancroft.inkwell.data.remote.readBoundedUtf8
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -93,7 +94,7 @@ class DiscoverViewModel @Inject constructor(
                     val searchRequest = Request.Builder().url(searchUrl).get().build()
                     client.newCall(searchRequest).execute().use {
                         if (!it.isSuccessful) throw IllegalStateException("Search returned HTTP ${it.code}")
-                        it.body?.string() ?: throw IllegalStateException("Search returned an empty response")
+                            it.body?.readBoundedUtf8() ?: throw IllegalStateException("Search returned an empty response")
                     }
                 }
 
@@ -110,7 +111,7 @@ class DiscoverViewModel @Inject constructor(
                         val actorsRequest = Request.Builder().url(actorsUrl).get().build()
                         client.newCall(actorsRequest).execute().use {
                             if (!it.isSuccessful) throw IllegalStateException("Actor search returned HTTP ${it.code}")
-                            it.body?.string() ?: throw IllegalStateException("Actor search returned an empty response")
+                            it.body?.readBoundedUtf8() ?: throw IllegalStateException("Actor search returned an empty response")
                         }
                     }
                     withContext(Dispatchers.IO) {
