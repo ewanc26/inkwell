@@ -159,4 +159,13 @@
     <string name="moderation_reason">Reason</string>
     <string name="moderation_comment_optional">Comment (optional)</string>
     <string name="moderation_report">Report</string>
+    <string name="moderation_content_filters">Content filters</string>
+    <string name="moderation_content_warnings">Content warnings</string>
+    <string name="moderation_content_warnings_description">Choose whether a labelled article is shown, shown behind a warning, or hidden until you reveal it.</string>
+    <string name="moderation_custom_labels">Custom labels</string>
+    <string name="moderation_custom_labels_description">Add labels used by a publication or labeler service, then choose how Inkwell should display them.</string>
+    <string name="moderation_custom_label">Custom label</string>
+    <string name="moderation_add_label">Add label</string>
+    <string name="moderation_remove_label">Remove %1$s</string>
+    <string name="moderation_show_label">How to show %1$s</string>
 </resources>
