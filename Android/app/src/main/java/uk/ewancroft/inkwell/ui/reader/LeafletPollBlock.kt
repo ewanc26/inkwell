@@ -32,6 +32,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import uk.ewancroft.inkwell.data.model.common.StrongRef
@@ -48,6 +51,8 @@ internal fun PollBlock(
     var isLoading by remember { mutableStateOf(true) }
     var selectedOptions by remember { mutableStateOf<Set<String>>(emptySet()) }
     var hasVoted by remember { mutableStateOf(false) }
+    var isSubmitting by remember { mutableStateOf(false) }
+    var statusMessage by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
 
     val pollRef = block.poll
@@ -56,7 +61,8 @@ internal fun PollBlock(
     LaunchedEffect(pollUri, authorDid) {
         if (pollUri.isBlank()) return@LaunchedEffect
         isLoading = true
-        onLoadPoll(pollRef!!)
+        runCatching { onLoadPoll(pollRef!!) }
+            .onFailure { statusMessage = "Poll could not be loaded" }
         isLoading = false
     }
 
@@ -65,7 +71,12 @@ internal fun PollBlock(
     hasVoted = data?.myVote?.isNotEmpty() == true
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .semantics {
+                statusMessage?.let { contentDescription = it }
+                liveRegion = LiveRegionMode.Polite
+            },
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
         shape = MaterialTheme.shapes.medium,
     ) {
@@ -91,7 +102,7 @@ internal fun PollBlock(
 
                     OutlinedButton(
                         onClick = {
-                            if (!isVoted) {
+                            if (!isVoted && !isSubmitting) {
                                 val newSelection = if (isSelected) {
                                     selectedOptions - option.text
                                 } else {
@@ -114,7 +125,7 @@ internal fun PollBlock(
                                     append(", $count votes, $percentage")
                                 }
                             },
-                        enabled = !isVoted,
+                        enabled = !isVoted && !isSubmitting,
                     ) {
                         Box(modifier = Modifier.fillMaxWidth()) {
                             if (totalVotes > 0) {
@@ -164,15 +175,23 @@ internal fun PollBlock(
                     TextButton(
                         onClick = {
                             val selected = selectedOptions.toList()
-                            hasVoted = true
-                            selectedOptions = emptySet()
+                            isSubmitting = true
+                            statusMessage = "Submitting vote"
                             scope.launch {
-                                onCastVote(pollUri, selected)
+                                runCatching { onCastVote(pollUri, selected) }
+                                    .onSuccess {
+                                        hasVoted = true
+                                        selectedOptions = emptySet()
+                                        statusMessage = "Vote submitted"
+                                    }
+                                    .onFailure { statusMessage = "Vote could not be submitted" }
+                                isSubmitting = false
                             }
                         },
+                        enabled = !isSubmitting,
                         modifier = Modifier.align(Alignment.End),
                     ) {
-                        Text("Vote")
+                        Text(if (isSubmitting) "Submitting…" else "Vote")
                     }
                 }
                 if (totalVotes > 0) {
