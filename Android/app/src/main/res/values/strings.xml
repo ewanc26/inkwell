@@ -167,6 +167,14 @@
     <string name="moderation_custom_label">Custom label</string>
     <string name="moderation_add_label">Add label</string>
     <string name="moderation_remove_label">Remove %1$s</string>
+    <plurals name="moderation_muted_count">
+        <item quantity="one">Muted (1)</item>
+        <item quantity="other">Muted (%d)</item>
+    </plurals>
+    <plurals name="moderation_blocked_count">
+        <item quantity="one">Blocked (1)</item>
+        <item quantity="other">Blocked (%d)</item>
+    </plurals>
     <string name="moderation_show_label">How to show %1$s</string>
     <string name="notifications_clear_all">Clear All</string>
     <string name="notifications_empty">No notifications yet</string>
