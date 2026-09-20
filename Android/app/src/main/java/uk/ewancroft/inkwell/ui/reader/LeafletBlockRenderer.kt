@@ -39,6 +39,7 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.AsyncImage
 import uk.ewancroft.inkwell.data.model.common.StrongRef
@@ -47,6 +48,7 @@ import uk.ewancroft.inkwell.data.model.content.LeafletFacet
 import uk.ewancroft.inkwell.shared.content.LeafletTypes
 import uk.ewancroft.inkwell.shared.facets.FacetSchema
 import uk.ewancroft.inkwell.shared.text.Utf8Offsets
+import uk.ewancroft.inkwell.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -473,7 +475,7 @@ fun PostsListBlock(block: LeafletBlock) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.AutoMirrored.Outlined.ViewList, contentDescription = null, modifier = Modifier.size(16.dp))
                 Spacer(Modifier.width(8.dp))
-                Text("Posts", style = MaterialTheme.typography.labelMedium)
+                Text(stringResource(R.string.reader_posts), style = MaterialTheme.typography.labelMedium)
             }
             if (!block.websiteTitle.isNullOrBlank()) {
                 Spacer(Modifier.height(4.dp))
@@ -496,7 +498,7 @@ fun PostsListBlock(block: LeafletBlock) {
                 val tags = block.websiteTitle?.split(",")?.map { it.trim() } ?: emptyList()
                 if (tags.isEmpty()) {
                     item {
-                        AssistChip(onClick = {}, label = { Text("All posts") }, enabled = false)
+                        AssistChip(onClick = {}, label = { Text(stringResource(R.string.reader_all_posts)) }, enabled = false)
                     }
                 } else {
                     items(tags) { tag ->

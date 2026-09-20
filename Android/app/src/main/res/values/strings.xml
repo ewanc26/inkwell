@@ -66,6 +66,9 @@
     <string name="reader_load_failed">Couldn\'t load this post</string>
     <string name="reader_retry">Retry</string>
     <string name="reader_more_actions_for">More actions for %1$s</string>
+    <string name="reader_posts">Posts</string>
+    <string name="reader_all_posts">All posts</string>
+    <string name="reader_unsupported_content">Unsupported content format</string>
     <string name="auth_feature_write">Write and publish your own posts using the standard.site lexicon.</string>
     <string name="auth_handle">Handle</string>
     <string name="auth_continue">Continue</string>
