@@ -216,7 +216,11 @@ extension LoginStateManager {
             guard let plcURL = URL(string: "https://plc.directory/\(did)") else {
                 throw LoginError.pdsResolutionFailed
             }
-            let (data, _) = try await URLSession.shared.data(from: plcURL)
+            let (data, response) = try await URLSession.shared.data(from: plcURL)
+            guard let http = response as? HTTPURLResponse,
+                  (200...299).contains(http.statusCode) else {
+                throw LoginError.pdsResolutionFailed
+            }
             try JSONSafety.validateResponse(data)
             let doc = try JSONSerialization.jsonObject(with: data) as? [String: Any]
             let services = doc?["service"] as? [[String: Any]]
