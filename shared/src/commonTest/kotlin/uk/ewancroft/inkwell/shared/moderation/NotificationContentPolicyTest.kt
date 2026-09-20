@@ -32,4 +32,18 @@ class NotificationContentPolicyTest {
 
         assertFalse(NotificationContentPolicy.shouldRedact(content, policy))
     }
+
+    @Test
+    fun `publication and document labels are evaluated together`() {
+        val publicationLabels = listOf(ModerationLabel("publication-warning"))
+        val documentLabels = listOf(ModerationLabel("document-warning"))
+        val policy = ModerationPolicy(hiddenLabels = setOf("publication-warning"))
+
+        assertTrue(
+            NotificationContentPolicy.shouldRedact(
+                FilterableContent(labels = publicationLabels + documentLabels),
+                policy
+            )
+        )
+    }
 }
