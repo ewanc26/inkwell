@@ -27,7 +27,6 @@ import uk.ewancroft.inkwell.shared.AtUri
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 import uk.ewancroft.inkwell.shared.model.UserLexicon
 import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
-import uk.ewancroft.inkwell.shared.policy.RecordListPolicy
 import uk.ewancroft.inkwell.shared.validation.JsonSafety
 import java.net.URLEncoder
 import java.net.URI
