@@ -19,6 +19,7 @@ class OfflineSyncQueueRetentionTest {
         assertEquals(1, decoded.version)
         assertEquals(listOf(entry), decoded.entries)
     }
+
     @Test
     fun `retention preserves stale mutations and keeps chronological order`() {
         val now = 30L * 24 * 60 * 60 * 1_000 + 1
