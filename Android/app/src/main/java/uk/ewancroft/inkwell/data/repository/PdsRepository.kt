@@ -19,6 +19,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.long
 import kotlinx.serialization.json.put
 import okhttp3.OkHttpClient
+import okhttp3.HttpUrl
 import okhttp3.Request
 import uk.ewancroft.inkwell.TestingConfig
 import uk.ewancroft.inkwell.TestingModeException
@@ -56,6 +57,12 @@ internal object RateLimitRetryPolicy {
         }.getOrNull()?.takeIf { it >= 0 }?.let { return it.coerceAtMost(MAX_DELAY_MS) }
         return (100L shl attempt.coerceIn(0, 9)).coerceAtMost(MAX_DELAY_MS)
     }
+}
+
+internal fun rateLimitOrigin(url: HttpUrl): String {
+    val defaultPort = (url.scheme == "https" && url.port == 443)
+        || (url.scheme == "http" && url.port == 80)
+    return if (defaultPort) "${url.scheme}://${url.host}" else "${url.scheme}://${url.host}:${url.port}"
 }
 
 internal object PdsResponseBodyReader {
@@ -123,7 +130,7 @@ class PdsRepository @Inject constructor(
     internal suspend fun executeGet(urlStr: String, maxBodyBytes: Int = DEFAULT_RESPONSE_BYTES): String {
         return withContext(Dispatchers.IO) {
             val request = Request.Builder().url(urlStr).get().build()
-            val origin = "${request.url.scheme}://${request.url.host}:${request.url.port}"
+            val origin = rateLimitOrigin(request.url)
             var attempt = 0
             var result: String? = null
             while (result == null) {
