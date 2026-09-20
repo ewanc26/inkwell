@@ -256,6 +256,19 @@ private struct ProfileStatistic: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
-        .accessibilityElement(children: .combine)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityCountLabel)
+    }
+
+    private var accessibilityCountLabel: Text {
+        guard let value else { return Text("—, \(label)") }
+        switch label {
+        case "Followers":
+            return Text("^[\(value) follower](inflect: true)")
+        case "Following":
+            return Text("Following ^[\(value) account](inflect: true)")
+        default:
+            return Text("^[\(value) post](inflect: true)")
+        }
     }
 }
