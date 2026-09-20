@@ -21,4 +21,10 @@ final class JSONSafetyTests: XCTestCase {
         let data = Data(repeating: 0x20, count: JSONSafety.maxResponseBytes + 1)
         XCTAssertThrowsError(try JSONSafety.validateResponse(data))
     }
+
+    func testRejectsTooManyContainerElements() throws {
+        let values = Array(repeating: "true", count: JSONSafety.maxContainerElements + 1)
+        let json = "[" + values.joined(separator: ",") + "]"
+        XCTAssertThrowsError(try JSONSafety.validate(Data(json.utf8)))
+    }
 }
