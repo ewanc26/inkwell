@@ -117,6 +117,8 @@ extension LoginStateManager {
             textContent: plainText
         )
 
+        try ensureDocumentRecordFits(UnknownType.record(document))
+
         return try await createRecord(
             collection: SiteStandardLexicon.DocumentRecord.type,
             record: UnknownType.record(document)

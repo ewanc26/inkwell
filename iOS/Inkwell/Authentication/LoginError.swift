@@ -12,6 +12,7 @@ enum LoginError: LocalizedError {
     case invalidURI
     case unexpectedRecordType
     case contentConversionFailed
+    case recordTooLarge(bytes: Int, limit: Int)
     case pdsResolutionFailed
     case httpError(status: Int)
     /// Thrown by the write choke points when `-testing` is set. Carries the
@@ -29,6 +30,8 @@ enum LoginError: LocalizedError {
             return "The record is not the expected type."
         case .contentConversionFailed:
             return "Failed to convert content to the output format."
+        case .recordTooLarge(let bytes, let limit):
+            return "This document is too large to publish ((bytes) bytes; limit is (limit)). Use a shorter document or a blob-backed format."
         case .pdsResolutionFailed:
             return "Could not resolve the repository's PDS. Check that the DID or handle is correct."
         case .httpError(let status):
