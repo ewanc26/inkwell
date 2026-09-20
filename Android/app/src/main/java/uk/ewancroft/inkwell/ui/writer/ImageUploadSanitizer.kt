@@ -3,7 +3,7 @@ package uk.ewancroft.inkwell.ui.writer
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import android.media.ExifInterface
+import androidx.exifinterface.media.ExifInterface
 import java.io.ByteArrayOutputStream
 
 /** Decodes and re-encodes user images without carrying source metadata. */
@@ -31,14 +31,29 @@ object ImageUploadSanitizer {
 
         val decoded = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
             ?: error("The selected file is not a supported image.")
+        val preserveAlpha = containsTransparency(decoded)
         val oriented = applyOrientation(bytes, decoded)
-        val format = if (oriented.hasAlpha()) Bitmap.CompressFormat.PNG else Bitmap.CompressFormat.JPEG
+        val format = if (preserveAlpha) {
+            Bitmap.CompressFormat.PNG
+        } else {
+            Bitmap.CompressFormat.JPEG
+        }
         val mimeType = if (format == Bitmap.CompressFormat.PNG) "image/png" else "image/jpeg"
         val output = ByteArrayOutputStream()
         check(oriented.compress(format, 90, output)) { "The image could not be prepared for upload." }
         if (oriented !== decoded) decoded.recycle()
         oriented.recycle()
         return Output(output.toByteArray(), mimeType)
+    }
+
+    private fun containsTransparency(bitmap: Bitmap): Boolean {
+        if (bitmap.config != Bitmap.Config.ARGB_8888) return false
+        val row = IntArray(bitmap.width)
+        for (y in 0 until bitmap.height) {
+            bitmap.getPixels(row, 0, bitmap.width, 0, y, bitmap.width, 1)
+            if (row.any { (it ushr 24) != 0xFF }) return true
+        }
+        return false
     }
 
     private fun applyOrientation(bytes: ByteArray, bitmap: Bitmap): Bitmap {

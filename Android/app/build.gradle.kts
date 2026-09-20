@@ -133,6 +133,7 @@ dependencies {
     implementation(libs.browser)
     implementation(libs.security.crypto)
     implementation(libs.core.ktx)
+    implementation("androidx.exifinterface:exifinterface:1.4.2")
 
     // Dagger 2.57+ unshaded kotlin-metadata-jvm; add explicit version for Kotlin 2.3.0 support
     ksp("org.jetbrains.kotlin:kotlin-metadata-jvm:2.3.0")
@@ -141,7 +142,6 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(kotlin("test"))
     testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation("androidx.exifinterface:exifinterface:1.4.2")
     testImplementation("org.robolectric:robolectric:4.14.1")
 
     // -- Shared KMP core --
