@@ -1,6 +1,8 @@
 import XCTest
+import InkwellShared
 @testable import Inkwell
 
+@MainActor
 final class NotificationMetadataTests: XCTestCase {
     func testVisibleMetadataPreservesTitleAndPublication() {
         let notification = notificationMetadata(
@@ -28,5 +30,24 @@ final class NotificationMetadataTests: XCTestCase {
 
         XCTAssertEqual(notification.documentTitle, "Hidden document")
         XCTAssertNil(notification.publicationName)
+    }
+
+    func testPublicationLevelLabelIsRedactedBySharedPolicy() {
+        let settings = ModerationSettings.shared
+        let oldHidden = settings.hiddenLabels
+        let oldWarnings = settings.warningLabels
+        defer {
+            settings.hiddenLabels = oldHidden
+            settings.warningLabels = oldWarnings
+        }
+
+        settings.hiddenLabels = ["adult"]
+        XCTAssertTrue(shouldRedactNotification(
+            title: "Sensitive title",
+            description: nil,
+            textContent: nil,
+            labels: [ModerationLabel(value: "adult", source: "publication")],
+            settings: settings
+        ))
     }
 }
