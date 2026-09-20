@@ -81,7 +81,7 @@ object LegalDocuments {
         |- **AT Protocol identity services:** DNS and `plc.directory` lookups to resolve handles and DIDs.
         |- **Leaflet Search (`leaflet-search-backend.fly.dev`):** a cross-platform search index for Standard.site records. Your search terms are sent to it.
         |- **Constellation (`constellation.microcosm.blue`):** to discover cross-repository backlinks and recommend counts.
-        |- **Bluesky CDN (`cdn.bsky.app`):** to load images and cover art stored as blobs.
+        |- **Bluesky CDN (`cdn.bsky.app`):** only for media supplied by Bluesky AppView responses; Standard.site blobs are fetched from their owning PDS.
         |- **Bluesky public API (`public.api.bsky.app`):** to render embedded Bluesky posts, profiles, and lists that appear inside documents you read.
         |- **userinput.app:** only if you use the optional feedback feature (section 7).
         |- **Ko-fi and GitHub Sponsors:** only if you tap a support link, which opens them in your browser. Any payment is handled entirely by them under their own policies; the developer never receives your payment details through Inkwell.
