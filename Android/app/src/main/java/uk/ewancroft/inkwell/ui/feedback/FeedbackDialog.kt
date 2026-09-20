@@ -11,10 +11,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import uk.ewancroft.inkwell.R
 
 /**
  * "Send Feedback" dialog — posts a discussion to Inkwell's userinput.app
@@ -33,24 +35,24 @@ fun FeedbackDialog(
         Surface(shape = MaterialTheme.shapes.large, tonalElevation = 6.dp) {
             Column(modifier = Modifier.padding(24.dp)) {
                 if (state.submitted) {
-                    Text("Thanks!", style = MaterialTheme.typography.titleLarge)
+                    Text(stringResource(R.string.feedback_thanks), style = MaterialTheme.typography.titleLarge)
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        "Your feedback was sent.",
+                        stringResource(R.string.feedback_sent),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Spacer(Modifier.height(20.dp))
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                        TextButton(onClick = onDismiss) { Text("Done") }
+                        TextButton(onClick = onDismiss) { Text(stringResource(R.string.feedback_done)) }
                     }
                     return@Column
                 }
 
-                Text("Send Feedback", style = MaterialTheme.typography.titleLarge)
+                Text(stringResource(R.string.feedback_title), style = MaterialTheme.typography.titleLarge)
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    "Sent to Inkwell's userinput.app board from your own account — bugs, questions, anything.",
+                    stringResource(R.string.feedback_description),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -59,7 +61,7 @@ fun FeedbackDialog(
                 OutlinedTextField(
                     value = state.title,
                     onValueChange = viewModel::updateTitle,
-                    label = { Text("Title") },
+                    label = { Text(stringResource(R.string.feedback_subject)) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     modifier = Modifier.fillMaxWidth(),
@@ -68,7 +70,7 @@ fun FeedbackDialog(
                 OutlinedTextField(
                     value = state.body,
                     onValueChange = viewModel::updateBody,
-                    label = { Text("Details (optional)") },
+                    label = { Text(stringResource(R.string.feedback_details_optional)) },
                     minLines = 3,
                     maxLines = 6,
                     modifier = Modifier.fillMaxWidth(),
@@ -97,13 +99,13 @@ fun FeedbackDialog(
 
                 Spacer(Modifier.height(20.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                    TextButton(onClick = onDismiss, enabled = !state.isSubmitting) { Text("Cancel") }
+                    TextButton(onClick = onDismiss, enabled = !state.isSubmitting) { Text(stringResource(R.string.reader_cancel)) }
                     Spacer(Modifier.width(8.dp))
                     Button(onClick = viewModel::submit, enabled = state.canSubmit) {
                         if (state.isSubmitting) {
                             CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
                         } else {
-                            Text("Send")
+                            Text(stringResource(R.string.feedback_send))
                         }
                     }
                 }
