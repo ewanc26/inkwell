@@ -48,15 +48,29 @@ class OfflineSyncQueueIos(durableDirPath: String, legacyCacheDirPath: String) : 
     private fun readInternal(): List<SyncQueueEntry> {
         migrateLegacyIfNeeded()
         if (!NSFileManager.defaultManager.fileExistsAtPath(queueFilePath)) return emptyList()
-        return runCatching {
+        return try {
             val content = NSString.stringWithContentsOfFile(
                 path = queueFilePath,
                 encoding = NSUTF8StringEncoding,
                 error = null,
-            ) ?: return emptyList()
+            ) ?: error("Unable to read offline sync queue as UTF-8")
             runCatching { json.decodeFromString<SyncQueueFile>(content).entries }
                 .getOrElse { json.decodeFromString<List<SyncQueueEntry>>(content) }
-        }.getOrThrow()
+        } catch (error: Throwable) {
+            preserveCorruptQueue()
+            throw error
+        }
+    }
+
+    private fun preserveCorruptQueue() {
+        val preserved = "$queueFilePath.corrupt-${nowMillis()}"
+        runCatching {
+            NSFileManager.defaultManager.copyItemAtPath(
+                srcPath = queueFilePath,
+                toPath = preserved,
+                error = null,
+            )
+        }
     }
 
     private fun writeInternal(entries: List<SyncQueueEntry>) {
