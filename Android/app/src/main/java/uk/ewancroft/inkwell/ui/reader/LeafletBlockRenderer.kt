@@ -80,7 +80,7 @@ fun LeafletBlockContent(
         LeafletTypes.BLOCKS_ORDERED_LIST -> OrderedListBlock(block, pollData, onLoadPoll, onCastVote)
         LeafletTypes.BLOCKS_CHECKLIST -> ChecklistBlock(block, pollData, onLoadPoll, onCastVote)
         LeafletTypes.BLOCKS_BSKY_POST -> BskyPostBlock(block)
-        LeafletTypes.BLOCKS_STANDARD_SITE_POST -> StandardSitePostBlock(block)
+        LeafletTypes.BLOCKS_STANDARD_SITE_POST -> StandardSitePostBlock(block, onLoadImage)
         LeafletTypes.BLOCKS_WEBSITE -> WebsiteEmbedBlock(block)
         LeafletTypes.BLOCKS_IFRAME -> IframeEmbedBlock(block)
         LeafletTypes.BLOCKS_BUTTON -> ButtonBlock(block)
