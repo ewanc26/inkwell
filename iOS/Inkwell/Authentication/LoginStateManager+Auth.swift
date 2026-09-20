@@ -159,6 +159,7 @@ extension LoginStateManager {
             self.isAuthenticated = true
             self.errorMessage = nil
             self.defaults.set(identity.handle, forKey: storedHandleKey)
+            self.defaults.set(identity.did, forKey: storedDIDKey)
             self.defaults.set(pdsURL.absoluteString, forKey: storedPDSKey)
 
             // 7. Best-effort profile fetch (cosmetic — don't block sign-in)
@@ -213,8 +214,9 @@ extension LoginStateManager {
         defer { isRestoringSession = false }
 
         guard let storedHandle = defaults.string(forKey: storedHandleKey),
+              let storedDID = defaults.string(forKey: storedDIDKey),
               let storedPDS = defaults.string(forKey: storedPDSKey),
-              let pdsURL = URL(string: storedPDS) else {
+              let storedPDSURL = URL(string: storedPDS) else {
             return
         }
 
@@ -243,17 +245,25 @@ extension LoginStateManager {
                 return
             }
 
-            guard let pdsHost = pdsURL.host else {
+            // Handles can be reassigned. The stored DID, not the current
+            // handle resolution, is the authoritative OAuth account identity.
+            guard identity.did == storedDID else {
+                logger.error("[RestoreSession] handle now resolves to a different DID")
                 clearSession()
                 return
             }
 
             guard let resolvedPDS = identity.serviceEndpoint.flatMap({ URL(string: $0) }),
-                  let resolvedHost = resolvedPDS.host,
-                  resolvedHost.caseInsensitiveCompare(pdsHost) == .orderedSame else {
-                logger.error("[RestoreSession] stored PDS does not match the handle's current PDS")
+                  resolvedPDS.scheme?.lowercased() == "https",
+                  resolvedPDS.user == nil,
+                  resolvedPDS.password == nil,
+                  let pdsHost = resolvedPDS.host else {
                 clearSession()
                 return
+            }
+
+            if !OAuthIssuerPolicy.sameHTTPSOrigin(storedPDSURL.absoluteString, resolvedPDS.absoluteString) {
+                logger.info("[RestoreSession] adopting the DID's migrated PDS")
             }
 
             let serverMetadata = try await ServerMetadata.load(for: pdsHost, provider: URLSession.defaultProvider)
@@ -278,9 +288,12 @@ extension LoginStateManager {
 
             self.authenticator = auth
             self.dpopKey = key
-            self.resolvedPDSURL = pdsURL
+            // A DID may migrate between PDSes. Use the freshly resolved PDS
+            // after subject validation rather than sending tokens to stale
+            // stored infrastructure.
+            self.resolvedPDSURL = resolvedPDS
             self.currentHandle = identity.handle
-            self.currentDID = identity.did
+            self.currentDID = storedDID
             self.isAuthenticated = true
             self.errorMessage = nil
 
@@ -357,6 +370,7 @@ extension LoginStateManager {
 
         if clearStoredAccount {
             defaults.removeObject(forKey: storedHandleKey)
+            defaults.removeObject(forKey: storedDIDKey)
             defaults.removeObject(forKey: storedPDSKey)
         }
     }
