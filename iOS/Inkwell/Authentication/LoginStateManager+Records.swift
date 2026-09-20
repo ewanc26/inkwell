@@ -20,9 +20,7 @@ extension LoginStateManager {
     /// Checks the encoded record before it reaches an XRPC write endpoint.
     func ensureDocumentRecordFits(_ record: UnknownType) throws {
         let bytes = try JSONEncoder().encode(record).count
-        guard bytes <= maxDocumentRecordBytes else {
-            throw LoginError.recordTooLarge(bytes: bytes, limit: maxDocumentRecordBytes)
-        }
+        try validateDocumentRecordSize(bytes)
     }
 
     // MARK: - Record CRUD
@@ -394,5 +392,11 @@ extension LoginStateManager {
         let page = try JSONDecoder().decode(TolerantRecordPage.self, from: data)
         logger.info("[listRecordsPage] \(collection): \(page.records.count) records")
         return (page.records, page.cursor)
+    }
+}
+
+func validateDocumentRecordSize(_ bytes: Int) throws {
+    guard bytes <= maxDocumentRecordBytes else {
+        throw LoginError.recordTooLarge(bytes: bytes, limit: maxDocumentRecordBytes)
     }
 }
