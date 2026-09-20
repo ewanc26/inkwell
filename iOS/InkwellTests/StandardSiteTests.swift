@@ -151,6 +151,11 @@ final class StandardSiteTests: XCTestCase {
         XCTAssertEqual(result.uri, "at://did:plc:alice/site.standard.publication/blog")
     }
 
+    func testSearchRejectsNonJSONErrorBody() {
+        let html = Data("<html><body>Bad gateway</body></html>".utf8)
+        XCTAssertThrowsError(try JSONDecoder().decode(ReaderSearchResponse.self, from: html))
+    }
+
     func testNotificationRoundTripsThroughJSON() throws {
         let notification = StandardSiteNotification(
             documentURI: "at://did:plc:alice/site.standard.document/3doc",
