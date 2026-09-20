@@ -40,7 +40,9 @@ object Utf8Offsets {
             if (startChar == -1 && bytePos + charBytes > byteStart) {
                 startChar = i
             }
-            if (endChar == -1 && bytePos + charBytes > byteEnd) {
+            // byteEnd is exclusive: a range ending exactly at this
+            // character's boundary must not include the next character.
+            if (endChar == -1 && bytePos + charBytes >= byteEnd) {
                 endChar = i
             }
 
