@@ -33,6 +33,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import uk.ewancroft.inkwell.data.model.content.LeafletBlock
@@ -133,7 +135,7 @@ private fun BSkyPostContent(post: uk.ewancroft.inkwell.data.model.bluesky.BSkyPo
             if (first?.thumb != null) {
                 AsyncImage(
                     model = first.thumb,
-                    contentDescription = first.alt,
+                    contentDescription = first.alt?.takeIf { it.isNotBlank() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(200.dp)
@@ -184,6 +186,9 @@ private fun BSkyPostContent(post: uk.ewancroft.inkwell.data.model.bluesky.BSkyPo
         if (embed is uk.ewancroft.inkwell.data.model.bluesky.BSkyEmbed.Record) {
             Card(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)),
+                modifier = Modifier.semantics(mergeDescendants = true) {
+                    contentDescription = "Quoted post by ${embed.record.author?.displayName ?: "unknown author"}"
+                },
             ) {
                 Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -223,7 +228,17 @@ private fun BSkyPostContent(post: uk.ewancroft.inkwell.data.model.bluesky.BSkyPo
 
 @Composable
 private fun PostStat(icon: androidx.compose.ui.graphics.vector.ImageVector, count: Int?) {
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = Modifier.semantics {
+            contentDescription = "${NumberFormat.formatCount(count ?: 0)} ${when (icon) {
+                Icons.Outlined.ChatBubbleOutline -> "replies"
+                Icons.Outlined.Repeat -> "reposts"
+                else -> "likes"
+            }}"
+        },
+    ) {
         Icon(icon, contentDescription = null, modifier = Modifier.size(12.dp))
         if (count != null) {
             Text(NumberFormat.formatCount(count), style = MaterialTheme.typography.labelSmall)
