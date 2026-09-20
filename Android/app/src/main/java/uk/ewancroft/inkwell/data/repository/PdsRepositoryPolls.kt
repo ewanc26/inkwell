@@ -20,7 +20,7 @@ import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
 suspend fun PdsRepository.getPollDefinition(did: String, rkey: String): LeafletPollDefinition {
     val urlStr = "${XrpcEndpoints.PUBLIC_BSKY_API}${XrpcEndpoints.REPO_GET_RECORD}?repo=${enc(did)}&collection=${CollectionNsids.LEAFLET_POLL_DEFINITION}&rkey=${enc(rkey)}"
     val body = executeGet(urlStr)
-    val record = json.parseToJsonElement(body).jsonObject
+    val record = decodeSafe<JsonObject>(body)
     val value = record["value"]?.jsonObject ?: throw IllegalStateException("Missing poll value")
     return json.decodeFromJsonElement(LeafletPollDefinition.serializer(), value)
 }
@@ -28,7 +28,7 @@ suspend fun PdsRepository.getPollDefinition(did: String, rkey: String): LeafletP
 suspend fun PdsRepository.listPollVotes(did: String, pollRkey: String): List<LeafletPollVote> {
     val urlStr = "${XrpcEndpoints.PUBLIC_BSKY_API}${XrpcEndpoints.REPO_LIST_RECORDS}?repo=${enc(did)}&collection=${CollectionNsids.LEAFLET_POLL_VOTE}&limit=100"
     val body = executeGet(urlStr)
-    val response = json.parseToJsonElement(body).jsonObject
+    val response = decodeSafe<JsonObject>(body)
     val records = response["records"]?.jsonArray.orEmpty()
     return records.mapNotNull { record ->
         val uri = record.jsonObject["uri"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null
