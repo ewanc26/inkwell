@@ -87,46 +87,48 @@ class PdsRepository @Inject constructor(
 
     /** Executes a GET and returns the raw body, throwing on non-2xx statuses
      *  or a missing body instead of decoding an error payload as success. */
-    internal suspend fun executeGet(urlStr: String, maxBodyBytes: Int = DEFAULT_RESPONSE_BYTES): String = withContext(Dispatchers.IO) {
-        val request = Request.Builder().url(urlStr).get().build()
-        val origin = "${request.url.scheme}://${request.url.host}:${request.url.port}"
-        var attempt = 0
-        while (true) {
-            val cooldown = synchronized(rateLimitCooldowns) {
-                (rateLimitCooldowns[origin] ?: 0L) - System.currentTimeMillis()
-            }
-            if (cooldown > 0) delay(cooldown)
-            val response = publicHttpClient.newCall(request).execute()
-            if (response.code == 429 && attempt < MAX_RATE_LIMIT_ATTEMPTS - 1) {
-                val delayMs = RateLimitRetryPolicy.delayMillis(response.header("Retry-After"), attempt)
-                response.close()
-                synchronized(rateLimitCooldowns) {
-                    val until = System.currentTimeMillis() + delayMs
-                    rateLimitCooldowns[origin] = maxOf(rateLimitCooldowns[origin] ?: 0L, until)
+    internal suspend fun executeGet(urlStr: String, maxBodyBytes: Int = DEFAULT_RESPONSE_BYTES): String {
+        return withContext(Dispatchers.IO) {
+            val request = Request.Builder().url(urlStr).get().build()
+            val origin = "${request.url.scheme}://${request.url.host}:${request.url.port}"
+            var attempt = 0
+            while (true) {
+                val cooldown = synchronized(rateLimitCooldowns) {
+                    (rateLimitCooldowns[origin] ?: 0L) - System.currentTimeMillis()
                 }
-                attempt += 1
-                continue
-            }
-            return@withContext response.use {
-                if (!response.isSuccessful) {
-                    throw java.io.IOException("PDS request failed: HTTP ${response.code}")
-                }
-                val body = response.body ?: throw IOException("PDS request returned no body")
-                if (body.contentLength() > maxBodyBytes) {
-                    throw IOException("PDS response exceeded the ${maxBodyBytes}-byte safety budget")
-                }
-                body.byteStream().use { input ->
-                    val output = ByteArrayOutputStream(minOf(maxBodyBytes, 64 * 1024))
-                    val buffer = ByteArray(16 * 1024)
-                    var total = 0
-                    while (true) {
-                        val read = input.read(buffer)
-                        if (read == -1) break
-                        total += read
-                        if (total > maxBodyBytes) throw IOException("PDS response exceeded the ${maxBodyBytes}-byte safety budget")
-                        output.write(buffer, 0, read)
+                if (cooldown > 0) delay(cooldown)
+                val response = publicHttpClient.newCall(request).execute()
+                if (response.code == 429 && attempt < MAX_RATE_LIMIT_ATTEMPTS - 1) {
+                    val delayMs = RateLimitRetryPolicy.delayMillis(response.header("Retry-After"), attempt)
+                    response.close()
+                    synchronized(rateLimitCooldowns) {
+                        val until = System.currentTimeMillis() + delayMs
+                        rateLimitCooldowns[origin] = maxOf(rateLimitCooldowns[origin] ?: 0L, until)
                     }
-                    output.toString(Charsets.UTF_8.name())
+                    attempt += 1
+                    continue
+                }
+                return response.use {
+                    if (!response.isSuccessful) {
+                        throw java.io.IOException("PDS request failed: HTTP ${response.code}")
+                    }
+                    val body = response.body ?: throw IOException("PDS request returned no body")
+                    if (body.contentLength() > maxBodyBytes) {
+                        throw IOException("PDS response exceeded the ${maxBodyBytes}-byte safety budget")
+                    }
+                    body.byteStream().use { input ->
+                        val output = ByteArrayOutputStream(minOf(maxBodyBytes, 64 * 1024))
+                        val buffer = ByteArray(16 * 1024)
+                        var total = 0
+                        while (true) {
+                            val read = input.read(buffer)
+                            if (read == -1) break
+                            total += read
+                            if (total > maxBodyBytes) throw IOException("PDS response exceeded the ${maxBodyBytes}-byte safety budget")
+                            output.write(buffer, 0, read)
+                        }
+                        output.toString(Charsets.UTF_8.name())
+                    }
                 }
             }
         }
