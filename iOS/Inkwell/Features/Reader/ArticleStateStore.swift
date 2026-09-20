@@ -135,6 +135,7 @@ final class ArticleStateStore {
         let envelope = try decoder.decode(ReadingDataExport.self, from: data)
         guard envelope.format == "uk.ewancroft.inkwell.reading-data" else { throw ImportError.invalidEnvelope }
         guard envelope.version == 1 else { throw ImportError.unsupportedVersion }
+        guard envelope.exportedAt <= Date() else { throw ImportError.invalidArticle }
         guard envelope.articles.count <= 10_000 else { throw ImportError.invalidArticle }
         for article in envelope.articles {
             guard parseAtUri(article.articleId) != nil, article.title.count <= 500, article.timestamp <= Date() else {

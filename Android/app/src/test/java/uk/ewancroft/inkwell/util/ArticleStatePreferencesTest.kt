@@ -27,4 +27,9 @@ class ArticleStatePreferencesTest {
         assertTrue(ArticleStatePreferences.previewImportJson(null, oversized) is ArticleStatePreferences.ImportResult.Invalid)
         assertTrue(ArticleStatePreferences.previewImportJson(null, future) is ArticleStatePreferences.ImportResult.Invalid)
     }
+
+    @Test fun `rejects a future export timestamp`() {
+        val raw = """{"format":"uk.ewancroft.inkwell.reading-data","version":1,"exportedAt":"2999-01-01T00:00:00Z","articles":[]}"""
+        assertTrue(ArticleStatePreferences.previewImportJson(null, raw) is ArticleStatePreferences.ImportResult.Invalid)
+    }
 }

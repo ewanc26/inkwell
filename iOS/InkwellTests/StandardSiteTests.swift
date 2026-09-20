@@ -212,6 +212,11 @@ final class StandardSiteTests: XCTestCase {
         XCTAssertThrowsError(try ArticleStateStore.shared.previewImportJSON(future))
     }
 
+    func testReadingDataImportRejectsFutureExportTimestamp() {
+        let data = Data(#"{"format":"uk.ewancroft.inkwell.reading-data","version":1,"exportedAt":"2999-01-01T00:00:00Z","articles":[]}"#.utf8)
+        XCTAssertThrowsError(try ArticleStateStore.shared.previewImportJSON(data))
+    }
+
     func testNotificationNavigationConsumesAQueuedDocumentExactlyOnce() {
         let coordinator = NotificationNavigationCoordinator.shared
         coordinator.enqueue(documentURI: "at://did:plc:alice/site.standard.document/queued")
