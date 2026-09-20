@@ -162,7 +162,10 @@ final class ReaderFeedStore {
             let subscriptions = try await fetchSubscriptions(
                 loginStateManager: loginStateManager,
                 timeout: ReaderFeedStore.subscriptionsTimeout
-            )
+            ).reduce(into: [SubscriptionEntry]()) { unique, subscription in
+                guard !unique.contains(where: { $0.record.publication == subscription.record.publication }) else { return }
+                unique.append(subscription)
+            }
             followingPublicationURIs = Set(subscriptions.map(\.record.publication))
 
             // Reset state

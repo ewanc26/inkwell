@@ -540,7 +540,7 @@ class ReaderViewModel @Inject constructor(
                     collection = CollectionNsids.GRAPH_SUBSCRIPTION,
                     pdsUrl = session.pdsUrl
                 )
-            }
+            }.distinctBy { it.value["publication"]?.jsonPrimitive?.contentOrNull }
 
             followingCursors.clear()
             val didToProfile = mutableMapOf<String, BlueskyProfile>()
