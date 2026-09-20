@@ -48,10 +48,10 @@ data class SearchResponse(
 )
 
 /**
- * A distinct publication (site) derived from search results. The
- * leaflet-search-backend indexes documents, not publications, so a
- * publication is reconstructed by grouping results that share an author DID
- * and `basePath` (the publication's origin domain).
+ * An authoritative publication hydrated from a native publication search
+ * result. The search result's AT-URI is retained as the identity; display
+ * metadata comes from the owning PDS record rather than from an article
+ * snapshot or inferred domain grouping.
  */
 data class PublicationResult(
     val uri: String,
