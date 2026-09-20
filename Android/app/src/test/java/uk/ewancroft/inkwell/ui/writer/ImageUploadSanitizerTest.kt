@@ -36,4 +36,23 @@ class ImageUploadSanitizerTest {
             result.bytes.copyOf(3),
         )
     }
+
+    @Test
+    fun `transparent input is reencoded as PNG with matching MIME`() {
+        val source = Bitmap.createBitmap(2, 2, Bitmap.Config.ARGB_8888).apply {
+            eraseColor(0x0000FF00)
+        }
+        val encoded = ByteArrayOutputStream().also { output ->
+            source.compress(Bitmap.CompressFormat.PNG, 100, output)
+            source.recycle()
+        }.toByteArray()
+
+        val result = ImageUploadSanitizer.sanitize(encoded)
+
+        assertEquals("image/png", result.mimeType)
+        assertContentEquals(
+            byteArrayOf(0x89.toByte(), 0x50, 0x4E, 0x47),
+            result.bytes.copyOf(4),
+        )
+    }
 }
