@@ -21,4 +21,15 @@ class NotificationContentPolicyTest {
         assertTrue(NotificationContentPolicy.shouldRedact(content, ModerationPolicy(warningLabels = setOf("spoiler"))))
         assertTrue(NotificationContentPolicy.shouldRedact(content, ModerationPolicy(hiddenLabels = setOf("spoiler"))))
     }
+
+    @Test
+    fun `labels not selected by the user remain visible`() {
+        val content = FilterableContent(labels = listOf(ModerationLabel("custom-label")))
+        val policy = ModerationPolicy(
+            warningLabels = setOf("spoiler"),
+            hiddenLabels = setOf("nsfw")
+        )
+
+        assertFalse(NotificationContentPolicy.shouldRedact(content, policy))
+    }
 }
