@@ -44,6 +44,8 @@ final class PollState {
     private(set) var myVote: [String]?
     private(set) var isLoading = true
     private(set) var totalVotes = 0
+    private(set) var statusMessage: String?
+    private(set) var isSubmitting = false
     private var pollURI: String = ""
 
     private static let logger = Logger(subsystem: "uk.ewancroft.Inkwell", category: "Poll")
@@ -65,6 +67,7 @@ final class PollState {
             definition = value?.getRecord(ofType: LeafletPollDefinition.self)
         } catch {
             Self.logger.error("[Poll] failed to load definition: \(error.localizedDescription)")
+            statusMessage = "Poll could not be loaded"
             return
         }
 
@@ -94,11 +97,15 @@ final class PollState {
             totalVotes = counts.values.reduce(0, +)
         } catch {
             Self.logger.error("[Poll] failed to load votes: \(error.localizedDescription)")
+            statusMessage = "Poll results could not be loaded"
         }
     }
 
     func castVote(option: String, loginStateManager: LoginStateManager) async {
-        guard loginStateManager.currentDID != nil else { return }
+        guard loginStateManager.currentDID != nil, !isSubmitting else { return }
+        isSubmitting = true
+        statusMessage = "Submitting vote"
+        defer { isSubmitting = false }
         myVote = [option]
 
         // Optimistic local update
@@ -119,7 +126,13 @@ final class PollState {
             )
         } catch {
             Self.logger.error("[Poll] vote failed: \(error.localizedDescription)")
+            voteCounts[option, default: 0] = max(0, voteCounts[option, default: 0] - 1)
+            totalVotes = max(0, totalVotes - 1)
+            myVote = nil
+            statusMessage = "Vote could not be submitted"
+            return
         }
+        statusMessage = "Vote submitted"
     }
 
     func hasVotedFor(_ option: String) -> Bool {
@@ -158,10 +171,21 @@ struct PollEmbedView: View {
                         .font(.subheadline)
                         .foregroundStyle(foregroundColor.opacity(0.5))
                 }
+            } else if let statusMessage = state.statusMessage, state.definition == nil {
+                Text(statusMessage)
+                    .font(.subheadline)
+                    .foregroundStyle(foregroundColor.opacity(0.6))
             } else if let options = state.definition?.options, !options.isEmpty {
                 ForEach(options, id: \.text) { option in
                     pollOptionRow(option)
                 }
+            }
+
+            if let statusMessage = state.statusMessage, state.definition != nil {
+                Text(statusMessage)
+                    .font(.caption)
+                    .foregroundStyle(foregroundColor.opacity(0.6))
+                    .accessibilityAddTraits(.updatesFrequently)
             }
 
             // Footer
@@ -246,6 +270,7 @@ struct PollEmbedView: View {
             )
         }
         .buttonStyle(.plain)
+        .disabled(state.isSubmitting || state.hasVotedFor(option.text))
         .accessibilityLabel(option.text)
         .accessibilityValue({
             var value = hasVoted ? "Voted" : "Not voted"
