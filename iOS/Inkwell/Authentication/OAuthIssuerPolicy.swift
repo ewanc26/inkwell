@@ -1,6 +1,10 @@
 import Foundation
 
 enum OAuthIssuerPolicy {
+    nonisolated static func sameDID(_ stored: String, _ resolved: String) -> Bool {
+        stored == resolved
+    }
+
     nonisolated static func sameHTTPSOrigin(_ lhs: String, _ rhs: String) -> Bool {
         guard let left = normalizedOrigin(lhs), let right = normalizedOrigin(rhs) else { return false }
         return left == right

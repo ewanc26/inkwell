@@ -247,7 +247,7 @@ extension LoginStateManager {
 
             // Handles can be reassigned. The stored DID, not the current
             // handle resolution, is the authoritative OAuth account identity.
-            guard identity.did == storedDID else {
+            guard OAuthIssuerPolicy.sameDID(storedDID, identity.did) else {
                 logger.error("[RestoreSession] handle now resolves to a different DID")
                 clearSession()
                 return
