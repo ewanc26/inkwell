@@ -1,6 +1,7 @@
 import Foundation
 
 enum JSONSafety {
+    static let maxResponseBytes = 2 * 1024 * 1024
     static let maxDepth = 32
     static let maxContainerElements = 131_072
     static let maxStringBytes = 1_048_576
@@ -28,5 +29,12 @@ enum JSONSafety {
         }
 
         try visit(object, depth: 0)
+    }
+
+    static func validateResponse(_ data: Data) throws {
+        guard data.count <= maxResponseBytes else {
+            throw URLError(.cannotParseResponse)
+        }
+        try validate(data)
     }
 }

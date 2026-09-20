@@ -159,6 +159,7 @@ enum BSkyPostFetcher {
 
         do {
             let (data, _) = try await session.data(from: url)
+            try JSONSafety.validateResponse(data)
             let response = try JSONDecoder().decode(GetPostsResponse.self, from: data)
 
             for post in response.posts {
