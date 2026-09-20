@@ -223,13 +223,13 @@ struct BSkyPostEmbedView: View {
         .foregroundStyle(foregroundColor.opacity(0.4))
     }
 
-    private func statLabel(icon: String, count: Int?) -> String {
+    private func statLabel(icon: String, count: Int?) -> Text {
         let value = sharedFormatCount(count ?? 0)
         switch icon {
-        case "bubble.right": return "\(value) replies"
-        case "arrow.2.squarepath": return "\(value) reposts"
-        case "heart": return "\(value) likes"
-        default: return value
+        case "bubble.right": return Text("^[\(count ?? 0) reply](inflect: true)")
+        case "arrow.2.squarepath": return Text("^[\(count ?? 0) repost](inflect: true)")
+        case "heart": return Text("^[\(count ?? 0) like](inflect: true)")
+        default: return Text(value)
         }
     }
 
