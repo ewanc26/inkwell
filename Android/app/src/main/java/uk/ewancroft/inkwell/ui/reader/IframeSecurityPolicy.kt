@@ -6,6 +6,10 @@ internal object IframeSecurityPolicy {
     fun isAllowedInitial(uri: Uri): Boolean =
         uri.scheme == "https" && !uri.host.isNullOrBlank()
 
-    fun isAllowedNavigation(originHost: String?, candidate: Uri): Boolean =
-        candidate.scheme == "https" && candidate.host == originHost
+    fun isAllowedNavigation(origin: Uri, candidate: Uri): Boolean =
+        candidate.scheme == "https" &&
+            candidate.host == origin.host &&
+            effectivePort(candidate) == effectivePort(origin)
+
+    private fun effectivePort(uri: Uri): Int = uri.port.takeIf { it != -1 } ?: 443
 }

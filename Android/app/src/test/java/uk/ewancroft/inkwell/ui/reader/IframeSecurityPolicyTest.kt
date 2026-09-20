@@ -15,22 +15,29 @@ class IframeSecurityPolicyTest {
 
     @Test
     fun `navigation stays on the original https host`() {
+        val origin = Uri.parse("https://embed.example/frame")
         assertTrue(
             IframeSecurityPolicy.isAllowedNavigation(
-                "embed.example",
+                origin,
                 Uri.parse("https://embed.example/redirected")
             )
         )
         assertFalse(
             IframeSecurityPolicy.isAllowedNavigation(
-                "embed.example",
+                origin,
                 Uri.parse("https://attacker.example/steal")
             )
         )
         assertFalse(
             IframeSecurityPolicy.isAllowedNavigation(
-                "embed.example",
+                origin,
                 Uri.parse("custom://embed.example/action")
+            )
+        )
+        assertFalse(
+            IframeSecurityPolicy.isAllowedNavigation(
+                Uri.parse("https://embed.example:8443/frame"),
+                Uri.parse("https://embed.example/redirected")
             )
         )
     }
