@@ -27,6 +27,18 @@
         <item quantity="one">change</item>
         <item quantity="other">changes</item>
     </plurals>
+    <plurals name="reader_reply_count">
+        <item quantity="one">%d reply</item>
+        <item quantity="other">%d replies</item>
+    </plurals>
+    <plurals name="reader_repost_count">
+        <item quantity="one">%d repost</item>
+        <item quantity="other">%d reposts</item>
+    </plurals>
+    <plurals name="reader_like_count">
+        <item quantity="one">%d like</item>
+        <item quantity="other">%d likes</item>
+    </plurals>
     <string name="poll_no_votes">No votes yet</string>
     <string name="poll_load_failed">Poll could not be loaded</string>
     <string name="poll_submitting">Submitting vote</string>

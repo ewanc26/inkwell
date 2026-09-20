@@ -36,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import coil.compose.AsyncImage
 import uk.ewancroft.inkwell.R
@@ -230,15 +231,16 @@ private fun BSkyPostContent(post: uk.ewancroft.inkwell.data.model.bluesky.BSkyPo
 
 @Composable
 private fun PostStat(icon: androidx.compose.ui.graphics.vector.ImageVector, count: Int?) {
+    val statDescription = when (icon) {
+        Icons.Outlined.ChatBubbleOutline -> pluralStringResource(R.plurals.reader_reply_count, count ?: 0, count ?: 0)
+        Icons.Outlined.Repeat -> pluralStringResource(R.plurals.reader_repost_count, count ?: 0, count ?: 0)
+        else -> pluralStringResource(R.plurals.reader_like_count, count ?: 0, count ?: 0)
+    }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         modifier = Modifier.semantics {
-            contentDescription = "${NumberFormat.formatCount(count ?: 0)} ${when (icon) {
-                Icons.Outlined.ChatBubbleOutline -> "replies"
-                Icons.Outlined.Repeat -> "reposts"
-                else -> "likes"
-            }}"
+            contentDescription = statDescription
         },
     ) {
         Icon(icon, contentDescription = null, modifier = Modifier.size(12.dp))
