@@ -30,6 +30,10 @@ final class OfflineMutationStore {
     private let queue: OfflineSyncQueue
     private(set) var pendingCount = 0
     private(set) var isSyncing = false
+    /// True when the durable queue could not be decoded. The shared queue
+    /// preserves the damaged file; keep that state visible instead of making
+    /// unsent mutations appear to have vanished.
+    private(set) var recoveryRequired = false
 
     private init() {
         let durableDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
@@ -42,7 +46,15 @@ final class OfflineMutationStore {
     }
 
     func refresh(accountDID: String?) async {
-        let entries = (try? await queue.load()) ?? []
+        let entries: [SyncQueueEntry]
+        do {
+            entries = try await queue.load()
+            recoveryRequired = false
+        } catch {
+            recoveryRequired = true
+            pendingCount = 0
+            return
+        }
         guard let accountDID else {
             pendingCount = 0
             return
@@ -80,7 +92,14 @@ final class OfflineMutationStore {
         isSyncing = true
         defer { isSyncing = false }
 
-        let entries = ((try? await queue.load()) ?? []).filter { $0.accountDid == accountDID }
+        let entries: [SyncQueueEntry]
+        do {
+            entries = try await queue.load().filter { $0.accountDid == accountDID }
+            recoveryRequired = false
+        } catch {
+            recoveryRequired = true
+            return .empty
+        }
         guard !entries.isEmpty else {
             pendingCount = 0
             return .empty
