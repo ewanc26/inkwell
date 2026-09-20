@@ -525,15 +525,13 @@ class ReaderViewModel @Inject constructor(
         }
 
         try {
-            val subscriptionsResponse = withTimeout(SUBSCRIPTIONS_TIMEOUT_MS) {
-                pdsRepository.listRecords(
+            val subscriptions = withTimeout(SUBSCRIPTIONS_TIMEOUT_MS) {
+                pdsRepository.listAllRecords(
                     did = session.did,
                     collection = CollectionNsids.GRAPH_SUBSCRIPTION,
                     pdsUrl = session.pdsUrl
                 )
             }
-
-            val subscriptionsJson = subscriptionsResponse["records"]?.jsonArray.orEmpty()
 
             followingCursors.clear()
             val didToProfile = mutableMapOf<String, BlueskyProfile>()
@@ -541,9 +539,9 @@ class ReaderViewModel @Inject constructor(
             val liveSubscriptions = mutableListOf<LiveSubscribedPublication>()
             val posts = mutableListOf<PostItem>()
 
-            for (subJson in subscriptionsJson) {
+            for (subEntry in subscriptions) {
                 try {
-                    val valueObj = subJson.jsonObject["value"]?.jsonObject ?: continue
+                    val valueObj = subEntry.value
                     val publication = valueObj["publication"]?.jsonPrimitive?.content ?: continue
                     val parsed = AtUri.parse(publication) ?: continue
                     subscribedDids += parsed.did
@@ -731,20 +729,19 @@ class ReaderViewModel @Inject constructor(
         try {
             val profile = runCatching { pdsRepository.getProfile(session.did) }.getOrNull()
 
-            val response = pdsRepository.listRecords(
+            val documents = pdsRepository.listAllRecords(
                 did = session.did,
                 collection = CollectionNsids.DOCUMENT,
                 pdsUrl = session.pdsUrl
             )
-            val docsJson = response["records"]?.jsonArray.orEmpty()
-            val posts = docsJson.mapNotNull { docJson ->
+            val posts = documents.mapNotNull { document ->
                 try {
-                    val valueObj = docJson.jsonObject["value"]?.jsonObject ?: return@mapNotNull null
-                    val docUri = docJson.jsonObject["uri"]?.jsonPrimitive?.content ?: return@mapNotNull null
+                    val valueObj = document.value
+                    val docUri = document.uri
                     PostItem(
                         uri = docUri,
                         authorDid = session.did,
-                        recordCid = docJson.jsonObject["cid"]?.jsonPrimitive?.contentOrNull,
+                        recordCid = null,
                         title = valueObj["title"]?.jsonPrimitive?.content ?: "Untitled",
                         description = valueObj["description"]?.jsonPrimitive?.contentOrNull,
                         textContent = valueObj["textContent"]?.jsonPrimitive?.contentOrNull,
