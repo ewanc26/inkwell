@@ -78,9 +78,15 @@ class ImageUploadSanitizerTest {
 
             val result = ImageUploadSanitizer.sanitize(file.readBytes())
             val decoded = BitmapFactory.decodeByteArray(result.bytes, 0, result.bytes.size)
+            val outputExif = ExifInterface(result.bytes.inputStream())
 
             assertEquals(3, decoded.width)
             assertEquals(2, decoded.height)
+            assertEquals(ExifInterface.ORIENTATION_NORMAL, outputExif.getAttributeInt(
+                ExifInterface.TAG_ORIENTATION,
+                ExifInterface.ORIENTATION_UNDEFINED,
+            ))
+            assertEquals(null, outputExif.getAttribute(ExifInterface.TAG_GPS_LATITUDE))
             decoded.recycle()
         } finally {
             file.delete()
