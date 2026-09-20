@@ -61,11 +61,18 @@ struct ConvertResult {
 func harvestImageBlobs(from content: UnknownType?) -> [String: ComAtprotoLexicon.Repository.UploadBlobOutput] {
     guard let content else { return [:] }
     var out: [String: ComAtprotoLexicon.Repository.UploadBlobOutput] = [:]
-    harvestImageBlobs(from: content, into: &out)
+    harvestImageBlobs(from: content, into: &out, depth: 0)
     return out
 }
 
-private func harvestImageBlobs(from value: Any, into out: inout [String: ComAtprotoLexicon.Repository.UploadBlobOutput]) {
+private let maxImageHarvestDepth = 32
+
+private func harvestImageBlobs(
+    from value: Any,
+    into out: inout [String: ComAtprotoLexicon.Repository.UploadBlobOutput],
+    depth: Int
+) {
+    guard depth <= maxImageHarvestDepth else { return }
     let mirror = Mirror(reflecting: value)
     // Walk the struct/class properties looking for blobs.
     for child in mirror.children {
@@ -74,11 +81,11 @@ private func harvestImageBlobs(from value: Any, into out: inout [String: ComAtpr
             let cid = blob.reference.link
             if !cid.isEmpty { out[cid] = blob }
         } else if let dict = child.value as? [String: Any] {
-            for (_, v) in dict { harvestImageBlobs(from: v, into: &out) }
+            for (_, v) in dict { harvestImageBlobs(from: v, into: &out, depth: depth + 1) }
         } else if let array = child.value as? [Any] {
-            for v in array { harvestImageBlobs(from: v, into: &out) }
+            for v in array { harvestImageBlobs(from: v, into: &out, depth: depth + 1) }
         } else if child.value is CustomReflectable || Mirror(reflecting: child.value).children.count > 0 {
-            harvestImageBlobs(from: child.value, into: &out)
+            harvestImageBlobs(from: child.value, into: &out, depth: depth + 1)
         }
     }
 }
