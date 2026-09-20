@@ -26,4 +26,12 @@ class PdsRepositoryDocumentsTest {
             validateDeclaredBlobSize(10L * 1024 * 1024 + 1)
         }
     }
+
+    @Test
+    fun `accepts matching response MIME type and rejects a mismatch`() {
+        validateBlobContentType("application/json; charset=utf-8", "application/json")
+        assertFailsWith<IOException> {
+            validateBlobContentType("text/html", "application/json")
+        }
+    }
 }
