@@ -95,6 +95,7 @@ jobs:
 
       - name: Resolve an available iOS Simulator destination
         id: destination
+        timeout-minutes: 3
         working-directory: iOS
         run: |
           # The runner's newest installed Simulator runtime may lag behind
