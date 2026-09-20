@@ -17,4 +17,8 @@
     <string name="poll_selected">Selected</string>
     <string name="poll_not_selected">Not selected</string>
     <string name="poll_voted">voted</string>
+    <string name="reader_loading">Loading…</string>
+    <string name="reader_loading_post">Loading post…</string>
+    <string name="reader_bluesky_post_unavailable">Bluesky post unavailable</string>
+    <string name="reader_standard_site_post_unavailable">Standard.site post unavailable</string>
 </resources>
