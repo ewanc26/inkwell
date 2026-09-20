@@ -107,7 +107,7 @@ final class ArticleStateStore {
 
         var merged = states
         var changes = 0
-        for article in envelope.articles {
+        for article in latestArticles(envelope.articles) {
             if let existing = merged[article.articleId], existing.updatedAt >= article.timestamp { continue }
             merged[article.articleId] = ArticleState(
                 title: article.title,
@@ -124,7 +124,7 @@ final class ArticleStateStore {
 
     /// Returns the number of local records that would change, without mutating state.
     func previewImportJSON(_ data: Data) throws -> Int {
-        try validatedImport(data).articles.reduce(into: 0) { count, article in
+        try latestArticles(validatedImport(data).articles).reduce(into: 0) { count, article in
             if states[article.articleId]?.updatedAt ?? .distantPast < article.timestamp { count += 1 }
         }
     }
@@ -143,6 +143,12 @@ final class ArticleStateStore {
             }
         }
         return envelope
+    }
+
+    private func latestArticles(_ articles: [ExportedArticleState]) -> [ExportedArticleState] {
+        Dictionary(grouping: articles, by: \.articleId).values.compactMap { entries in
+            entries.max(by: { $0.timestamp < $1.timestamp })
+        }
     }
 
     private func persist() {

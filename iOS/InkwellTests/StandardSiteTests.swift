@@ -217,6 +217,12 @@ final class StandardSiteTests: XCTestCase {
         XCTAssertThrowsError(try ArticleStateStore.shared.previewImportJSON(data))
     }
 
+    func testReadingDataImportPreviewDeduplicatesByNewestTimestamp() throws {
+        let data = Data(#"{"format":"uk.ewancroft.inkwell.reading-data","version":1,"exportedAt":"2026-09-19T00:00:00Z","articles":[{"articleId":"at://did:plc:dedupe/site.standard.document/one","title":"old","isRead":false,"isBookmarked":false,"timestamp":"2026-09-18T00:00:00Z"},{"articleId":"at://did:plc:dedupe/site.standard.document/one","title":"new","isRead":true,"isBookmarked":true,"timestamp":"2026-09-19T00:00:00Z"}]}"#.utf8)
+
+        XCTAssertEqual(try ArticleStateStore.shared.previewImportJSON(data), 1)
+    }
+
     func testNotificationNavigationConsumesAQueuedDocumentExactlyOnce() {
         let coordinator = NotificationNavigationCoordinator.shared
         coordinator.enqueue(documentURI: "at://did:plc:alice/site.standard.document/queued")

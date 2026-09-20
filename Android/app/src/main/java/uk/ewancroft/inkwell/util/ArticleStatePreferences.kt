@@ -119,7 +119,7 @@ object ArticleStatePreferences {
         if (envelope.version != 1) return ImportResult.UnsupportedVersion
         val current = readAll(context).toMutableMap()
         var changes = 0
-        envelope.articles.forEach { article ->
+        latestArticles(envelope.articles).forEach { article ->
             val timestamp = Instant.parse(article.timestamp)
             if (current[article.articleId]?.updatedAt?.let { Instant.ofEpochMilli(it) >= timestamp } == true) return@forEach
             current[article.articleId] = ArticleState(article.title, article.isRead, article.isBookmarked, timestamp.toEpochMilli())
@@ -135,7 +135,7 @@ object ArticleStatePreferences {
         if (envelope.format != "uk.ewancroft.inkwell.reading-data") return ImportResult.Invalid
         if (envelope.version != 1) return ImportResult.UnsupportedVersion
         val current = context?.let(::readAll) ?: emptyMap()
-        val changes = envelope.articles.count { article ->
+        val changes = latestArticles(envelope.articles).count { article ->
             current[article.articleId]?.updatedAt?.let { Instant.ofEpochMilli(it) >= Instant.parse(article.timestamp) } != true
         }
         return ImportResult.Success(changes)
@@ -147,6 +147,11 @@ object ArticleStatePreferences {
         if (envelope.articles.size > 10_000 || exportedAt.isAfter(Instant.now()) || envelope.articles.any { !atUriPattern.matches(it.articleId) || it.title.length > 500 || runCatching { Instant.parse(it.timestamp) }.getOrNull()?.isAfter(Instant.now()) == true }) return null
         return envelope
     }
+
+    private fun latestArticles(articles: List<ExportedArticleState>): List<ExportedArticleState> =
+        articles.groupBy { it.articleId }.values.map { entries ->
+            entries.maxBy { Instant.parse(it.timestamp) }
+        }
 
     private val atUriPattern = Regex("^at://[^/]+/[^/]+/[^/]+$")
 }

@@ -32,4 +32,9 @@ class ArticleStatePreferencesTest {
         val raw = """{"format":"uk.ewancroft.inkwell.reading-data","version":1,"exportedAt":"2999-01-01T00:00:00Z","articles":[]}"""
         assertTrue(ArticleStatePreferences.previewImportJson(null, raw) is ArticleStatePreferences.ImportResult.Invalid)
     }
+
+    @Test fun `preview deduplicates entries by newest timestamp`() {
+        val raw = """{"format":"uk.ewancroft.inkwell.reading-data","version":1,"exportedAt":"2026-09-19T00:00:00Z","articles":[{"articleId":"at://did:plc:alice/site.standard.document/one","title":"old","isRead":false,"isBookmarked":false,"timestamp":"2026-09-18T00:00:00Z"},{"articleId":"at://did:plc:alice/site.standard.document/one","title":"new","isRead":true,"isBookmarked":true,"timestamp":"2026-09-19T00:00:00Z"}]}"""
+        assertEquals(ArticleStatePreferences.ImportResult.Success(1), ArticleStatePreferences.previewImportJson(null, raw))
+    }
 }
