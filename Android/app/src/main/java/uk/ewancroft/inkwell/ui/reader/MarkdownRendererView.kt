@@ -15,7 +15,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
@@ -37,7 +36,10 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.LinkInteractionListener
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
@@ -416,14 +418,23 @@ private fun LinkAwareText(
     if (links.isEmpty()) {
         Text(text = text, style = resolvedStyle, modifier = modifier)
     } else {
-        ClickableText(
-            text = text,
-            style = resolvedStyle,
-            modifier = modifier,
-            onClick = { offset ->
-                links.firstOrNull { offset >= it.start && offset < it.end }
-                    ?.let { uriHandler.openUri(it.item) }
-            },
-        )
+        val linkedText = remember(text) {
+            AnnotatedString.Builder(text).apply {
+                links.forEach { annotation ->
+                    addLink(
+                        LinkAnnotation.Url(
+                            annotation.item,
+                            TextLinkStyles(SpanStyle(textDecoration = resolvedStyle.textDecoration)),
+                            LinkInteractionListener { link ->
+                                uriHandler.openUri((link as LinkAnnotation.Url).url)
+                            },
+                        ),
+                        annotation.start,
+                        annotation.end,
+                    )
+                }
+            }.toAnnotatedString()
+        }
+        Text(text = linkedText, style = resolvedStyle, modifier = modifier)
     }
 }
