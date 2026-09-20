@@ -170,4 +170,11 @@
     <string name="moderation_show_label">How to show %1$s</string>
     <string name="notifications_clear_all">Clear All</string>
     <string name="notifications_empty">No notifications yet</string>
+    <string name="settings_new_document_notifications">New Document Notifications</string>
+    <string name="settings_notifications_description">Inkwell polls your subscriptions in the background and notifies you about new documents. Turning this off keeps the in-app notification list working but stops system banners. The system permission (below) controls whether banners can appear at all.</string>
+    <string name="settings_open_system_notifications">Open System Notification Settings</string>
+    <string name="settings_sort_order">Sort Order</string>
+    <string name="settings_newest_first">Newest First</string>
+    <string name="settings_oldest_first">Oldest First</string>
+    <string name="settings_sort_order_description">Controls the order documents appear in your reader feed.</string>
 </resources>

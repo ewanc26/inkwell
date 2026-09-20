@@ -46,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -53,6 +54,7 @@ import androidx.core.content.FileProvider
 import uk.ewancroft.inkwell.shared.theme.SharedReaderTheme
 import uk.ewancroft.inkwell.ui.moderation.ModerationSettingsDialog
 import uk.ewancroft.inkwell.ui.moderation.MutedBlockedDialog
+import uk.ewancroft.inkwell.R
 import uk.ewancroft.inkwell.util.AccessibilityPreferences
 import uk.ewancroft.inkwell.util.ArticleStatePreferences
 import uk.ewancroft.inkwell.util.CustomisationPreferences
@@ -225,31 +227,31 @@ fun SettingsDialog(
             Scaffold(
                 topBar = {
                     TopAppBar(
-                        title = { Text("Settings") },
+                        title = { Text(stringResource(R.string.reader_settings)) },
                         navigationIcon = {
                             IconButton(onClick = onDismiss) {
-                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Close")
+                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.reader_back))
                             }
                         },
                     )
                 },
             ) { innerPadding ->
                 Column(modifier = Modifier.fillMaxSize().padding(innerPadding).verticalScroll(rememberScrollState())) {
-                    SectionHeader("Notifications", modifier = Modifier.padding(top = 8.dp))
+                    SectionHeader(stringResource(R.string.reader_notifications), modifier = Modifier.padding(top = 8.dp))
                     SettingsRow(
-                        title = "New Document Notifications",
+                        title = stringResource(R.string.settings_new_document_notifications),
                         trailing = {
                             Switch(checked = notificationsEnabled, onCheckedChange = onNotificationsEnabledChange)
                         },
                     )
                     Text(
-                        "Inkwell polls your subscriptions in the background and notifies you about new documents. Turning this off keeps the in-app notification list working but stops system banners. The system permission (below) controls whether banners can appear at all.",
+                        stringResource(R.string.settings_notifications_description),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     )
                     SettingsRow(
-                        title = "Open System Notification Settings",
+                        title = stringResource(R.string.settings_open_system_notifications),
                         onClick = {
                             val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
                                 putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
@@ -260,9 +262,9 @@ fun SettingsDialog(
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-                    SectionHeader("Reader")
+                    SectionHeader(stringResource(R.string.reader_title))
                     Text(
-                        "Sort Order",
+                        stringResource(R.string.settings_sort_order),
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                     )
@@ -276,7 +278,7 @@ fun SettingsDialog(
                                 sortOrder = ReaderPreferences.SortOrder.NEWEST_FIRST
                                 ReaderPreferences.setSortOrder(context, ReaderPreferences.SortOrder.NEWEST_FIRST)
                             },
-                            label = { Text("Newest First") },
+                            label = { Text(stringResource(R.string.settings_newest_first)) },
                         )
                         FilterChip(
                             selected = sortOrder == ReaderPreferences.SortOrder.OLDEST_FIRST,
@@ -284,11 +286,11 @@ fun SettingsDialog(
                                 sortOrder = ReaderPreferences.SortOrder.OLDEST_FIRST
                                 ReaderPreferences.setSortOrder(context, ReaderPreferences.SortOrder.OLDEST_FIRST)
                             },
-                            label = { Text("Oldest First") },
+                            label = { Text(stringResource(R.string.settings_oldest_first)) },
                         )
                     }
                     Text(
-                        "Controls the order documents appear in your reader feed.",
+                        stringResource(R.string.settings_sort_order_description),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
