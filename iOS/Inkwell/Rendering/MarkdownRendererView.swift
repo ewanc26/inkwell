@@ -210,6 +210,7 @@ struct MarkdownRendererView: View {
                     Image(systemName: item.checked == true ? "checkmark.square.fill" : "square")
                         .foregroundStyle(item.checked == true ? accentColor : foregroundColor.opacity(0.5))
                         .frame(width: 20, alignment: .center)
+                        .accessibilityHidden(true)
 
                     Text(renderInline(item.text))
                         .font(theme.bodyFont(.body))
