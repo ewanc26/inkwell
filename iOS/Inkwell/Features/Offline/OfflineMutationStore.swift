@@ -34,10 +34,11 @@ final class OfflineMutationStore {
     private init() {
         let durableDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
         try? FileManager.default.createDirectory(at: durableDirectory, withIntermediateDirectories: true)
-        // The checked-in XCFramework still exposes the legacy single-path
-        // factory; point it at Application Support so pending mutations are
-        // no longer stored in a purgeable cache directory.
-        queue = CreateOfflineSyncQueue_iosKt.createOfflineSyncQueue(cacheDirPath: durableDirectory.path)
+        let legacyCacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
+        queue = CreateOfflineSyncQueue_iosKt.createOfflineSyncQueue(
+            durableDirPath: durableDirectory.path,
+            legacyCacheDirPath: legacyCacheDirectory.path
+        )
     }
 
     func refresh(accountDID: String?) async {
