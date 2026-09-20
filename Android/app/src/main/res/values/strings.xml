@@ -118,6 +118,10 @@
     <string name="reader_source_unverified">Unverified source</string>
     <string name="reader_source_verification_verified">Source verification: verified</string>
     <string name="reader_source_verification_unverified">Source verification: unverified. %1$s</string>
+    <string name="writer_view_post">View post</string>
+    <string name="writer_delete_title">Delete %1$s?</string>
+    <string name="writer_delete_message">This permanently removes the document from your repository. The current record version will be checked first.</string>
+    <string name="writer_delete">Delete</string>
     <string name="reader_posts">Posts</string>
     <string name="reader_all_posts">All posts</string>
     <string name="reader_unsupported_content">Unsupported content format</string>
