@@ -21,6 +21,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import uk.ewancroft.inkwell.R
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -29,9 +31,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.res.stringResource
 import coil.compose.AsyncImage
-import uk.ewancroft.inkwell.R
 import uk.ewancroft.inkwell.shared.verification.VerificationResult
 import uk.ewancroft.inkwell.data.model.common.StrongRef
 import uk.ewancroft.inkwell.util.formatPublishedDate
@@ -502,7 +502,7 @@ private fun UnsupportedFormatNotice(formatType: String?) {
         ) {
             Icon(Icons.Outlined.HourglassEmpty, contentDescription = null)
             Column {
-                Text("Unsupported content format", style = MaterialTheme.typography.titleSmall)
+                Text(stringResource(R.string.reader_unsupported_content), style = MaterialTheme.typography.titleSmall)
                 Text(
                     if (formatType != null) "This post uses \"$formatType\", which Inkwell doesn't render yet."
                     else "This post's content couldn't be identified.",
