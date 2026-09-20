@@ -7,6 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.kikin81.atproto.oauth.AtOAuth
 import io.github.kikin81.atproto.oauth.OAuthSessionStore
 import uk.ewancroft.inkwell.data.remote.InkwellNotificationManager
+import uk.ewancroft.inkwell.data.repository.PdsRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -28,6 +29,7 @@ class AuthViewModel @Inject constructor(
     private val oauth: AtOAuth,
     private val sessionStore: OAuthSessionStore,
     private val notificationManager: InkwellNotificationManager,
+    private val pdsRepository: PdsRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Loading)
@@ -42,14 +44,16 @@ class AuthViewModel @Inject constructor(
 
     private fun checkExistingSession() {
         viewModelScope.launch {
-            val session = sessionStore.load()
+            val session = runCatching { pdsRepository.validateRestoredSession() }.getOrNull()
             if (session != null) notificationManager.activateCurrentAccount()
             _uiState.value = if (session != null) {
                 AuthUiState.LoggedIn(
-                    handle = session.handle ?: session.did.orEmpty(),
+                    handle = session.handle,
                     did = session.did,
                 )
             } else {
+                sessionStore.clear()
+                notificationManager.deactivateAccount()
                 AuthUiState.LoggedOut()
             }
         }
