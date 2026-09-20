@@ -156,9 +156,9 @@ fun WriterScreen(
                         )
                         pendingImage = null
                     },
-                ) { Text("Insert image") }
+                ) { Text(stringResource(R.string.writer_insert_image)) }
             },
-            dismissButton = { TextButton(onClick = { pendingImage = null }) { Text("Cancel") } },
+            dismissButton = { TextButton(onClick = { pendingImage = null }) { Text(stringResource(R.string.reader_cancel)) } },
         )
     }
 
@@ -169,19 +169,19 @@ fun WriterScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Write") },
+                title = { Text(stringResource(R.string.writer_write_title)) },
                 navigationIcon = {
                     IconButton(onClick = onSignOut) {
                         Icon(
                             Icons.AutoMirrored.Outlined.Logout,
-                            contentDescription = "Sign Out",
+                            contentDescription = stringResource(R.string.writer_sign_out),
                             tint = MaterialTheme.colorScheme.error,
                         )
                     }
                 },
                 actions = {
                     IconButton(onClick = { showCredits = true }) {
-                        Icon(Icons.Outlined.Info, contentDescription = "About")
+                        Icon(Icons.Outlined.Info, contentDescription = stringResource(R.string.writer_about))
                     }
                 },
             )
@@ -200,12 +200,12 @@ fun WriterScreen(
                     CircularProgressIndicator()
                 }
             } else if (uiState.publications.isEmpty()) {
-                Text("No publications found.", style = MaterialTheme.typography.bodyMedium,
+                Text(stringResource(R.string.writer_no_publications), style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Button(onClick = { viewModel.showCreateDialog() }) {
                     Icon(Icons.Outlined.Add, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
-                    Text("Create a Publication")
+                    Text(stringResource(R.string.writer_create_publication))
                 }
             } else {
                 // Publication picker
@@ -238,7 +238,7 @@ fun WriterScreen(
                 TextButton(onClick = { viewModel.showCreateDialog() }) {
                     Icon(Icons.Outlined.Add, contentDescription = null, Modifier.size(18.dp))
                     Spacer(Modifier.width(4.dp))
-                    Text("New Publication")
+                    Text(stringResource(R.string.writer_new_publication))
                 }
             }
 

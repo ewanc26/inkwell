@@ -126,6 +126,13 @@
     <string name="writer_description_optional">Description (optional)</string>
     <string name="writer_path_optional">Path (optional, e.g. my-post)</string>
     <string name="writer_content_markdown">Content (Markdown)</string>
+    <string name="writer_insert_image">Insert image</string>
+    <string name="writer_write_title">Write</string>
+    <string name="writer_sign_out">Sign out</string>
+    <string name="writer_about">About</string>
+    <string name="writer_no_publications">No publications found.</string>
+    <string name="writer_create_publication">Create a Publication</string>
+    <string name="writer_new_publication">New Publication</string>
     <string name="reader_posts">Posts</string>
     <string name="reader_all_posts">All posts</string>
     <string name="reader_unsupported_content">Unsupported content format</string>
