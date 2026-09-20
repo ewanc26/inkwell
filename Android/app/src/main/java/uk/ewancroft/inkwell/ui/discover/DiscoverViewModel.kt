@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.OkHttpClient
@@ -26,6 +27,7 @@ import uk.ewancroft.inkwell.data.model.common.PublicationResult
 import uk.ewancroft.inkwell.shared.content.SearchBackendUrl
 import uk.ewancroft.inkwell.data.repository.PdsRepository
 import uk.ewancroft.inkwell.data.remote.readBoundedUtf8
+import uk.ewancroft.inkwell.shared.validation.JsonSafety
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -99,7 +101,9 @@ class DiscoverViewModel @Inject constructor(
                 }
 
                 val searchResponse = withContext(Dispatchers.IO) {
-                    json.decodeFromString<SearchResponse>(searchBody)
+                    val element = json.parseToJsonElement(searchBody)
+                    check(JsonSafety.isSafe(element)) { "Search response exceeded structural safety limits" }
+                    json.decodeFromJsonElement<SearchResponse>(element)
                 }
 
                 // Actor (Bluesky) search only applies to the document scope.
@@ -115,7 +119,9 @@ class DiscoverViewModel @Inject constructor(
                         }
                     }
                     withContext(Dispatchers.IO) {
-                        json.decodeFromString<SearchActorResponse>(actorsBody)
+                        val element = json.parseToJsonElement(actorsBody)
+                        check(JsonSafety.isSafe(element)) { "Actor search response exceeded structural safety limits" }
+                        json.decodeFromJsonElement<SearchActorResponse>(element)
                     }
                 } else {
                     SearchActorResponse()
