@@ -215,6 +215,7 @@ extension LoginStateManager {
                 throw LoginError.pdsResolutionFailed
             }
             let (data, _) = try await URLSession.shared.data(from: plcURL)
+            try JSONSafety.validateResponse(data)
             let doc = try JSONSerialization.jsonObject(with: data) as? [String: Any]
             let services = doc?["service"] as? [[String: Any]]
             let atprotoService = services?.first(where: { svc in
