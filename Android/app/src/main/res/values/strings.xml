@@ -40,6 +40,13 @@
     <string name="reader_empty_yours_title">No published posts</string>
     <string name="reader_empty_following_message">Subscribe to publications to see their posts here.</string>
     <string name="reader_empty_yours_message">Posts you publish will appear here.</string>
+    <string name="reader_comments">Comments</string>
+    <string name="reader_replying_to">Replying to "%1$s"</string>
+    <string name="reader_cancel">Cancel</string>
+    <string name="reader_no_comments">No comments yet.</string>
+    <string name="reader_reply_hint">Reply…</string>
+    <string name="reader_comment_hint">Add a comment…</string>
+    <string name="reader_send_comment">Send comment</string>
     <string name="auth_feature_write">Write and publish your own posts using the standard.site lexicon.</string>
     <string name="auth_handle">Handle</string>
     <string name="auth_continue">Continue</string>
