@@ -30,6 +30,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import uk.ewancroft.inkwell.data.remote.readBoundedUtf8
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
+import uk.ewancroft.inkwell.shared.validation.JsonSafety
 
 @Composable
 internal fun DocumentPickerDialog(
@@ -57,6 +58,7 @@ internal fun DocumentPickerDialog(
                 response.body?.readBoundedUtf8()
             } ?: return@LaunchedEffect
             val response = Json.parseToJsonElement(body).jsonObject
+            check(JsonSafety.isSafe(response)) { "Document list response exceeded structural safety limits" }
             val records = response["records"]?.jsonArray.orEmpty()
             documents = records.mapNotNull { record ->
                 val uri = record.jsonObject["uri"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null

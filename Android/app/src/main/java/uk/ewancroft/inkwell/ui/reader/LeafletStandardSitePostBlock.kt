@@ -36,6 +36,7 @@ import uk.ewancroft.inkwell.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import uk.ewancroft.inkwell.data.remote.readBoundedUtf8
+import uk.ewancroft.inkwell.shared.validation.JsonSafety
 import kotlinx.coroutines.async
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
@@ -121,7 +122,8 @@ private suspend fun fetchStandardSitePost(uri: String): StandardSitePostData? {
             if (!response.isSuccessful) return null
             response.body?.readBoundedUtf8()
         } ?: return null
-        val docJson = kotlinx.serialization.json.Json.parseToJsonElement(docBody).jsonObject
+            val docJson = kotlinx.serialization.json.Json.parseToJsonElement(docBody).jsonObject
+            check(JsonSafety.isSafe(docJson)) { "Document response exceeded structural safety limits" }
         val value = docJson["value"]?.jsonObject ?: return null
 
         val title = value["title"]?.jsonPrimitive?.contentOrNull ?: return null
@@ -147,6 +149,7 @@ private suspend fun fetchStandardSitePost(uri: String): StandardSitePostData? {
                         }
                         if (pubBody != null) {
                             val pubJson = kotlinx.serialization.json.Json.parseToJsonElement(pubBody).jsonObject
+                            check(JsonSafety.isSafe(pubJson)) { "Publication response exceeded structural safety limits" }
                             val pubValue = pubJson["value"]?.jsonObject
                             pubValue?.get("name")?.jsonPrimitive?.contentOrNull
                         } else null
