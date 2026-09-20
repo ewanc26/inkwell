@@ -68,6 +68,22 @@ final class StandardSiteTests: XCTestCase {
         ))
     }
 
+    func testRestoredAccountIdentityIsBoundToDIDNotHandle() {
+        XCTAssertTrue(OAuthIssuerPolicy.sameDID("did:plc:alice", "did:plc:alice"))
+        XCTAssertFalse(OAuthIssuerPolicy.sameDID("did:plc:alice", "did:plc:mallory"))
+    }
+
+    func testRestoredAccountCanAdoptAValidMigratedPDSOrigin() {
+        XCTAssertFalse(OAuthIssuerPolicy.sameHTTPSOrigin(
+            "https://old-pds.example",
+            "https://new-pds.example"
+        ))
+        XCTAssertTrue(OAuthIssuerPolicy.sameHTTPSOrigin(
+            "https://new-pds.example",
+            "HTTPS://NEW-PDS.EXAMPLE:443/"
+        ))
+    }
+
     func testPublicationAssociationPrefersATURIAndAcceptsNormalizedURL() {
         let publication = PublicationEntry(
             uri: "at://did:plc:alice/site.standard.publication/3pub",
