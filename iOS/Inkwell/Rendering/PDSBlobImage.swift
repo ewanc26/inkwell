@@ -7,17 +7,24 @@ struct PDSBlobImage: View {
     let cid: String
     let loginStateManager: LoginStateManager
     var height: CGFloat
+    var contentMode: ContentMode = .fill
 
     @State private var image: Image?
+    @State private var failed = false
 
     var body: some View {
         Group {
             if let image {
-                image
-                    .resizable()
-                    .scaledToFill()
+                if contentMode == .fit {
+                    image.resizable().scaledToFit()
+                } else {
+                    image.resizable().scaledToFill()
+                }
+            } else if failed {
+                Image(systemName: "photo")
+                    .foregroundStyle(.secondary)
             } else {
-                Color.clear
+                ProgressView()
             }
         }
         .frame(maxWidth: .infinity)
@@ -34,6 +41,7 @@ struct PDSBlobImage: View {
                 image = Image(uiImage: uiImage)
             } catch {
                 image = nil
+                failed = true
             }
         }
     }

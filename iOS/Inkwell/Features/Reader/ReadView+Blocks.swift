@@ -121,41 +121,25 @@ extension ReadView {
 
             case "pub.leaflet.blocks.image":
                 if let img = block.image, let did = authorDID ?? loginStateManager.currentDID {
-                    let urlString = "https://cdn.bsky.app/img/feed_thumbnail/plain/\(did)/\(img.reference.link)"
-                    if let url = URL(string: urlString) {
-                        VStack(alignment: .center, spacing: 8) {
-                            AsyncImage(url: url) { phase in
-                                switch phase {
-                                case .empty:
-                                    ProgressView()
-                                        .tint(accentColor)
-                                        .frame(minHeight: 180)
-                                case .success(let image):
-                                    image
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(maxHeight: 400)
-                                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                                case .failure:
-                                    Image(systemName: "photo")
-                                        .font(.largeTitle)
-                                        .foregroundStyle(foregroundColor.opacity(0.5))
-                                        .frame(minHeight: 180)
-                                @unknown default:
-                                    EmptyView()
-                                }
-                            }
+                    VStack(alignment: .center, spacing: 8) {
+                        PDSBlobImage(
+                            did: did,
+                            cid: img.reference.link,
+                            loginStateManager: loginStateManager,
+                            height: 400,
+                            contentMode: .fit
+                        )
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
 
-                            if let alt = block.alt, !alt.isEmpty {
-                                Text(alt)
-                                    .font(.caption)
-                                    .italic()
-                                    .foregroundStyle(foregroundColor.opacity(0.6))
-                                    .multilineTextAlignment(.center)
-                            }
+                        if let alt = block.alt, !alt.isEmpty {
+                            Text(alt)
+                                .font(.caption)
+                                .italic()
+                                .foregroundStyle(foregroundColor.opacity(0.6))
+                                .multilineTextAlignment(.center)
                         }
-                        .frame(maxWidth: .infinity)
                     }
+                    .frame(maxWidth: .infinity)
                 }
 
             case "pub.leaflet.blocks.unorderedList":
