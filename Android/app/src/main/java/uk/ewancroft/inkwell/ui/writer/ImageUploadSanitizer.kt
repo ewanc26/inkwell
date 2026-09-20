@@ -8,12 +8,14 @@ import java.io.ByteArrayOutputStream
 
 /** Decodes and re-encodes user images without carrying source metadata. */
 object ImageUploadSanitizer {
+    private const val MAX_INPUT_BYTES = 10 * 1024 * 1024
     private const val MAX_DIMENSION = 8_192
     private const val MAX_PIXELS = 40_000_000L
 
     data class Output(val bytes: ByteArray, val mimeType: String)
 
     fun sanitize(bytes: ByteArray): Output {
+        require(bytes.size <= MAX_INPUT_BYTES) { "That image file is too large to process safely." }
         require(!GifAnimationDetector.isAnimated(bytes)) {
             "Animated images are not supported for upload. Choose a still image."
         }
