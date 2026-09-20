@@ -53,15 +53,12 @@ struct StandardSitePostEmbedView: View {
         VStack(alignment: .leading, spacing: 0) {
             // Cover image
             if !isSmall, let cover = doc.record.coverImage {
-                let imgURL = URL(string: "https://cdn.bsky.app/img/feed_thumbnail/plain/\(doc.authorDID)/\(cover.reference.link)")
-                AsyncImage(url: imgURL) { phase in
-                    if let image = phase.image {
-                        image.resizable().scaledToFill()
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 140)
-                            .clipped()
-                    }
-                }
+                PDSBlobImage(
+                    did: doc.authorDID,
+                    cid: cover.reference.link,
+                    loginStateManager: loginStateManager,
+                    height: 140
+                )
             }
 
             VStack(alignment: .leading, spacing: isSmall ? 4 : 8) {
