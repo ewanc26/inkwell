@@ -11,6 +11,7 @@ struct ReaderPostCard: View {
     var reservesOverflowSpace = false
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(LoginStateManager.self) private var loginStateManager
 
     private var document: SiteStandardLexicon.DocumentRecord { item.document.record }
     private var publication: SiteStandardLexicon.PublicationRecord? { item.publication?.record }
@@ -39,21 +40,14 @@ struct ReaderPostCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            if let coverURL {
-                AsyncImage(url: coverURL) { phase in
-                    switch phase {
-                    case .success(let image):
-                        image.resizable().scaledToFill()
-                            .frame(maxWidth: .infinity)
-                            .aspectRatio(16 / 9, contentMode: .fit)
-                            .clipped()
-                            .accessibilityHidden(true)
-                    case .failure, .empty:
-                        EmptyView()
-                    @unknown default:
-                        EmptyView()
-                    }
-                }
+            if let cover = document.coverImage {
+                PDSBlobImage(
+                    did: item.document.authorDID,
+                    cid: cover.reference.link,
+                    loginStateManager: loginStateManager,
+                    height: 180
+                )
+                .accessibilityHidden(true)
             }
 
             VStack(alignment: .leading, spacing: 9) {
@@ -155,11 +149,6 @@ struct ReaderPostCard: View {
         }
         .font(.caption)
         .foregroundStyle(foreground.opacity(0.55))
-    }
-
-    private var coverURL: URL? {
-        guard let cover = document.coverImage else { return nil }
-        return URL(string: "https://cdn.bsky.app/img/feed_thumbnail/plain/\(item.document.authorDID)/\(cover.reference.link)")
     }
 
     private var formattedDate: String {
