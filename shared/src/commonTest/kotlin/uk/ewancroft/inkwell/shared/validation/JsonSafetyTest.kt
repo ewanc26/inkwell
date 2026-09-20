@@ -25,7 +25,7 @@ class JsonSafetyTest {
     @Test
     fun rejectsTooManyContainerElements() {
         val value = buildJsonArray {
-            repeat(JsonSafety.MAX_CONTAINER_ELEMENTS + 1) { add(true) }
+            repeat(JsonSafety.MAX_CONTAINER_ELEMENTS + 1) { add(JsonPrimitive(true)) }
         }
         assertFalse(JsonSafety.isSafe(value))
     }
