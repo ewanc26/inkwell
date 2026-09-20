@@ -36,11 +36,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import uk.ewancroft.inkwell.util.LabelMode
 import uk.ewancroft.inkwell.util.ModerationPreferences
+import uk.ewancroft.inkwell.R
 
 /**
  * A focused settings surface for reader content warnings. The shared KMP
@@ -82,10 +84,10 @@ fun ModerationSettingsDialog(
         ) {
             Column {
                 TopAppBar(
-                    title = { Text("Content filters") },
+                    title = { Text(stringResource(R.string.moderation_content_filters)) },
                     navigationIcon = {
                         IconButton(onClick = onDismiss) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.reader_back))
                         }
                     },
                 )
@@ -97,9 +99,9 @@ fun ModerationSettingsDialog(
                         .padding(horizontal = 20.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(18.dp),
                 ) {
-                    FilterSectionTitle("Content warnings")
+                    FilterSectionTitle(stringResource(R.string.moderation_content_warnings))
                     Text(
-                        "Choose whether a labelled article is shown, shown behind a warning, or hidden until you reveal it.",
+                        stringResource(R.string.moderation_content_warnings_description),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -116,17 +118,17 @@ fun ModerationSettingsDialog(
 
                     HorizontalDivider()
 
-                    FilterSectionTitle("Custom labels")
+                    FilterSectionTitle(stringResource(R.string.moderation_custom_labels))
                     Text(
-                        "Add labels used by a publication or labeler service, then choose how Inkwell should display them.",
+                        stringResource(R.string.moderation_custom_labels_description),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     AddValueRow(
                         value = customLabelInput,
                         onValueChange = { customLabelInput = it },
-                        label = "Custom label",
-                        addLabel = "Add label",
+                        label = stringResource(R.string.moderation_custom_label),
+                        addLabel = stringResource(R.string.moderation_add_label),
                         onAdd = {
                             ModerationPreferences.addCustomLabel(context, customLabelInput)
                             customLabelInput = ""
@@ -143,11 +145,11 @@ fun ModerationSettingsDialog(
                                         changed()
                                     },
                                 ) {
-                                    Icon(Icons.Outlined.DeleteOutline, contentDescription = "Remove $label")
+                                    Icon(Icons.Outlined.DeleteOutline, contentDescription = stringResource(R.string.moderation_remove_label, label))
                                 }
                             }
                             LabelModeRow(
-                                title = "How to show $label",
+                                title = stringResource(R.string.moderation_show_label, label),
                                 mode = ModerationPreferences.labelMode(context, label),
                                 onModeSelected = { mode ->
                                     ModerationPreferences.setLabelMode(context, label, mode)
