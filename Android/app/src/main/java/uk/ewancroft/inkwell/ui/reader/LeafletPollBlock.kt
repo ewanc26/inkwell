@@ -57,6 +57,14 @@ internal fun PollBlock(
     var isSubmitting by remember { mutableStateOf(false) }
     var statusMessage by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
+    val pollLoadFailed = stringResource(R.string.poll_load_failed)
+    val pollSubmitting = stringResource(R.string.poll_submitting)
+    val pollSubmitted = stringResource(R.string.poll_submitted)
+    val pollSubmitFailed = stringResource(R.string.poll_submit_failed)
+    val pollSelected = stringResource(R.string.poll_selected)
+    val pollNotSelected = stringResource(R.string.poll_not_selected)
+    val pollVoted = stringResource(R.string.poll_voted)
+    val pollVoteAction = stringResource(R.string.poll_vote_action)
 
     val pollRef = block.poll
     val pollUri = pollRef?.uri ?: ""
@@ -65,7 +73,7 @@ internal fun PollBlock(
         if (pollUri.isBlank()) return@LaunchedEffect
         isLoading = true
         runCatching { onLoadPoll(pollRef!!) }
-            .onFailure { statusMessage = "Poll could not be loaded" }
+            .onFailure { statusMessage = pollLoadFailed }
         isLoading = false
     }
 
@@ -128,8 +136,8 @@ internal fun PollBlock(
                                     ""
                                 }
                                 stateDescription = buildString {
-                                    append(if (isSelected) "Selected" else "Not selected")
-                                    if (isVoted) append(", voted")
+                                    append(if (isSelected) pollSelected else pollNotSelected)
+                                    if (isVoted) append(", $pollVoted")
                                     append(", $voteCountDescription")
                                     if (percentage.isNotEmpty()) append(", $percentage")
                                 }
@@ -185,22 +193,22 @@ internal fun PollBlock(
                         onClick = {
                             val selected = selectedOptions.toList()
                             isSubmitting = true
-                            statusMessage = "Submitting vote"
+                            statusMessage = pollSubmitting
                             scope.launch {
                                 runCatching { onCastVote(pollUri, selected) }
                                     .onSuccess {
                                         hasVoted = true
                                         selectedOptions = emptySet()
-                                        statusMessage = "Vote submitted"
+                                        statusMessage = pollSubmitted
                                     }
-                                    .onFailure { statusMessage = "Vote could not be submitted" }
+                                    .onFailure { statusMessage = pollSubmitFailed }
                                 isSubmitting = false
                             }
                         },
                         enabled = !isSubmitting,
                         modifier = Modifier.align(Alignment.End),
                     ) {
-                        Text(if (isSubmitting) "Submitting…" else "Vote")
+                        Text(if (isSubmitting) pollSubmitting else pollVoteAction)
                     }
                 }
                 if (totalVotes > 0) {

@@ -7,4 +7,12 @@
         <item quantity="other">%d votes</item>
     </plurals>
     <string name="poll_no_votes">No votes yet</string>
+    <string name="poll_load_failed">Poll could not be loaded</string>
+    <string name="poll_submitting">Submitting vote</string>
+    <string name="poll_submitted">Vote submitted</string>
+    <string name="poll_submit_failed">Vote could not be submitted</string>
+    <string name="poll_vote_action">Vote</string>
+    <string name="poll_selected">Selected</string>
+    <string name="poll_not_selected">Not selected</string>
+    <string name="poll_voted">voted</string>
 </resources>
