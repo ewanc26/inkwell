@@ -97,6 +97,11 @@
     <string name="discover_search_hint">Search articles and documents</string>
     <string name="discover_search">Search</string>
     <string name="discover_searching">Searching the Standard.site network…</string>
+    <string name="discover_documents">Documents</string>
+    <string name="discover_publications">Publications</string>
+    <string name="discover_users">Users</string>
+    <string name="discover_open_web_title">Search the Open Web</string>
+    <string name="discover_open_web_message">Find Standard.site writing from Leaflet, pckt, Offprint, and independent publishers.</string>
     <string name="reader_posts">Posts</string>
     <string name="reader_all_posts">All posts</string>
     <string name="reader_unsupported_content">Unsupported content format</string>
