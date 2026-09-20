@@ -94,6 +94,7 @@ private actor BSkyProfileCache {
 enum BSkyProfileFetcher {
     private static let logger = Logger(subsystem: "uk.ewancroft.Inkwell", category: "BSkyProfile")
     private static let baseURL = sharedPublicBskyApi()
+    private static let maxResponseBytes = 2 * 1024 * 1024
     private static let session: URLSession = {
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = 10
@@ -127,6 +128,10 @@ enum BSkyProfileFetcher {
             throw URLError(.badServerResponse)
         }
 
+        guard data.count <= maxResponseBytes else {
+            throw URLError(.cannotParseResponse)
+        }
+        try JSONSafety.validate(data)
         let profile = try JSONDecoder().decode(BSkyActorProfile.self, from: data)
         await cache.set(did, profile)
         await cache.set(profile.handle.lowercased(), profile)
@@ -159,6 +164,10 @@ enum BSkyProfileFetcher {
             throw URLError(.badServerResponse)
         }
 
+        guard resolveData.count <= maxResponseBytes else {
+            throw URLError(.cannotParseResponse)
+        }
+        try JSONSafety.validate(resolveData)
         let resolved = try JSONDecoder().decode(ResolveHandleResponse.self, from: resolveData)
         return try await fetchProfile(did: resolved.did)
     }
