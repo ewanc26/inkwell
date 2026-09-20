@@ -199,6 +199,14 @@
         <item quantity="one">Imported 1 change.</item>
         <item quantity="other">Imported %d changes.</item>
     </plurals>
+    <plurals name="reader_sync_completed_with_pending">
+        <item quantity="one">Synced 1 saved change; %2$d still waiting.</item>
+        <item quantity="other">Synced %1$d saved changes; %2$d still waiting.</item>
+    </plurals>
+    <plurals name="reader_sync_completed">
+        <item quantity="one">Synced 1 saved change.</item>
+        <item quantity="other">Synced %1$d saved changes.</item>
+    </plurals>
     <string name="notification_new_document_from_subscription">New document from a subscribed publication</string>
     <string name="notification_new_document">New document</string>
     <string name="notification_open_to_view_document">Open Inkwell to view this document</string>

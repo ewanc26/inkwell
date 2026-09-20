@@ -255,9 +255,18 @@ class ReaderViewModel @Inject constructor(
                 val outcome = OfflineMutationQueue.flush(context, pdsRepository)
                 val message = when {
                     outcome.completedCount > 0 && outcome.failedCount > 0 ->
-                        "Synced ${outcome.completedCount} saved ${pluralChanges(outcome.completedCount)}; ${outcome.pendingCount} still waiting."
+                        context.resources.getQuantityString(
+                            R.plurals.reader_sync_completed_with_pending,
+                            outcome.completedCount,
+                            outcome.completedCount,
+                            outcome.pendingCount,
+                        )
                     outcome.completedCount > 0 ->
-                        "Synced ${outcome.completedCount} saved ${pluralChanges(outcome.completedCount)}."
+                        context.resources.getQuantityString(
+                            R.plurals.reader_sync_completed,
+                            outcome.completedCount,
+                            outcome.completedCount,
+                        )
                     outcome.failedCount > 0 ->
                         "Some saved changes couldn’t sync yet. They’ll be retried."
                     else -> null
@@ -302,9 +311,6 @@ class ReaderViewModel @Inject constructor(
     fun dismissPendingSyncMessage() {
         _uiState.value = _uiState.value.copy(pendingSyncMessage = null)
     }
-
-    private fun pluralChanges(count: Int): String =
-        context.resources.getQuantityString(R.plurals.reader_pending_change_count, count)
 
     fun dismissError() {
         _uiState.value = _uiState.value.copy(error = null)
