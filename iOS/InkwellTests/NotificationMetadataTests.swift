@@ -69,4 +69,25 @@ final class NotificationMetadataTests: XCTestCase {
             settings: settings
         ))
     }
+
+    func testNotificationUnreadStateIsIsolatedAcrossAccountSwitches() {
+        let defaults = UserDefaults.standard
+        let accountAKey = "standardSite.account.did:plc:account-a.unreadCount"
+        let accountBKey = "standardSite.account.did:plc:account-b.unreadCount"
+        defaults.set(7, forKey: accountAKey)
+        defaults.set(2, forKey: accountBKey)
+        defer {
+            defaults.removeObject(forKey: accountAKey)
+            defaults.removeObject(forKey: accountBKey)
+            NotificationManager.shared.deactivate()
+        }
+
+        let manager = NotificationManager.shared
+        manager.activate(accountDID: "did:plc:account-a")
+        XCTAssertEqual(manager.unreadCount, 7)
+        manager.activate(accountDID: "did:plc:account-b")
+        XCTAssertEqual(manager.unreadCount, 2)
+        manager.activate(accountDID: "did:plc:account-a")
+        XCTAssertEqual(manager.unreadCount, 7)
+    }
 }
