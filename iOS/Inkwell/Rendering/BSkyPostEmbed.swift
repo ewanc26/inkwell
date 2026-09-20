@@ -172,7 +172,7 @@ struct BSkyPostEmbedView: View {
                     .stroke(foregroundColor.opacity(0.08), lineWidth: 1)
             )
             .accessibilityElement(children: .combine)
-            .accessibilityLabel("External link: \(externalEmbed.external.title ?? host(from: externalEmbed.external.uri ?? ""))")
+            .accessibilityLabel(externalCardAccessibilityLabel(externalEmbed.external))
 
         case .record(let recordEmbed):
             VStack(alignment: .leading, spacing: 4) {
@@ -200,7 +200,7 @@ struct BSkyPostEmbedView: View {
                     .stroke(foregroundColor.opacity(0.08), lineWidth: 1)
             )
             .accessibilityElement(children: .combine)
-            .accessibilityLabel("Quoted post by \(recordEmbed.record.author?.displayName ?? "unknown author")")
+            .accessibilityLabel(quotedPostAccessibilityLabel(recordEmbed.record))
 
         case .unknown:
             EmptyView()
@@ -231,6 +231,22 @@ struct BSkyPostEmbedView: View {
         case "heart": return Text("^[\(count ?? 0) like](inflect: true)")
         default: return Text(value)
         }
+    }
+
+    private func externalCardAccessibilityLabel(_ card: BSkyExternalEmbed.BSkyExternal) -> String {
+        var parts = ["External link"]
+        if let title = card.title, !title.isEmpty { parts.append(title) }
+        if let description = card.description, !description.isEmpty { parts.append(description) }
+        if let uri = card.uri { parts.append(host(from: uri)) }
+        return parts.joined(separator: ". ")
+    }
+
+    private func quotedPostAccessibilityLabel(_ record: BSkyRecordEmbed.BSkyEmbeddedRecord) -> String {
+        var label = "Quoted post by \(record.author?.displayName ?? "unknown author")"
+        if let text = record.value?.text, !text.isEmpty {
+            label += ". \(text)"
+        }
+        return label
     }
 
     private func host(from urlString: String) -> String {
