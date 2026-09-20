@@ -18,3 +18,28 @@ enum RetryAfterPolicy {
         return min(Double(1 << min(max(attempt, 0), 9)) * 0.1, maxDelay)
     }
 }
+
+/// Shares short-lived rate-limit cooldowns between concurrent requests to the
+/// same service without blocking unrelated origins.
+actor RateLimitCoordinator {
+    static let shared = RateLimitCoordinator()
+
+    private var cooldownUntil: [String: Date] = [:]
+
+    func wait(for origin: String) async throws {
+        guard let until = cooldownUntil[origin] else { return }
+        let delay = until.timeIntervalSinceNow
+        guard delay > 0 else {
+            cooldownUntil[origin] = nil
+            return
+        }
+        try await Task.sleep(for: .seconds(delay))
+    }
+
+    func record(origin: String, delay: TimeInterval) {
+        let candidate = Date().addingTimeInterval(min(max(delay, 0), RetryAfterPolicy.maxDelay))
+        if candidate > (cooldownUntil[origin] ?? .distantPast) {
+            cooldownUntil[origin] = candidate
+        }
+    }
+}
