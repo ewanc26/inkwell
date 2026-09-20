@@ -35,6 +35,9 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import uk.ewancroft.inkwell.R
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import uk.ewancroft.inkwell.data.model.common.StrongRef
@@ -99,6 +102,11 @@ internal fun PollBlock(
                     val isSelected = selectedOptions.contains(option.text) ||
                         (hasVoted && data.myVote?.contains(option.text) == true)
                     val isVoted = hasVoted
+                    val voteCountDescription = if (totalVotes > 0) {
+                        pluralStringResource(R.plurals.poll_vote_count, count, count)
+                    } else {
+                        stringResource(R.string.poll_no_votes)
+                    }
 
                     OutlinedButton(
                         onClick = {
@@ -117,12 +125,13 @@ internal fun PollBlock(
                                 val percentage = if (totalVotes > 0) {
                                     "${(fraction * 100).toInt()} percent"
                                 } else {
-                                    "No votes yet"
+                                    ""
                                 }
                                 stateDescription = buildString {
                                     append(if (isSelected) "Selected" else "Not selected")
                                     if (isVoted) append(", voted")
-                                    append(", $count votes, $percentage")
+                                    append(", $voteCountDescription")
+                                    if (percentage.isNotEmpty()) append(", $percentage")
                                 }
                             },
                         enabled = !isVoted && !isSubmitting,
@@ -196,7 +205,7 @@ internal fun PollBlock(
                 }
                 if (totalVotes > 0) {
                     Text(
-                        "$totalVotes vote${if (totalVotes == 1) "" else "s"}",
+                        pluralStringResource(R.plurals.poll_vote_count, totalVotes, totalVotes),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
