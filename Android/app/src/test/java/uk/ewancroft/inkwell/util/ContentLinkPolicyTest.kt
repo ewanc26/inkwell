@@ -3,7 +3,10 @@ package uk.ewancroft.inkwell.util
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 class ContentLinkPolicyTest {
     @Test fun `allows web links case insensitively`() {
         assertEquals("https", ContentLinkPolicy.parse("HTTPS://example.com/a")?.scheme)

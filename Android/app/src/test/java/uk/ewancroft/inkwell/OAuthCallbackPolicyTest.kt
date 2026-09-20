@@ -5,7 +5,10 @@ import android.content.Intent
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 class OAuthCallbackPolicyTest {
     @Test fun `accepts only the exact callback path`() {
         assertTrue(OAuthCallbackPolicy.isCallback(Uri.parse("uk.ewancroft.inkwell:/callback?code=abc&state=xyz")))
