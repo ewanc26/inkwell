@@ -183,7 +183,12 @@ class StandardSiteVerifierTest {
     @Test
     fun `document cache does not reuse verification for changed record inputs`() = runBlocking {
         val documentURI = "at://did:plc:alice/site.standard.document/same"
-        val first = DocumentRecord(site = "https://example.com", title = "First", path = "/first")
+        val first = DocumentRecord(
+            site = "https://example.com",
+            title = "First",
+            publishedAt = "2026-01-01T00:00:00Z",
+            path = "/first",
+        )
         val second = first.copy(path = "/second")
         val calls = AtomicInteger(0)
         val verifier = SiteVerifier {
