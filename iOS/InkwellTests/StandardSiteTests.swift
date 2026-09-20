@@ -231,6 +231,22 @@ final class StandardSiteTests: XCTestCase {
         XCTAssertThrowsError(try ImageUploadSanitizer.sanitize(oversized))
     }
 
+    func testContentDeepLinkPolicyAcceptsEncodedDocumentURI() {
+        let uri = "at://did:plc:alice/site.standard.document/café"
+        let encoded = uri.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+        let url = URL(string: "inkwell://document?uri=\(encoded)")!
+
+        XCTAssertEqual(ContentDeepLinkPolicy.documentURI(from: url), uri)
+    }
+
+    func testContentDeepLinkPolicyRejectsPublicationAndOAuthLinks() {
+        let publication = URL(string: "inkwell://document?uri=at://did:plc:alice/site.standard.publication/pub")!
+        let oauth = URL(string: "uk.ewancroft.inkwell:/callback?uri=at://did:plc:alice/site.standard.document/doc")!
+
+        XCTAssertNil(ContentDeepLinkPolicy.documentURI(from: publication))
+        XCTAssertNil(ContentDeepLinkPolicy.documentURI(from: oauth))
+    }
+
     private func document(
         site: String,
         path: String? = nil
