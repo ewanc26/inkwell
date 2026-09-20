@@ -16,4 +16,9 @@ final class JSONSafetyTests: XCTestCase {
         let json = "{\"value\":\"" + String(repeating: "x", count: JSONSafety.maxStringBytes + 1) + "\"}"
         XCTAssertThrowsError(try JSONSafety.validate(Data(json.utf8)))
     }
+
+    func testRejectsOversizedResponseBeforeStructuralValidation() {
+        let data = Data(repeating: 0x20, count: JSONSafety.maxResponseBytes + 1)
+        XCTAssertThrowsError(try JSONSafety.validateResponse(data))
+    }
 }
