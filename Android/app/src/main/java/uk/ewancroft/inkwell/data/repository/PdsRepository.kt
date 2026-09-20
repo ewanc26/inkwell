@@ -50,7 +50,11 @@ internal object RateLimitRetryPolicy {
 
     fun delayMillis(header: String?, attempt: Int, nowMillis: Long = System.currentTimeMillis()): Long {
         val value = header?.trim().orEmpty()
-        value.toLongOrNull()?.takeIf { it >= 0 }?.let { return (it * 1000).coerceAtMost(MAX_DELAY_MS) }
+        value.toLongOrNull()?.takeIf { it >= 0 }?.let {
+            // Cap before converting seconds to milliseconds so an untrusted
+            // header cannot overflow Long during the multiplication.
+            return it.coerceAtMost(MAX_DELAY_MS / 1000) * 1000
+        }
         runCatching {
             ZonedDateTime.parse(value, DateTimeFormatter.RFC_1123_DATE_TIME)
                 .toInstant().toEpochMilli() - nowMillis
