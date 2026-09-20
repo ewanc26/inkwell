@@ -343,12 +343,7 @@ class PdsRepository @Inject constructor(
             nsid = "com.atproto.repo.deleteRecord",
             params = Unit,
             paramsSerializer = Unit.serializer(),
-            input = buildJsonObject {
-                put("repo", session.did)
-                put("collection", collection)
-                put("rkey", rkey)
-                swapRecord?.let { put("swapRecord", it) }
-            },
+            input = deleteRecordInput(session.did.orEmpty(), collection, rkey, swapRecord),
             inputSerializer = JsonObject.serializer(),
             responseSerializer = JsonObject.serializer(),
         )
@@ -403,4 +398,16 @@ class PdsRepository @Inject constructor(
                 ?: body["pdsUrl"]?.jsonPrimitive?.content
         } catch (_: Exception) { null }
     }
+}
+
+internal fun deleteRecordInput(
+    repo: String,
+    collection: String,
+    rkey: String,
+    swapRecord: String?,
+): JsonObject = buildJsonObject {
+    put("repo", repo)
+    put("collection", collection)
+    put("rkey", rkey)
+    swapRecord?.let { put("swapRecord", it) }
 }
