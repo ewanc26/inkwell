@@ -28,6 +28,11 @@ class RateLimitRetryPolicyTest {
         assertEquals(51_200L, RateLimitRetryPolicy.delayMillis("not-a-date", attempt = 20))
     }
 
+    @Test fun `rejects negative and blank retry-after values`() {
+        assertEquals(400L, RateLimitRetryPolicy.delayMillis("-1", attempt = 2))
+        assertEquals(400L, RateLimitRetryPolicy.delayMillis("   ", attempt = 2))
+    }
+
     @Test fun `expired HTTP date uses bounded exponential fallback`() {
         assertEquals(
             400L,
