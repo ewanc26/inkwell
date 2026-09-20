@@ -59,11 +59,11 @@ fun WriterViewModel.publish() {
             val plaintext = markdownToPlaintext(state.markdown)
 
             if (state.editingDocumentUri != null) {
-                val revision = state.editingDocumentRevision
-                if (revision == null) {
+                val recordCID = state.editingDocumentRecordCID
+                if (recordCID == null) {
                     uiStateInternal.value = uiStateInternal.value.copy(
                         isPublishing = false,
-                        publishError = "Missing revision for existing document",
+                        publishError = "Missing record CID for existing document",
                     )
                     return@launch
                 }
@@ -90,7 +90,7 @@ fun WriterViewModel.publish() {
                 val result = pdsRepository.updateRecord(
                     uri = state.editingDocumentUri,
                     record = record,
-                    recordCID = revision,
+                    recordCID = recordCID,
                 )
 
                 uiStateInternal.value = uiStateInternal.value.copy(
@@ -98,7 +98,7 @@ fun WriterViewModel.publish() {
                     publishSuccess = "Updated successfully.",
                     publishedUri = state.editingDocumentUri,
                     editingDocumentUri = null,
-                    editingDocumentRevision = null,
+                    editingDocumentRecordCID = null,
                 )
             } else {
                 val record = buildJsonObject {

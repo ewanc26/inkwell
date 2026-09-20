@@ -65,7 +65,7 @@ fun WriterViewModel.loadDocumentForEditing(uri: String) {
                 editingDocumentDescription = description,
                 editingDocumentPath = path,
                 editingDocumentMarkdown = markdownText,
-                editingDocumentRevision = cid,
+                editingDocumentRecordCID = cid,
                 editingDocumentRecord = value,
                 title = title,
                 description = description,
@@ -99,7 +99,7 @@ private fun harvestBlobRefs(markdown: String?): Map<String, JsonObject> {
 fun WriterViewModel.cancelEditing() {
     uiStateInternal.value = uiStateInternal.value.copy(
         editingDocumentUri = null,
-        editingDocumentRevision = null,
+        editingDocumentRecordCID = null,
         editingDocumentRecord = null,
         editingDocumentTitle = null,
         editingDocumentDescription = null,
@@ -113,9 +113,9 @@ fun WriterViewModel.cancelEditing() {
 fun WriterViewModel.deleteDocument() {
     val state = uiStateInternal.value
     val uri = state.editingDocumentUri
-    val revision = state.editingDocumentRevision
-    if (uri == null || revision == null) {
-        uiStateInternal.value = state.copy(publishError = "Missing document revision")
+    val recordCID = state.editingDocumentRecordCID
+    if (uri == null || recordCID == null) {
+        uiStateInternal.value = state.copy(publishError = "Missing document record CID")
         return
     }
 
@@ -127,7 +127,7 @@ fun WriterViewModel.deleteDocument() {
             pdsRepository.deleteRecord(
                 collection = parsed.collection,
                 rkey = parsed.recordKey,
-                swapRecord = revision,
+                swapRecord = recordCID,
             )
             OfflineContentCacheManager.remove(context, uri)
             cancelEditing()
