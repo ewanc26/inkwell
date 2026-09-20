@@ -228,13 +228,7 @@ class InkwellNotificationManager @Inject constructor(
             }
 
             val notificationEntries = newDocs.map {
-                InkwellNotification(
-                    documentURI = it.uri,
-                    documentTitle = if (it.sensitive) "Hidden document" else it.title,
-                    publicationName = if (it.sensitive) null else it.publicationName,
-                    publishedAt = it.publishedAt,
-                    date = System.currentTimeMillis()
-                )
+                it.toNotification(System.currentTimeMillis())
             }
             saveNotifications(notificationEntries)
             prefs.edit().putInt(UNREAD_COUNT_KEY, getUnreadCount() + newDocs.size).apply()
@@ -383,6 +377,15 @@ data class NewDocument(
     val publishedAt: String,
     val sensitive: Boolean = false
 )
+
+internal fun NewDocument.toNotification(date: Long): InkwellNotification =
+    InkwellNotification(
+        documentURI = uri,
+        documentTitle = if (sensitive) "Hidden document" else title,
+        publicationName = if (sensitive) null else publicationName,
+        publishedAt = publishedAt,
+        date = date,
+    )
 
 private fun JsonElement?.moderationLabels(): List<ModerationLabel> =
     (this?.jsonObject?.get("value")?.jsonObject ?: this?.jsonObject)?.get("labels")?.jsonObject
