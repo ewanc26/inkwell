@@ -71,6 +71,9 @@ class OfflineSyncQueueIos(durableDirPath: String, legacyCacheDirPath: String) : 
                 error = null,
             )
         }
+        // Keep the preserved artifact for recovery, but clear the active path
+        // so the next load can recover with an empty queue.
+        NSFileManager.defaultManager.removeItemAtPath(queueFilePath, error = null)
     }
 
     private fun writeInternal(entries: List<SyncQueueEntry>) {
