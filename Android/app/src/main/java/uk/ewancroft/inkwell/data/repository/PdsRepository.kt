@@ -358,17 +358,7 @@ class PdsRepository @Inject constructor(
             contentType,
             JsonObject.serializer(),
         )
-        val blob = response["blob"]?.jsonObject
-            ?: throw IllegalStateException("Blob upload response did not contain a blob")
-        check(blob["mimeType"]?.jsonPrimitive?.content == mimeType) {
-            "Blob upload response MIME type did not match request"
-        }
-        check(blob["size"]?.jsonPrimitive?.long == bytes.size.toLong()) {
-            "Blob upload response size did not match request"
-        }
-        check(blob["ref"]?.jsonObject?.get("\$link")?.jsonPrimitive?.content?.isNotBlank() == true) {
-            "Blob upload response did not contain a CID"
-        }
+        validateUploadBlobResponse(response, mimeType, bytes.size.toLong())
         return response
     }
 
@@ -439,6 +429,20 @@ class PdsRepository @Inject constructor(
             }?.jsonObject?.get("serviceEndpoint")?.jsonPrimitive?.content
                 ?: body["pdsUrl"]?.jsonPrimitive?.content
         } catch (_: Exception) { null }
+    }
+}
+
+internal fun validateUploadBlobResponse(response: JsonObject, mimeType: String, byteCount: Long) {
+    val blob = response["blob"]?.jsonObject
+        ?: throw IllegalStateException("Blob upload response did not contain a blob")
+    check(blob["mimeType"]?.jsonPrimitive?.content == mimeType) {
+        "Blob upload response MIME type did not match request"
+    }
+    check(blob["size"]?.jsonPrimitive?.long == byteCount) {
+        "Blob upload response size did not match request"
+    }
+    check(blob["ref"]?.jsonObject?.get("\$link")?.jsonPrimitive?.content?.isNotBlank() == true) {
+        "Blob upload response did not contain a CID"
     }
 }
 

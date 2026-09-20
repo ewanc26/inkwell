@@ -6,6 +6,8 @@ import kotlin.test.assertContentEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertEquals
 import okhttp3.ResponseBody.Companion.toResponseBody
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 class PdsRepositoryDocumentsTest {
     @Test
@@ -56,5 +58,33 @@ class PdsRepositoryDocumentsTest {
         assertEquals("site.standard.document", input["collection"]?.toString()?.trim('"'))
         assertEquals("post", input["rkey"]?.toString()?.trim('"'))
         assertEquals("bafyreighost", input["swapRecord"]?.toString()?.trim('"'))
+    }
+
+    @Test
+    fun `upload response validation accepts exact blob shape`() {
+        val response = buildJsonObject {
+            put("blob", buildJsonObject {
+                put("mimeType", "image/png")
+                put("size", 3)
+                put("ref", buildJsonObject { put("\$link", "bafycid") })
+            })
+        }
+
+        validateUploadBlobResponse(response, "image/png", 3)
+    }
+
+    @Test
+    fun `upload response validation rejects mismatched metadata`() {
+        val response = buildJsonObject {
+            put("blob", buildJsonObject {
+                put("mimeType", "image/jpeg")
+                put("size", 3)
+                put("ref", buildJsonObject { put("\$link", "bafycid") })
+            })
+        }
+
+        assertFailsWith<IllegalStateException> {
+            validateUploadBlobResponse(response, "image/png", 3)
+        }
     }
 }
