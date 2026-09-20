@@ -215,7 +215,7 @@ class WriterViewModel @Inject constructor(
         uiStateInternal.value = uiStateInternal.value.copy(showPreview = !uiStateInternal.value.showPreview)
     }
 
-    fun uploadImage(bytes: ByteArray, mimeType: String) {
+    fun uploadImage(bytes: ByteArray, mimeType: String, altText: String = "") {
         viewModelScope.launch {
             try {
                 val result = pdsRepository.uploadBlob(bytes, mimeType)
@@ -224,7 +224,7 @@ class WriterViewModel @Inject constructor(
                     ?: blobRef["link"]?.jsonPrimitive?.content
                     ?: throw Exception("Missing blob reference in upload response")
 
-                val markdown = "\n![Image]($blobLink)\n"
+                val markdown = "\n![${altText.trim()}]($blobLink)\n"
                 val newBlobs = uiStateInternal.value.uploadedBlobs + (blobLink to blobRef)
                 uiStateInternal.value = uiStateInternal.value.copy(
                     markdown = uiStateInternal.value.markdown + markdown,

@@ -50,6 +50,9 @@ fun WriterScreen(
     var formatExpanded by remember { mutableStateOf(false) }
     var showCredits by remember { mutableStateOf(false) }
     var showDocumentPicker by remember { mutableStateOf(false) }
+    var pendingImage by remember { mutableStateOf<ImageUploadSanitizer.Output?>(null) }
+    var imageAltText by rememberSaveable { mutableStateOf("") }
+    var imageIsDecorative by rememberSaveable { mutableStateOf(false) }
 
     // Local TextFieldValue tracks cursor/selection alongside the text, so
     // FormattingToolbar can insert markdown at the actual cursor instead of
@@ -107,9 +110,54 @@ fun WriterScreen(
                 return@rememberLauncherForActivityResult
             }
             runCatching { ImageUploadSanitizer.sanitize(bytes) }
-                .onSuccess { viewModel.uploadImage(it.bytes, it.mimeType) }
+                .onSuccess {
+                    pendingImage = it
+                    imageAltText = ""
+                    imageIsDecorative = false
+                }
                 .onFailure { viewModel.setPublishError(it.localizedMessage ?: "The image could not be prepared for upload.") }
         }
+    }
+
+    pendingImage?.let { image ->
+        AlertDialog(
+            onDismissRequest = { pendingImage = null },
+            title = { Text("Describe this image") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Add alt text for people using a screen reader, or mark the image as decorative.")
+                    OutlinedTextField(
+                        value = imageAltText,
+                        onValueChange = { imageAltText = it },
+                        enabled = !imageIsDecorative,
+                        label = { Text("Alt text") },
+                        supportingText = { Text("Describe the image's purpose, not its filename.") },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(
+                            checked = imageIsDecorative,
+                            onCheckedChange = { imageIsDecorative = it },
+                        )
+                        Text("Decorative image")
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    enabled = imageIsDecorative || imageAltText.isNotBlank(),
+                    onClick = {
+                        viewModel.uploadImage(
+                            image.bytes,
+                            image.mimeType,
+                            if (imageIsDecorative) "" else imageAltText.trim(),
+                        )
+                        pendingImage = null
+                    },
+                ) { Text("Insert image") }
+            },
+            dismissButton = { TextButton(onClick = { pendingImage = null }) { Text("Cancel") } },
+        )
     }
 
     LaunchedEffect(Unit) {
