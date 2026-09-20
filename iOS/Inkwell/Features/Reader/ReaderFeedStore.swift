@@ -10,6 +10,12 @@ import Foundation
 import ATProtoKit
 import InkwellShared
 
+private enum JetstreamReconnectPolicy {
+    static func delayMilliseconds(attempt: Int) -> Int64 {
+        min(60_000, 1_000 << min(max(attempt, 0), 6))
+    }
+}
+
 // MARK: - Pagination State
 
 /// Tracks cursor-based pagination across multiple subscribed publications.
@@ -373,7 +379,9 @@ final class ReaderFeedStore {
                 }
                 }
                 guard !Task.isCancelled else { break }
-                try? await Task.sleep(for: .milliseconds(Int64(JetstreamRetryPolicy.delayMillis(attempt))))
+                try? await Task.sleep(for: .milliseconds(
+                    JetstreamReconnectPolicy.delayMilliseconds(attempt: attempt)
+                ))
                 attempt += 1
             }
         }
