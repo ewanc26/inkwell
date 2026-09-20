@@ -28,11 +28,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import android.text.format.DateUtils
 import uk.ewancroft.inkwell.data.remote.InkwellNotification
+import uk.ewancroft.inkwell.R
 
 /**
  * The in-app notification history -- mirrors iOS NotificationsView.swift.
@@ -61,16 +63,16 @@ fun NotificationsDialog(
             Scaffold(
                 topBar = {
                     TopAppBar(
-                        title = { Text("Notifications") },
+                        title = { Text(stringResource(R.string.reader_notifications)) },
                         navigationIcon = {
                             IconButton(onClick = onDismiss) {
-                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Close")
+                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.reader_back))
                             }
                         },
                         actions = {
                             if (notifications.isNotEmpty()) {
                                 TextButton(onClick = onClearAll) {
-                                    Text("Clear All")
+                                    Text(stringResource(R.string.notifications_clear_all))
                                 }
                             }
                         },
@@ -90,7 +92,7 @@ fun NotificationsDialog(
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             Text(
-                                "No notifications yet",
+                                stringResource(R.string.notifications_empty),
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
