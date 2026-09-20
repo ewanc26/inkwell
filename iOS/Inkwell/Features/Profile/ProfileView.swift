@@ -131,18 +131,18 @@ private struct ProfileHeader: View {
         return trimmed
     }
 
-    private var accessibilityLabel: String {
-        var parts = [displayName, "@\(profile.handle)"]
+    private var accessibilityLabel: Text {
+        var label = Text("\(displayName). @\(profile.handle)")
         if let followersCount = profile.followersCount {
-            parts.append("\(followersCount) followers")
+            label = label + Text(". ") + Text("^[\(followersCount) follower](inflect: true)")
         }
         if let followsCount = profile.followsCount {
-            parts.append("Following \(followsCount) accounts")
+            label = label + Text(". Following ^[\(followsCount) account](inflect: true)")
         }
         if let postsCount = profile.postsCount {
-            parts.append("\(postsCount) posts")
+            label = label + Text(". ^[\(postsCount) post](inflect: true)")
         }
-        return parts.joined(separator: ". ")
+        return label
     }
 
     var body: some View {
