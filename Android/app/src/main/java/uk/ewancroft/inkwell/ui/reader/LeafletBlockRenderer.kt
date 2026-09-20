@@ -18,6 +18,7 @@ import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -43,7 +44,6 @@ import coil.compose.AsyncImage
 import uk.ewancroft.inkwell.data.model.common.StrongRef
 import uk.ewancroft.inkwell.data.model.content.LeafletBlock
 import uk.ewancroft.inkwell.data.model.content.LeafletFacet
-import uk.ewancroft.inkwell.shared.content.CdnUrls
 import uk.ewancroft.inkwell.shared.content.LeafletTypes
 import uk.ewancroft.inkwell.shared.facets.FacetSchema
 import uk.ewancroft.inkwell.shared.text.Utf8Offsets
@@ -58,6 +58,7 @@ fun LeafletBlockContent(
     pollData: kotlinx.coroutines.flow.StateFlow<Map<String, PostDetailViewModel.PollData>> = kotlinx.coroutines.flow.MutableStateFlow(emptyMap()),
     onLoadPoll: suspend (StrongRef) -> Unit = {},
     onCastVote: suspend (String, List<String>) -> Unit = { _, _ -> },
+    onLoadImage: suspend (String, String) -> ByteArray? = { _, _ -> null },
 ) {
     val alignModifier = modifier.fillMaxWidth()
     val textAlign = when {
@@ -72,7 +73,7 @@ fun LeafletBlockContent(
         LeafletTypes.BLOCKS_PARAGRAPH, LeafletTypes.BLOCKS_BLOCKQUOTE -> ParagraphBlock(block, alignModifier, textAlign)
         LeafletTypes.BLOCKS_CODE -> CodeBlock(block)
         LeafletTypes.BLOCKS_MATH -> MathBlock(block)
-        LeafletTypes.BLOCKS_IMAGE -> ImageBlock(block, authorDid)
+        LeafletTypes.BLOCKS_IMAGE -> ImageBlock(block, authorDid, onLoadImage)
         LeafletTypes.BLOCKS_UNORDERED_LIST -> UnorderedListBlock(block, pollData, onLoadPoll, onCastVote)
         LeafletTypes.BLOCKS_ORDERED_LIST -> OrderedListBlock(block, pollData, onLoadPoll, onCastVote)
         LeafletTypes.BLOCKS_CHECKLIST -> ChecklistBlock(block, pollData, onLoadPoll, onCastVote)
@@ -301,10 +302,14 @@ fun MathBlock(block: LeafletBlock) {
 }
 
 @Composable
-fun ImageBlock(block: LeafletBlock, authorDid: String) {
-    val imageUrl = if (block.image?.link?.startsWith("http") == true) block.image.link else CdnUrls.bskyThumbnail(authorDid, block.image?.link ?: "")
+fun ImageBlock(block: LeafletBlock, authorDid: String, onLoadImage: suspend (String, String) -> ByteArray?) {
+    val link = block.image?.link.orEmpty()
+    val imageUrl = link.takeIf { it.startsWith("http") }
+    val imageBytes by produceState<ByteArray?>(initialValue = null, link, authorDid) {
+        value = if (imageUrl == null && link.isNotBlank()) onLoadImage(authorDid, link) else null
+    }
     AsyncImage(
-        model = imageUrl,
+        model = imageUrl ?: imageBytes,
         contentDescription = block.alt,
         modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f),
         contentScale = ContentScale.Crop

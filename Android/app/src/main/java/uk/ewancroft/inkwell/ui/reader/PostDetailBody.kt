@@ -53,6 +53,7 @@ internal fun PostDetailContent(
     pollData: kotlinx.coroutines.flow.StateFlow<Map<String, PostDetailViewModel.PollData>>,
     onLoadPoll: suspend (StrongRef) -> Unit,
     onCastVote: suspend (String, List<String>) -> Unit,
+    onLoadImage: suspend (String, String) -> ByteArray?,
     modifier: Modifier = Modifier,
 ) {
     val titleColor = if (readerTheme.foreground != Color.Unspecified) readerTheme.foreground else MaterialTheme.colorScheme.onBackground
@@ -132,6 +133,7 @@ internal fun PostDetailContent(
                                 alignment = container.alignment,
                                 onLoadPoll = onLoadPoll,
                                 onCastVote = onCastVote,
+                                onLoadImage = onLoadImage,
                             )
                         }
                     }
