@@ -15,7 +15,7 @@ enum RetryAfterPolicy {
         if let date = formatter.date(from: value), date >= now {
             return min(date.timeIntervalSince(now), maxDelay)
         }
-        return min(Double(1 << min(max(attempt, 0), 9)) * 0.1, maxDelay)
+        return min(Double(1 << min(max(attempt, 0), 10)) * 0.1, maxDelay)
     }
 
     static func origin(for url: URL) -> String {
