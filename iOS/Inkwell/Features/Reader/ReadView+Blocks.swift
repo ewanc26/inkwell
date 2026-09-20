@@ -43,6 +43,7 @@ extension ReadView {
                     .foregroundStyle(foregroundColor)
                     .multilineTextAlignment(textAlignment)
                     .padding(.top, 8)
+                    .accessibilityAddTraits(.isHeader)
 
             case "pub.leaflet.blocks.text":
                 if let text = block.plaintext, !text.isEmpty {
