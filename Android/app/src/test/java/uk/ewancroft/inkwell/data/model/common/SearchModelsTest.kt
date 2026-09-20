@@ -1,10 +1,12 @@
 package uk.ewancroft.inkwell.data.model.common
 
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.SerializationException
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Assert.assertThrows
 import org.junit.Test
 
 /**
@@ -13,6 +15,12 @@ import org.junit.Test
  * when `format=v2` is requested, so the models must tolerate both.
  */
 class SearchModelsTest {
+    @Test
+    fun `non JSON search error body is rejected`() {
+        assertThrows(SerializationException::class.java) {
+            Json.decodeFromString<SearchResponse>("<html><body>Bad gateway</body></html>")
+        }
+    }
 
     private val json = Json { ignoreUnknownKeys = true }
 
