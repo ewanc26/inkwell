@@ -24,14 +24,14 @@ suspend fun PdsRepository.fetchDocumentEntries(did: String, pdsUrl: String? = nu
 suspend fun PdsRepository.resolveHandle(handle: String): String {
     val normalized = HandleUtils.normalize(handle)
     val urlStr = "${XrpcEndpoints.PUBLIC_BSKY_API}${XrpcEndpoints.IDENTITY_RESOLVE_HANDLE}?handle=${enc(normalized)}"
-    val body: JsonObject = json.decodeFromString(executeGet(urlStr))
+    val body: JsonObject = decodeSafe(executeGet(urlStr))
     return body["did"]?.jsonPrimitive?.content
         ?: throw IllegalStateException("resolveHandle returned no did")
 }
 
 suspend fun PdsRepository.getProfile(did: String): BlueskyProfile {
     val urlStr = "${XrpcEndpoints.PUBLIC_BSKY_API}${XrpcEndpoints.ACTOR_GET_PROFILE}?actor=${enc(did)}"
-    return json.decodeFromString(executeGet(urlStr))
+    return decodeSafe(executeGet(urlStr))
 }
 
 suspend fun PdsRepository.downloadBlob(cid: String, fromDID: String): ByteArray = withContext(Dispatchers.IO) {

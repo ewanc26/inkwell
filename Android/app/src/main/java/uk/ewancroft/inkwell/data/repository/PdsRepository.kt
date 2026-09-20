@@ -12,6 +12,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -26,6 +27,7 @@ import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 import uk.ewancroft.inkwell.shared.model.UserLexicon
 import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
 import uk.ewancroft.inkwell.shared.policy.RecordListPolicy
+import uk.ewancroft.inkwell.shared.validation.JsonSafety
 import java.net.URLEncoder
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -109,6 +111,13 @@ class PdsRepository @Inject constructor(
      *  query string. */
     internal fun enc(value: String): String = URLEncoder.encode(value, "UTF-8")
 
+    /** Parses untrusted PDS JSON only after applying structural safety limits. */
+    internal inline fun <reified T> decodeSafe(body: String): T {
+        val element = json.parseToJsonElement(body)
+        check(JsonSafety.isSafe(element)) { "PDS JSON exceeded structural safety limits" }
+        return json.decodeFromJsonElement(element)
+    }
+
     /** Executes a GET and returns the raw body, throwing on non-2xx statuses
      *  or a missing body instead of decoding an error payload as success. */
     internal suspend fun executeGet(urlStr: String, maxBodyBytes: Int = DEFAULT_RESPONSE_BYTES): String {
@@ -166,7 +175,7 @@ class PdsRepository @Inject constructor(
             cursor?.let { append("&cursor=").append(enc(it)) }
         }
         val pageBudget = (DEFAULT_RESPONSE_BYTES + limit.coerceIn(1, 100) * 8 * 1024).coerceAtMost(8 * 1024 * 1024)
-        return json.decodeFromString(executeGet(urlStr, pageBudget))
+        return decodeSafe(executeGet(urlStr, pageBudget))
     }
 
     suspend fun getRecord(uri: String, pdsUrl: String? = null): JsonObject {
@@ -178,7 +187,7 @@ class PdsRepository @Inject constructor(
             append("&collection=").append(enc(parsed.collection))
             append("&rkey=").append(enc(parsed.recordKey))
         }
-        return json.decodeFromString(executeGet(urlStr))
+        return decodeSafe(executeGet(urlStr))
     }
 
     suspend fun createRecord(
@@ -384,7 +393,7 @@ class PdsRepository @Inject constructor(
     internal suspend fun resolvePdsUrl(did: String): String? {
         return try {
             val urlStr = "https://plc.directory/${enc(did)}"
-            val body = json.parseToJsonElement(executeGet(urlStr)).jsonObject
+            val body = decodeSafe<JsonObject>(executeGet(urlStr))
             val services = body["service"]?.jsonArray
                 ?: body["services"]?.jsonArray
             services?.firstOrNull { service ->
