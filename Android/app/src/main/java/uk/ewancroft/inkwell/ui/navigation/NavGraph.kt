@@ -24,6 +24,7 @@ import uk.ewancroft.inkwell.ui.discover.DiscoverScreen
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
+import uk.ewancroft.inkwell.util.formatLocalizedInteger
 
 sealed class Screen(val route: String, val label: String, val icon: ImageVector, val selectedIcon: ImageVector) {
     data object Reader   : Screen("reader",   "Read",     Icons.Outlined.Book,    Icons.Filled.Book)
@@ -102,7 +103,7 @@ fun InkwellNavHost(
                                 }
                                 // Mirrors iOS's `Tab("Read", ...).badge(notificationManager.unreadCount)`.
                                 if (screen == Screen.Reader && unreadCount > 0) {
-                                    BadgedBox(badge = { Badge { Text("$unreadCount") } }) { icon() }
+                                    BadgedBox(badge = { Badge { Text(formatLocalizedInteger(unreadCount)) } }) { icon() }
                                 } else {
                                     icon()
                                 }
