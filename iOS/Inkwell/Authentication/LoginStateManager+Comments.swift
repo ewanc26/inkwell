@@ -25,6 +25,7 @@ extension LoginStateManager {
                 cid: blobRef.reference.link,
                 declaredSize: blobRef.size
             )
+            try JSONSafety.validateResponse(blobData)
             let pages = try JSONDecoder().decode([LeafletPage].self, from: blobData)
             let resolved = LeafletContent(pages: pages, blobPages: nil)
             return UnknownType.record(resolved)
