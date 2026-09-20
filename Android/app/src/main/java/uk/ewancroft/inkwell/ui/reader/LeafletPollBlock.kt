@@ -30,6 +30,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import uk.ewancroft.inkwell.data.model.common.StrongRef
@@ -97,7 +99,20 @@ internal fun PollBlock(
                                 selectedOptions = newSelection
                             }
                         },
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .semantics {
+                                val percentage = if (totalVotes > 0) {
+                                    "${(fraction * 100).toInt()} percent"
+                                } else {
+                                    "No votes yet"
+                                }
+                                stateDescription = buildString {
+                                    append(if (isSelected) "Selected" else "Not selected")
+                                    if (isVoted) append(", voted")
+                                    append(", $count votes, $percentage")
+                                }
+                            },
                         enabled = !isVoted,
                     ) {
                         Box(modifier = Modifier.fillMaxWidth()) {
@@ -122,8 +137,6 @@ internal fun PollBlock(
                                 Text(
                                     option.text,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    maxLines = 3,
-                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                                 )
                                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                                     if (totalVotes > 0) {
