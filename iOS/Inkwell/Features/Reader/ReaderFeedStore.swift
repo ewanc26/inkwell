@@ -82,6 +82,7 @@ final class ReaderFeedStore {
 
     var selectedFeed: ReaderFeed = .following
     var followingState = FollowingFeedState()
+    private var followingPublicationURIs = Set<String>()
     var yours: [ReaderFeedItem] = []
     var isLoadingYours = false
     var yoursError: String?
@@ -162,6 +163,7 @@ final class ReaderFeedStore {
                 loginStateManager: loginStateManager,
                 timeout: ReaderFeedStore.subscriptionsTimeout
             )
+            followingPublicationURIs = Set(subscriptions.map(\.record.publication))
 
             // Reset state
             if force || followingState.items.isEmpty {
@@ -345,6 +347,7 @@ final class ReaderFeedStore {
                     guard let self else { return }
 
                     if let cachedItem {
+                        guard self.followingPublicationURIs.contains(cachedItem.site) else { return }
                         // Convert to a ReaderFeedItem and merge into the feed.
                         let newItem = cachedItem.toReaderFeedItem(
                             publication: publication,
@@ -484,6 +487,7 @@ final class ReaderFeedStore {
         }
 
         followingState.cursors = [:]
+        let subscribedPublicationURIs = followingPublicationURIs
 
         // Look up cached profiles for existing DIDs.
         let existingProfiles: [String: BSkyActorProfile] = {
@@ -523,7 +527,8 @@ final class ReaderFeedStore {
                     }
                     let items: [ReaderFeedItem] = records.compactMap { record in
                         guard let value = record.value,
-                              let doc = value.getRecord(ofType: SiteStandardLexicon.DocumentRecord.self) else {
+                              let doc = value.getRecord(ofType: SiteStandardLexicon.DocumentRecord.self),
+                              subscribedPublicationURIs.contains(doc.site) else {
                             return nil
                         }
                         return ReaderFeedItem(
