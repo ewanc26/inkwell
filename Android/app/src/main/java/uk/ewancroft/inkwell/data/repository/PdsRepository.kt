@@ -41,6 +41,20 @@ data class UserSessionInfo(
     val pdsUrl: String,
 )
 
+internal object RateLimitRetryPolicy {
+    const val MAX_DELAY_MS = 60_000L
+
+    fun delayMillis(header: String?, attempt: Int, nowMillis: Long = System.currentTimeMillis()): Long {
+        val value = header?.trim().orEmpty()
+        value.toLongOrNull()?.takeIf { it >= 0 }?.let { return (it * 1000).coerceAtMost(MAX_DELAY_MS) }
+        runCatching {
+            ZonedDateTime.parse(value, DateTimeFormatter.RFC_1123_DATE_TIME)
+                .toInstant().toEpochMilli() - nowMillis
+        }.getOrNull()?.takeIf { it >= 0 }?.let { return it.coerceAtMost(MAX_DELAY_MS) }
+        return (100L shl attempt.coerceIn(0, 9)).coerceAtMost(MAX_DELAY_MS)
+    }
+}
+
 @Singleton
 class PdsRepository @Inject constructor(
     internal val atOAuth: AtOAuth,
@@ -84,7 +98,7 @@ class PdsRepository @Inject constructor(
             if (cooldown > 0) delay(cooldown)
             val response = publicHttpClient.newCall(request).execute()
             if (response.code == 429 && attempt < MAX_RATE_LIMIT_ATTEMPTS - 1) {
-                val delayMs = retryAfterMillis(response.header("Retry-After"), attempt)
+                val delayMs = RateLimitRetryPolicy.delayMillis(response.header("Retry-After"), attempt)
                 response.close()
                 synchronized(rateLimitCooldowns) {
                     val until = System.currentTimeMillis() + delayMs
@@ -118,19 +132,8 @@ class PdsRepository @Inject constructor(
         }
     }
 
-    private fun retryAfterMillis(header: String?, attempt: Int): Long {
-        val value = header?.trim().orEmpty()
-        value.toLongOrNull()?.takeIf { it >= 0 }?.let { return (it * 1000).coerceAtMost(MAX_RATE_LIMIT_DELAY_MS) }
-        runCatching {
-            ZonedDateTime.parse(value, DateTimeFormatter.RFC_1123_DATE_TIME)
-                .toInstant().toEpochMilli() - System.currentTimeMillis()
-        }.getOrNull()?.takeIf { it >= 0 }?.let { return it.coerceAtMost(MAX_RATE_LIMIT_DELAY_MS) }
-        return (100L shl attempt).coerceAtMost(MAX_RATE_LIMIT_DELAY_MS)
-    }
-
     private companion object {
         const val MAX_RATE_LIMIT_ATTEMPTS = 3
-        const val MAX_RATE_LIMIT_DELAY_MS = 60_000L
         const val DEFAULT_RESPONSE_BYTES = 2 * 1024 * 1024
     }
 
