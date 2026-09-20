@@ -58,6 +58,7 @@ data class DocumentRecord(
     val site: String,
     val title: String,
     val publishedAt: String,
+    val updatedAt: String? = null,
     val path: String? = null,
     val description: String? = null,
     val tags: List<String>? = null,

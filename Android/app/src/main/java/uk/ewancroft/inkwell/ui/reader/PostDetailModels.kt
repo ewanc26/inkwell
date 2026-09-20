@@ -24,6 +24,7 @@ data class PostDetailUiState(
     val recordCid: String? = null,
     val description: String? = null,
     val publishedAt: String? = null,
+    val updatedAt: String? = null,
     val path: String? = null,
     val coverUrl: String? = null,
     val content: DocumentContent = DocumentContent.Empty,
