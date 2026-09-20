@@ -141,6 +141,7 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(kotlin("test"))
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation("androidx.exifinterface:exifinterface:1.4.2")
     testImplementation("org.robolectric:robolectric:4.14.1")
 
     // -- Shared KMP core --
