@@ -46,7 +46,7 @@ final class WriterViewModel {
     // MARK: - Document editing
 
     var editingDocumentURI: String?
-    var editingDocumentRevision: String?
+    var editingDocumentRecordCID: String?
     var editingDocumentRawRecord: UnknownType?
     var isEditing: Bool { editingDocumentURI != nil }
     var showDeleteConfirmation = false
@@ -186,7 +186,7 @@ final class WriterViewModel {
                 collection: parsed.collection,
                 recordKey: parsed.recordKey
             )
-            editingDocumentRevision = cid
+            editingDocumentRecordCID = cid
 
             let document = entry.record
             let rawRecord = try? await loginStateManager.getRepositoryRecord(
@@ -221,7 +221,7 @@ final class WriterViewModel {
 
     func cancelEditing() {
         editingDocumentURI = nil
-        editingDocumentRevision = nil
+        editingDocumentRecordCID = nil
         editingDocumentRawRecord = nil
         title = ""
         description = ""
@@ -233,7 +233,7 @@ final class WriterViewModel {
 
     func deleteDocument() {
         guard let documentURI = editingDocumentURI,
-              let revision = editingDocumentRevision,
+              let revision = editingDocumentRecordCID,
               let parsed = parseAtUri(documentURI) else {
             publishError = "This document is no longer available to delete."
             return
@@ -294,7 +294,7 @@ final class WriterViewModel {
 
         Task {
             do {
-                if let editURI = editingDocumentURI, let revision = editingDocumentRevision {
+                if let editURI = editingDocumentURI, let revision = editingDocumentRecordCID {
                     let parsed = parseAtUri(editURI)
                     guard let parsed else {
                         publishError = "Invalid document URI."
