@@ -212,6 +212,10 @@ struct SettingsView: View {
                     LabeledContent("Saved changes") {
                         Text("^[\(offlineMutationStore.pendingCount) change](inflect: true) waiting to sync")
                     }
+                    if offlineMutationStore.recoveryRequired {
+                        Label("Saved changes need recovery. The damaged queue was preserved for diagnosis.", systemImage: "exclamationmark.triangle")
+                            .foregroundStyle(.orange)
+                    }
                     if offlineMutationStore.pendingCount > 0 {
                         Button("Sync Saved Changes Now") {
                             Task {
