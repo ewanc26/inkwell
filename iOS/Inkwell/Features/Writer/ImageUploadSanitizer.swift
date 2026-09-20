@@ -4,14 +4,18 @@ import UIKit
 import UniformTypeIdentifiers
 
 enum ImageUploadSanitizer {
+    private static let maxInputBytes = 10 * 1024 * 1024
+
     enum Failure: LocalizedError {
         case invalidImage
+        case inputTooLarge
         case dimensionsTooLarge
         case encodingFailed
 
         var errorDescription: String? {
             switch self {
             case .invalidImage: return "The selected file is not a supported image."
+            case .inputTooLarge: return "That image file is too large to process safely."
             case .dimensionsTooLarge: return "That image is too large to upload safely."
             case .encodingFailed: return "The image could not be prepared for upload."
             }
@@ -31,6 +35,7 @@ enum ImageUploadSanitizer {
     }
 
     nonisolated static func sanitize(_ data: Data) throws -> Output {
+        guard data.count <= maxInputBytes else { throw Failure.inputTooLarge }
         guard let source = CGImageSourceCreateWithData(data as CFData, nil),
               let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any],
               let width = properties[kCGImagePropertyPixelWidth] as? Int,
