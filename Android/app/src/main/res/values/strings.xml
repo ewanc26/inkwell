@@ -148,4 +148,12 @@
     <string name="profile_retry">Try again</string>
     <string name="profile_account">Account</string>
     <string name="profile_open_bluesky">Open in Bluesky</string>
+    <string name="feedback_thanks">Thanks!</string>
+    <string name="feedback_sent">Your feedback was sent.</string>
+    <string name="feedback_done">Done</string>
+    <string name="feedback_title">Send Feedback</string>
+    <string name="feedback_description">Sent to Inkwell\'s userinput.app board from your own account — bugs, questions, anything.</string>
+    <string name="feedback_subject">Title</string>
+    <string name="feedback_details_optional">Details (optional)</string>
+    <string name="feedback_send">Send</string>
 </resources>
