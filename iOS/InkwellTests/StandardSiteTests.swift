@@ -231,6 +231,15 @@ final class StandardSiteTests: XCTestCase {
         XCTAssertThrowsError(try ImageUploadSanitizer.sanitize(oversized))
     }
 
+    func testImageSanitizerDerivesMimeFromEncodedOutput() throws {
+        let onePixelPNG = Data(base64Encoded: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=")!
+
+        let output = try ImageUploadSanitizer.sanitize(onePixelPNG)
+
+        XCTAssertEqual(output.mimeType, "image/png")
+        XCTAssertEqual(Array(output.data.prefix(8)), [137, 80, 78, 71, 13, 10, 26, 10])
+    }
+
     func testContentDeepLinkPolicyAcceptsEncodedDocumentURI() {
         let uri = "at://did:plc:alice/site.standard.document/café"
         let encoded = uri.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
