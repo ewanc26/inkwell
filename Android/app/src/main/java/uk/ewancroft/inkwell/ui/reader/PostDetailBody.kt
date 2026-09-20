@@ -221,8 +221,8 @@ private fun PrevNextRow(
                 Spacer(Modifier.width(8.dp))
                 Text(
                     previousTitle ?: "Previous",
-                    maxLines = 3,
-                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                    maxLines = Int.MAX_VALUE,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Clip,
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -234,8 +234,8 @@ private fun PrevNextRow(
             ) {
                 Text(
                     nextTitle ?: "Next",
-                    maxLines = 3,
-                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                    maxLines = Int.MAX_VALUE,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Clip,
                     modifier = Modifier.weight(1f),
                 )
                 Spacer(Modifier.width(8.dp))
