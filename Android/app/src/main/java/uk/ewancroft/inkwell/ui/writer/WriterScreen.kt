@@ -28,14 +28,14 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-
-private const val MAX_IMAGE_UPLOAD_BYTES = 10 * 1024 * 1024
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
 import uk.ewancroft.inkwell.ui.reader.MarkdownRendererView
 import uk.ewancroft.inkwell.util.rememberInkwellHaptics
+
+private const val MAX_IMAGE_UPLOAD_BYTES = 10 * 1024 * 1024
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
