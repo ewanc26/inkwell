@@ -26,9 +26,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import uk.ewancroft.inkwell.shared.text.StringUtils
+import uk.ewancroft.inkwell.R
 import uk.ewancroft.inkwell.data.repository.downloadBlob
 import uk.ewancroft.inkwell.ui.moderation.ReportDialog
 
@@ -56,6 +58,7 @@ fun PostDetailScreen(
     val isDarkTheme = uk.ewancroft.inkwell.ui.theme.LocalForceDarkTheme.current
         ?: androidx.compose.foundation.isSystemInDarkTheme()
     val context = androidx.compose.ui.platform.LocalContext.current
+    val sharePostTitle = stringResource(R.string.reader_share_post)
     var reportTarget by remember { mutableStateOf<PostReportTarget?>(null) }
     var showMoreMenu by remember { mutableStateOf(false) }
     val readerTheme = remember(uiState.documentTheme, uiState.publicationTheme, uiState.basicTheme, isDarkTheme) {
@@ -113,7 +116,7 @@ fun PostDetailScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.reader_back))
                     }
                 },
                 actions = {
@@ -127,11 +130,11 @@ fun PostDetailScreen(
                                 type = "text/plain"
                                 putExtra(Intent.EXTRA_TEXT, canonicalUrl)
                             }
-                            context.startActivity(Intent.createChooser(shareIntent, "Share post"))
+                            context.startActivity(Intent.createChooser(shareIntent, sharePostTitle))
                         }) {
                             Icon(
                                 Icons.Outlined.Share,
-                                contentDescription = "Share",
+                                contentDescription = stringResource(R.string.reader_share),
                             )
                         }
                         IconButton(onClick = {
@@ -139,13 +142,13 @@ fun PostDetailScreen(
                         }) {
                             Icon(
                                 Icons.AutoMirrored.Outlined.OpenInNew,
-                                contentDescription = "Open in browser",
+                                contentDescription = stringResource(R.string.reader_open_browser),
                             )
                         }
                     }
                     Box {
                         IconButton(onClick = { showMoreMenu = true }) {
-                            Icon(Icons.Outlined.MoreVert, contentDescription = "More options")
+                            Icon(Icons.Outlined.MoreVert, contentDescription = stringResource(R.string.reader_more_options))
                         }
                         DropdownMenu(
                             expanded = showMoreMenu,
@@ -153,7 +156,7 @@ fun PostDetailScreen(
                         ) {
                             uiState.authorDid?.takeIf(String::isNotBlank)?.let { authorDid ->
                                 DropdownMenuItem(
-                                    text = { Text("View profile") },
+                                    text = { Text(stringResource(R.string.reader_view_profile)) },
                                     onClick = {
                                         showMoreMenu = false
                                         onNavigateToProfile(authorDid)
@@ -164,7 +167,7 @@ fun PostDetailScreen(
                                 )
                             }
                             DropdownMenuItem(
-                                text = { Text("Report post") },
+                                text = { Text(stringResource(R.string.reader_report_post)) },
                                 onClick = {
                                     showMoreMenu = false
                                     reportTarget = PostReportTarget(uri, uiState.recordCid)
@@ -175,7 +178,7 @@ fun PostDetailScreen(
                             )
                             uiState.authorDid?.takeIf(String::isNotBlank)?.let { authorDid ->
                                 DropdownMenuItem(
-                                    text = { Text("Report account") },
+                                    text = { Text(stringResource(R.string.reader_report_account)) },
                                     onClick = {
                                         showMoreMenu = false
                                         reportTarget = PostReportTarget(authorDid)
@@ -301,7 +304,7 @@ private fun ModeratedDetailState(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             )
-            Button(onClick = onReveal) { Text("Reveal article") }
+            Button(onClick = onReveal) { Text(stringResource(R.string.reader_reveal_article)) }
         }
     }
 }
@@ -321,7 +324,7 @@ private fun ErrorState(message: String, onRetry: () -> Unit, modifier: Modifier 
                 tint = MaterialTheme.colorScheme.error,
             )
             Text(
-                "Couldn't load this post",
+                stringResource(R.string.reader_load_failed),
                 style = MaterialTheme.typography.titleMedium,
             )
             Text(
@@ -331,7 +334,7 @@ private fun ErrorState(message: String, onRetry: () -> Unit, modifier: Modifier 
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             )
             Spacer(Modifier.height(4.dp))
-            Button(onClick = onRetry) { Text("Retry") }
+            Button(onClick = onRetry) { Text(stringResource(R.string.reader_retry)) }
         }
     }
 }
