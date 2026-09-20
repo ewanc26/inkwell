@@ -8,6 +8,7 @@ class RateLimitRetryPolicyTest {
     @Test fun `parses delta seconds and caps them`() {
         assertEquals(5_000L, RateLimitRetryPolicy.delayMillis("5", attempt = 0))
         assertEquals(60_000L, RateLimitRetryPolicy.delayMillis("999", attempt = 0))
+        assertEquals(60_000L, RateLimitRetryPolicy.delayMillis("9223372036854775", attempt = 0))
     }
 
     @Test fun `parses HTTP dates against an injected clock`() {
