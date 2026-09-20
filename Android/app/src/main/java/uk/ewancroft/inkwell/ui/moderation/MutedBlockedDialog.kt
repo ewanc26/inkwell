@@ -33,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -84,12 +85,28 @@ fun MutedBlockedDialog(
                         Tab(
                             selected = selectedTab == 0,
                             onClick = { selectedTab = 0 },
-                            text = { Text("Muted (${state.mutes.size})") },
+                            text = {
+                                Text(
+                                    pluralStringResource(
+                                        uk.ewancroft.inkwell.R.plurals.moderation_muted_count,
+                                        state.mutes.size,
+                                        state.mutes.size,
+                                    ),
+                                )
+                            },
                         )
                         Tab(
                             selected = selectedTab == 1,
                             onClick = { selectedTab = 1 },
-                            text = { Text("Blocked (${state.blocks.size})") },
+                            text = {
+                                Text(
+                                    pluralStringResource(
+                                        uk.ewancroft.inkwell.R.plurals.moderation_blocked_count,
+                                        state.blocks.size,
+                                        state.blocks.size,
+                                    ),
+                                )
+                            },
                         )
                     }
 
