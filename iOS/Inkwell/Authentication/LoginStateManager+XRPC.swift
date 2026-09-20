@@ -60,7 +60,17 @@ extension LoginStateManager {
         }
         request.setValue("application/json", forHTTPHeaderField: "Accept")
 
-        let (data, response) = try await authenticator.response(for: request)
+        let isIdempotentRead = method.caseInsensitiveCompare("GET") == .orderedSame
+            || method.caseInsensitiveCompare("HEAD") == .orderedSame
+        let (data, response) = try await withRetry {
+            let result = try await authenticator.response(for: request)
+            if isIdempotentRead,
+               let http = result.1 as? HTTPURLResponse,
+               http.statusCode == 429 {
+                throw RetryableHTTPError(retryAfter: Self.retryAfter(from: http))
+            }
+            return result
+        }
 
         guard let http = response as? HTTPURLResponse,
               (200...299).contains(http.statusCode) else {
