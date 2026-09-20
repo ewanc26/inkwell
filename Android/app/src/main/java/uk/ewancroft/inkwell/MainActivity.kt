@@ -176,7 +176,10 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         pendingIntent.value = intent
-        pendingDocumentUri.value = ContentDeepLinkPolicy.documentUri(intent) ?: intent.getStringExtra("documentURI")
+        val documentUri = ContentDeepLinkPolicy.documentUri(intent) ?: intent.getStringExtra("documentURI")
+        if (documentUri != null) {
+            pendingDocumentUri.value = documentUri
+        }
     }
 }
 
