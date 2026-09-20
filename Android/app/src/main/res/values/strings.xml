@@ -187,6 +187,18 @@
     <string name="settings_underline_links">Underline Links</string>
     <string name="settings_haptics">Haptics</string>
     <string name="settings_reset_defaults">Reset to Defaults</string>
+    <plurals name="settings_pending_import_message">
+        <item quantity="one">1 change will be imported. Only newer local choices change.</item>
+        <item quantity="other">%d changes will be imported. Only newer local choices change.</item>
+    </plurals>
+    <plurals name="settings_pending_sync_count">
+        <item quantity="one">1 waiting to sync</item>
+        <item quantity="other">%d waiting to sync</item>
+    </plurals>
+    <plurals name="settings_imported_change_count">
+        <item quantity="one">Imported 1 change.</item>
+        <item quantity="other">Imported %d changes.</item>
+    </plurals>
     <string name="notification_new_document_from_subscription">New document from a subscribed publication</string>
     <string name="notification_new_document">New document</string>
     <string name="notification_open_to_view_document">Open Inkwell to view this document</string>
