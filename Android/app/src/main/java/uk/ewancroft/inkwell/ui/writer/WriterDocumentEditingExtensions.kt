@@ -14,6 +14,16 @@ import uk.ewancroft.inkwell.shared.content.JsonMapBridge
 import uk.ewancroft.inkwell.shared.markdown.MarkdownSerializer
 import uk.ewancroft.inkwell.util.OfflineContentCacheManager
 
+internal fun deleteDocumentErrorMessage(error: Throwable): String {
+    return if (error.message.orEmpty().contains("swap", ignoreCase = true)
+        || error.message.orEmpty().contains("invalidswap", ignoreCase = true)
+    ) {
+        "This document changed elsewhere. Reload it before deleting."
+    } else {
+        "Failed to delete document: ${error.message}"
+    }
+}
+
 fun WriterViewModel.loadDocumentForEditing(uri: String) {
     viewModelScope.launch {
         uiStateInternal.value = uiStateInternal.value.copy(isEditing = true, publishError = null)
@@ -126,9 +136,7 @@ fun WriterViewModel.deleteDocument() {
         } catch (e: Exception) {
             uiStateInternal.value = uiStateInternal.value.copy(
                 isPublishing = false,
-                publishError = if (e.message.orEmpty().contains("swap", ignoreCase = true))
-                    "This document changed elsewhere. Reload it before deleting."
-                else "Failed to delete document: ${e.message}",
+                publishError = deleteDocumentErrorMessage(e),
             )
         }
     }
