@@ -240,6 +240,7 @@ extension LoginStateManager {
                 queryItems: queryItems,
                 proxy: blueskyAppViewProxy
             )
+            try JSONSafety.validateResponse(data)
             let page = try JSONDecoder().decode(GraphActorPage.self, from: data)
             let actors: [GraphActorDTO]
             switch list {
