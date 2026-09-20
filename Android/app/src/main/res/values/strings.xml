@@ -12,6 +12,8 @@
     <string name="poll_submitted">Vote submitted</string>
     <string name="poll_submit_failed">Vote could not be submitted</string>
     <string name="poll_vote_action">Vote</string>
+    <string name="poll_title">Poll</string>
+    <string name="poll_percentage">%d percent</string>
     <string name="poll_selected">Selected</string>
     <string name="poll_not_selected">Not selected</string>
     <string name="poll_voted">voted</string>
