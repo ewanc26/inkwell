@@ -1,6 +1,7 @@
 package uk.ewancroft.inkwell.data.remote
 
 import okhttp3.ResponseBody
+import okio.Buffer
 import java.io.IOException
 
 private const val MAX_JSON_RESPONSE_BYTES = 2 * 1024 * 1024L
@@ -10,9 +11,17 @@ internal fun ResponseBody.readBoundedUtf8(maxBytes: Long = MAX_JSON_RESPONSE_BYT
     if (contentLength() > maxBytes) {
         throw IOException("Response exceeded the ${maxBytes}-byte safety budget")
     }
-    val bytes = source().readByteArray(maxBytes + 1)
-    if (bytes.size.toLong() > maxBytes) {
+    require(maxBytes >= 0) { "maxBytes must not be negative" }
+    val source = source()
+    val buffer = Buffer()
+    var total = 0L
+    while (total <= maxBytes) {
+        val read = source.read(buffer, minOf(16 * 1024L, maxBytes + 1 - total))
+        if (read == -1L) break
+        total += read
+    }
+    if (total > maxBytes) {
         throw IOException("Response exceeded the ${maxBytes}-byte safety budget")
     }
-    return bytes.toString(Charsets.UTF_8)
+    return buffer.readByteArray().toString(Charsets.UTF_8)
 }
