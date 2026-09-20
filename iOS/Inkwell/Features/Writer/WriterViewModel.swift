@@ -247,10 +247,7 @@ final class WriterViewModel {
                 publishSuccess = "Document deleted."
                 InkwellHaptics.success()
             } catch {
-                let message = error.localizedDescription
-                publishError = message.localizedCaseInsensitiveContains("swap")
-                    ? "This document changed elsewhere. Reload it before deleting."
-                    : "Failed to delete document: \(message)"
+                publishError = writerDeleteErrorMessage(error)
             }
             isPublishing = false
         }
