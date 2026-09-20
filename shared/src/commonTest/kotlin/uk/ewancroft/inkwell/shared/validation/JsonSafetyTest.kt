@@ -37,6 +37,14 @@ class JsonSafetyTest {
     }
 
     @Test
+    fun rejectsOversizedObjectKeys() {
+        val value = buildJsonObject {
+            put("x".repeat(JsonSafety.MAX_STRING_BYTES + 1), true)
+        }
+        assertFalse(JsonSafety.isSafe(value))
+    }
+
+    @Test
     fun acceptsContainerAndStringLimitsExactly() {
         val value = buildJsonObject {
             repeat(JsonSafety.MAX_CONTAINER_ELEMENTS) { put("key$it", true) }
