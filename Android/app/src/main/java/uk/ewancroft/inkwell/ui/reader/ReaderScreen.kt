@@ -30,6 +30,7 @@ import uk.ewancroft.inkwell.ui.moderation.ReportDialog
 import uk.ewancroft.inkwell.ui.offline.OfflineStatusBanner
 import uk.ewancroft.inkwell.ui.offline.rememberNetworkAvailable
 import uk.ewancroft.inkwell.util.TipPromptManager
+import uk.ewancroft.inkwell.util.formatLocalizedInteger
 
 private data class ReaderReportTarget(
     val subject: String,
@@ -159,7 +160,7 @@ fun ReaderScreen(
                         showNotifications = true
                     }) {
                         if (unreadCount > 0) {
-                            BadgedBox(badge = { Badge { Text("$unreadCount") } }) {
+                            BadgedBox(badge = { Badge { Text(formatLocalizedInteger(unreadCount)) } }) {
                                 Icon(
                                     Icons.Outlined.Notifications,
                                     contentDescription = stringResource(R.string.reader_notifications_unread, unreadCount),
