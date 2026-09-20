@@ -21,7 +21,10 @@ extension LoginStateManager {
             return content
         }
         do {
-            let blobData = try await downloadBlob(cid: blobRef.reference.link)
+            let blobData = try await downloadBlob(
+                cid: blobRef.reference.link,
+                declaredSize: blobRef.size
+            )
             let pages = try JSONDecoder().decode([LeafletPage].self, from: blobData)
             let resolved = LeafletContent(pages: pages, blobPages: nil)
             return UnknownType.record(resolved)
