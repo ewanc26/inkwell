@@ -16,6 +16,41 @@ private enum XRPCResponseLimits {
     nonisolated static let maxResponseBytes = 2 * 1024 * 1024
 }
 
+internal func didDocumentURL(for did: String) -> URL? {
+    if did.hasPrefix("did:plc:") {
+        var components = URLComponents()
+        components.scheme = "https"
+        components.host = "plc.directory"
+        components.path = "/\(did)"
+        return components.url
+    }
+    guard did.hasPrefix("did:web:") else { return nil }
+    let parts = String(did.dropFirst("did:web:".count)).split(separator: ":", omittingEmptySubsequences: false)
+    guard let first = parts.first, !first.isEmpty,
+          !parts.contains(where: { $0.isEmpty || $0 == "." || $0 == ".." }) else { return nil }
+    let host = String(first).removingPercentEncoding ?? String(first)
+    guard URL(string: "https://\(host)")?.host != nil else { return nil }
+    let path = parts.count == 1
+        ? "/.well-known/did.json"
+        : "/\(parts.dropFirst().joined(separator: "/"))/did.json"
+    return URL(string: "https://\(host)\(path)")
+}
+
+internal func atprotoPDSURL(from document: [String: Any], did: String) -> URL? {
+    guard let services = document["service"] as? [[String: Any]] else { return nil }
+    for service in services {
+        let id = service["id"] as? String
+        guard (id == "#atproto_pds" || id == "\(did)#atproto_pds"),
+              service["type"] as? String == "AtprotoPersonalDataServer",
+              let endpoint = service["serviceEndpoint"] as? String,
+              let url = URL(string: endpoint),
+              url.scheme?.lowercased() == "https",
+              url.user == nil, url.query == nil, url.fragment == nil else { continue }
+        return url
+    }
+    return nil
+}
+
 extension LoginStateManager {
     // MARK: - XRPC Helpers
 
@@ -232,23 +267,18 @@ extension LoginStateManager {
         }
 
         if did.hasPrefix("did:") {
-            // DID — fetch the DID document from the PLC directory.
-            guard let plcURL = URL(string: "https://plc.directory/\(did)") else {
+            // Resolve each DID method using its authoritative DID document.
+            guard let documentURL = didDocumentURL(for: did) else {
                 throw LoginError.pdsResolutionFailed
             }
-            let (data, response) = try await URLSession.shared.data(from: plcURL)
+            let (data, response) = try await URLSession.shared.data(from: documentURL)
             guard let http = response as? HTTPURLResponse,
                   (200...299).contains(http.statusCode) else {
                 throw LoginError.pdsResolutionFailed
             }
             try JSONSafety.validateResponse(data)
             let doc = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-            let services = doc?["service"] as? [[String: Any]]
-            let atprotoService = services?.first(where: { svc in
-                (svc["type"] as? String) == "AtprotoPersonalDataServer"
-            })
-            guard let pdsString = atprotoService?["serviceEndpoint"] as? String,
-                  let url = URL(string: pdsString) else {
+            guard let url = atprotoPDSURL(from: doc ?? [:], did: did) else {
                 throw LoginError.pdsResolutionFailed
             }
             repositoryPDSURLs[did] = url
