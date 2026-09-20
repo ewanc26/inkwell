@@ -48,6 +48,7 @@ extension LoginStateManager {
         guard let url = components?.url else {
             throw URLError(.badURL)
         }
+        let origin = "\(url.scheme ?? "")://\(url.host ?? ""):\(url.port ?? 443)"
 
         var request = URLRequest(url: url)
         request.httpMethod = method
@@ -63,11 +64,14 @@ extension LoginStateManager {
         let isIdempotentRead = method.caseInsensitiveCompare("GET") == .orderedSame
             || method.caseInsensitiveCompare("HEAD") == .orderedSame
         let (data, response) = try await withRetry {
+            try await RateLimitCoordinator.shared.wait(for: origin)
             let result = try await authenticator.response(for: request)
             if isIdempotentRead,
                let http = result.1 as? HTTPURLResponse,
                http.statusCode == 429 {
-                throw RetryableHTTPError(retryAfter: Self.retryAfter(from: http))
+                let delay = Self.retryAfter(from: http)
+                await RateLimitCoordinator.shared.record(origin: origin, delay: delay ?? 0)
+                throw RetryableHTTPError(retryAfter: delay)
             }
             return result
         }
@@ -104,6 +108,7 @@ extension LoginStateManager {
         guard let url = components?.url else {
             throw URLError(.badURL)
         }
+        let origin = "\(url.scheme ?? "")://\(url.host ?? ""):\(url.port ?? 443)"
 
         var request = URLRequest(url: url)
         request.httpMethod = method
@@ -115,9 +120,12 @@ extension LoginStateManager {
         request.setValue("application/json", forHTTPHeaderField: "Accept")
 
         let (data, response) = try await withRetry {
+            try await RateLimitCoordinator.shared.wait(for: origin)
             let result = try await URLSession.shared.data(for: request)
             if let http = result.1 as? HTTPURLResponse, http.statusCode == 429 {
-                throw RetryableHTTPError(retryAfter: Self.retryAfter(from: http))
+                let delay = Self.retryAfter(from: http)
+                await RateLimitCoordinator.shared.record(origin: origin, delay: delay ?? 0)
+                throw RetryableHTTPError(retryAfter: delay)
             }
             return result
         }
