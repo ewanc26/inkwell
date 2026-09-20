@@ -177,7 +177,7 @@ struct PublicationDiscoveryRow: View {
         }
         .padding(.vertical, 4)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Publication: \(publication.name). \(publication.domain)")
+        .accessibilityLabel("Publication: \(publication.name.bidiIsolated). \(publication.domain.bidiIsolated)")
         .accessibilityHint("Opens this publication")
     }
 }

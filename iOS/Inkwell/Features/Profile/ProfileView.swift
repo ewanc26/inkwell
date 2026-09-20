@@ -132,7 +132,7 @@ private struct ProfileHeader: View {
     }
 
     private var accessibilityLabel: Text {
-        var label = Text("\(displayName). @\(profile.handle)")
+        var label = Text("\(displayName.bidiIsolated). @\(profile.handle.bidiIsolated)")
         if let followersCount = profile.followersCount {
             label = label + Text(". ") + Text("^[\(followersCount) follower](inflect: true)")
         }
