@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import uk.ewancroft.inkwell.data.remote.readBoundedUtf8
 import kotlinx.coroutines.async
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
@@ -114,10 +115,10 @@ private suspend fun fetchStandardSitePost(uri: String): StandardSitePostData? {
         // Fetch the document record
         val docUrl = "${XrpcEndpoints.PUBLIC_BSKY_API}${XrpcEndpoints.REPO_GET_RECORD}?repo=${parsed.did}&collection=${parsed.collection}&rkey=${parsed.recordKey}"
         val docRequest = okhttp3.Request.Builder().url(docUrl).build()
-        val docResponse = client.newCall(docRequest).execute()
-        if (!docResponse.isSuccessful) return null
-
-        val docBody = docResponse.body?.string() ?: return null
+        val docBody = client.newCall(docRequest).execute().use { response ->
+            if (!response.isSuccessful) return null
+            response.body?.readBoundedUtf8()
+        } ?: return null
         val docJson = kotlinx.serialization.json.Json.parseToJsonElement(docBody).jsonObject
         val value = docJson["value"]?.jsonObject ?: return null
 
@@ -138,14 +139,14 @@ private suspend fun fetchStandardSitePost(uri: String): StandardSitePostData? {
                     try {
                         val pubUrl = "${XrpcEndpoints.PUBLIC_BSKY_API}${XrpcEndpoints.REPO_GET_RECORD}?repo=${pubParsed.did}&collection=${pubParsed.collection}&rkey=${pubParsed.recordKey}"
                         val pubRequest = okhttp3.Request.Builder().url(pubUrl).build()
-                        val pubResponse = client.newCall(pubRequest).execute()
-                        if (pubResponse.isSuccessful) {
-                            val pubBody = pubResponse.body?.string()
-                            if (pubBody != null) {
-                                val pubJson = kotlinx.serialization.json.Json.parseToJsonElement(pubBody).jsonObject
-                                val pubValue = pubJson["value"]?.jsonObject
-                                pubValue?.get("name")?.jsonPrimitive?.contentOrNull
-                            } else null
+                        val pubBody = client.newCall(pubRequest).execute().use { response ->
+                            if (!response.isSuccessful) return@use null
+                            response.body?.readBoundedUtf8()
+                        }
+                        if (pubBody != null) {
+                            val pubJson = kotlinx.serialization.json.Json.parseToJsonElement(pubBody).jsonObject
+                            val pubValue = pubJson["value"]?.jsonObject
+                            pubValue?.get("name")?.jsonPrimitive?.contentOrNull
                         } else null
                     } catch (_: Exception) { null }
                 }

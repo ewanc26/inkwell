@@ -27,6 +27,7 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import uk.ewancroft.inkwell.data.remote.readBoundedUtf8
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
 
@@ -52,7 +53,9 @@ internal fun DocumentPickerDialog(
             val client = okhttp3.OkHttpClient()
             val url = "${XrpcEndpoints.PUBLIC_BSKY_API}${XrpcEndpoints.REPO_LIST_RECORDS}?repo=${pub.did}&collection=${CollectionNsids.DOCUMENT}&limit=25"
             val request = okhttp3.Request.Builder().url(url).get().build()
-            val body = client.newCall(request).execute().body?.string() ?: return@LaunchedEffect
+            val body = client.newCall(request).execute().use { response ->
+                response.body?.readBoundedUtf8()
+            } ?: return@LaunchedEffect
             val response = Json.parseToJsonElement(body).jsonObject
             val records = response["records"]?.jsonArray.orEmpty()
             documents = records.mapNotNull { record ->
