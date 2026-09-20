@@ -246,6 +246,18 @@ struct PollEmbedView: View {
             )
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(option.text)
+        .accessibilityValue({
+            var value = hasVoted ? "Voted" : "Not voted"
+            if state.totalVotes > 0 {
+                let percentage = Int((fraction * 100).rounded())
+                value += ", \(count) vote\(count == 1 ? "" : "s"), \(percentage) percent"
+            } else {
+                value += ", no votes yet"
+            }
+            return Text(value)
+        }())
+        .accessibilityHint(hasVoted ? "This poll option has already been submitted." : "Double tap to vote for this option.")
     }
 }
 
