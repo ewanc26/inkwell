@@ -45,7 +45,10 @@ internal func atprotoPDSURL(from document: [String: Any], did: String) -> URL? {
               let endpoint = service["serviceEndpoint"] as? String,
               let url = URL(string: endpoint),
               url.scheme?.lowercased() == "https",
-              url.user == nil, url.query == nil, url.fragment == nil else { continue }
+              url.user == nil,
+              url.query == nil,
+              url.fragment == nil,
+              url.path.isEmpty || url.path == "/" else { continue }
         return url
     }
     return nil
