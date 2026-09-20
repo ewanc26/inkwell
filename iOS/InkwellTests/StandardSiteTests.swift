@@ -257,6 +257,19 @@ final class StandardSiteTests: XCTestCase {
         XCTAssertFalse(IframeSecurityPolicy.isAllowedInitial(URL(string: "javascript:alert(1)")!))
     }
 
+    func testRetryAfterPolicyParsesDeltaHTTPDateAndFallback() {
+        let now = Date(timeIntervalSince1970: 1_800_000_000)
+        let httpDate = ISO8601DateFormatter().date(from: "2026-09-20T00:00:05Z")!
+        XCTAssertEqual(RetryAfterPolicy.delay(for: "5", attempt: 0, now: now), 5, accuracy: 0.001)
+        XCTAssertEqual(
+            RetryAfterPolicy.delay(for: "Sun, 20 Sep 2026 00:00:05 GMT", attempt: 0, now: httpDate.addingTimeInterval(-5)),
+            5,
+            accuracy: 0.001
+        )
+        XCTAssertEqual(RetryAfterPolicy.delay(for: "invalid", attempt: 2, now: now), 0.4, accuracy: 0.001)
+        XCTAssertEqual(RetryAfterPolicy.delay(for: "999", attempt: 0, now: now), 60, accuracy: 0.001)
+    }
+
     private func document(
         site: String,
         path: String? = nil

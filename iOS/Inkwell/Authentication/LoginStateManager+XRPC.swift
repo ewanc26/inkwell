@@ -159,8 +159,8 @@ extension LoginStateManager {
                 attempt += 1
                 lastError = LoginError.httpError(status: 429)
                 guard attempt < maxAttempts else { throw lastError! }
-                let fallback = min(60.0, Double(1 << min(attempt, 4)) * 0.1)
-                try await Task.sleep(for: .seconds(min(error.retryAfter ?? fallback, 60.0)))
+                let fallback = RetryAfterPolicy.delay(for: nil, attempt: attempt)
+                try await Task.sleep(for: .seconds(min(error.retryAfter ?? fallback, RetryAfterPolicy.maxDelay)))
             }
         }
 
@@ -168,16 +168,7 @@ extension LoginStateManager {
     }
 
     private static func retryAfter(from response: HTTPURLResponse) -> TimeInterval? {
-        guard let value = response.value(forHTTPHeaderField: "Retry-After")?.trimmingCharacters(in: .whitespacesAndNewlines),
-              !value.isEmpty else { return nil }
-        if let seconds = TimeInterval(value), seconds >= 0 {
-            return min(seconds, 60.0)
-        }
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
-        formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss z"
-        return formatter.date(from: value).map { max(0, min($0.timeIntervalSinceNow, 60.0)) }
+        RetryAfterPolicy.delay(for: response.value(forHTTPHeaderField: "Retry-After"), attempt: 0)
     }
 
     // MARK: - PDS Resolution
