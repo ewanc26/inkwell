@@ -8,8 +8,8 @@
 //  metadata; Inkwell always fetches the authoritative record from the
 //  author's own PDS before rendering or subscribing to anything.
 //
-//  Keyword search is exposed through `search(query:)`, `search(query:mode:)`,
-//  and `search(for:)` — all hitting the same `/search` endpoint. Publication
+//  Keyword search is exposed through `search(query:)` and `search(for:)` —
+//  both hitting the same `/search` endpoint. Publication
 //  results are native records in the normal corpus; clients must not invent a
 //  separate `publications` mode.
 //
@@ -125,19 +125,6 @@ final class StandardReaderAPI {
         try await request("search", queryItems: [
             URLQueryItem(name: "q", value: query),
             URLQueryItem(name: "mode", value: "keyword"),
-            URLQueryItem(name: "limit", value: String(max(1, min(limit, 100)))),
-            URLQueryItem(name: "format", value: "v2")
-        ])
-    }
-
-    /// Keyword search that allows an explicit backend `mode` (e.g.
-    /// `"publications"`). The leaflet-search-backend indexes documents rather
-    /// than publications, so the Publications scope aggregates the returned
-    /// documents into distinct publications on the client.
-    func search(query: String, mode: String, limit: Int = 40) async throws -> ReaderSearchResponse {
-        try await request("search", queryItems: [
-            URLQueryItem(name: "q", value: query),
-            URLQueryItem(name: "mode", value: mode),
             URLQueryItem(name: "limit", value: String(max(1, min(limit, 100)))),
             URLQueryItem(name: "format", value: "v2")
         ])
