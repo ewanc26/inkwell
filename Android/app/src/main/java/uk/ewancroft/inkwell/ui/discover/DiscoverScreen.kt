@@ -114,12 +114,12 @@ fun DiscoverScreen(
                 Tab(
                     selected = uiState.scope == DiscoverSearchScope.DOCUMENTS,
                     onClick = { viewModel.onScopeChanged(DiscoverSearchScope.DOCUMENTS) },
-                    text = { Text("Documents") }
+                    text = { Text(stringResource(R.string.discover_documents)) }
                 )
                 Tab(
                     selected = uiState.scope == DiscoverSearchScope.PUBLICATIONS,
                     onClick = { viewModel.onScopeChanged(DiscoverSearchScope.PUBLICATIONS) },
-                    text = { Text("Publications") }
+                    text = { Text(stringResource(R.string.discover_publications)) }
                 )
             }
 
@@ -145,9 +145,9 @@ fun DiscoverScreen(
                             Icon(Icons.Outlined.Search, null, Modifier.size(48.dp),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant)
                             Spacer(Modifier.height(16.dp))
-                            Text("Search the Open Web", style = MaterialTheme.typography.titleMedium)
+                            Text(stringResource(R.string.discover_open_web_title), style = MaterialTheme.typography.titleMedium)
                             Text(
-                                "Find Standard.site writing from Leaflet, pckt, Offprint, and independent publishers.",
+                                stringResource(R.string.discover_open_web_message),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 textAlign = TextAlign.Center,
@@ -167,7 +167,7 @@ fun DiscoverScreen(
                         if (isPublications) {
                             if (uiState.publications.isNotEmpty()) {
                                 item {
-                                    Text("Publications", style = MaterialTheme.typography.titleSmall,
+                                    Text(stringResource(R.string.discover_publications), style = MaterialTheme.typography.titleSmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     Spacer(Modifier.height(4.dp))
                                 }
@@ -181,7 +181,7 @@ fun DiscoverScreen(
                         } else {
                             if (uiState.actors.isNotEmpty()) {
                                 item {
-                                    Text("Users", style = MaterialTheme.typography.titleSmall,
+                                    Text(stringResource(R.string.discover_users), style = MaterialTheme.typography.titleSmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     Spacer(Modifier.height(4.dp))
                                 }
@@ -199,7 +199,7 @@ fun DiscoverScreen(
                             if (documents.isNotEmpty()) {
                                 item {
                                     if (uiState.actors.isNotEmpty()) Spacer(Modifier.height(12.dp))
-                                    Text("Documents", style = MaterialTheme.typography.titleSmall,
+                                    Text(stringResource(R.string.discover_documents), style = MaterialTheme.typography.titleSmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     Spacer(Modifier.height(4.dp))
                                 }
