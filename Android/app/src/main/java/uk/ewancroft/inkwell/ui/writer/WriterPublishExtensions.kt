@@ -90,7 +90,7 @@ fun WriterViewModel.publish() {
                 val result = pdsRepository.updateRecord(
                     uri = state.editingDocumentUri,
                     record = record,
-                    revision = revision,
+                    recordCID = revision,
                 )
 
                 uiStateInternal.value = uiStateInternal.value.copy(

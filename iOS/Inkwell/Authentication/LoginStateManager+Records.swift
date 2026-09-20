@@ -107,7 +107,7 @@ extension LoginStateManager {
         collection: String,
         recordKey: String,
         record: UnknownType,
-        revision: String
+        recordCID: String
     ) async throws -> ComAtprotoLexicon.Repository.StrongReference {
         if TestingMode.isEnabled {
             TestingModeNotice.shared.report("Update \(collection) record")
@@ -123,10 +123,10 @@ extension LoginStateManager {
             let rkey: String
             let record: UnknownType
             let validate: Bool
-            let swapCommit: String
+            let swapRecord: String
 
             enum CodingKeys: String, CodingKey {
-                case repo, collection, rkey, record, validate, swapCommit
+                case repo, collection, rkey, record, validate, swapRecord
             }
         }
 
@@ -136,7 +136,7 @@ extension LoginStateManager {
             rkey: recordKey,
             record: record,
             validate: true,
-            swapCommit: revision
+            swapRecord: recordCID
         )
         let bodyData = try JSONEncoder().encode(body)
 
