@@ -273,14 +273,15 @@ struct PollEmbedView: View {
         .disabled(state.isSubmitting || state.hasVotedFor(option.text))
         .accessibilityLabel(option.text)
         .accessibilityValue({
-            var value = hasVoted ? "Voted" : "Not voted"
+            let status = hasVoted ? "Voted" : "Not voted"
             if state.totalVotes > 0 {
                 let percentage = Int((fraction * 100).rounded())
-                value += ", \(count) \(count == 1 ? "vote" : "votes"), \(percentage) percent"
+                return Text("\(status), ")
+                    + Text("^[\(count) vote](inflect: true)")
+                    + Text(", \(percentage) percent")
             } else {
-                value += ", no votes yet"
+                return Text("\(status), no votes yet")
             }
-            return Text(value)
         }())
         .accessibilityHint(hasVoted ? "This poll option has already been submitted." : "Double tap to vote for this option.")
     }
