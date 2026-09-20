@@ -258,11 +258,12 @@ final class NotificationManager {
 
             // Update in-app notification list.
             let newNotifications = sortedDocs.map { doc in
-                StandardSiteNotification(
+                notificationMetadata(
                     documentURI: doc.doc.uri,
-                    documentTitle: doc.sensitive ? "Hidden document" : doc.doc.record.title,
-                    publicationName: doc.sensitive ? nil : doc.pub?.record.name,
+                    title: doc.doc.record.title,
+                    publicationName: doc.pub?.record.name,
                     publishedAt: doc.doc.record.publishedAt,
+                    sensitive: doc.sensitive,
                     date: Date()
                 )
             }
@@ -367,4 +368,24 @@ struct StandardSiteNotification: Identifiable, Codable, Equatable {
         self.publishedAt = publishedAt
         self.date = date
     }
+}
+
+/// Projects fetched document metadata into the safe notification/history form.
+/// Sensitive content must not leak its title or publication name outside the
+/// reader's moderation gate.
+func notificationMetadata(
+    documentURI: String,
+    title: String,
+    publicationName: String?,
+    publishedAt: Date,
+    sensitive: Bool,
+    date: Date
+) -> StandardSiteNotification {
+    StandardSiteNotification(
+        documentURI: documentURI,
+        documentTitle: sensitive ? "Hidden document" : title,
+        publicationName: sensitive ? nil : publicationName,
+        publishedAt: publishedAt,
+        date: date
+    )
 }
