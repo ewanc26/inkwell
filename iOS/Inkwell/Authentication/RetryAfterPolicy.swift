@@ -17,6 +17,13 @@ enum RetryAfterPolicy {
         }
         return min(Double(1 << min(max(attempt, 0), 9)) * 0.1, maxDelay)
     }
+
+    static func origin(for url: URL) -> String {
+        let scheme = (url.scheme ?? "").lowercased()
+        let host = (url.host ?? "").lowercased()
+        let port = url.port ?? (scheme == "http" ? 80 : 443)
+        return "\(scheme)://\(host):\(port)"
+    }
 }
 
 /// Shares short-lived rate-limit cooldowns between concurrent requests to the

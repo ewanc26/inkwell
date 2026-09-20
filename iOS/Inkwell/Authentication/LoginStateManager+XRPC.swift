@@ -48,7 +48,7 @@ extension LoginStateManager {
         guard let url = components?.url else {
             throw URLError(.badURL)
         }
-        let origin = "\(url.scheme ?? "")://\(url.host ?? ""):\(url.port ?? 443)"
+        let origin = RetryAfterPolicy.origin(for: url)
 
         var request = URLRequest(url: url)
         request.httpMethod = method
@@ -111,7 +111,7 @@ extension LoginStateManager {
         guard let url = components?.url else {
             throw URLError(.badURL)
         }
-        let origin = "\(url.scheme ?? "")://\(url.host ?? ""):\(url.port ?? 443)"
+        let origin = RetryAfterPolicy.origin(for: url)
 
         var request = URLRequest(url: url)
         request.httpMethod = method
