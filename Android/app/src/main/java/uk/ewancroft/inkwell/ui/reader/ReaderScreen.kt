@@ -16,12 +16,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import uk.ewancroft.inkwell.TestingConfig
+import uk.ewancroft.inkwell.R
 import uk.ewancroft.inkwell.ui.reader.InkwellNotificationViewModel
 import uk.ewancroft.inkwell.ui.components.CreditsView
 import uk.ewancroft.inkwell.ui.moderation.ReportDialog
@@ -139,14 +141,14 @@ fun ReaderScreen(
                             modifier = Modifier.height(20.dp),
                             color = MaterialTheme.colorScheme.onBackground,
                         )
-                        Text("Reader", style = MaterialTheme.typography.titleLarge)
+                        Text(stringResource(R.string.reader_title), style = MaterialTheme.typography.titleLarge)
                     }
                 },
                 navigationIcon = {
                     IconButton(onClick = onSignOut) {
                         Icon(
                             Icons.AutoMirrored.Outlined.Logout,
-                            contentDescription = "Sign Out",
+                            contentDescription = stringResource(R.string.reader_sign_out),
                             tint = MaterialTheme.colorScheme.error,
                         )
                     }
@@ -160,21 +162,21 @@ fun ReaderScreen(
                             BadgedBox(badge = { Badge { Text("$unreadCount") } }) {
                                 Icon(
                                     Icons.Outlined.Notifications,
-                                    contentDescription = "Notifications, $unreadCount unread",
+                                    contentDescription = stringResource(R.string.reader_notifications_unread, unreadCount),
                                 )
                             }
                         } else {
-                            Icon(Icons.Outlined.Notifications, contentDescription = "Notifications")
+                            Icon(Icons.Outlined.Notifications, contentDescription = stringResource(R.string.reader_notifications))
                         }
                     }
                     IconButton(onClick = { showCredits = true }) {
-                        Icon(Icons.Outlined.Info, contentDescription = "About")
+                        Icon(Icons.Outlined.Info, contentDescription = stringResource(R.string.reader_about))
                     }
                     IconButton(onClick = { showSettings = true }) {
-                        Icon(Icons.Outlined.Settings, contentDescription = "Settings")
+                        Icon(Icons.Outlined.Settings, contentDescription = stringResource(R.string.reader_settings))
                     }
                     IconButton(onClick = { viewModel.loadData() }) {
-                        Icon(Icons.Outlined.Refresh, contentDescription = "Refresh")
+                        Icon(Icons.Outlined.Refresh, contentDescription = stringResource(R.string.reader_refresh))
                     }
                 },
             )
