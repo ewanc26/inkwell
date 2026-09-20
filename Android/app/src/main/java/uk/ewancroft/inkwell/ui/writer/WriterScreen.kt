@@ -22,6 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import uk.ewancroft.inkwell.R
 import uk.ewancroft.inkwell.ui.components.CreditsView
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.serialization.json.contentOrNull
@@ -122,16 +124,16 @@ fun WriterScreen(
     pendingImage?.let { image ->
         AlertDialog(
             onDismissRequest = { pendingImage = null },
-            title = { Text("Describe this image") },
+            title = { Text(stringResource(R.string.writer_describe_image)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Add alt text for people using a screen reader, or mark the image as decorative.")
+                    Text(stringResource(R.string.writer_alt_text_guidance))
                     OutlinedTextField(
                         value = imageAltText,
                         onValueChange = { imageAltText = it },
                         enabled = !imageIsDecorative,
-                        label = { Text("Alt text") },
-                        supportingText = { Text("Describe the image's purpose, not its filename.") },
+                        label = { Text(stringResource(R.string.writer_alt_text)) },
+                        supportingText = { Text(stringResource(R.string.writer_alt_text_hint)) },
                         modifier = Modifier.fillMaxWidth(),
                     )
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -139,7 +141,7 @@ fun WriterScreen(
                             checked = imageIsDecorative,
                             onCheckedChange = { imageIsDecorative = it },
                         )
-                        Text("Decorative image")
+                        Text(stringResource(R.string.writer_decorative_image))
                     }
                 }
             },
