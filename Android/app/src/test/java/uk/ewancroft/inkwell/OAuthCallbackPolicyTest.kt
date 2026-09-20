@@ -12,6 +12,7 @@ import org.robolectric.RobolectricTestRunner
 class OAuthCallbackPolicyTest {
     @Test fun `accepts only the exact callback path`() {
         assertTrue(OAuthCallbackPolicy.isCallback(Uri.parse("uk.ewancroft.inkwell:/callback?code=abc&state=xyz")))
+        assertTrue(OAuthCallbackPolicy.isCallback(Uri.parse("UK.EWANCROFT.INKWELL:/callback?code=abc")))
         assertFalse(OAuthCallbackPolicy.isCallback(Uri.parse("uk.ewancroft.inkwell:/callback-extra?code=abc")))
         assertFalse(OAuthCallbackPolicy.isCallback(Uri.parse("uk.ewancroft.inkwell:/other?code=abc")))
         assertFalse(OAuthCallbackPolicy.isCallback(Uri.parse("other.app:/callback?code=abc")))
@@ -27,6 +28,11 @@ class OAuthCallbackPolicyTest {
             "inkwell://document?uri=at%3A%2F%2Fdid%3Aplc%3Aexample%2Fsite.standard.publication%2Fabc"
         ))
         assertTrue(ContentDeepLinkPolicy.documentUri(publication) == null)
+
+        val mixedCase = Intent(Intent.ACTION_VIEW, Uri.parse(
+            "INKWELL://DOCUMENT?uri=at%3A%2F%2Fdid%3Aplc%3Aexample%2Fsite.standard.document%2Fabc"
+        ))
+        assertTrue(ContentDeepLinkPolicy.documentUri(mixedCase)?.startsWith("at://") == true)
     }
 
     @Test fun `content links reject oauth and malformed inputs`() {
