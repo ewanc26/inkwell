@@ -21,6 +21,7 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.Json
 import uk.ewancroft.inkwell.data.model.atproto.DocumentRecord
@@ -547,6 +548,7 @@ class ReaderViewModel @Inject constructor(
             val subscribedDids = mutableSetOf<String>()
             val liveSubscriptions = mutableListOf<LiveSubscribedPublication>()
             val posts = mutableListOf<PostItem>()
+            val firstPageByDid = mutableMapOf<String, JsonObject>()
 
             for (subEntry in subscriptions) {
                 try {
@@ -564,13 +566,13 @@ class ReaderViewModel @Inject constructor(
                             .onSuccess { didToProfile[parsed.did] = it }
                     }
 
-                    val docsResponse = withTimeout(PUBLICATION_TIMEOUT_MS) {
+                    val docsResponse = firstPageByDid[parsed.did] ?: withTimeout(PUBLICATION_TIMEOUT_MS) {
                         pdsRepository.listRecords(
                             did = parsed.did,
                             collection = CollectionNsids.DOCUMENT,
                             limit = 25
                         )
-                    }
+                    }.also { firstPageByDid[parsed.did] = it }
                     val docsJson = docsResponse["records"]?.jsonArray.orEmpty()
                     val cursor = docsResponse["cursor"]?.jsonPrimitive?.contentOrNull
                     if (cursor != null) followingCursors[parsed.did] = cursor
