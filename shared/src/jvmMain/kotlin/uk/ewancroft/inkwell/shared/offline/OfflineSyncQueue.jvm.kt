@@ -39,13 +39,17 @@ class OfflineSyncQueueJvm(durableDirPath: String, legacyCacheDirPath: String) : 
     private fun readInternal(): List<SyncQueueEntry> = runCatching {
         migrateLegacyIfNeeded()
         if (!queueFile.exists()) emptyList()
-        else json.decodeFromString<List<SyncQueueEntry>>(queueFile.readText())
+        else decodeEntries(queueFile.readText())
     }.getOrThrow()
+
+    private fun decodeEntries(raw: String): List<SyncQueueEntry> = runCatching {
+        json.decodeFromString<SyncQueueFile>(raw).entries
+    }.getOrElse { json.decodeFromString<List<SyncQueueEntry>>(raw) }
 
     private fun writeInternal(entries: List<SyncQueueEntry>) {
         queueFile.parentFile?.mkdirs()
         val temporary = File(queueFile.parentFile, "$QUEUE_FILENAME.tmp")
-        temporary.writeText(json.encodeToString(entries))
+        temporary.writeText(json.encodeToString(SyncQueueFile(entries = entries)))
         Files.move(temporary.toPath(), queueFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
     }
 

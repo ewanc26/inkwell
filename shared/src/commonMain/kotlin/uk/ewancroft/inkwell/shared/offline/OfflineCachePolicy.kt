@@ -119,6 +119,17 @@ data class SyncQueueEntry(
     }
 }
 
+/** Versioned on-disk container for pending mutations. */
+@Serializable
+data class SyncQueueFile(
+    val version: Int = CURRENT_VERSION,
+    val entries: List<SyncQueueEntry> = emptyList(),
+) {
+    init { require(version in 1..CURRENT_VERSION) { "Unsupported offline queue version: $version" } }
+
+    private companion object { const val CURRENT_VERSION = 1 }
+}
+
 /** Storage contract for platform-specific offline content caches. */
 interface OfflineCacheIndex {
     suspend fun loadEntries(): List<OfflineCacheEntry>

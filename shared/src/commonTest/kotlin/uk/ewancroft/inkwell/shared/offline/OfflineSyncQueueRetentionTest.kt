@@ -2,8 +2,20 @@ package uk.ewancroft.inkwell.shared.offline
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 class OfflineSyncQueueRetentionTest {
+    @Test
+    fun `queue file has an explicit version and preserves entries`() {
+        val entry = entry("versioned", 1)
+        val decoded = Json.decodeFromString<SyncQueueFile>(
+            Json.encodeToString(SyncQueueFile(entries = listOf(entry))),
+        )
+
+        assertEquals(1, decoded.version)
+        assertEquals(listOf(entry), decoded.entries)
+    }
     @Test
     fun `retention removes stale mutations and keeps chronological order`() {
         val now = OfflineSyncQueueRetention.maxAgeMillis + 1
