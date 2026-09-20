@@ -60,7 +60,7 @@ object ConstellationClient {
 
         val request = Request.Builder().url(urlBuilder.toString()).get().build()
         client.newCall(request).execute().use { response ->
-            val bodyString = response.body?.string()
+            val bodyString = response.body?.readBoundedUtf8()
             if (!response.isSuccessful || bodyString == null) {
                 throw java.io.IOException(
                     "Constellation getBacklinks failed: HTTP ${response.code}"
