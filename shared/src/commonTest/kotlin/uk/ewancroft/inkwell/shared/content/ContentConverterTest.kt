@@ -379,6 +379,34 @@ class ContentConverterTest {
         assertEquals(4, readResult.blocks.size)
     }
 
+    @Test
+    fun leafletNestedListDepthLimitPreservesSiblingItems() {
+        fun item(depth: Int): Map<String, Any?> = mapOf(
+            "content" to mapOf("\$type" to LeafletTypes.BLOCKS_TEXT, "plaintext" to "level $depth"),
+            "children" to if (depth < 40) listOf(item(depth + 1)) else emptyList<Any>(),
+        )
+        val content = mapOf(
+            "pages" to listOf(mapOf(
+                "\$type" to LeafletTypes.PAGES_LINEAR_DOCUMENT,
+                "blocks" to listOf(mapOf(
+                    "block" to mapOf(
+                        "\$type" to LeafletTypes.BLOCKS_UNORDERED_LIST,
+                        "children" to listOf(
+                            item(0),
+                            mapOf("content" to mapOf("\$type" to LeafletTypes.BLOCKS_TEXT, "plaintext" to "sibling")),
+                        ),
+                    ),
+                )),
+            )),
+        )
+
+        val result = LeafletContentConverter.toMarkdown(content)
+        val list = result.blocks.single() as MarkdownBlock.UnorderedList
+
+        assertEquals(2, list.items.size)
+        assertTrue(list.items[1].text.contains("sibling"))
+    }
+
     // Helper to avoid unused warning
     private fun writeOrderedList(content: Map<String, Any?>): Map<String, Any?> = content
 }

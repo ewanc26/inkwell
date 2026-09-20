@@ -18,6 +18,8 @@ import uk.ewancroft.inkwell.shared.markdown.MarkdownSerializer
  */
 object LeafletContentConverter {
 
+    private const val MAX_LIST_DEPTH = 32
+
     private val schema = FacetSchema.leaflet
     private val lossLabels = BlockLossLabels.leaflet
 
@@ -122,7 +124,8 @@ object LeafletContentConverter {
         }
     }
 
-    private fun listItemToMarkdown(item: Map<String, Any?>): MarkdownListItem {
+    private fun listItemToMarkdown(item: Map<String, Any?>, depth: Int = 0): MarkdownListItem? {
+        if (depth > MAX_LIST_DEPTH) return null
         var text = ""
         val content = item["content"] as? Map<String, Any?>
         if (content != null) {
@@ -138,7 +141,7 @@ object LeafletContentConverter {
         }
 
         val children = item["children"] as? List<*>
-        val mdChildren = children?.mapNotNull { (it as? Map<*, *>)?.let { m -> @Suppress("UNCHECKED_CAST") listItemToMarkdown(m as Map<String, Any?>) } }
+        val mdChildren = children?.mapNotNull { (it as? Map<*, *>)?.let { m -> @Suppress("UNCHECKED_CAST") listItemToMarkdown(m as Map<String, Any?>, depth + 1) } }
 
         val checked = item["checked"] as? Boolean
 
