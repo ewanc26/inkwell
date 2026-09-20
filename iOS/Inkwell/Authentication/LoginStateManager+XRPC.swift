@@ -32,7 +32,8 @@ extension LoginStateManager {
         method: String = "GET",
         body: Data? = nil,
         queryItems: [URLQueryItem]? = nil,
-        proxy: String? = nil
+        proxy: String? = nil,
+        expectJSON: Bool = true
     ) async throws -> Data {
         guard let authenticator, let pdsURL = resolvedPDSURL else {
             throw LoginError.notAuthenticated
@@ -87,7 +88,7 @@ extension LoginStateManager {
             logger.error("[authenticatedData] response exceeded safety budget")
             throw URLError(.dataLengthExceedsMaximum)
         }
-        if (response as? HTTPURLResponse)?.value(forHTTPHeaderField: "Content-Type")?.localizedCaseInsensitiveContains("json") == true {
+        if expectJSON {
             try JSONSafety.validate(data)
         }
         return data
@@ -99,7 +100,8 @@ extension LoginStateManager {
         path: String,
         method: String = "GET",
         body: Data? = nil,
-        queryItems: [URLQueryItem]? = nil
+        queryItems: [URLQueryItem]? = nil,
+        expectJSON: Bool = true
     ) async throws -> Data {
         var components = URLComponents(
             url: pdsURL.appendingPathComponent(path),
@@ -144,7 +146,7 @@ extension LoginStateManager {
             logger.error("[unauthenticatedData] response exceeded safety budget")
             throw URLError(.dataLengthExceedsMaximum)
         }
-        if (response as? HTTPURLResponse)?.value(forHTTPHeaderField: "Content-Type")?.localizedCaseInsensitiveContains("json") == true {
+        if expectJSON {
             try JSONSafety.validate(data)
         }
         return data

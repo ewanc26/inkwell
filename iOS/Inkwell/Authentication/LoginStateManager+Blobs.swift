@@ -39,7 +39,8 @@ extension LoginStateManager {
                 queryItems: [
                     URLQueryItem(name: "did", value: did),
                     URLQueryItem(name: "cid", value: cid),
-                ]
+                ],
+                expectJSON: false
             )
             guard data.count <= maxReaderBlobBytes else { throw BlobDownloadError.oversized }
             return data
@@ -50,7 +51,8 @@ extension LoginStateManager {
                 queryItems: [
                     URLQueryItem(name: "did", value: did),
                     URLQueryItem(name: "cid", value: cid),
-                ]
+                ],
+                expectJSON: false
             )
             guard data.count <= maxReaderBlobBytes else { throw BlobDownloadError.oversized }
             return data
