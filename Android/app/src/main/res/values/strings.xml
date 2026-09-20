@@ -11,6 +11,18 @@
         <item quantity="one">%d recommendation</item>
         <item quantity="other">%d recommendations</item>
     </plurals>
+    <plurals name="profile_followers_count">
+        <item quantity="one">%d follower</item>
+        <item quantity="other">%d followers</item>
+    </plurals>
+    <plurals name="profile_following_count">
+        <item quantity="one">Following %d account</item>
+        <item quantity="other">Following %d accounts</item>
+    </plurals>
+    <plurals name="profile_posts_count">
+        <item quantity="one">%d post</item>
+        <item quantity="other">%d posts</item>
+    </plurals>
     <string name="poll_no_votes">No votes yet</string>
     <string name="poll_load_failed">Poll could not be loaded</string>
     <string name="poll_submitting">Submitting vote</string>
