@@ -26,4 +26,11 @@
     <string name="writer_alt_text">Alt text</string>
     <string name="writer_alt_text_hint">Describe the purpose of the image, not its filename.</string>
     <string name="writer_decorative_image">Decorative image</string>
+    <string name="reader_recommend">Recommend</string>
+    <string name="reader_unrecommend">Unrecommend</string>
+    <string name="reader_subscribe">Subscribe to publication</string>
+    <string name="reader_unsubscribe">Unsubscribe</string>
+    <string name="reader_bookmark">Bookmark</string>
+    <string name="reader_remove_bookmark">Remove bookmark</string>
+    <string name="reader_bookmarked">Bookmarked</string>
 </resources>

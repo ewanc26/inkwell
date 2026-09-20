@@ -29,7 +29,9 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import coil.compose.AsyncImage
+import uk.ewancroft.inkwell.R
 import uk.ewancroft.inkwell.shared.verification.VerificationResult
 import uk.ewancroft.inkwell.data.model.common.StrongRef
 import uk.ewancroft.inkwell.util.formatPublishedDate
@@ -330,6 +332,7 @@ private fun VerificationBadge(result: VerificationResult?) {
 
 @Composable
 private fun RecommendRow(uiState: PostDetailUiState, onToggleRecommend: () -> Unit) {
+    val recommendLabel = stringResource(if (uiState.isRecommended) R.string.reader_unrecommend else R.string.reader_recommend)
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -348,7 +351,7 @@ private fun RecommendRow(uiState: PostDetailUiState, onToggleRecommend: () -> Un
             ) {
                 Icon(
                     if (uiState.isRecommended) Icons.Filled.ThumbUp else Icons.Outlined.ThumbUp,
-                    contentDescription = if (uiState.isRecommended) "Unrecommend" else "Recommend",
+                    contentDescription = recommendLabel,
                     tint = if (uiState.isRecommended) MaterialTheme.colorScheme.primary
                            else MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -377,6 +380,7 @@ private fun RecommendRow(uiState: PostDetailUiState, onToggleRecommend: () -> Un
 
 @Composable
 private fun SubscribeRow(uiState: PostDetailUiState, onToggleSubscription: () -> Unit) {
+    val subscribeLabel = stringResource(if (uiState.isSubscribed) R.string.reader_unsubscribe else R.string.reader_subscribe)
     val haptics = rememberInkwellHaptics()
     LaunchedEffect(uiState.isSubscribed) {
         if (uiState.isSubscribed) haptics.success()
@@ -402,7 +406,7 @@ private fun SubscribeRow(uiState: PostDetailUiState, onToggleSubscription: () ->
             ) {
                 Icon(
                     if (uiState.isSubscribed) Icons.Filled.Notifications else Icons.Outlined.Notifications,
-                    contentDescription = if (uiState.isSubscribed) "Unsubscribe" else "Subscribe",
+                    contentDescription = subscribeLabel,
                     tint = if (uiState.isSubscribed) MaterialTheme.colorScheme.primary
                            else MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -417,7 +421,7 @@ private fun SubscribeRow(uiState: PostDetailUiState, onToggleSubscription: () ->
             )
         } else {
             Text(
-                if (uiState.isSubscribed) "Subscribed" else "Subscribe to publication",
+                if (uiState.isSubscribed) stringResource(R.string.reader_subscribe) else subscribeLabel,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -427,6 +431,7 @@ private fun SubscribeRow(uiState: PostDetailUiState, onToggleSubscription: () ->
 
 @Composable
 private fun BookmarkRow(uiState: PostDetailUiState, onToggleBookmark: () -> Unit) {
+    val bookmarkLabel = stringResource(if (uiState.isBookmarked) R.string.reader_remove_bookmark else R.string.reader_bookmark)
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -437,13 +442,13 @@ private fun BookmarkRow(uiState: PostDetailUiState, onToggleBookmark: () -> Unit
         ) {
             Icon(
                 if (uiState.isBookmarked) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
-                contentDescription = if (uiState.isBookmarked) "Remove bookmark" else "Bookmark",
+                contentDescription = bookmarkLabel,
                 tint = if (uiState.isBookmarked) MaterialTheme.colorScheme.primary
                        else MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         Text(
-            if (uiState.isBookmarked) "Bookmarked" else "Bookmark this post",
+            if (uiState.isBookmarked) stringResource(R.string.reader_bookmarked) else bookmarkLabel,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
