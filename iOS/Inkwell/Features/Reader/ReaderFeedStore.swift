@@ -288,7 +288,9 @@ final class ReaderFeedStore {
         let cache = feedCache
 
         jetstreamTask = Task { [weak self] in
-            for await payload in streamJetstreamPayloads(client: client, config: config) {
+            var attempt = 0
+            while !Task.isCancelled {
+                for await payload in streamJetstreamPayloads(client: client, config: config) {
                 guard !Task.isCancelled else { break }
                 guard payload.collection == "site.standard.document" else { continue }
 
@@ -368,6 +370,10 @@ final class ReaderFeedStore {
                     let deletedUri = "at://\(payload.did)/\(payload.collection)/\(payload.rkey)"
                     try? await cache.remove(uri: deletedUri)
                 }
+                }
+                guard !Task.isCancelled else { break }
+                try? await Task.sleep(for: .milliseconds(Int64(JetstreamRetryPolicy.delayMillis(attempt))))
+                attempt += 1
             }
         }
     }
