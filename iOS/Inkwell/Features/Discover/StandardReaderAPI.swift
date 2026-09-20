@@ -8,9 +8,10 @@
 //  metadata; Inkwell always fetches the authoritative record from the
 //  author's own PDS before rendering or subscribing to anything.
 //
-//  Keyword search is exposed through `search(query:)`, `search(query:mode:)`
-//  (which lets the Discover tab request the backend's `publications` mode),
-//  and `search(for:)` — all hitting the same `/search` endpoint.
+//  Keyword search is exposed through `search(query:)`, `search(query:mode:)`,
+//  and `search(for:)` — all hitting the same `/search` endpoint. Publication
+//  results are native records in the normal corpus; clients must not invent a
+//  separate `publications` mode.
 //
 
 import Foundation
@@ -68,10 +69,9 @@ struct ReaderSearchActorResponse: Decodable {
     let actors: [ReaderSearchActorResult]
 }
 
-/// A distinct publication (site) derived from search results. The
-/// leaflet-search-backend indexes documents, not publications, so a
-/// publication is reconstructed by grouping results that share an author DID
-/// and `basePath` (the publication's origin domain).
+/// A publication result keyed by its native publication AT-URI. Search
+/// metadata is only a discovery hint; callers should fetch the authoritative
+/// record from the owning PDS before displaying or subscribing.
 struct PublicationResult: Identifiable, Hashable {
     let uri: String
     let name: String
@@ -82,8 +82,9 @@ struct PublicationResult: Identifiable, Hashable {
 
     var id: String { uri }
 
-    /// Collapses document search results into distinct publications: results
-    /// from the same author DID and `basePath` are one publication.
+    /// Legacy compatibility helper for older document-only index responses.
+    /// New code should prefer native publication results and authoritative PDS
+    /// records instead of inferring publications from document groupings.
     static func aggregate(_ results: [ReaderSearchResult]) -> [PublicationResult] {
         let grouped = Dictionary(grouping: results) { "\($0.did)|\($0.basePath ?? "")" }
         return grouped.compactMap { (_, items) in
