@@ -646,18 +646,23 @@ class ReaderViewModel @Inject constructor(
         jetstreamJob?.cancel()
         if (dids.isEmpty()) return
 
-        val config = JetstreamConfig(
-            collections = listOf("site.standard.document"),
-            dids = dids
-        )
-
         jetstreamJob = viewModelScope.launch {
             var attempt = 0
+            var resumeCursor: Long? = null
             while (isActive) {
+                val config = JetstreamConfig(
+                    collections = listOf("site.standard.document"),
+                    dids = dids,
+                    cursor = resumeCursor,
+                )
                 jetstreamClient.connect(config)
                     .catch { e -> Log.w("ReaderViewModel", "Jetstream connection error", e) }
                     .collect { payload ->
                     attempt = 0
+                    payload.cursor?.let { cursor ->
+                        if (resumeCursor != null && cursor <= resumeCursor!!) return@collect
+                        resumeCursor = cursor
+                    }
                     if (payload.collection != "site.standard.document") return@collect
 
                     // Parse the event into a CachedFeedItem.
