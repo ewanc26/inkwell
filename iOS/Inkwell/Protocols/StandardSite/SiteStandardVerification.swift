@@ -84,6 +84,9 @@ extension SiteStandardLexicon {
             guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
                 throw Failure.endpointUnreachable(statusCode: (response as? HTTPURLResponse)?.statusCode)
             }
+            guard data.count <= JSONSafety.maxResponseBytes else {
+                throw Failure.malformedResponse
+            }
 
             guard let foundURI = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines),
                   foundURI.hasPrefix("at://") else {
@@ -121,6 +124,9 @@ extension SiteStandardLexicon {
             guard let httpResponse = response as? HTTPURLResponse,
                   (200...299).contains(httpResponse.statusCode) else {
                 throw Failure.endpointUnreachable(statusCode: (response as? HTTPURLResponse)?.statusCode)
+            }
+            guard data.count <= JSONSafety.maxResponseBytes else {
+                throw Failure.malformedResponse
             }
             guard let html = String(data: data, encoding: .utf8) else {
                 throw Failure.malformedResponse
