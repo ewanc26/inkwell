@@ -138,14 +138,14 @@ final class WriterViewModel {
 
     // MARK: - Image Upload
 
-    func uploadImage(_ image_data: Data, mimeType: String) {
+    func uploadImage(_ image_data: Data, mimeType: String, altText: String = "") {
         guard canUploadImages else { return }
         Task {
             do {
                 let blob = try await loginStateManager.uploadBlob(image_data, mimeType: mimeType)
                 let cid = blob.reference.link
                 uploadedBlobs[cid] = blob
-                let markdownImage = "![Image](\(cid))"
+                let markdownImage = "![\(altText.trimmingCharacters(in: .whitespacesAndNewlines))](\(cid))"
                 insertTextAtEnd(markdownImage)
             } catch {
                 publishError = "Failed to upload image: \(error.localizedDescription)"
