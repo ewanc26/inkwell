@@ -357,7 +357,7 @@ class PdsRepository @Inject constructor(
     suspend fun updateRecord(
         uri: String,
         record: JsonObject,
-        revision: String,
+        recordCID: String,
     ): JsonObject {
         if (TestingConfig.enabled) {
             TestingConfig.report("Update record")
@@ -376,7 +376,7 @@ class PdsRepository @Inject constructor(
                 put("rkey", parsed.recordKey)
                 put("record", record)
                 put("validate", true)
-                put("swapCommit", revision)
+                put("swapRecord", recordCID)
             },
             inputSerializer = JsonObject.serializer(),
             responseSerializer = JsonObject.serializer(),

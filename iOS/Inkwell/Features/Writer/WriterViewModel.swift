@@ -175,7 +175,7 @@ final class WriterViewModel {
             let entry = try await loginStateManager.fetchDocument(uri: uri)
 
             editingDocumentURI = uri
-            // We need the CID for swapCommit. Re-fetch to get it.
+            // We need the record CID for swapRecord. Re-fetch to get it.
             let parsed = parseAtUri(uri)
             guard let parsed else {
                 publishError = "Invalid document URI."
@@ -337,7 +337,7 @@ final class WriterViewModel {
                         collection: SiteStandardLexicon.DocumentRecord.type,
                         recordKey: parsed.recordKey,
                         record: updatedRecord,
-                        revision: revision
+                        recordCID: revision
                     )
                     publishSuccess = "Document updated."
                     InkwellHaptics.success()
