@@ -464,7 +464,14 @@ private fun PlainTextParagraph(paragraph: String, foregroundColor: Color = Color
             2 -> MaterialTheme.typography.titleLarge
             else -> MaterialTheme.typography.titleMedium
         }
-        Text(text, style = style, color = color, modifier = Modifier.fillMaxWidth())
+        Text(
+            text,
+            style = style,
+            color = color,
+            modifier = Modifier
+                .fillMaxWidth()
+                .semantics { heading() },
+        )
     } else {
         Text(
             paragraph,
