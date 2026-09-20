@@ -12,6 +12,7 @@ import ATProtoKit
 /// Pckt provider (`blog.pckt.content`). Pckt stores an `items` array of blocks.
 /// Blocks map closely to markdown; inline formatting uses pckt's richtext facets.
 struct PcktProvider: ContentProvider {
+    private static let maxListDepth = 32
     let id = "pckt"
     let label = "pckt"
     let contentType = "blog.pckt.content"
@@ -116,7 +117,7 @@ struct PcktProvider: ContentProvider {
         }
     }
 
-    private func pcktListItemToMarkdown(_ item: PcktListItem) -> MarkdownListItemNode {
+    private func pcktListItemToMarkdown(_ item: PcktListItem, depth: Int = 0) -> MarkdownListItemNode {
         var text = ""
         var children: [MarkdownListItemNode]? = nil
         for block in item.content ?? [] {
@@ -129,7 +130,9 @@ struct PcktProvider: ContentProvider {
                 // A nested sub-list lives as another entry in this item's
                 // `content` array, alongside its text block — see
                 // standard.horse's `pckt.ts` `listItemToMdast`.
-                children = (block.listContent ?? []).map { pcktListItemToMarkdown($0) }
+                if depth < Self.maxListDepth {
+                    children = (block.listContent ?? []).map { pcktListItemToMarkdown($0, depth: depth + 1) }
+                }
             default:
                 break
             }

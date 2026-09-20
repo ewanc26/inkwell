@@ -13,6 +13,7 @@ import ATProtoKit
 /// pages; we read and write a single `linearDocument` page whose `blocks` map
 /// closely to markdown. Inline formatting uses leaflet's richtext facets.
 struct LeafletProvider: ContentProvider {
+    private static let maxListDepth = 32
     let id = "leaflet"
     let label = "Leaflet"
     let contentType = LeafletTypes.shared.CONTENT
@@ -132,7 +133,7 @@ struct LeafletProvider: ContentProvider {
         }
     }
 
-    private func leafletListItemToMarkdown(_ item: LeafletListItem) -> MarkdownListItemNode {
+    private func leafletListItemToMarkdown(_ item: LeafletListItem, depth: Int = 0) -> MarkdownListItemNode {
         var text = ""
         if let content = item.content {
             switch content.type {
@@ -153,8 +154,8 @@ struct LeafletProvider: ContentProvider {
         // only has `children`, but when a stored record has both we prefer
         // `orderedListChildren` for ordered nesting.
         var mdChildren: [MarkdownListItemNode]? = nil
-        if let kids = item.children, !kids.isEmpty {
-            mdChildren = kids.map { leafletListItemToMarkdown($0) }
+        if depth < Self.maxListDepth, let kids = item.children, !kids.isEmpty {
+            mdChildren = kids.map { leafletListItemToMarkdown($0, depth: depth + 1) }
         }
 
         return MarkdownListItemNode(text: text, checked: item.checked, children: mdChildren)

@@ -13,6 +13,7 @@ import ATProtoKit
 /// array of blocks. Blocks map closely to markdown; inline formatting uses
 /// offprint's richtext facets.
 struct OffprintProvider: ContentProvider {
+    private static let maxListDepth = 32
     let id = "offprint"
     let label = "Offprint"
     let contentType = "app.offprint.content"
@@ -116,7 +117,7 @@ struct OffprintProvider: ContentProvider {
         }
     }
 
-    private func offprintListItemToMarkdown(_ item: OffprintListItem) -> MarkdownListItemNode {
+    private func offprintListItemToMarkdown(_ item: OffprintListItem, depth: Int = 0) -> MarkdownListItemNode {
         var text = ""
         if let content = item.content, content.type == LeafletTypes.shared.BLOCKS_TEXT {
             text = FacetConverter.facetsToMarkdown(
@@ -125,8 +126,8 @@ struct OffprintProvider: ContentProvider {
         }
 
         var children: [MarkdownListItemNode]? = nil
-        if let kids = item.children, !kids.isEmpty {
-            children = kids.map { offprintListItemToMarkdown($0) }
+        if depth < Self.maxListDepth, let kids = item.children, !kids.isEmpty {
+            children = kids.map { offprintListItemToMarkdown($0, depth: depth + 1) }
         }
 
         return MarkdownListItemNode(text: text, checked: item.checked, children: children)
