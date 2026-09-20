@@ -37,7 +37,8 @@ internal suspend fun PostDetailViewModel.parseContent(
                 pages = runCatching {
                     val blobData = pdsRepository.downloadBlob(
                         cid = leaflet.blobPages.link,
-                        fromDID = authorDid
+                        fromDID = authorDid,
+                        declaredSize = leaflet.blobPages.size.takeIf { it > 0 }?.toLong()
                     )
                     contentParsingJson.decodeFromString<List<LeafletPage>>(blobData.decodeToString())
                 }.getOrNull()

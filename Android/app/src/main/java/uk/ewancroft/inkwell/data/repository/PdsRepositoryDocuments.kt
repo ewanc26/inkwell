@@ -34,7 +34,12 @@ suspend fun PdsRepository.getProfile(did: String): BlueskyProfile {
     return decodeSafe(executeGet(urlStr))
 }
 
-suspend fun PdsRepository.downloadBlob(cid: String, fromDID: String): ByteArray = withContext(Dispatchers.IO) {
+suspend fun PdsRepository.downloadBlob(
+    cid: String,
+    fromDID: String,
+    declaredSize: Long? = null
+): ByteArray = withContext(Dispatchers.IO) {
+    validateDeclaredBlobSize(declaredSize)
     val pdsUrl = resolvePdsUrl(fromDID) ?: XrpcEndpoints.PUBLIC_BSKY_API
     val urlStr = "$pdsUrl${XrpcEndpoints.SYNC_GET_BLOB}?cid=${enc(cid)}&did=${enc(fromDID)}"
     val request = Request.Builder().url(urlStr).get().build()
@@ -44,6 +49,12 @@ suspend fun PdsRepository.downloadBlob(cid: String, fromDID: String): ByteArray 
         }
         val body = response.body ?: throw java.io.IOException("Blob response had no body")
         readBoundedBlob(body)
+    }
+}
+
+internal fun validateDeclaredBlobSize(declaredSize: Long?) {
+    if (declaredSize != null && declaredSize > MAX_READER_BLOB_BYTES) {
+        throw java.io.IOException("Blob declaration exceeds the reader size limit")
     }
 }
 
