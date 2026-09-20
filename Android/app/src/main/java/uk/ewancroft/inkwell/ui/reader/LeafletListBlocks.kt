@@ -18,6 +18,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.dp
 import uk.ewancroft.inkwell.data.model.common.StrongRef
 import uk.ewancroft.inkwell.data.model.content.LeafletBlock
@@ -32,7 +35,9 @@ fun UnorderedListBlock(
     onCastVote: suspend (String, List<String>) -> Unit = { _, _ -> },
 ) {
     Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        block.children?.forEach { item -> ListItem(item, pollData = pollData, onLoadPoll = onLoadPoll, onCastVote = onCastVote) }
+        block.children?.forEachIndexed { index, item ->
+            ListItem(item, position = index + 1, total = block.children.size, pollData = pollData, onLoadPoll = onLoadPoll, onCastVote = onCastVote)
+        }
     }
 }
 
@@ -44,7 +49,9 @@ fun OrderedListBlock(
     onCastVote: suspend (String, List<String>) -> Unit = { _, _ -> },
 ) {
     Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        block.children?.forEachIndexed { index, item -> ListItem(item, index + 1, pollData = pollData, onLoadPoll = onLoadPoll, onCastVote = onCastVote) }
+        block.children?.forEachIndexed { index, item ->
+            ListItem(item, number = index + 1, position = index + 1, total = block.children.size, pollData = pollData, onLoadPoll = onLoadPoll, onCastVote = onCastVote)
+        }
     }
 }
 
@@ -56,7 +63,9 @@ fun ChecklistBlock(
     onCastVote: suspend (String, List<String>) -> Unit = { _, _ -> },
 ) {
     Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        block.children?.forEach { item -> ChecklistItem(item, pollData = pollData, onLoadPoll = onLoadPoll, onCastVote = onCastVote) }
+        block.children?.forEachIndexed { index, item ->
+            ChecklistItem(item, position = index + 1, total = block.children.size, pollData = pollData, onLoadPoll = onLoadPoll, onCastVote = onCastVote)
+        }
     }
 }
 
@@ -64,11 +73,22 @@ fun ChecklistBlock(
 fun ListItem(
     item: ListItemModel,
     number: Int? = null,
+    position: Int? = null,
+    total: Int? = null,
     pollData: kotlinx.coroutines.flow.StateFlow<Map<String, PostDetailViewModel.PollData>> = kotlinx.coroutines.flow.MutableStateFlow(emptyMap()),
     onLoadPoll: suspend (StrongRef) -> Unit = {},
     onCastVote: suspend (String, List<String>) -> Unit = { _, _ -> },
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    val accessibilityContext = buildList {
+        if (position != null && total != null) add("Item $position of $total")
+        if (item.type == LeafletTypes.BLOCKS_CHECKLIST) add(if (item.checked == true) "Completed" else "Not completed")
+    }.joinToString(", ")
+    Row(
+        modifier = if (accessibilityContext.isEmpty()) Modifier else Modifier.semantics {
+            stateDescription = accessibilityContext
+        },
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         if (item.type == LeafletTypes.BLOCKS_CHECKLIST) {
             Box(
                 modifier = Modifier.size(20.dp),
@@ -83,7 +103,9 @@ fun ListItem(
             Text(
                 "$number.",
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.width(24.dp)
+                modifier = Modifier
+                    .width(24.dp)
+                    .clearAndSetSemantics {},
             )
             Spacer(Modifier.width(8.dp))
         } else {
@@ -104,9 +126,11 @@ fun ListItem(
 @Composable
 fun ChecklistItem(
     item: ListItemModel,
+    position: Int? = null,
+    total: Int? = null,
     pollData: kotlinx.coroutines.flow.StateFlow<Map<String, PostDetailViewModel.PollData>> = kotlinx.coroutines.flow.MutableStateFlow(emptyMap()),
     onLoadPoll: suspend (StrongRef) -> Unit = {},
     onCastVote: suspend (String, List<String>) -> Unit = { _, _ -> },
 ) {
-    ListItem(item)
+    ListItem(item, position = position, total = total, pollData = pollData, onLoadPoll = onLoadPoll, onCastVote = onCastVote)
 }
