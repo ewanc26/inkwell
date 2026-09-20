@@ -127,7 +127,8 @@ struct BSkyPostEmbedView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
                 }
-                .accessibilityLabel(first.alt?.isEmpty == false ? first.alt! : "Bluesky image")
+                .accessibilityLabel(first.alt?.isEmpty == false ? first.alt! : "")
+                .accessibilityHidden(first.alt?.isEmpty != false)
             }
 
         case .external(let externalEmbed):
@@ -160,6 +161,7 @@ struct BSkyPostEmbedView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 6))
                         }
                     }
+                    .accessibilityHidden(true)
                 }
             }
             .padding(10)
@@ -178,6 +180,7 @@ struct BSkyPostEmbedView: View {
                     Image(systemName: "quote.bubble")
                         .font(.caption)
                         .foregroundStyle(accentColor)
+                        .accessibilityHidden(true)
                     Text(recordEmbed.record.author?.displayName ?? "Quoted post")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(foregroundColor)
@@ -223,9 +226,9 @@ struct BSkyPostEmbedView: View {
     private func statLabel(icon: String, count: Int?) -> String {
         let value = sharedFormatCount(count ?? 0)
         switch icon {
-        case "bubble.right": return "(value) replies"
-        case "arrow.2.squarepath": return "(value) reposts"
-        case "heart": return "(value) likes"
+        case "bubble.right": return "\(value) replies"
+        case "arrow.2.squarepath": return "\(value) reposts"
+        case "heart": return "\(value) likes"
         default: return value
         }
     }
