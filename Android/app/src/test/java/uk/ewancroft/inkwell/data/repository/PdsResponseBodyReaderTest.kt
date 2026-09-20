@@ -27,4 +27,18 @@ class PdsResponseBodyReaderTest {
             PdsResponseBodyReader.read(ByteArrayInputStream(ByteArray(33)), null, 32)
         }
     }
+
+    @Test
+    fun `accepts a large safety budget without an integer counter`() {
+        val body = "x".repeat(64)
+
+        assertEquals(
+            body,
+            PdsResponseBodyReader.read(
+                ByteArrayInputStream(body.toByteArray()),
+                null,
+                Int.MAX_VALUE,
+            ),
+        )
+    }
 }

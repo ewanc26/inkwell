@@ -73,12 +73,12 @@ internal object PdsResponseBodyReader {
         input.use {
             val output = ByteArrayOutputStream(minOf(maxBodyBytes, 64 * 1024))
             val buffer = ByteArray(16 * 1024)
-            var total = 0
+            var total = 0L
             while (true) {
                 val read = it.read(buffer)
                 if (read == -1) break
-                total += read
-                if (total > maxBodyBytes) {
+                total += read.toLong()
+                if (total > maxBodyBytes.toLong()) {
                     throw IOException("PDS response exceeded the ${maxBodyBytes}-byte safety budget")
                 }
                 output.write(buffer, 0, read)
