@@ -191,7 +191,7 @@ struct PollEmbedView: View {
             // Footer
             if state.totalVotes > 0 {
                 HStack {
-                    Text("\(state.totalVotes) vote\(state.totalVotes == 1 ? "" : "s")")
+                    Text("^[\(state.totalVotes) vote](inflect: true)")
                         .font(.caption2)
                         .foregroundStyle(foregroundColor.opacity(0.4))
                     if let _ = state.myVote {
@@ -276,7 +276,7 @@ struct PollEmbedView: View {
             var value = hasVoted ? "Voted" : "Not voted"
             if state.totalVotes > 0 {
                 let percentage = Int((fraction * 100).rounded())
-                value += ", \(count) vote\(count == 1 ? "" : "s"), \(percentage) percent"
+                value += ", \(count) \(count == 1 ? "vote" : "votes"), \(percentage) percent"
             } else {
                 value += ", no votes yet"
             }
