@@ -380,6 +380,29 @@ class ContentConverterTest {
     }
 
     @Test
+    fun imageAltTextRoundTripsAcrossRichFormats() {
+        val meaningful = "![A mountain at sunrise](https://example.com/mountain.png)"
+        val decorative = "![](https://example.com/divider.png)"
+
+        val meaningfulResults = listOf(
+            LeafletContentConverter.toMarkdown(LeafletContentConverter.fromMarkdown(meaningful).content),
+            PcktContentConverter.toMarkdown(PcktContentConverter.fromMarkdown(meaningful).content),
+            OffprintContentConverter.toMarkdown(OffprintContentConverter.fromMarkdown(meaningful).content),
+        )
+        val decorativeResults = listOf(
+            LeafletContentConverter.toMarkdown(LeafletContentConverter.fromMarkdown(decorative).content),
+            PcktContentConverter.toMarkdown(PcktContentConverter.fromMarkdown(decorative).content),
+            OffprintContentConverter.toMarkdown(OffprintContentConverter.fromMarkdown(decorative).content),
+        )
+        meaningfulResults.forEachIndexed { index, result ->
+            assertEquals("A mountain at sunrise", (result.blocks.single() as MarkdownBlock.Image).alt, "meaningful format $index")
+        }
+        decorativeResults.forEachIndexed { index, result ->
+            assertEquals("", (result.blocks.single() as MarkdownBlock.Image).alt, "decorative format $index")
+        }
+    }
+
+    @Test
     fun leafletNestedListDepthLimitPreservesSiblingItems() {
         fun item(depth: Int): Map<String, Any?> = mapOf(
             "content" to mapOf("\$type" to LeafletTypes.BLOCKS_TEXT, "plaintext" to "level $depth"),
