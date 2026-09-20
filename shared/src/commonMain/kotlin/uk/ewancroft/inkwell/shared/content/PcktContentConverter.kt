@@ -93,7 +93,10 @@ object PcktContentConverter {
                     ?: attrs?.get("src") as? String
                     ?: ""
                 if (ref.isEmpty()) null
-                else MarkdownBlock.Image(attrs?.get("alt") as? String ?: "", ref)
+                else MarkdownBlock.Image(
+                    block["alt"] as? String ?: attrs?.get("alt") as? String ?: "",
+                    ref
+                )
             }
 
             PcktTypes.BLOCK_BULLET_LIST -> {
