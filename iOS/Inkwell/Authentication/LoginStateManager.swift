@@ -108,6 +108,7 @@ final class LoginStateManager {
             sharedOAuthScopeRepoDocument(),
             sharedOAuthScopeRepoSubscription(),
             sharedOAuthScopeRepoRecommend(),
+            sharedOAuthScopeRepoLeafletComment(),
             sharedOAuthScopeRepoUserInputDiscussion(),
             "repo:uk.ewancroft.inkwell.user",
             "repo:app.bsky.graph.block?action=create&action=delete",

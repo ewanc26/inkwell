@@ -9,6 +9,7 @@ object OAuthScopes {
     const val REPO_USERINPUT_DISCUSSION = "repo:app.userinput.discussion"
     const val REPO_SUBSCRIPTION = "repo:site.standard.graph.subscription"
     const val REPO_RECOMMEND = "repo:site.standard.graph.recommend"
+    const val REPO_LEAFLET_COMMENT = "repo:pub.leaflet.comment"
     const val AUTH_FULL = "site.standard.authFull"
     const val AUTH_SOCIAL = "site.standard.authSocial"
     /** Scope for moderation RPCs (report, etc.) proxied through the Bluesky AppView. */
