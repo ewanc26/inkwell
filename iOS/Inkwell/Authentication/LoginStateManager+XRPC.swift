@@ -33,7 +33,8 @@ extension LoginStateManager {
         body: Data? = nil,
         queryItems: [URLQueryItem]? = nil,
         proxy: String? = nil,
-        expectJSON: Bool = true
+        expectJSON: Bool = true,
+        maxResponseBytes: Int = maxXRPCResponseBytes
     ) async throws -> Data {
         guard let authenticator, let pdsURL = resolvedPDSURL else {
             throw LoginError.notAuthenticated
@@ -84,7 +85,7 @@ extension LoginStateManager {
             throw LoginError.httpError(status: status)
         }
 
-        guard data.count <= maxXRPCResponseBytes else {
+        guard data.count <= maxResponseBytes else {
             logger.error("[authenticatedData] response exceeded safety budget")
             throw URLError(.dataLengthExceedsMaximum)
         }
@@ -101,7 +102,8 @@ extension LoginStateManager {
         method: String = "GET",
         body: Data? = nil,
         queryItems: [URLQueryItem]? = nil,
-        expectJSON: Bool = true
+        expectJSON: Bool = true,
+        maxResponseBytes: Int = maxXRPCResponseBytes
     ) async throws -> Data {
         var components = URLComponents(
             url: pdsURL.appendingPathComponent(path),
@@ -142,7 +144,7 @@ extension LoginStateManager {
             throw LoginError.httpError(status: status)
         }
 
-        guard data.count <= maxXRPCResponseBytes else {
+        guard data.count <= maxResponseBytes else {
             logger.error("[unauthenticatedData] response exceeded safety budget")
             throw URLError(.dataLengthExceedsMaximum)
         }
