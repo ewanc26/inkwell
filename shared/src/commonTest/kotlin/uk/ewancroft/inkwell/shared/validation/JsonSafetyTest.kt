@@ -37,6 +37,12 @@ class JsonSafetyTest {
     }
 
     @Test
+    fun rejectsMultibytePrimitiveContentOverByteLimit() {
+        val value = JsonPrimitive("é".repeat(JsonSafety.MAX_STRING_BYTES / 2 + 1))
+        assertFalse(JsonSafety.isSafe(value))
+    }
+
+    @Test
     fun rejectsOversizedObjectKeys() {
         val value = buildJsonObject {
             put("x".repeat(JsonSafety.MAX_STRING_BYTES + 1), true)
