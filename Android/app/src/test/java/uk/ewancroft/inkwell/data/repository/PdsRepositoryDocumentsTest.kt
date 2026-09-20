@@ -12,6 +12,16 @@ import kotlinx.serialization.json.buildJsonArray
 
 class PdsRepositoryDocumentsTest {
     @Test
+    fun `blob upload request preserves raw bytes and MIME type`() {
+        val bytes = byteArrayOf(0, 1, -2, -1)
+        val request = buildBlobUploadRequest(bytes, "image/png")
+
+        assertContentEquals(bytes, request.body)
+        assertEquals("image", request.contentType.contentType)
+        assertEquals("png", request.contentType.contentSubtype)
+    }
+
+    @Test
     fun `paginates three pages and stops at the end cursor`() = kotlinx.coroutines.runBlocking {
         val pages = listOf(
             page("cursor-1", "one"),

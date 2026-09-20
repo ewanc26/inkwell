@@ -391,14 +391,14 @@ class PdsRepository @Inject constructor(
         val session = sessionStore.load() ?: throw Exception("Not authenticated")
         val authClient = atOAuth.createClient()
 
-        val contentType = io.ktor.http.ContentType.parse(mimeType)
+        val upload = buildBlobUploadRequest(bytes, mimeType)
 
         val response = authClient.procedure(
             nsid = "com.atproto.repo.uploadBlob",
             params = Unit,
             paramsSerializer = Unit.serializer(),
-            bytes,
-            contentType,
+            upload.body,
+            upload.contentType,
             JsonObject.serializer(),
         )
         validateUploadBlobResponse(response, mimeType, bytes.size.toLong())
@@ -453,6 +453,14 @@ class PdsRepository @Inject constructor(
         }
     }
 }
+
+internal data class BlobUploadRequest(
+    val body: ByteArray,
+    val contentType: io.ktor.http.ContentType,
+)
+
+internal fun buildBlobUploadRequest(bytes: ByteArray, mimeType: String): BlobUploadRequest =
+    BlobUploadRequest(bytes, io.ktor.http.ContentType.parse(mimeType))
 
 internal suspend fun paginateRecordPages(
     maxRecords: Int = Int.MAX_VALUE,
