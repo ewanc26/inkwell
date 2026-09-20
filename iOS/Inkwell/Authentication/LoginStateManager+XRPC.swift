@@ -85,6 +85,11 @@ extension LoginStateManager {
             throw LoginError.httpError(status: status)
         }
 
+        if http.expectedContentLength > Int64(maxResponseBytes) {
+            logger.error("[authenticatedData] advertised response exceeded safety budget")
+            throw URLError(.dataLengthExceedsMaximum)
+        }
+
         guard data.count <= maxResponseBytes else {
             logger.error("[authenticatedData] response exceeded safety budget")
             throw URLError(.dataLengthExceedsMaximum)
@@ -142,6 +147,11 @@ extension LoginStateManager {
             let status = (response as? HTTPURLResponse)?.statusCode ?? 0
             logger.error("[unauthenticatedData] HTTP \(status)")
             throw LoginError.httpError(status: status)
+        }
+
+        if http.expectedContentLength > Int64(maxResponseBytes) {
+            logger.error("[unauthenticatedData] advertised response exceeded safety budget")
+            throw URLError(.dataLengthExceedsMaximum)
         }
 
         guard data.count <= maxResponseBytes else {
