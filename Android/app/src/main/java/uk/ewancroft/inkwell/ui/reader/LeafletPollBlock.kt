@@ -65,6 +65,7 @@ internal fun PollBlock(
     val pollNotSelected = stringResource(R.string.poll_not_selected)
     val pollVoted = stringResource(R.string.poll_voted)
     val pollVoteAction = stringResource(R.string.poll_vote_action)
+    val pollTitle = stringResource(R.string.poll_title)
 
     val pollRef = block.poll
     val pollUri = pollRef?.uri ?: ""
@@ -115,6 +116,11 @@ internal fun PollBlock(
                     } else {
                         stringResource(R.string.poll_no_votes)
                     }
+                    val percentageLabel = if (totalVotes > 0) {
+                        stringResource(R.string.poll_percentage, (fraction * 100).toInt())
+                    } else {
+                        ""
+                    }
 
                     OutlinedButton(
                         onClick = {
@@ -130,16 +136,11 @@ internal fun PollBlock(
                         modifier = Modifier
                             .fillMaxWidth()
                             .semantics {
-                                val percentage = if (totalVotes > 0) {
-                                    "${(fraction * 100).toInt()} percent"
-                                } else {
-                                    ""
-                                }
                                 stateDescription = buildString {
                                     append(if (isSelected) pollSelected else pollNotSelected)
                                     if (isVoted) append(", $pollVoted")
                                     append(", $voteCountDescription")
-                                    if (percentage.isNotEmpty()) append(", $percentage")
+                                    if (percentageLabel.isNotEmpty()) append(", $percentageLabel")
                                 }
                             },
                         enabled = !isVoted && !isSubmitting,
@@ -220,7 +221,7 @@ internal fun PollBlock(
                 }
             } else {
                 Text(
-                    "Poll",
+                    pollTitle,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
