@@ -479,7 +479,7 @@ fun WriterScreen(
                             },
                             contentPadding = PaddingValues(horizontal = 12.dp),
                         ) {
-                            Text("View post")
+                            Text(stringResource(R.string.writer_view_post))
                             Spacer(Modifier.width(4.dp))
                             Icon(Icons.AutoMirrored.Outlined.Send, contentDescription = null, Modifier.size(16.dp))
                         }
@@ -490,8 +490,8 @@ fun WriterScreen(
             if (showDeleteConfirmation) {
                 AlertDialog(
                     onDismissRequest = { showDeleteConfirmation = false },
-                    title = { Text("Delete ${uiState.title}?") },
-                    text = { Text("This permanently removes the document from your repository. The current record version will be checked first.") },
+                    title = { Text(stringResource(R.string.writer_delete_title, uiState.title)) },
+                    text = { Text(stringResource(R.string.writer_delete_message)) },
                     confirmButton = {
                         TextButton(
                             onClick = {
@@ -499,7 +499,7 @@ fun WriterScreen(
                                 viewModel.deleteDocument()
                             },
                             colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
-                        ) { Text("Delete") }
+                        ) { Text(stringResource(R.string.writer_delete)) }
                     },
                     dismissButton = {
                         TextButton(onClick = { showDeleteConfirmation = false }) { Text("Cancel") }
