@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -209,31 +210,55 @@ private fun PrevNextRow(
 ) {
     if (previousUri == null && nextUri == null) return
 
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+    val stacked = LocalDensity.current.fontScale >= 1.5f
+    if (stacked) Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         if (previousUri != null) {
             OutlinedButton(
                 onClick = { onNavigateToPost(previousUri, null, null, null, null) },
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
             ) {
                 Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
                 Text(
                     previousTitle ?: "Previous",
-                    maxLines = 1,
-                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                    maxLines = 3,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f),
                 )
             }
         }
         if (nextUri != null) {
             OutlinedButton(
                 onClick = { onNavigateToPost(nextUri, null, null, null, null) },
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
             ) {
                 Text(
                     nextTitle ?: "Next",
-                    maxLines = 1,
-                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                    maxLines = 3,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f),
                 )
+                Spacer(Modifier.width(8.dp))
+                Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null, modifier = Modifier.size(18.dp))
+            }
+        }
+    } else Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        if (previousUri != null) {
+            OutlinedButton(
+                onClick = { onNavigateToPost(previousUri, null, null, null, null) },
+                modifier = Modifier.weight(1f).heightIn(min = 48.dp),
+            ) {
+                Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(previousTitle ?: "Previous", maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+            }
+        }
+        if (nextUri != null) {
+            OutlinedButton(
+                onClick = { onNavigateToPost(nextUri, null, null, null, null) },
+                modifier = Modifier.weight(1f).heightIn(min = 48.dp),
+            ) {
+                Text(nextTitle ?: "Next", maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
                 Spacer(Modifier.width(8.dp))
                 Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null, modifier = Modifier.size(18.dp))
             }
