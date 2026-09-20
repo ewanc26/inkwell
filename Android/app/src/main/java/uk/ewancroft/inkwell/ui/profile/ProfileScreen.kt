@@ -34,6 +34,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import uk.ewancroft.inkwell.R
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -92,10 +93,10 @@ fun ProfileScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Profile") },
+                title = { Text(stringResource(R.string.profile_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.reader_back))
                     }
                 },
             )
@@ -155,14 +156,14 @@ private fun ProfileError(
                 modifier = Modifier.size(40.dp),
                 tint = MaterialTheme.colorScheme.error,
             )
-            Text("Profile unavailable", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.profile_unavailable), style = MaterialTheme.typography.titleMedium)
             Text(
                 message,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
             )
-            Button(onClick = onRetry) { Text("Try again") }
+            Button(onClick = onRetry) { Text(stringResource(R.string.profile_retry)) }
         }
     }
 }
@@ -190,11 +191,11 @@ private fun ProfileContent(
                 modifier = Modifier.padding(20.dp),
             ) {
                 profile.description?.trim()?.takeIf(String::isNotEmpty)?.let { description ->
-                    Text("About", style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.reader_about), style = MaterialTheme.typography.titleMedium)
                     Text(description, style = MaterialTheme.typography.bodyLarge)
                 }
 
-                Text("Account", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.profile_account), style = MaterialTheme.typography.titleMedium)
                 Text(
                     profile.did,
                     style = MaterialTheme.typography.bodySmall,
@@ -213,7 +214,7 @@ private fun ProfileContent(
                 ) {
                     Icon(Icons.AutoMirrored.Outlined.OpenInNew, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
-                    Text("Open in Bluesky")
+                    Text(stringResource(R.string.profile_open_bluesky))
                 }
 
                 OutlinedButton(
@@ -225,7 +226,7 @@ private fun ProfileContent(
                 ) {
                     Icon(Icons.Outlined.Report, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
-                    Text("Report account")
+                    Text(stringResource(R.string.reader_report_account))
                 }
             }
         }

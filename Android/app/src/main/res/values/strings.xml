@@ -143,4 +143,9 @@
     <string name="auth_oauth_note">Inkwell uses OAuth to sign in to your PDS securely.</string>
     <string name="auth_browser_note">Your browser will open so you can approve access — no app password needed.</string>
     <string name="auth_about">About Inkwell</string>
+    <string name="profile_title">Profile</string>
+    <string name="profile_unavailable">Profile unavailable</string>
+    <string name="profile_retry">Try again</string>
+    <string name="profile_account">Account</string>
+    <string name="profile_open_bluesky">Open in Bluesky</string>
 </resources>
