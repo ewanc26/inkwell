@@ -1,8 +1,13 @@
 package uk.ewancroft.inkwell.data.remote
 
+import org.junit.Assert.assertTrue
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import uk.ewancroft.inkwell.shared.moderation.FilterableContent
+import uk.ewancroft.inkwell.shared.moderation.ModerationLabel
+import uk.ewancroft.inkwell.shared.moderation.ModerationPolicy
+import uk.ewancroft.inkwell.shared.moderation.NotificationContentPolicy
 
 class NotificationMetadataTest {
     @Test
@@ -32,5 +37,18 @@ class NotificationMetadataTest {
         assertEquals("Hidden document", notification.documentTitle)
         assertNull(notification.publicationName)
         assertEquals(43L, notification.date)
+    }
+
+    @Test
+    fun `warning labels are redacted before notification metadata is exposed`() {
+        assertTrue(
+            NotificationContentPolicy.shouldRedact(
+                FilterableContent(
+                    title = "Spoiler title",
+                    labels = listOf(ModerationLabel("spoiler", source = "document")),
+                ),
+                ModerationPolicy(warningLabels = setOf("spoiler")),
+            )
+        )
     }
 }
