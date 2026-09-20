@@ -659,6 +659,7 @@ class ReaderViewModel @Inject constructor(
                 jetstreamClient.connect(config)
                     .catch { e -> Log.w("ReaderViewModel", "Jetstream connection error", e) }
                     .collect { payload ->
+                    attempt = 0
                     if (payload.collection != "site.standard.document") return@collect
 
                     // Parse the event into a CachedFeedItem.

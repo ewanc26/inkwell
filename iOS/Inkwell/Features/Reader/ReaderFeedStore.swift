@@ -292,6 +292,7 @@ final class ReaderFeedStore {
             while !Task.isCancelled {
                 for await payload in streamJetstreamPayloads(client: client, config: config) {
                 guard !Task.isCancelled else { break }
+                attempt = 0
                 guard payload.collection == "site.standard.document" else { continue }
 
                 // Parse the event into a CachedFeedItem.
