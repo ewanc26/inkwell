@@ -60,6 +60,7 @@ struct BSkyPostEmbedView: View {
                 }
                 .frame(width: 28, height: 28)
                 .clipShape(Circle())
+                .accessibilityHidden(true)
 
                 VStack(alignment: .leading, spacing: 1) {
                     Text(post.author.displayName ?? post.author.handle ?? "Unknown")
@@ -126,6 +127,7 @@ struct BSkyPostEmbedView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
                 }
+                .accessibilityLabel(first.alt?.isEmpty == false ? first.alt! : "Bluesky image")
             }
 
         case .external(let externalEmbed):
@@ -167,6 +169,8 @@ struct BSkyPostEmbedView: View {
                 RoundedRectangle(cornerRadius: 8)
                     .stroke(foregroundColor.opacity(0.08), lineWidth: 1)
             )
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("External link: \(externalEmbed.external.title ?? host(from: externalEmbed.external.uri ?? ""))")
 
         case .record(let recordEmbed):
             VStack(alignment: .leading, spacing: 4) {
@@ -192,6 +196,8 @@ struct BSkyPostEmbedView: View {
                 RoundedRectangle(cornerRadius: 8)
                     .stroke(foregroundColor.opacity(0.08), lineWidth: 1)
             )
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Quoted post by \(recordEmbed.record.author?.displayName ?? "unknown author")")
 
         case .unknown:
             EmptyView()
@@ -209,7 +215,19 @@ struct BSkyPostEmbedView: View {
                     .font(.caption2)
             }
         }
+        .accessibilityLabel(statLabel(icon: icon, count: count))
+        .accessibilityElement(children: .ignore)
         .foregroundStyle(foregroundColor.opacity(0.4))
+    }
+
+    private func statLabel(icon: String, count: Int?) -> String {
+        let value = sharedFormatCount(count ?? 0)
+        switch icon {
+        case "bubble.right": return "(value) replies"
+        case "arrow.2.squarepath": return "(value) reposts"
+        case "heart": return "(value) likes"
+        default: return value
+        }
     }
 
     private func host(from urlString: String) -> String {
