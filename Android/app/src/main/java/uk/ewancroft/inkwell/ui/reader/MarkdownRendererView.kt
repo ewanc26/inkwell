@@ -23,8 +23,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.semantics
@@ -48,6 +49,7 @@ import coil.compose.AsyncImage
 import uk.ewancroft.inkwell.shared.markdown.InlineMarkdownScanner
 import uk.ewancroft.inkwell.shared.markdown.InlineSegment
 import uk.ewancroft.inkwell.util.AccessibilityPreferences
+import uk.ewancroft.inkwell.util.LinkPreferences
 
 /**
  * A Compose view that renders markdown text using the same MarkdownParser
@@ -68,6 +70,7 @@ fun MarkdownRendererView(
     accentColor: Color = MaterialTheme.colorScheme.primary,
 ) {
     val context = LocalContext.current
+    val uriHandler = LocalUriHandler.current
     val fontSizeScale = AccessibilityPreferences.getFontSizeScale(context)
     val boldText = AccessibilityPreferences.getBoldText(context)
     val underlineLinks = AccessibilityPreferences.getUnderlineLinks(context)
@@ -84,7 +87,7 @@ fun MarkdownRendererView(
     val bodyColor = if (foregroundColor != Color.Unspecified) foregroundColor else MaterialTheme.colorScheme.onBackground
     val mutedColor = bodyColor.copy(alpha = 0.6f)
     val surfaceColor = bodyColor.copy(alpha = 0.04f)
-    val uriHandler = LocalUriHandler.current
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -404,7 +407,7 @@ private fun LinkAwareText(
     fontWeight: FontWeight? = null,
     textDecoration: TextDecoration? = null,
 ) {
-    val uriHandler = LocalUriHandler.current
+    val context = LocalContext.current
     val links = remember(text) {
         if (text.isEmpty()) emptyList()
         else text.getStringAnnotations("URL", 0, text.length)
@@ -426,7 +429,7 @@ private fun LinkAwareText(
                             annotation.item,
                             TextLinkStyles(SpanStyle(textDecoration = resolvedStyle.textDecoration)),
                             LinkInteractionListener { link ->
-                                uriHandler.openUri((link as LinkAnnotation.Url).url)
+                                LinkPreferences.openContentUrl(context, (link as LinkAnnotation.Url).url)
                             },
                         ),
                         annotation.start,
