@@ -277,9 +277,10 @@ private fun VerificationBadge(result: VerificationResult?) {
         null -> Unit
 
         is VerificationResult.Verified -> {
+            val verificationDescription = stringResource(R.string.reader_source_verification_verified)
             Row(
                 modifier = Modifier.semantics(mergeDescendants = true) {
-                    contentDescription = "Source verification: verified"
+                    contentDescription = verificationDescription
                 },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -291,7 +292,7 @@ private fun VerificationBadge(result: VerificationResult?) {
                     modifier = Modifier.size(16.dp),
                 )
                 Text(
-                    "Verified source",
+                    stringResource(R.string.reader_source_verified),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
                 )
@@ -299,9 +300,13 @@ private fun VerificationBadge(result: VerificationResult?) {
         }
 
         is VerificationResult.Failed -> {
+            val verificationDescription = stringResource(
+                R.string.reader_source_verification_unverified,
+                result.failure.reason,
+            )
             Column(
                 modifier = Modifier.semantics(mergeDescendants = true) {
-                    contentDescription = "Source verification: unverified. ${result.failure.reason}"
+                    contentDescription = verificationDescription
                 },
                 verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
@@ -316,7 +321,7 @@ private fun VerificationBadge(result: VerificationResult?) {
                         modifier = Modifier.size(16.dp),
                     )
                     Text(
-                        "Unverified source",
+                        stringResource(R.string.reader_source_unverified),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
