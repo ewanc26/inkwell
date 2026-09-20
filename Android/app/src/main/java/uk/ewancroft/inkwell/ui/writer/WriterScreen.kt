@@ -26,7 +26,6 @@ import uk.ewancroft.inkwell.ui.components.CreditsView
 import androidx.hilt.navigation.compose.hiltViewModel
 
 private const val MAX_IMAGE_UPLOAD_BYTES = 10 * 1024 * 1024
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
