@@ -35,7 +35,7 @@ class JetstreamClientJvm : JetstreamClient {
                 when (val frame = wsSession.incoming.receive()) {
                     is Frame.Text -> try {
                         val event = json.decodeFromString<JetstreamEvent>(frame.readText())
-                        if (event.payload.operation == "commit") trySend(event.payload)
+                        if (event.payload.isValidCommitOperation()) trySend(event.payload)
                     } catch (_: Exception) { }
                     is Frame.Close -> break
                     else -> Unit
