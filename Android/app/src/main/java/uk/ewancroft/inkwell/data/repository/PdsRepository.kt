@@ -107,7 +107,7 @@ class PdsRepository @Inject constructor(
                 attempt += 1
                 continue
             }
-            response.use {
+            return@withContext response.use {
                 if (!response.isSuccessful) {
                     throw java.io.IOException("PDS request failed: HTTP ${response.code}")
                 }

@@ -104,7 +104,7 @@ fun SettingsDialog(
         val text = runCatching {
             context.contentResolver.openInputStream(uri)?.use { input ->
                 input.bufferedReader().readText()
-            } ?: ArticleStatePreferences.ImportResult.Invalid
+            } ?: null
         }.getOrNull()
         if (text == null) {
             importMessage = "This file is not a valid Inkwell reading-data export."

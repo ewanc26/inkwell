@@ -26,7 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class WriterViewModel @Inject constructor(
     internal val pdsRepository: PdsRepository,
-    @ApplicationContext private val context: Context,
+    @ApplicationContext internal val context: Context,
 ) : ViewModel() {
 
     internal val uiStateInternal = MutableStateFlow(WriterUiState())
