@@ -36,6 +36,9 @@ downloadable files when this was set up.
 
 ## Publishing a new version
 
+See [`PROVENANCE.md`](PROVENANCE.md) for the exact-byte hashing and
+attestation limitations that must accompany a release.
+
 1. Build a signed release APK from the `inkwell-android` repo (needs the
    gitignored `keystore.properties` at that repo's root pointing at
    `fdroid-repo/inkwell-release.keystore` — both are gitignored, restore them
