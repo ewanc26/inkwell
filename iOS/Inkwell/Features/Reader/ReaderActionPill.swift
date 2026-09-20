@@ -22,6 +22,7 @@ struct ReaderActionPill: View {
     let action: () -> Void
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         Button(action: action) {
@@ -37,7 +38,7 @@ struct ReaderActionPill: View {
                         .symbolEffect(.bounce, value: isActive)
                 }
                 Text(label)
-                    .lineLimit(2)
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
                     .multilineTextAlignment(.center)
             }
             .font(.subheadline.weight(.semibold))
