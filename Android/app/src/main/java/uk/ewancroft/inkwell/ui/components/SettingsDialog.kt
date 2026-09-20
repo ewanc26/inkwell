@@ -62,6 +62,7 @@ import uk.ewancroft.inkwell.util.ImageCacheManager
 import uk.ewancroft.inkwell.util.LinkPreferences
 import uk.ewancroft.inkwell.util.OfflineContentCacheManager
 import uk.ewancroft.inkwell.util.ReaderPreferences
+import uk.ewancroft.inkwell.util.formatCacheSize
 import uk.ewancroft.inkwell.util.rememberInkwellHaptics
 import java.io.File
 import kotlinx.coroutines.launch
@@ -676,11 +677,6 @@ fun SettingsDialog(
             }
         }
     }
-}
-
-private fun formatCacheSize(bytes: Long): String {
-    val mb = bytes / (1024.0 * 1024.0)
-    return if (mb < 0.1) "Empty" else "%.1f MB".format(mb)
 }
 
 @Composable
