@@ -31,7 +31,7 @@ enum LoginError: LocalizedError {
         case .contentConversionFailed:
             return "Failed to convert content to the output format."
         case .recordTooLarge(let bytes, let limit):
-            return "This document is too large to publish ((bytes) bytes; limit is (limit)). Use a shorter document or a blob-backed format."
+            return "This document is too large to publish (\(bytes) bytes; limit is \(limit)). Use a shorter document or a blob-backed format."
         case .pdsResolutionFailed:
             return "Could not resolve the repository's PDS. Check that the DID or handle is correct."
         case .httpError(let status):
