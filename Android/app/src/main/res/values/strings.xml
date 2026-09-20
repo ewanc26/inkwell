@@ -21,4 +21,9 @@
     <string name="reader_loading_post">Loading post…</string>
     <string name="reader_bluesky_post_unavailable">Bluesky post unavailable</string>
     <string name="reader_standard_site_post_unavailable">Standard.site post unavailable</string>
+    <string name="writer_describe_image">Describe this image</string>
+    <string name="writer_alt_text_guidance">Add alt text for people using a screen reader, or mark the image as decorative.</string>
+    <string name="writer_alt_text">Alt text</string>
+    <string name="writer_alt_text_hint">Describe the purpose of the image, not its filename.</string>
+    <string name="writer_decorative_image">Decorative image</string>
 </resources>
