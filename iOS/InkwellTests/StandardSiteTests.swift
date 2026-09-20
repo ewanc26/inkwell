@@ -52,6 +52,18 @@ final class StandardSiteTests: XCTestCase {
             "http://pds.example",
             "https://pds.example"
         ))
+        XCTAssertFalse(OAuthIssuerPolicy.sameHTTPSOrigin(
+            "https://pds.example/path",
+            "https://pds.example"
+        ))
+        XCTAssertFalse(OAuthIssuerPolicy.sameHTTPSOrigin(
+            "https://pds.example?issuer=other#fragment",
+            "https://pds.example"
+        ))
+        XCTAssertFalse(OAuthIssuerPolicy.sameHTTPSOrigin(
+            "https://pds.example:8443",
+            "HTTPS://PDS.EXAMPLE:9443/"
+        ))
     }
 
     func testPublicationAssociationPrefersATURIAndAcceptsNormalizedURL() {
