@@ -75,12 +75,7 @@ extension LoginStateManager {
 
         let url = pdsURL.appendingPathComponent(sharedXrpcRepoUploadBlob())
 
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue(mimeType, forHTTPHeaderField: "Content-Type")
-        request.setValue(String(data.count), forHTTPHeaderField: "Content-Length")
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.httpBody = data
+        let request = makeBlobUploadRequest(url: url, data: data, mimeType: mimeType)
 
         let (responseData, response) = try await authenticator.response(for: request)
 
@@ -99,6 +94,18 @@ extension LoginStateManager {
         }
         return blob
     }
+}
+
+/// Builds the protocol-level upload request independently of authentication.
+/// AT Protocol uploadBlob receives the exact blob bytes, not multipart framing.
+func makeBlobUploadRequest(url: URL, data: Data, mimeType: String) -> URLRequest {
+    var request = URLRequest(url: url)
+    request.httpMethod = "POST"
+    request.setValue(mimeType, forHTTPHeaderField: "Content-Type")
+    request.setValue(String(data.count), forHTTPHeaderField: "Content-Length")
+    request.setValue("application/json", forHTTPHeaderField: "Accept")
+    request.httpBody = data
+    return request
 }
 
 func validateDeclaredBlobSize(_ declaredSize: Int?) throws {
