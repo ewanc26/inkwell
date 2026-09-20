@@ -21,6 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import uk.ewancroft.inkwell.util.appVersionString
+import androidx.compose.ui.res.stringResource
+import uk.ewancroft.inkwell.R
 
 @Composable
 fun LoginScreen(
@@ -74,7 +76,7 @@ fun LoginScreen(
         Spacer(Modifier.height(16.dp))
         Text("Inkwell", style = MaterialTheme.typography.headlineLarge)
         Text(
-            "Sign in with your AT Protocol account",
+            stringResource(R.string.auth_sign_in_subtitle),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -88,16 +90,16 @@ fun LoginScreen(
             )
         ) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                FeatureRow(Icons.Outlined.Book, "Read long-form posts from any standard.site blog — directly from the AT Protocol network, no middleman.", Color(0xFF2E7DD1))
-                FeatureRow(Icons.Outlined.Notifications, "Subscribe to publications, leave comments, and recommend posts. Your data stays in your PDS.", Color(0xFFE8A040))
-                FeatureRow(Icons.Outlined.Edit, "Write and publish your own posts using the standard.site lexicon.", MaterialTheme.colorScheme.primary)
+                FeatureRow(Icons.Outlined.Book, stringResource(R.string.auth_feature_read), Color(0xFF2E7DD1))
+                FeatureRow(Icons.Outlined.Notifications, stringResource(R.string.auth_feature_subscribe), Color(0xFFE8A040))
+                FeatureRow(Icons.Outlined.Edit, stringResource(R.string.auth_feature_write), MaterialTheme.colorScheme.primary)
             }
         }
 
         Spacer(Modifier.height(24.dp))
 
         Column(Modifier.fillMaxWidth()) {
-            Text("Handle", style = MaterialTheme.typography.labelMedium,
+            Text(stringResource(R.string.auth_handle), style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.height(4.dp))
             OutlinedTextField(
@@ -131,7 +133,7 @@ fun LoginScreen(
                 )
                 Spacer(Modifier.width(8.dp))
             }
-            Text("Continue")
+            Text(stringResource(R.string.auth_continue))
         }
 
         if (errorMessage != null) {
@@ -148,14 +150,14 @@ fun LoginScreen(
         Spacer(Modifier.height(12.dp))
 
         Text(
-            "Inkwell uses OAuth to sign in to your PDS securely.",
+            stringResource(R.string.auth_oauth_note),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             modifier = Modifier.fillMaxWidth(),
         )
         Text(
-            "Your browser will open so you can approve access — no app password needed.",
+            stringResource(R.string.auth_browser_note),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -165,7 +167,7 @@ fun LoginScreen(
         Spacer(Modifier.height(16.dp))
 
         TextButton(onClick = { showCredits = true }) {
-            Text("About Inkwell")
+            Text(stringResource(R.string.auth_about))
         }
     }
 }
