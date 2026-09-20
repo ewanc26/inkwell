@@ -146,7 +146,7 @@ fun WriterViewModel.publish() {
     }
 }
 
-private fun ensureDocumentRecordFits(record: JsonObject) {
+internal fun ensureDocumentRecordFits(record: JsonObject) {
     val encodedBytes = Json.encodeToString(JsonObject.serializer(), record).encodeToByteArray().size
     check(encodedBytes <= MAX_DOCUMENT_RECORD_BYTES) {
         "Document is too large to publish (${encodedBytes} bytes; limit is $MAX_DOCUMENT_RECORD_BYTES bytes). Use a shorter document or a blob-backed format."
