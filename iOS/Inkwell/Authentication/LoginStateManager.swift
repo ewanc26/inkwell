@@ -47,6 +47,8 @@ final class LoginStateManager {
     // MARK: - Storage Keys
     @ObservationIgnored let defaults: UserDefaults
     let storedHandleKey = "storedAccountHandle"
+    /// The DID is the account identity; the handle is mutable presentation data.
+    let storedDIDKey = "storedAccountDID"
     let storedPDSKey = "storedAccountPDS"
 
     // MARK: - OAuth State
