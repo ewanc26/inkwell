@@ -29,6 +29,7 @@ object OAuthModule {
         OAuthScopes.REPO_DOCUMENT,
         OAuthScopes.REPO_SUBSCRIPTION,
         OAuthScopes.REPO_RECOMMEND,
+        OAuthScopes.REPO_LEAFLET_COMMENT,
         OAuthScopes.REPO_USERINPUT_DISCUSSION,
         OAuthScopes.REPO_USER,
         "repo:app.bsky.graph.block?action=create&action=delete",
