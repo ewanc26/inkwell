@@ -33,6 +33,8 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.ui.res.pluralStringResource
+import uk.ewancroft.inkwell.R
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -236,9 +238,9 @@ private fun ProfileHeader(profile: BlueskyProfile) {
     val accessibilityLabel = buildList {
         add(displayName)
         add("@${profile.handle}")
-        profile.followersCount?.let { add("$it followers") }
-        profile.followsCount?.let { add("Following $it accounts") }
-        profile.postsCount?.let { add("$it posts") }
+        profile.followersCount?.let { add(pluralStringResource(R.plurals.profile_followers_count, it, it)) }
+        profile.followsCount?.let { add(pluralStringResource(R.plurals.profile_following_count, it, it)) }
+        profile.postsCount?.let { add(pluralStringResource(R.plurals.profile_posts_count, it, it)) }
     }.joinToString(separator = ". ")
 
     Column(
