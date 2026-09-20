@@ -22,6 +22,17 @@ final class RetryAfterPolicyTests: XCTestCase {
         XCTAssertEqual(RetryAfterPolicy.delay(for: "not-a-date", attempt: 20), RetryAfterPolicy.maxDelay, accuracy: 0.001)
     }
 
+    func testMissingHeaderLeavesRetryFallbackToAttemptBackoff() {
+        let response = HTTPURLResponse(
+            url: URL(string: "https://pds.example")!,
+            statusCode: 429,
+            httpVersion: nil,
+            headerFields: nil
+        )!
+        XCTAssertNil(response.value(forHTTPHeaderField: "Retry-After"))
+        XCTAssertEqual(RetryAfterPolicy.delay(for: nil, attempt: 2), 0.4, accuracy: 0.001)
+    }
+
     func testOriginUsesSchemeDefaultPortAndNormalizesHost() {
         XCTAssertEqual(
             RetryAfterPolicy.origin(for: URL(string: "HTTP://PDS.Example")!),

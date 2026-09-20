@@ -206,7 +206,13 @@ extension LoginStateManager {
     }
 
     private static func retryAfter(from response: HTTPURLResponse) -> TimeInterval? {
-        RetryAfterPolicy.delay(for: response.value(forHTTPHeaderField: "Retry-After"), attempt: 0)
+        guard let header = response.value(forHTTPHeaderField: "Retry-After"),
+              !header.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            // Let withRetry select the attempt-based fallback when the server
+            // does not provide a retry delay.
+            return nil
+        }
+        return RetryAfterPolicy.delay(for: header, attempt: 0)
     }
 
     // MARK: - PDS Resolution
