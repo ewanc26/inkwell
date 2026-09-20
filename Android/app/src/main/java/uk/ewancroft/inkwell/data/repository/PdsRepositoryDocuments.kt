@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import okio.Buffer
 import okhttp3.ResponseBody
 import okhttp3.Request
 import uk.ewancroft.inkwell.data.model.bluesky.BlueskyProfile
@@ -58,13 +59,20 @@ internal fun validateDeclaredBlobSize(declaredSize: Long?) {
     }
 }
 
-private fun readBoundedBlob(body: ResponseBody): ByteArray {
+internal fun readBoundedBlob(body: ResponseBody): ByteArray {
     if (body.contentLength() > MAX_READER_BLOB_BYTES) {
         throw java.io.IOException("Blob response exceeds the reader size limit")
     }
-    val bytes = body.source().readByteArray(MAX_READER_BLOB_BYTES + 1)
-    if (bytes.size.toLong() > MAX_READER_BLOB_BYTES) {
+    val source = body.source()
+    val buffer = Buffer()
+    var total = 0L
+    while (total <= MAX_READER_BLOB_BYTES) {
+        val read = source.read(buffer, minOf(16 * 1024L, MAX_READER_BLOB_BYTES + 1 - total))
+        if (read == -1L) break
+        total += read
+    }
+    if (total > MAX_READER_BLOB_BYTES) {
         throw java.io.IOException("Blob response exceeds the reader size limit")
     }
-    return bytes
+    return buffer.readByteArray()
 }
