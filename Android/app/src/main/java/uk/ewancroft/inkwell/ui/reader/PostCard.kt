@@ -50,8 +50,10 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import coil.compose.AsyncImage
 import uk.ewancroft.inkwell.data.model.atproto.BasicTheme
+import uk.ewancroft.inkwell.R
 import uk.ewancroft.inkwell.data.model.atproto.PublicationTheme
 import uk.ewancroft.inkwell.ui.theme.LocalForceDarkTheme
 import uk.ewancroft.inkwell.util.AccessibilityPreferences
@@ -295,7 +297,7 @@ fun PostCard(
                 ) {
                     Icon(
                         Icons.Outlined.MoreVert,
-                        contentDescription = "More actions for $title",
+                        contentDescription = stringResource(R.string.reader_more_actions_for, title),
                         tint = secondaryForeground,
                     )
                 }
@@ -305,7 +307,7 @@ fun PostCard(
                 ) {
                     onViewProfile?.let { viewProfile ->
                         DropdownMenuItem(
-                            text = { Text("View profile") },
+                            text = { Text(stringResource(R.string.reader_view_profile)) },
                             onClick = {
                                 overflowMenuExpanded = false
                                 viewProfile()
@@ -317,7 +319,7 @@ fun PostCard(
                     }
                     onReportPost?.let { reportPost ->
                         DropdownMenuItem(
-                            text = { Text("Report post") },
+                            text = { Text(stringResource(R.string.reader_report_post)) },
                             onClick = {
                                 overflowMenuExpanded = false
                                 reportPost()
@@ -329,7 +331,7 @@ fun PostCard(
                     }
                     onReportAccount?.let { reportAccount ->
                         DropdownMenuItem(
-                            text = { Text("Report account") },
+                            text = { Text(stringResource(R.string.reader_report_account)) },
                             onClick = {
                                 overflowMenuExpanded = false
                                 reportAccount()
