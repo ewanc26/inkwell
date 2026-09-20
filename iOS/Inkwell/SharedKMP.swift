@@ -611,17 +611,6 @@ func sharedNormalizeHandle(_ handle: String) -> String {
     HandleUtils.shared.normalize(handle: handle)
 }
 
-// MARK: - Record List Pagination
-
-/// Maximum records to accumulate when paginating `listRecords` to
-/// completion — a safety cap so a misbehaving PDS returning an endless
-/// cursor can't hang the caller forever. Shared with Android so both
-/// platforms give up at the same point.
-/// `nonisolated` because it is used as a default argument (see
-/// `LoginStateManager.listAllRecords`), and default arguments are
-/// evaluated in the caller's context rather than on the main actor.
-nonisolated var sharedMaxRecordsPerList: Int { Int(RecordListPolicy.shared.MAX_RECORDS) }
-
 // MARK: - String Utilities
 
 func sharedTrimTrailingSlash(_ value: String) -> String {
