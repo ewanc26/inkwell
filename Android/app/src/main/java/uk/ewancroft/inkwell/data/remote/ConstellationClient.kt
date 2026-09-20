@@ -17,6 +17,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromJsonElement
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
@@ -29,6 +30,7 @@ import uk.ewancroft.inkwell.shared.constellation.ConstellationPagination
 import uk.ewancroft.inkwell.shared.constellation.ConstellationBacklink as SharedBacklink
 import uk.ewancroft.inkwell.shared.constellation.ConstellationResponse as SharedResponse
 import uk.ewancroft.inkwell.shared.constellation.ConstellationSourcePaths
+import uk.ewancroft.inkwell.shared.validation.JsonSafety
 
 object ConstellationClient {
     private val json = Json { ignoreUnknownKeys = true }
@@ -66,7 +68,9 @@ object ConstellationClient {
                     "Constellation getBacklinks failed: HTTP ${response.code}"
                 )
             }
-            json.decodeFromString(bodyString)
+            val element = json.parseToJsonElement(bodyString)
+            check(JsonSafety.isSafe(element)) { "Constellation response exceeded structural safety limits" }
+            json.decodeFromJsonElement<ConstellationResponse>(element)
         }
     }
 
