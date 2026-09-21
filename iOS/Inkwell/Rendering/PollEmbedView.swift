@@ -238,7 +238,7 @@ struct PollEmbedView: View {
                 Spacer()
 
                 if state.totalVotes > 0 {
-                    Text("\(count)")
+                    Text(count, format: .number)
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(foregroundColor.opacity(0.5))
                         .frame(minWidth: 24, alignment: .trailing)
@@ -279,7 +279,9 @@ struct PollEmbedView: View {
                 let percentage = Int((fraction * 100).rounded())
                 return Text("\(status), ")
                     + Text("^[\(count) vote](inflect: true)")
-                    + Text(", \(percentage) percent")
+                    + Text(", ")
+                    + Text(percentage, format: .number)
+                    + Text(" percent")
             } else {
                 return Text("\(status), no votes yet")
             }
