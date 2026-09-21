@@ -304,6 +304,14 @@
     <string name="settings_customisation_tip_message">These overrides are free for everyone. If you find them useful, consider a tip to support ongoing development.</string>
     <string name="settings_tip_me">Tip Me</string>
     <string name="settings_maybe_later">Maybe Later</string>
+    <string name="settings_customisation">Customisation</string>
+    <string name="settings_accent_color">Accent Color</string>
+    <string name="settings_reading_font">Reading Font</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_system">System</string>
+    <string name="settings_light">Light</string>
+    <string name="settings_dark">Dark</string>
+    <string name="settings_reset_defaults">Reset to Defaults</string>
     <string name="profile_followers">Followers</string>
     <string name="profile_following">Following</string>
     <string name="profile_posts">Posts</string>
