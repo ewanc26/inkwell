@@ -21,9 +21,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import uk.ewancroft.inkwell.R
 
 /**
  * Tip jar + alternate support methods, opened from [CreditsView] and
@@ -55,7 +57,7 @@ fun SupportDialog(onDismiss: () -> Unit) {
                     .verticalScroll(rememberScrollState())
                     .padding(24.dp),
             ) {
-                Text("Support Inkwell", style = MaterialTheme.typography.titleLarge)
+                Text(stringResource(R.string.support_title), style = MaterialTheme.typography.titleLarge)
 
                 Spacer(Modifier.height(16.dp))
                 SupportMethodRow(
@@ -73,7 +75,7 @@ fun SupportDialog(onDismiss: () -> Unit) {
 
                 Spacer(Modifier.height(16.dp))
                 Text(
-                    "Non-Monetary",
+                    stringResource(R.string.support_non_monetary),
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.primary,
                 )
@@ -94,7 +96,7 @@ fun SupportDialog(onDismiss: () -> Unit) {
 
                 Spacer(Modifier.height(12.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                    TextButton(onClick = onDismiss) { Text("Done") }
+                    TextButton(onClick = onDismiss) { Text(stringResource(R.string.reader_done)) }
                 }
             }
         }
