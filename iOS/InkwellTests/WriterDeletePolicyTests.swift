@@ -15,4 +15,17 @@ final class WriterDeletePolicyTests: XCTestCase {
             "Failed to delete document: The operation was cancelled."
         )
     }
+
+    func testInvalidSwapDuringEditRequestsReload() {
+        let error = NSError(
+            domain: "ATProto",
+            code: 409,
+            userInfo: [NSLocalizedDescriptionKey: "InvalidSwap"]
+        )
+
+        XCTAssertEqual(
+            writerEditErrorMessage(error),
+            "This document changed elsewhere. Reload it before saving."
+        )
+    }
 }
