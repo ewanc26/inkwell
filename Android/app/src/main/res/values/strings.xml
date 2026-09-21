@@ -223,6 +223,13 @@
     <string name="notification_a_publication">a publication</string>
     <string name="notification_channel_name">New Documents</string>
     <string name="notification_channel_description">Notifications for new documents from subscribed publications</string>
+    <string name="writer_format_bold">Bold</string>
+    <string name="writer_format_italic">Italic</string>
+    <string name="writer_format_heading">Heading</string>
+    <string name="writer_format_quote">Quote</string>
+    <string name="writer_format_code">Code</string>
+    <string name="writer_format_link">Link</string>
+    <string name="writer_format_image">Image</string>
     <plurals name="notification_new_documents">
         <item quantity="one">1 new document</item>
         <item quantity="other">%d new documents</item>

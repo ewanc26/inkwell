@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 
 /**
  * A horizontal toolbar of markdown formatting buttons for the writer.
@@ -69,15 +70,15 @@ fun FormattingToolbar(
             .padding(horizontal = 12.dp, vertical = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        FormatButton(icon = Icons.Outlined.FormatBold, label = "Bold") { wrapSelection("**", "**") }
-        FormatButton(icon = Icons.Outlined.FormatItalic, label = "Italic") { wrapSelection("*", "*") }
-        FormatButton(icon = Icons.Outlined.Title, label = "Heading") { prependToLine("## ") }
-        FormatButton(icon = Icons.Outlined.FormatQuote, label = "Quote") { prependToLine("> ") }
-        FormatButton(icon = Icons.Outlined.Code, label = "Code") { wrapSelection("`", "`") }
-        FormatButton(icon = Icons.Outlined.Link, label = "Link") { insertText("[text](url)") }
+        FormatButton(icon = Icons.Outlined.FormatBold, label = stringResource(R.string.writer_format_bold)) { wrapSelection("**", "**") }
+        FormatButton(icon = Icons.Outlined.FormatItalic, label = stringResource(R.string.writer_format_italic)) { wrapSelection("*", "*") }
+        FormatButton(icon = Icons.Outlined.Title, label = stringResource(R.string.writer_format_heading)) { prependToLine("## ") }
+        FormatButton(icon = Icons.Outlined.FormatQuote, label = stringResource(R.string.writer_format_quote)) { prependToLine("> ") }
+        FormatButton(icon = Icons.Outlined.Code, label = stringResource(R.string.writer_format_code)) { wrapSelection("`", "`") }
+        FormatButton(icon = Icons.Outlined.Link, label = stringResource(R.string.writer_format_link)) { insertText("[text](url)") }
         FormatButton(
             icon = Icons.Outlined.Image,
-            label = "Image",
+            label = stringResource(R.string.writer_format_image),
             enabled = canUploadImages,
             onClick = onImagePicker,
         )
