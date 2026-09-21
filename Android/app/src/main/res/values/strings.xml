@@ -23,6 +23,7 @@
         <item quantity="one">%d post</item>
         <item quantity="other">%d posts</item>
     </plurals>
+    <string name="profile_count_unavailable">Count unavailable</string>
     <plurals name="reader_pending_change_count">
         <item quantity="one">change</item>
         <item quantity="other">changes</item>
