@@ -8,3 +8,11 @@ func writerDeleteErrorMessage(_ error: Error) -> String {
     }
     return "Failed to delete document: \(message)"
 }
+
+func writerEditErrorMessage(_ error: Error) -> String {
+    let message = error.localizedDescription
+    if message.localizedCaseInsensitiveContains("swap") {
+        return "This document changed elsewhere. Reload it before saving."
+    }
+    return "Failed to update document: \(message)"
+}
