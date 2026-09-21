@@ -156,6 +156,17 @@
     <string name="feedback_subject">Title</string>
     <string name="feedback_details_optional">Details (optional)</string>
     <string name="feedback_send">Send</string>
+    <string name="credits_send_feedback">Send Feedback</string>
+    <string name="credits_feedback_summary">Bugs, questions, anything</string>
+    <string name="credits_open_feedback">Open feedback form</string>
+    <string name="credits_source_github">Source on GitHub</string>
+    <string name="credits_developer">Developer</string>
+    <string name="credits_legal">Legal</string>
+    <string name="credits_privacy">Privacy Policy</string>
+    <string name="credits_open_privacy">Open privacy policy</string>
+    <string name="credits_terms">Terms of Service</string>
+    <string name="credits_open_terms">Open terms of service</string>
+    <string name="credits_sign_out">Sign Out</string>
     <string name="moderation_reason">Reason</string>
     <string name="moderation_comment_optional">Comment (optional)</string>
     <string name="moderation_report">Report</string>
