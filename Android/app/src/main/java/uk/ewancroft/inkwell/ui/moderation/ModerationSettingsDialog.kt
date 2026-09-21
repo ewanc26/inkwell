@@ -162,17 +162,17 @@ fun ModerationSettingsDialog(
 
                     HorizontalDivider()
 
-                    FilterSectionTitle("Labeler services")
+                    FilterSectionTitle(stringResource(R.string.moderation_labeler_services))
                     Text(
-                        "Disable a source to ignore labels from that service. This applies whenever the PDS includes a label source with an article.",
+                        stringResource(R.string.moderation_labeler_services_description),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     AddValueRow(
                         value = labelerInput,
                         onValueChange = { labelerInput = it },
-                        label = "Labeler DID or service",
-                        addLabel = "Add labeler",
+                        label = stringResource(R.string.moderation_labeler_input),
+                        addLabel = stringResource(R.string.moderation_add_labeler),
                         onAdd = {
                             ModerationPreferences.setLabelerEnabled(context, labelerInput, enabled = true)
                             labelerInput = ""

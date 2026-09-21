@@ -192,6 +192,10 @@
     <string name="moderation_content_warnings_description">Choose whether a labelled article is shown, shown behind a warning, or hidden until you reveal it.</string>
     <string name="moderation_custom_labels">Custom labels</string>
     <string name="moderation_custom_labels_description">Add labels used by a publication or labeler service, then choose how Inkwell should display them.</string>
+    <string name="moderation_labeler_services">Labeler services</string>
+    <string name="moderation_labeler_services_description">Disable a source to ignore labels from that service. This applies whenever the PDS includes a label source with an article.</string>
+    <string name="moderation_labeler_input">Labeler DID or service</string>
+    <string name="moderation_add_labeler">Add labeler</string>
     <string name="moderation_custom_label">Custom label</string>
     <string name="moderation_add_label">Add label</string>
     <string name="moderation_remove_label">Remove %1$s</string>
