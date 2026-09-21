@@ -243,6 +243,16 @@
     <string name="settings_saved_changes">Saved Changes</string>
     <string name="settings_syncing">Syncing…</string>
     <string name="settings_sync_saved_changes_now">Sync Saved Changes Now</string>
+    <string name="settings_data">Data</string>
+    <string name="settings_export_data">Export Data</string>
+    <string name="settings_export_reading_data">Export Reading Data</string>
+    <string name="settings_import_data">Import Data</string>
+    <string name="settings_export_data_message">Exports your locally tracked read and bookmarked articles as a versioned JSON file. This never leaves your device unless you choose to share it.</string>
+    <string name="settings_import_reading_data_title">Import reading data?</string>
+    <string name="settings_import_unsupported_version">This reading-data export uses an unsupported version.</string>
+    <string name="settings_import_invalid_file">This file is not a valid Inkwell reading-data export.</string>
+    <string name="ok">OK</string>
+    <string name="import_action">Import</string>
     <plurals name="settings_pending_import_message">
         <item quantity="one">1 change will be imported. Only newer local choices change.</item>
         <item quantity="other">%d changes will be imported. Only newer local choices change.</item>

@@ -553,9 +553,9 @@ fun SettingsDialog(
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-                    SectionHeader("Data")
+                    SectionHeader(stringResource(R.string.settings_data))
                     SettingsRow(
-                        title = "Export Data",
+                        title = stringResource(R.string.settings_export_data),
                         onClick = {
                             val exportsDir = File(context.cacheDir, "exports").apply { mkdirs() }
                             val file = File(exportsDir, "inkwell-reading-data.json")
@@ -566,15 +566,15 @@ fun SettingsDialog(
                                 putExtra(Intent.EXTRA_STREAM, uri)
                                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                             }
-                            context.startActivity(Intent.createChooser(shareIntent, "Export Reading Data"))
+                            context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.settings_export_reading_data)))
                         },
                     )
                     SettingsRow(
-                        title = "Import Data",
+                        title = stringResource(R.string.settings_import_data),
                         onClick = { importLauncher.launch(arrayOf("application/json", "text/json")) },
                     )
                     Text(
-                        "Exports your locally tracked read and bookmarked articles as a versioned JSON file. This never leaves your device unless you choose to share it.",
+                        stringResource(R.string.settings_export_data_message),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -582,15 +582,15 @@ fun SettingsDialog(
                     importMessage?.let { message ->
                         AlertDialog(
                             onDismissRequest = { importMessage = null },
-                            title = { Text("Import Data") },
+                            title = { Text(stringResource(R.string.settings_import_data)) },
                             text = { Text(message) },
-                            confirmButton = { TextButton(onClick = { importMessage = null }) { Text("OK") } },
+                            confirmButton = { TextButton(onClick = { importMessage = null }) { Text(stringResource(R.string.ok)) } },
                         )
                     }
                     pendingImportText?.let { text ->
                         AlertDialog(
                             onDismissRequest = { pendingImportText = null },
-                            title = { Text("Import reading data?") },
+                            title = { Text(stringResource(R.string.settings_import_reading_data_title)) },
                             text = {
                                 Text(
                                     context.resources.getQuantityString(
@@ -608,13 +608,13 @@ fun SettingsDialog(
                                             result.changes,
                                             result.changes,
                                         )
-                                        ArticleStatePreferences.ImportResult.UnsupportedVersion -> "This reading-data export uses an unsupported version."
-                                        ArticleStatePreferences.ImportResult.Invalid -> "This file is not a valid Inkwell reading-data export."
+                                        ArticleStatePreferences.ImportResult.UnsupportedVersion -> context.getString(R.string.settings_import_unsupported_version)
+                                        ArticleStatePreferences.ImportResult.Invalid -> context.getString(R.string.settings_import_invalid_file)
                                     }
                                     pendingImportText = null
-                                }) { Text("Import") }
+                                }) { Text(stringResource(R.string.import_action)) }
                             },
-                            dismissButton = { TextButton(onClick = { pendingImportText = null }) { Text("Cancel") } },
+                            dismissButton = { TextButton(onClick = { pendingImportText = null }) { Text(stringResource(R.string.cancel)) } },
                         )
                     }
 
