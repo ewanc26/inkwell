@@ -303,9 +303,9 @@ private fun ProfileHeader(profile: BlueskyProfile) {
             verticalArrangement = Arrangement.spacedBy(6.dp),
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp),
         ) {
-            ProfileStatistic(profile.followersCount, "Followers")
-            ProfileStatistic(profile.followsCount, "Following")
-            ProfileStatistic(profile.postsCount, "Posts")
+            ProfileStatistic(profile.followersCount, stringResource(R.string.profile_followers))
+            ProfileStatistic(profile.followsCount, stringResource(R.string.profile_following))
+            ProfileStatistic(profile.postsCount, stringResource(R.string.profile_posts))
         }
     }
 }
