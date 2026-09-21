@@ -386,15 +386,16 @@ private fun PublicationSearchRow(
     publication: PublicationResult,
     onClick: () -> Unit,
 ) {
+    val publicationDescription = stringResource(
+        R.string.discover_publication_description,
+        publication.name.bidiIsolated(),
+        publication.domain.bidiIsolated(),
+    )
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .semantics(mergeDescendants = true) {
-                contentDescription = stringResource(
-                    R.string.discover_publication_description,
-                    publication.name.bidiIsolated(),
-                    publication.domain.bidiIsolated(),
-                )
+                contentDescription = publicationDescription
             }
             .clickable(
                 role = Role.Button,
