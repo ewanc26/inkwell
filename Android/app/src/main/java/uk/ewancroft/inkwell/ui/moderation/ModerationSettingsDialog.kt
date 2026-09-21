@@ -199,24 +199,24 @@ fun ModerationSettingsDialog(
                                     changed()
                                 },
                             ) {
-                                Icon(Icons.Outlined.DeleteOutline, contentDescription = "Remove $labeler")
+                                Icon(Icons.Outlined.DeleteOutline, contentDescription = stringResource(R.string.moderation_remove_label, labeler))
                             }
                         }
                     }
 
                     HorizontalDivider()
 
-                    FilterSectionTitle("Keywords to hide")
+                    FilterSectionTitle(stringResource(R.string.moderation_keywords_to_hide))
                     Text(
-                        "Keywords are matched case-insensitively against article titles, summaries, and available text.",
+                        stringResource(R.string.moderation_keywords_description),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     AddValueRow(
                         value = keywordInput,
                         onValueChange = { keywordInput = it },
-                        label = "Keyword",
-                        addLabel = "Add keyword",
+                        label = stringResource(R.string.moderation_keyword),
+                        addLabel = stringResource(R.string.moderation_add_keyword),
                         onAdd = {
                             ModerationPreferences.addKeyword(context, keywordInput)
                             keywordInput = ""
@@ -234,7 +234,7 @@ fun ModerationSettingsDialog(
                                     ModerationPreferences.removeKeyword(context, keyword)
                                     changed()
                                 },
-                            ) { Text("Remove") }
+                            ) { Text(stringResource(R.string.moderation_remove_keyword)) }
                         }
                     }
                 }
