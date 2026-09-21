@@ -25,10 +25,23 @@ if [[ "$actual" != "$expected" ]]; then
   exit 1
 fi
 
-apk="${1:-app/build/outputs/apk/release/app-release.apk}"
-if [[ ! -f "$apk" ]]; then
-  echo "Release APK not found: $apk" >&2
-  exit 1
+apk="${1:-}"
+if [[ -n "$apk" ]]; then
+  if [[ ! -f "$apk" ]]; then
+    echo "Release APK not found: $apk" >&2
+    exit 1
+  fi
+else
+  release_apks=()
+  while IFS= read -r apk_path; do
+    release_apks+=("$apk_path")
+  done < <(find app/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' -print | sort)
+  if [[ "${#release_apks[@]}" -ne 1 ]]; then
+    echo "Expected exactly one release APK, found ${#release_apks[@]}" >&2
+    printf '%s\n' "${release_apks[@]}" >&2
+    exit 1
+  fi
+  apk="${release_apks[0]}"
 fi
 
 sdk_dir="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
