@@ -215,7 +215,7 @@ fun WriterScreen(
                         modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(
-                            uiState.selectedPublication?.name ?: "Select a publication...",
+                            uiState.selectedPublication?.name ?: stringResource(R.string.writer_select_publication),
                             modifier = Modifier.weight(1f),
                         )
                         Icon(Icons.Outlined.ArrowDropDown, contentDescription = null)
@@ -250,7 +250,7 @@ fun WriterScreen(
                 ) {
                     CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)
                     Text(
-                        "Verifying publication...",
+                        stringResource(R.string.writer_verifying_publication),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -284,7 +284,7 @@ fun WriterScreen(
                             tint = MaterialTheme.colorScheme.primary,
                         )
                         Text(
-                            "Editing existing document",
+                            stringResource(R.string.writer_editing_existing_document),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.weight(1f),
@@ -311,7 +311,7 @@ fun WriterScreen(
                 ) {
                     Icon(Icons.Outlined.List, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
-                    Text(if (uiState.editingDocumentUri != null) "Change document" else "Edit existing document")
+                    Text(stringResource(if (uiState.editingDocumentUri != null) R.string.writer_change_document else R.string.writer_edit_existing_document))
                 }
             }
 

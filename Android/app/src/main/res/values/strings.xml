@@ -60,6 +60,11 @@
     <string name="writer_alt_text">Alt text</string>
     <string name="writer_alt_text_hint">Describe the purpose of the image, not its filename.</string>
     <string name="writer_decorative_image">Decorative image</string>
+    <string name="writer_select_publication">Select a publication…</string>
+    <string name="writer_verifying_publication">Verifying publication…</string>
+    <string name="writer_editing_existing_document">Editing existing document</string>
+    <string name="writer_change_document">Change document</string>
+    <string name="writer_edit_existing_document">Edit existing document</string>
     <string name="reader_recommend">Recommend</string>
     <string name="reader_unrecommend">Unrecommend</string>
     <string name="reader_subscribe">Subscribe to publication</string>
