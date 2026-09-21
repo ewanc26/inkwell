@@ -289,6 +289,14 @@
     <string name="create">Create</string>
     <string name="cancel">Cancel</string>
     <string name="selected">Selected</string>
+    <string name="discover_clear">Clear</string>
+    <string name="discover_published_on">Published on %1$s</string>
+    <string name="discover_by">By %1$s</string>
+    <string name="discover_open_article">Open article</string>
+    <string name="discover_open_browser">Open in browser</string>
+    <string name="discover_open_profile">Open profile</string>
+    <string name="discover_publication_description">Publication: %1$s. %2$s</string>
+    <string name="discover_open_publication">Open publication</string>
     <plurals name="notification_new_documents">
         <item quantity="one">1 new document</item>
         <item quantity="other">%d new documents</item>
