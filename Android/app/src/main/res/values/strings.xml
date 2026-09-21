@@ -196,6 +196,9 @@
     <string name="moderation_labeler_services_description">Disable a source to ignore labels from that service. This applies whenever the PDS includes a label source with an article.</string>
     <string name="moderation_labeler_input">Labeler DID or service</string>
     <string name="moderation_add_labeler">Add labeler</string>
+    <string name="moderation_muted_blocked_title">Muted &amp; Blocked</string>
+    <string name="close">Close</string>
+    <string name="moderation_loading_settings">Loading moderation settings</string>
     <string name="moderation_custom_label">Custom label</string>
     <string name="moderation_add_label">Add label</string>
     <string name="moderation_remove_label">Remove %1$s</string>
