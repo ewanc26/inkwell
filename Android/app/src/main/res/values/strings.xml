@@ -335,7 +335,6 @@
     <string name="discover_open_publication">Open publication</string>
     <string name="settings_sign_out_title">Sign out of Inkwell?</string>
     <string name="settings_sign_out_message">Your publications and subscriptions stay in your PDS. You can sign back in at any time.</string>
-    <string name="settings_sign_out">Sign Out</string>
     <string name="settings_customisation_tip_title">Enjoying Customisation?</string>
     <string name="settings_customisation_tip_message">These overrides are free for everyone. If you find them useful, consider a tip to support ongoing development.</string>
     <string name="settings_tip_me">Tip Me</string>
