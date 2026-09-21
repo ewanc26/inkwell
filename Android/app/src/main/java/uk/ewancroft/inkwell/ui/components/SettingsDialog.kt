@@ -620,9 +620,9 @@ fun SettingsDialog(
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-                    SectionHeader("Links")
+                    SectionHeader(stringResource(R.string.settings_links))
                     SettingsRow(
-                        title = "Open Links In-App",
+                        title = stringResource(R.string.settings_open_links_in_app),
                         trailing = {
                             Switch(
                                 checked = openLinksInApp,
@@ -634,7 +634,7 @@ fun SettingsDialog(
                         },
                     )
                     Text(
-                        "Article and post links open in an in-app browser instead of leaving Inkwell. This doesn't affect sign-in or the links above, which always open in your default browser.",
+                        stringResource(R.string.settings_open_links_in_app_message),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -642,14 +642,14 @@ fun SettingsDialog(
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-                    SectionHeader("Legal")
-                    SettingsRow(title = "Privacy Policy", onClick = { legalDocument = LegalDocumentType.PrivacyPolicy })
-                    SettingsRow(title = "Terms of Service", onClick = { legalDocument = LegalDocumentType.TermsOfService })
+                    SectionHeader(stringResource(R.string.settings_legal))
+                    SettingsRow(title = stringResource(R.string.settings_privacy_policy), onClick = { legalDocument = LegalDocumentType.PrivacyPolicy })
+                    SettingsRow(title = stringResource(R.string.settings_terms_of_service), onClick = { legalDocument = LegalDocumentType.TermsOfService })
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-                    SectionHeader("About")
-                    SettingsRow(title = "About Inkwell", onClick = { showAbout = true })
+                    SectionHeader(stringResource(R.string.settings_about))
+                    SettingsRow(title = stringResource(R.string.settings_about_inkwell), onClick = { showAbout = true })
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
