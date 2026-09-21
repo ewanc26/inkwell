@@ -96,6 +96,8 @@
     <string name="reader_report_post">Report post</string>
     <string name="reader_report_account">Report account</string>
     <string name="reader_reveal_article">Reveal article</string>
+    <string name="reader_published_date">Published %1$s</string>
+    <string name="reader_updated_date">Updated %1$s</string>
     <string name="reader_load_failed">Couldn\'t load this post</string>
     <string name="reader_retry">Retry</string>
     <string name="reader_loading_recommendations">Loading recommendations…</string>
