@@ -345,6 +345,7 @@
     <string name="profile_followers">Followers</string>
     <string name="profile_following">Following</string>
     <string name="profile_posts">Posts</string>
+    <string name="reader_reveal_article">Reveal article</string>
     <plurals name="notification_new_documents">
         <item quantity="one">1 new document</item>
         <item quantity="other">%d new documents</item>
