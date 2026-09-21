@@ -231,6 +231,14 @@
     <string name="support_title">Support Inkwell</string>
     <string name="support_non_monetary">Non-Monetary</string>
     <string name="reader_done">Done</string>
+    <string name="support_kofi">Ko-fi</string>
+    <string name="support_kofi_detail">Buy me a tea — £2.99 suggested</string>
+    <string name="support_sponsors">GitHub Sponsors</string>
+    <string name="support_sponsors_detail">Sponsor development work</string>
+    <string name="support_share">Share Inkwell</string>
+    <string name="support_share_detail">Word of mouth is the best support</string>
+    <string name="support_contribute">Contribute</string>
+    <string name="support_contribute_detail">Bugs, features, pull requests</string>
     <string name="writer_format_bold">Bold</string>
     <string name="writer_format_italic">Italic</string>
     <string name="writer_format_heading">Heading</string>

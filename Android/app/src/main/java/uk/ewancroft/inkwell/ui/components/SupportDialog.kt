@@ -62,14 +62,14 @@ fun SupportDialog(onDismiss: () -> Unit) {
                 Spacer(Modifier.height(16.dp))
                 SupportMethodRow(
                     icon = Icons.Filled.LocalCafe,
-                    title = "Ko-fi",
-                    detail = "Buy me a tea — £2.99 suggested",
+                    title = stringResource(R.string.support_kofi),
+                    detail = stringResource(R.string.support_kofi_detail),
                     onClick = { openUrl("https://ko-fi.com/ewancroft?amount=2.99") },
                 )
                 SupportMethodRow(
                     icon = Icons.Filled.Favorite,
-                    title = "GitHub Sponsors",
-                    detail = "Sponsor development work",
+                    title = stringResource(R.string.support_sponsors),
+                    detail = stringResource(R.string.support_sponsors_detail),
                     onClick = { openUrl("https://github.com/sponsors/ewanc26") },
                 )
 
@@ -82,15 +82,15 @@ fun SupportDialog(onDismiss: () -> Unit) {
                 Spacer(Modifier.height(8.dp))
                 SupportMethodRow(
                     icon = Icons.Filled.Share,
-                    title = "Share Inkwell",
-                    detail = "Word of mouth is the best support",
-                    actionLabel = "Share Inkwell",
+                    title = stringResource(R.string.support_share),
+                    detail = stringResource(R.string.support_share_detail),
+                    actionLabel = stringResource(R.string.support_share),
                     onClick = ::shareInkwell,
                 )
                 SupportMethodRow(
                     icon = Icons.Filled.Code,
-                    title = "Contribute",
-                    detail = "Bugs, features, pull requests",
+                    title = stringResource(R.string.support_contribute),
+                    detail = stringResource(R.string.support_contribute_detail),
                     onClick = { openUrl("https://github.com/ewanc26/inkwell") },
                 )
 
