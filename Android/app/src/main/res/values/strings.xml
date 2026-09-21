@@ -278,6 +278,8 @@
     <string name="writer_publication_url">URL (e.g. https://mysite.com)</string>
     <string name="writer_publication_name">Publication Name</string>
     <string name="writer_publication_description">Description (optional)</string>
+    <string name="writer_select_document">Select a document to edit</string>
+    <string name="writer_no_documents">No documents found.</string>
     <string name="create">Create</string>
     <string name="cancel">Cancel</string>
     <plurals name="notification_new_documents">
