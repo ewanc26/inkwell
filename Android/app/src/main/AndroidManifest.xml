@@ -83,7 +83,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
                     android:scheme="uk.ewancroft.inkwell"
-                    android:path="/callback" />
+                    android:path="/callback"
+                    tools:ignore="AppLinkUrlError" />
             </intent-filter>
         </activity>
 
