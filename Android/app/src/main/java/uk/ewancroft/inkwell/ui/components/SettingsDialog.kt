@@ -499,10 +499,10 @@ fun SettingsDialog(
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-                    SectionHeader("Storage")
-                    SettingsRow(title = "Image Cache", trailing = { Text(formatCacheSize(cacheSizeBytes)) })
+                    SectionHeader(stringResource(R.string.settings_storage))
+                    SettingsRow(title = stringResource(R.string.settings_image_cache), trailing = { Text(formatCacheSize(cacheSizeBytes)) })
                     SettingsRow(
-                        title = "Clear Cached Content",
+                        title = stringResource(R.string.settings_clear_cached_content),
                         titleColor = MaterialTheme.colorScheme.error,
                         onClick = {
                             ImageCacheManager.clear(context)
@@ -511,7 +511,7 @@ fun SettingsDialog(
                         },
                     )
                     Text(
-                        "Removes downloaded images, saved feed cards, and full documents and publications available for offline reading. Saved changes waiting to sync are kept.",
+                        stringResource(R.string.settings_clear_cached_content_message),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -519,9 +519,9 @@ fun SettingsDialog(
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-                    SectionHeader("Pending Changes")
+                    SectionHeader(stringResource(R.string.settings_pending_changes))
                     SettingsRow(
-                        title = "Saved Changes",
+                        title = stringResource(R.string.settings_saved_changes),
                         trailing = {
                             Text(
                                 pluralStringResource(
@@ -538,7 +538,10 @@ fun SettingsDialog(
                             enabled = canSyncPendingChanges && !isSyncingPendingChanges,
                             modifier = Modifier.padding(horizontal = 8.dp),
                         ) {
-                            Text(if (isSyncingPendingChanges) "Syncing…" else "Sync Saved Changes Now")
+                            Text(
+                                if (isSyncingPendingChanges) stringResource(R.string.settings_syncing)
+                                else stringResource(R.string.settings_sync_saved_changes_now),
+                            )
                         }
                     }
                     Text(
