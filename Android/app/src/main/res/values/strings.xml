@@ -253,6 +253,14 @@
     <string name="settings_import_invalid_file">This file is not a valid Inkwell reading-data export.</string>
     <string name="ok">OK</string>
     <string name="import_action">Import</string>
+    <string name="settings_links">Links</string>
+    <string name="settings_open_links_in_app">Open Links In-App</string>
+    <string name="settings_open_links_in_app_message">Article and post links open in an in-app browser instead of leaving Inkwell. This doesn’t affect sign-in or the links above, which always open in your default browser.</string>
+    <string name="settings_legal">Legal</string>
+    <string name="settings_privacy_policy">Privacy Policy</string>
+    <string name="settings_terms_of_service">Terms of Service</string>
+    <string name="settings_about">About</string>
+    <string name="settings_about_inkwell">About Inkwell</string>
     <plurals name="settings_pending_import_message">
         <item quantity="one">1 change will be imported. Only newer local choices change.</item>
         <item quantity="other">%d changes will be imported. Only newer local choices change.</item>
