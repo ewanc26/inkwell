@@ -119,6 +119,7 @@ fun NotificationsDialog(
 
 @Composable
 private fun NotificationRow(notification: InkwellNotification, onClick: () -> Unit) {
+    val openArticleLabel = stringResource(R.string.discover_open_article)
     val metadata = listOfNotNull(
         notification.publicationName,
         relativeTime(notification.date),
@@ -127,11 +128,11 @@ private fun NotificationRow(notification: InkwellNotification, onClick: () -> Un
         modifier = Modifier
             .fillMaxWidth()
             .semantics(mergeDescendants = true) {
-                contentDescription = listOf(notification.documentTitle, metadata, "Open article")
+                contentDescription = listOf(notification.documentTitle, metadata, openArticleLabel)
                     .filter(String::isNotBlank)
                     .joinToString(". ")
             }
-            .clickable(role = Role.Button, onClickLabel = "Open article", onClick = onClick)
+            .clickable(role = Role.Button, onClickLabel = openArticleLabel, onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
