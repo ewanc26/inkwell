@@ -11,6 +11,7 @@
 
 import Foundation
 import ImageIO
+import UIKit
 import XCTest
 import UniformTypeIdentifiers
 @testable import Inkwell
@@ -376,13 +377,39 @@ final class StandardSiteTests: XCTestCase {
     }
 
     func testImageSanitizerRejectsAnimatedGIF() {
-        let animatedGIF = Data(base64Encoded: "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7")!
+        let animatedGIF = makeAnimatedGIF()
 
         XCTAssertThrowsError(try ImageUploadSanitizer.sanitize(animatedGIF)) { error in
             guard case .animatedImage = error as? ImageUploadSanitizer.Failure else {
                 return XCTFail("Expected animated-image rejection, got \(error)")
             }
         }
+    }
+
+    private func makeAnimatedGIF() -> Data {
+        let data = NSMutableData()
+        let destination = CGImageDestinationCreateWithData(
+            data,
+            UTType.gif.identifier as CFString,
+            2,
+            nil
+        )!
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 1, height: 1))
+        let red = renderer.image { context in
+            UIColor.red.setFill()
+            context.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
+        }.cgImage!
+        let blue = renderer.image { context in
+            UIColor.blue.setFill()
+            context.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
+        }.cgImage!
+        let frameProperties: [CFString: Any] = [
+            kCGImagePropertyGIFDictionary: [kCGImagePropertyGIFDelayTime: 0.1],
+        ]
+        CGImageDestinationAddImage(destination, red, frameProperties as CFDictionary)
+        CGImageDestinationAddImage(destination, blue, frameProperties as CFDictionary)
+        XCTAssertTrue(CGImageDestinationFinalize(destination))
+        return data as Data
     }
 
     func testContentDeepLinkPolicyAcceptsEncodedDocumentURI() {
