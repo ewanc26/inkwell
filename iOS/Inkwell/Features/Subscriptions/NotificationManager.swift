@@ -247,7 +247,7 @@ final class NotificationManager {
                 let newest = sortedDocs[0]
                 if notificationsEnabled {
                     await sendNotification(
-                        title: String(localized: "\(count) New Documents"),
+                        title: String(localized: "^[\(count) new document](inflect: true)"),
                         body: newest.sensitive ? "Open Inkwell to view your new documents" : "Latest: \(newest.doc.record.title) from \(newest.pub?.record.name ?? "a publication")",
                         documentURI: newest.doc.uri
                     )
