@@ -25,6 +25,7 @@ struct ReadView: View {
     @Environment(LoginStateManager.self) var loginStateManager
     @Environment(ConnectivityMonitor.self) var connectivityMonitor
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.dynamicTypeSize) var dynamicTypeSize
 
     let document: SiteStandardLexicon.DocumentRecord
     let publication: SiteStandardLexicon.PublicationRecord?
@@ -109,7 +110,7 @@ struct ReadView: View {
                             .font(theme.headingFont(.caption, weight: .bold))
                             .foregroundStyle(accentColor)
                             .tracking(2)
-                            .lineLimit(1)
+                            .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 1)
                             .accessibilityLabel("Publication: \(pubName)")
                     }
 
@@ -130,8 +131,8 @@ struct ReadView: View {
                             Text(path)
                                 .font(.caption2)
                                 .foregroundStyle(foregroundColor.opacity(0.5))
-                                .lineLimit(1)
-                                .truncationMode(.middle)
+                                .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 1)
+                                .truncationMode(dynamicTypeSize.isAccessibilitySize ? .tail : .middle)
                         }
                     }
                     .font(.caption)
