@@ -99,11 +99,11 @@ fun PostCard(
     val cardBorderColor = foreground.copy(alpha = 0.1f)
     val accessibilityLabel = buildList {
         add(title)
-        authorDisplayName?.takeIf(String::isNotBlank)?.let { add("By $it") }
+        authorDisplayName?.takeIf(String::isNotBlank)?.let { add(stringResource(R.string.reader_by_author, it)) }
         description?.takeIf(String::isNotBlank)?.let(::add)
-        publicationName?.takeIf(String::isNotBlank)?.let { add("Published in $it") }
-        if (isCached) add("Available offline")
-        add("Published $date")
+        publicationName?.takeIf(String::isNotBlank)?.let { add(stringResource(R.string.reader_published_in, it)) }
+        if (isCached) add(stringResource(R.string.reader_available_offline))
+        add(stringResource(R.string.reader_published_date, date))
     }.joinToString(separator = ". ")
     val hasOverflowActions = onViewProfile != null || onReportPost != null || onReportAccount != null
     var overflowMenuExpanded by remember { mutableStateOf(false) }
