@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -38,6 +39,7 @@ import uk.ewancroft.inkwell.data.remote.BSkyListFetcher
 import uk.ewancroft.inkwell.shared.content.SearchBackendUrl
 import uk.ewancroft.inkwell.shared.support.SupportersList
 import uk.ewancroft.inkwell.ui.feedback.FeedbackDialog
+import uk.ewancroft.inkwell.R
 
 @Composable
 fun CreditsView(
@@ -164,8 +166,8 @@ fun CreditsView(
                         modifier = Modifier
                             .fillMaxWidth()
                             .accessibleAction(
-                                description = "Send Feedback. Bugs, questions, anything",
-                                actionLabel = "Open feedback form",
+                                description = stringResource(R.string.credits_send_feedback) + ". " + stringResource(R.string.credits_feedback_summary),
+                                actionLabel = stringResource(R.string.credits_open_feedback),
                                 onClick = { showFeedback = true },
                             )
                             .padding(vertical = 6.dp),
@@ -179,46 +181,46 @@ fun CreditsView(
                         )
                         Spacer(Modifier.width(8.dp))
                         Column(modifier = Modifier.weight(1f)) {
-                            Text("Send Feedback", style = MaterialTheme.typography.bodyMedium)
+                            Text(stringResource(R.string.credits_send_feedback), style = MaterialTheme.typography.bodyMedium)
                             Text(
-                                "Bugs, questions, anything",
+                                stringResource(R.string.credits_feedback_summary),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                     }
                 }
-                CreditRow(title = "Source on GitHub", detail = "ewanc26/inkwell", url = "https://github.com/ewanc26/inkwell", openUrl = ::openUrl)
-                CreditRow(title = "Ewan Croft", detail = "Developer", url = "https://ewancroft.uk", openUrl = ::openUrl)
+                CreditRow(title = stringResource(R.string.credits_source_github), detail = "ewanc26/inkwell", url = "https://github.com/ewanc26/inkwell", openUrl = ::openUrl)
+                CreditRow(title = "Ewan Croft", detail = stringResource(R.string.credits_developer), url = "https://ewancroft.uk", openUrl = ::openUrl)
 
                 Spacer(Modifier.height(24.dp))
                 HorizontalDivider()
                 Spacer(Modifier.height(16.dp))
 
                 // Legal
-                SectionHeader("Legal")
+                SectionHeader(stringResource(R.string.credits_legal))
                 Text(
-                    "Privacy Policy",
+                    stringResource(R.string.credits_privacy),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
                         .fillMaxWidth()
                         .accessibleAction(
-                            description = "Privacy Policy",
-                            actionLabel = "Open privacy policy",
+                            description = stringResource(R.string.credits_privacy),
+                            actionLabel = stringResource(R.string.credits_open_privacy),
                             onClick = { showPrivacy = true },
                         ),
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "Terms of Service",
+                    stringResource(R.string.credits_terms),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
                         .fillMaxWidth()
                         .accessibleAction(
-                            description = "Terms of Service",
-                            actionLabel = "Open terms of service",
+                            description = stringResource(R.string.credits_terms),
+                            actionLabel = stringResource(R.string.credits_open_terms),
                             onClick = { showTerms = true },
                         ),
                 )
@@ -245,7 +247,7 @@ fun CreditsView(
                     ) {
                         Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null, Modifier.size(18.dp))
                         Spacer(Modifier.width(6.dp))
-                        Text("Sign Out")
+                        Text(stringResource(R.string.credits_sign_out))
                     }
                 }
 
