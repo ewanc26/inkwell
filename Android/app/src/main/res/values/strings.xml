@@ -167,6 +167,11 @@
     <string name="moderation_custom_label">Custom label</string>
     <string name="moderation_add_label">Add label</string>
     <string name="moderation_remove_label">Remove %1$s</string>
+    <string name="moderation_keywords_to_hide">Keywords to hide</string>
+    <string name="moderation_keywords_description">Keywords are matched case-insensitively against article titles, summaries, and available text.</string>
+    <string name="moderation_keyword">Keyword</string>
+    <string name="moderation_add_keyword">Add keyword</string>
+    <string name="moderation_remove_keyword">Remove</string>
     <plurals name="moderation_muted_count">
         <item quantity="one">Muted (1)</item>
         <item quantity="other">Muted (%d)</item>
