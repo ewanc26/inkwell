@@ -304,6 +304,9 @@
     <string name="settings_customisation_tip_message">These overrides are free for everyone. If you find them useful, consider a tip to support ongoing development.</string>
     <string name="settings_tip_me">Tip Me</string>
     <string name="settings_maybe_later">Maybe Later</string>
+    <string name="profile_followers">Followers</string>
+    <string name="profile_following">Following</string>
+    <string name="profile_posts">Posts</string>
     <plurals name="notification_new_documents">
         <item quantity="one">1 new document</item>
         <item quantity="other">%d new documents</item>
