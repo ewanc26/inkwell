@@ -113,9 +113,9 @@ fun CreditsView(
                 Spacer(Modifier.height(16.dp))
 
                 // About
-                SectionHeader("About")
+                SectionHeader(stringResource(R.string.credits_about))
                 Text(
-                    "A native reader and writer for the Standard.site publishing ecosystem on AT Protocol — read, discover, and publish portable writing from your own PDS.",
+                    stringResource(R.string.credits_about_summary),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -125,13 +125,13 @@ fun CreditsView(
                 Spacer(Modifier.height(16.dp))
 
                 // Built On
-                SectionHeader("Built On")
-                CreditRow(title = "atproto-kotlin", detail = "AT Protocol SDK + OAuth 2.1 by kikin81", url = "https://github.com/kikin81/atproto-kotlin", openUrl = ::openUrl)
-                CreditRow(title = "Standard.site", detail = "The publishing protocol Inkwell reads and writes", url = "https://standard.site", openUrl = ::openUrl)
-                CreditRow(title = "pub search", detail = "Cross-platform Standard.site search index", url = SearchBackendUrl.BASE, openUrl = ::openUrl)
+                SectionHeader(stringResource(R.string.credits_built_on))
+                CreditRow(title = "atproto-kotlin", detail = stringResource(R.string.credits_atproto_detail), url = "https://github.com/kikin81/atproto-kotlin", openUrl = ::openUrl)
+                CreditRow(title = "Standard.site", detail = stringResource(R.string.credits_standard_detail), url = "https://standard.site", openUrl = ::openUrl)
+                CreditRow(title = "pub search", detail = stringResource(R.string.credits_search_detail), url = SearchBackendUrl.BASE, openUrl = ::openUrl)
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "Inkwell reads and writes Leaflet, Markpub, pckt, and Offprint content alongside the shared site.standard.* records.",
+                    stringResource(R.string.credits_formats_summary),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -142,13 +142,13 @@ fun CreditsView(
                     Spacer(Modifier.height(16.dp))
 
                     // Supporters
-                    SectionHeader("Supporters")
+                    SectionHeader(stringResource(R.string.credits_supporters))
                     supporters.forEach { supporter ->
                         SupporterRow(supporter = supporter, openUrl = ::openUrl)
                     }
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        "Everyone who's tipped Inkwell via Ko-fi or GitHub Sponsors, listed on Bluesky. Thank you.",
+                        stringResource(R.string.credits_supporters_summary),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -159,7 +159,7 @@ fun CreditsView(
                 Spacer(Modifier.height(16.dp))
 
                 // Support
-                SectionHeader("Support")
+                SectionHeader(stringResource(R.string.credits_support))
                 SupportRow(onClick = { showSupport = true })
                 if (isAuthenticated) {
                     Row(
@@ -226,8 +226,8 @@ fun CreditsView(
                 )
                 Spacer(Modifier.height(8.dp))
                 CreditRow(
-                    title = "AGPL-3.0 with App Store Exception",
-                    detail = "Open-source licence and store-distribution permission",
+                    title = stringResource(R.string.credits_license),
+                    detail = stringResource(R.string.credits_license_detail),
                     url = "https://github.com/ewanc26/inkwell/blob/main/APP_STORE_EXCEPTION.md",
                     openUrl = ::openUrl,
                 )
@@ -253,7 +253,7 @@ fun CreditsView(
 
                 Spacer(Modifier.height(16.dp))
                 Text(
-                    "Inkwell for iOS is also available on GitHub.",
+                    stringResource(R.string.credits_ios_github),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -297,7 +297,7 @@ private fun CreditRow(title: String, detail: String, url: String, openUrl: (Stri
             .fillMaxWidth()
             .accessibleAction(
                 description = "$title. $detail",
-                actionLabel = "Open $title",
+                actionLabel = stringResource(R.string.credits_open_item, title),
                 onClick = { openUrl(url) },
             )
             .padding(vertical = 6.dp),
@@ -334,7 +334,7 @@ private fun SupporterRow(supporter: BlueskyProfile, openUrl: (String) -> Unit) {
             .fillMaxWidth()
             .accessibleAction(
                 description = accessibilityDescription,
-                actionLabel = "Open supporter profile",
+                actionLabel = stringResource(R.string.credits_open_supporter),
                 onClick = { openUrl("https://bsky.app/profile/${supporter.handle}") },
             )
             .padding(vertical = 6.dp),
@@ -383,8 +383,8 @@ private fun SupportRow(onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .accessibleAction(
-                description = "Support Inkwell",
-                actionLabel = "Open support options",
+                description = stringResource(R.string.credits_support_inkwell),
+                actionLabel = stringResource(R.string.credits_open_support),
                 onClick = onClick,
             )
             .padding(vertical = 6.dp),
@@ -398,7 +398,7 @@ private fun SupportRow(onClick: () -> Unit) {
         )
         Spacer(Modifier.width(8.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text("Support Inkwell", style = MaterialTheme.typography.bodyMedium)
+            Text(stringResource(R.string.credits_support_inkwell), style = MaterialTheme.typography.bodyMedium)
         }
         Icon(
             Icons.Filled.ChevronRight,
