@@ -96,7 +96,7 @@ enum ConstellationClient {
 
         logger.debug("[Constellation] getBacklinks subject=\(subject) source=\(source)")
 
-        let (data, response) = try await session.data(from: url)
+        let (data, response) = try await JSONSafety.boundedData(from: url, using: session)
 
         guard let http = response as? HTTPURLResponse else {
             throw URLError(.badServerResponse)
