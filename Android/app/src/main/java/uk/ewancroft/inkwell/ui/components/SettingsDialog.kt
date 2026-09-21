@@ -750,7 +750,11 @@ private fun ColorSwatch(hex: String, selected: Boolean, onClick: () -> Unit) {
         contentAlignment = Alignment.Center,
     ) {
         if (selected) {
-            Icon(Icons.Filled.Check, contentDescription = "Selected", tint = Color.White)
+            Icon(
+                Icons.Filled.Check,
+                contentDescription = stringResource(R.string.selected),
+                tint = Color.White,
+            )
         }
     }
 }

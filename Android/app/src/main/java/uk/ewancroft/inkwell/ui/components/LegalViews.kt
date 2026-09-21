@@ -17,9 +17,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import uk.ewancroft.inkwell.R
 import uk.ewancroft.inkwell.shared.legal.LegalDocuments
 import uk.ewancroft.inkwell.ui.reader.MarkdownRendererView
 
@@ -54,7 +56,10 @@ fun LegalDocumentDialog(documentType: LegalDocumentType, onDismiss: () -> Unit) 
                         title = { Text(documentType.title) },
                         navigationIcon = {
                             IconButton(onClick = onDismiss) {
-                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Close")
+                                Icon(
+                                    Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = stringResource(R.string.close),
+                                )
                             }
                         },
                     )
