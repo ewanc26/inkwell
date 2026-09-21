@@ -87,11 +87,7 @@ extension LoginStateManager {
 
         try JSONSafety.validateResponse(responseData)
         let blob = try JSONDecoder().decode(ComAtprotoLexicon.Repository.UploadBlobOutput.self, from: responseData)
-        guard blob.size == data.count,
-              blob.mimeType == mimeType,
-              !blob.reference.link.isEmpty else {
-            throw LoginError.httpError(status: 0)
-        }
+        try validateUploadedBlob(blob, expectedMimeType: mimeType, expectedSize: data.count)
         return blob
     }
 }
@@ -111,5 +107,17 @@ func makeBlobUploadRequest(url: URL, data: Data, mimeType: String) -> URLRequest
 func validateDeclaredBlobSize(_ declaredSize: Int?) throws {
     if let declaredSize, declaredSize < 0 || declaredSize > maxReaderBlobBytes {
         throw BlobDownloadError.oversized
+    }
+}
+
+func validateUploadedBlob(
+    _ blob: ComAtprotoLexicon.Repository.UploadBlobOutput,
+    expectedMimeType: String,
+    expectedSize: Int
+) throws {
+    guard blob.size == expectedSize,
+          blob.mimeType == expectedMimeType,
+          !blob.reference.link.isEmpty else {
+        throw LoginError.httpError(status: 0)
     }
 }
