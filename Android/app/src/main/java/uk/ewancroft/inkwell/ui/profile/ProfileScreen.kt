@@ -303,15 +303,16 @@ private fun ProfileHeader(profile: BlueskyProfile) {
             verticalArrangement = Arrangement.spacedBy(6.dp),
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp),
         ) {
-            ProfileStatistic(profile.followersCount, stringResource(R.string.profile_followers))
-            ProfileStatistic(profile.followsCount, stringResource(R.string.profile_following))
-            ProfileStatistic(profile.postsCount, stringResource(R.string.profile_posts))
+            ProfileStatistic(profile.followersCount, R.plurals.profile_followers_count)
+            ProfileStatistic(profile.followsCount, R.plurals.profile_following_count)
+            ProfileStatistic(profile.postsCount, R.plurals.profile_posts_count)
         }
     }
 }
 
 @Composable
-private fun ProfileStatistic(value: Int?, label: String) {
+private fun ProfileStatistic(value: Int?, label: Int) {
+    val formattedLabel = value?.let { pluralStringResource(label, it, it) } ?: stringResource(R.string.profile_count_unavailable)
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
             value?.toString() ?: "—",
@@ -319,6 +320,6 @@ private fun ProfileStatistic(value: Int?, label: String) {
             fontWeight = FontWeight.SemiBold,
         )
         Spacer(Modifier.width(8.dp))
-        Text(label, style = MaterialTheme.typography.bodyMedium)
+        Text(formattedLabel, style = MaterialTheme.typography.bodyMedium)
     }
 }
