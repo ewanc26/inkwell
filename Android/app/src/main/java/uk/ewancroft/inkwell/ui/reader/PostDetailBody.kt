@@ -262,7 +262,12 @@ private fun PrevNextRow(
             ) {
                 Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
-                Text(previousTitle ?: "Previous", maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                Text(
+                    previousTitle ?: "Previous",
+                    maxLines = Int.MAX_VALUE,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Clip,
+                    modifier = Modifier.weight(1f),
+                )
             }
         }
         if (nextUri != null) {
@@ -270,7 +275,12 @@ private fun PrevNextRow(
                 onClick = { onNavigateToPost(nextUri, null, null, null, null) },
                 modifier = Modifier.weight(1f).heightIn(min = 48.dp),
             ) {
-                Text(nextTitle ?: "Next", maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                Text(
+                    nextTitle ?: "Next",
+                    maxLines = Int.MAX_VALUE,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Clip,
+                    modifier = Modifier.weight(1f),
+                )
                 Spacer(Modifier.width(8.dp))
                 Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null, modifier = Modifier.size(18.dp))
             }
