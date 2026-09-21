@@ -288,6 +288,7 @@
     <string name="writer_no_documents">No documents found.</string>
     <string name="create">Create</string>
     <string name="cancel">Cancel</string>
+    <string name="selected">Selected</string>
     <plurals name="notification_new_documents">
         <item quantity="one">1 new document</item>
         <item quantity="other">%d new documents</item>
