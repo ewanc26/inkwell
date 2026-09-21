@@ -653,9 +653,9 @@ fun SettingsDialog(
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-                    SectionHeader("Account")
+                    SectionHeader(stringResource(R.string.settings_account))
                     SettingsRow(
-                        title = "Declare me as an Inkwell user",
+                        title = stringResource(R.string.settings_declare_user),
                         trailing = {
                             Switch(
                                 checked = userLexiconEnabled,
@@ -665,20 +665,20 @@ fun SettingsDialog(
                         },
                     )
                     Text(
-                        "Publishes a small record (uk.ewancroft.inkwell.user) to your own PDS declaring you use Inkwell. The website reads these via Constellation to show a \"people using Inkwell\" carousel. Turn it off to delete the record.",
+                        stringResource(R.string.settings_declare_user_message),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     )
                     SettingsRow(
-                        title = "Muted & Blocked",
+                        title = stringResource(R.string.settings_muted_blocked),
                         onClick = {
                             haptics.light()
                             showMutedBlocked = true
                         },
                     )
                     SettingsRow(
-                        title = "Sign Out",
+                        title = stringResource(R.string.settings_sign_out),
                         titleColor = MaterialTheme.colorScheme.error,
                         onClick = {
                             haptics.light()
