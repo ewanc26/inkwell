@@ -398,9 +398,9 @@ fun SettingsDialog(
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-                    SectionHeader("Customisation")
+                    SectionHeader(stringResource(R.string.settings_customisation))
                     Text(
-                        "Accent Color",
+                        stringResource(R.string.settings_accent_color),
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                     )
@@ -421,7 +421,7 @@ fun SettingsDialog(
                         }
                     }
                     Text(
-                        "Reading Font",
+                        stringResource(R.string.settings_reading_font),
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                     )
@@ -442,7 +442,7 @@ fun SettingsDialog(
                         }
                     }
                     Text(
-                        "Appearance",
+                        stringResource(R.string.settings_appearance),
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                     )
@@ -457,7 +457,7 @@ fun SettingsDialog(
                                 CustomisationPreferences.setAppearanceOverride(context, null)
                                 promptForTipIfNeeded()
                             },
-                            label = { Text("System") },
+                            label = { Text(stringResource(R.string.settings_system)) },
                         )
                         FilterChip(
                             selected = appearanceOverride == CustomisationPreferences.AppearanceOverride.LIGHT,
@@ -466,7 +466,7 @@ fun SettingsDialog(
                                 CustomisationPreferences.setAppearanceOverride(context, CustomisationPreferences.AppearanceOverride.LIGHT)
                                 promptForTipIfNeeded()
                             },
-                            label = { Text("Light") },
+                            label = { Text(stringResource(R.string.settings_light)) },
                         )
                         FilterChip(
                             selected = appearanceOverride == CustomisationPreferences.AppearanceOverride.DARK,
@@ -475,11 +475,11 @@ fun SettingsDialog(
                                 CustomisationPreferences.setAppearanceOverride(context, CustomisationPreferences.AppearanceOverride.DARK)
                                 promptForTipIfNeeded()
                             },
-                            label = { Text("Dark") },
+                            label = { Text(stringResource(R.string.settings_dark)) },
                         )
                     }
                     SettingsRow(
-                        title = "Reset to Defaults",
+                        title = stringResource(R.string.settings_reset_defaults),
                         titleColor = MaterialTheme.colorScheme.error,
                         onClick = {
                             accentColorHex = null
