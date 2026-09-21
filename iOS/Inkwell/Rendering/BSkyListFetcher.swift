@@ -75,7 +75,7 @@ enum BSkyListFetcher {
             }
 
             do {
-                let (data, response) = try await session.data(from: url)
+                let (data, response) = try await JSONSafety.boundedData(from: url, using: session)
                 guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
                     logger.error("[BSkyListFetcher] Bad response fetching list \(listUri)")
                     return members

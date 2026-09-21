@@ -158,7 +158,7 @@ enum BSkyPostFetcher {
         guard let url = components.url else { return results }
 
         do {
-            let (data, _) = try await session.data(from: url)
+            let (data, _) = try await JSONSafety.boundedData(from: url, using: session)
             try JSONSafety.validateResponse(data)
             let response = try JSONDecoder().decode(GetPostsResponse.self, from: data)
 

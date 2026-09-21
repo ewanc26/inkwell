@@ -6,6 +6,22 @@ enum JSONSafety {
     static let maxContainerElements = 131_072
     static let maxStringBytes = 1_048_576
 
+    /// Reads an untrusted JSON response incrementally so the byte budget is
+    /// enforced while the body is arriving, rather than after URLSession has
+    /// already buffered it in memory.
+    static func boundedData(from url: URL, using session: URLSession) async throws -> (Data, URLResponse) {
+        let (bytes, response) = try await session.bytes(from: url)
+        var data = Data()
+        data.reserveCapacity(min(response.expectedContentLength > 0 ? Int(response.expectedContentLength) : 0, maxResponseBytes))
+        for try await byte in bytes {
+            guard data.count < maxResponseBytes else {
+                throw URLError(.dataLengthExceedsMaximum)
+            }
+            data.append(byte)
+        }
+        return (data, response)
+    }
+
     static func validate(_ data: Data) throws {
         let object = try JSONSerialization.jsonObject(with: data, options: [.fragmentsAllowed])
         var containers = 0

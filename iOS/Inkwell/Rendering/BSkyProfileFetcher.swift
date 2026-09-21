@@ -117,7 +117,7 @@ enum BSkyProfileFetcher {
             throw URLError(.badURL)
         }
 
-        let (data, response) = try await session.data(from: url)
+        let (data, response) = try await JSONSafety.boundedData(from: url, using: session)
 
         guard let http = response as? HTTPURLResponse else {
             throw URLError(.badServerResponse)
@@ -154,7 +154,7 @@ enum BSkyProfileFetcher {
             throw URLError(.badURL)
         }
 
-        let (resolveData, resolveResponse) = try await session.data(from: resolveURL)
+        let (resolveData, resolveResponse) = try await JSONSafety.boundedData(from: resolveURL, using: session)
         guard let http = resolveResponse as? HTTPURLResponse,
               (200...299).contains(http.statusCode) else {
             throw URLError(.badServerResponse)
