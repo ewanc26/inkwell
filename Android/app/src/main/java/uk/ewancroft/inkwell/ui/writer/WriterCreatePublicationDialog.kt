@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import uk.ewancroft.inkwell.R
 
 @Composable
 internal fun CreatePublicationDialog(
@@ -28,27 +30,27 @@ internal fun CreatePublicationDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("New Publication") },
+        title = { Text(stringResource(R.string.writer_new_publication)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedTextField(
                     value = uiState.createUrl,
                     onValueChange = onUrlChanged,
-                    label = { Text("URL (e.g. https://mysite.com)") },
+                    label = { Text(stringResource(R.string.writer_publication_url)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = uiState.createName,
                     onValueChange = onNameChanged,
-                    label = { Text("Publication Name") },
+                    label = { Text(stringResource(R.string.writer_publication_name)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = uiState.createDescription,
                     onValueChange = onDescriptionChanged,
-                    label = { Text("Description (optional)") },
+                    label = { Text(stringResource(R.string.writer_publication_description)) },
                     maxLines = 3,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -71,12 +73,12 @@ internal fun CreatePublicationDialog(
                         color = MaterialTheme.colorScheme.onPrimary)
                     Spacer(Modifier.width(8.dp))
                 }
-                Text("Create")
+                Text(stringResource(R.string.create))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         }
     )
