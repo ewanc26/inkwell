@@ -114,14 +114,14 @@ internal fun PostDetailContent(
                 }
                 if (!uiState.publishedAt.isNullOrBlank()) {
                     Text(
-                        "Published ${uiState.publishedAt.formatPublishedDate()}",
+                        stringResource(R.string.reader_published_date, uiState.publishedAt.formatPublishedDate()),
                         style = MaterialTheme.typography.labelSmall,
                         color = bodyColor.copy(alpha = 0.7f),
                     )
                 }
                 if (!uiState.updatedAt.isNullOrBlank() && uiState.updatedAt != uiState.publishedAt) {
                     Text(
-                        "Updated ${uiState.updatedAt.formatPublishedDate()}",
+                        stringResource(R.string.reader_updated_date, uiState.updatedAt.formatPublishedDate()),
                         style = MaterialTheme.typography.labelSmall,
                         color = bodyColor.copy(alpha = 0.7f),
                     )
