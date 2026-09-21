@@ -274,7 +274,6 @@
     <string name="writer_format_code">Code</string>
     <string name="writer_format_link">Link</string>
     <string name="writer_format_image">Image</string>
-    <string name="writer_new_publication">New Publication</string>
     <string name="writer_publication_url">URL (e.g. https://mysite.com)</string>
     <string name="writer_publication_name">Publication Name</string>
     <string name="writer_publication_description">Description (optional)</string>
