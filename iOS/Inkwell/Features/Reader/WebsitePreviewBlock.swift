@@ -16,6 +16,7 @@ struct WebsitePreviewBlock: View {
     let description: String?
     let foregroundColor: Color
     let accentColor: Color
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         Link(destination: URL(string: url) ?? URL(string: "about:blank")!) {
@@ -24,18 +25,18 @@ struct WebsitePreviewBlock: View {
                     Text(title)
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(foregroundColor)
-                        .lineLimit(1)
+                        .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 1)
                 }
                 if let description {
                     Text(description)
                         .font(.caption)
                         .foregroundStyle(foregroundColor.opacity(0.6))
-                        .lineLimit(2)
+                        .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
                 }
                 Text(URL(string: url)?.host ?? url)
                     .font(.caption2)
                     .foregroundStyle(foregroundColor.opacity(0.4))
-                    .lineLimit(1)
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 1)
             }
             .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
