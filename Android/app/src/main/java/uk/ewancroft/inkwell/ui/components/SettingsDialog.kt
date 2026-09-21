@@ -101,6 +101,9 @@ fun SettingsDialog(
     var pendingImportText by remember { mutableStateOf<String?>(null) }
     var pendingImportCount by remember { mutableStateOf(0) }
     val context = LocalContext.current
+    val exportReadingDataLabel = stringResource(R.string.settings_export_reading_data)
+    val importInvalidFileMessage = stringResource(R.string.settings_import_invalid_file)
+    val importUnsupportedVersionMessage = stringResource(R.string.settings_import_unsupported_version)
     val coroutineScope = rememberCoroutineScope()
     val haptics = rememberInkwellHaptics()
     val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -111,15 +114,15 @@ fun SettingsDialog(
             } ?: null
         }.getOrNull()
         if (text == null) {
-            importMessage = "This file is not a valid Inkwell reading-data export."
+            importMessage = importInvalidFileMessage
         } else when (val result = ArticleStatePreferences.previewImportJson(context, text)) {
             is ArticleStatePreferences.ImportResult.Success -> {
                 pendingImportText = text
                 pendingImportCount = result.changes
             }
             else -> importMessage = when (result) {
-                ArticleStatePreferences.ImportResult.UnsupportedVersion -> "This reading-data export uses an unsupported version."
-                else -> "This file is not a valid Inkwell reading-data export."
+                ArticleStatePreferences.ImportResult.UnsupportedVersion -> importUnsupportedVersionMessage
+                else -> importInvalidFileMessage
             }
         }
     }
@@ -566,7 +569,7 @@ fun SettingsDialog(
                                 putExtra(Intent.EXTRA_STREAM, uri)
                                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                             }
-                            context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.settings_export_reading_data)))
+                            context.startActivity(Intent.createChooser(shareIntent, exportReadingDataLabel))
                         },
                     )
                     SettingsRow(
@@ -608,8 +611,8 @@ fun SettingsDialog(
                                             result.changes,
                                             result.changes,
                                         )
-                                        ArticleStatePreferences.ImportResult.UnsupportedVersion -> context.getString(R.string.settings_import_unsupported_version)
-                                        ArticleStatePreferences.ImportResult.Invalid -> context.getString(R.string.settings_import_invalid_file)
+                                        ArticleStatePreferences.ImportResult.UnsupportedVersion -> importUnsupportedVersionMessage
+                                        ArticleStatePreferences.ImportResult.Invalid -> importInvalidFileMessage
                                     }
                                     pendingImportText = null
                                 }) { Text(stringResource(R.string.import_action)) }
