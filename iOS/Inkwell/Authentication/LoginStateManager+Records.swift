@@ -16,6 +16,22 @@ private let userLexiconNSID = "uk.ewancroft.inkwell.user"
 private let userLexiconAppURI = "https://inkwell.ewancroft.uk"
 private let maxDocumentRecordBytes = 900 * 1024
 
+internal struct DecodedCreateRecordResponse {
+    let reference: ComAtprotoLexicon.Repository.StrongReference
+    let validationStatus: String?
+}
+
+internal func decodeCreateRecordResponse(_ data: Data) throws -> DecodedCreateRecordResponse {
+    let output = try JSONDecoder().decode(
+        ComAtprotoLexicon.Repository.CreateRecordOutput.self,
+        from: data
+    )
+    return DecodedCreateRecordResponse(
+        reference: .init(recordURI: output.uri, cidHash: output.cid),
+        validationStatus: output.validationStatus?.rawValue
+    )
+}
+
 internal struct CreateRecordRequestBody: Encodable {
     let repo: String
     let collection: String
@@ -66,7 +82,9 @@ extension LoginStateManager {
         )
 
         try JSONSafety.validateResponse(data)
-        return try JSONDecoder().decode(ComAtprotoLexicon.Repository.StrongReference.self, from: data)
+        let decoded = try decodeCreateRecordResponse(data)
+        lastRecordValidationStatus = decoded.validationStatus
+        return decoded.reference
     }
 
     /// Deletes an AT Protocol record from the user's repository.

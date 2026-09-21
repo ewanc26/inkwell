@@ -39,6 +39,8 @@ final class LoginStateManager {
     var displayName: String?
     var avatarURL: URL?
     var errorMessage: String?
+    /// Validation outcome returned by the most recent create-record write, when supplied by the PDS.
+    var lastRecordValidationStatus: String?
 
     /// `true` while the app is attempting to silently resume a previously
     /// authenticated session on launch.

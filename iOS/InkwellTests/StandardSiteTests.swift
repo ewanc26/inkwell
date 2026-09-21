@@ -52,6 +52,16 @@ final class StandardSiteTests: XCTestCase {
             XCTAssertEqual(object["validate"] as? Bool, value)
         }
     }
+
+    func testCreateRecordResponseExposesValidationStatus() throws {
+        let response = Data(#"{"uri":"at://did:plc:author/site.standard.document/abc","cid":"bafyrecord","validationStatus":"valid"}"#.utf8)
+
+        let decoded = try decodeCreateRecordResponse(response)
+
+        XCTAssertEqual(decoded.reference.recordURI, "at://did:plc:author/site.standard.document/abc")
+        XCTAssertEqual(decoded.reference.recordCID, "bafyrecord")
+        XCTAssertEqual(decoded.validationStatus, "valid")
+    }
     func testInkwellNSIDNamespace() {
         XCTAssertEqual(InkwellIdentifiers.lexiconNamespace, "uk.ewancroft.inkwell")
         XCTAssertEqual(BackgroundRefreshManager.taskIdentifier, "uk.ewancroft.inkwell.refresh")
