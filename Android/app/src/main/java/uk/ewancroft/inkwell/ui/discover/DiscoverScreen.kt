@@ -74,7 +74,7 @@ fun DiscoverScreen(
                 trailingIcon = {
                     if (uiState.query.isNotBlank()) {
                         IconButton(onClick = { viewModel.onQueryChanged("") }) {
-                            Icon(Icons.Outlined.Close, "Clear")
+                            Icon(Icons.Outlined.Close, stringResource(R.string.discover_clear))
                         }
                     }
                 },
@@ -241,10 +241,12 @@ private fun SearchResultRow(
     val accessibilityLabel = buildList {
         add(result.title)
         result.snippet?.takeIf(String::isNotBlank)?.let(::add)
-        add("Published on ${result.platform ?: "standard.site"}")
-        result.handle?.takeIf(String::isNotBlank)?.let { add("By $it") }
+        add(stringResource(R.string.discover_published_on, result.platform ?: "standard.site"))
+        result.handle?.takeIf(String::isNotBlank)?.let { add(stringResource(R.string.discover_by, it)) }
     }.joinToString(separator = ". ")
-    val actionLabel = if (result.isStandardSiteDocument) "Open article" else "Open in browser"
+    val actionLabel = stringResource(
+        if (result.isStandardSiteDocument) R.string.discover_open_article else R.string.discover_open_browser,
+    )
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -334,7 +336,7 @@ private fun ActorSearchRow(
             }
             .clickable(
                 role = Role.Button,
-                onClickLabel = "Open profile",
+                onClickLabel = stringResource(R.string.discover_open_profile),
                 onClick = onClick,
             ),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -388,11 +390,15 @@ private fun PublicationSearchRow(
         modifier = Modifier
             .fillMaxWidth()
             .semantics(mergeDescendants = true) {
-                contentDescription = "Publication: ${publication.name.bidiIsolated()}. ${publication.domain.bidiIsolated()}"
+                contentDescription = stringResource(
+                    R.string.discover_publication_description,
+                    publication.name.bidiIsolated(),
+                    publication.domain.bidiIsolated(),
+                )
             }
             .clickable(
                 role = Role.Button,
-                onClickLabel = "Open publication",
+                onClickLabel = stringResource(R.string.discover_open_publication),
                 onClick = onClick,
             ),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
