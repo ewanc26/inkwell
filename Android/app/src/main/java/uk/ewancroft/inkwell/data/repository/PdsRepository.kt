@@ -77,7 +77,15 @@ internal fun extractAtprotoPdsEndpoint(document: JsonObject, did: String): Strin
     val endpoint = service["serviceEndpoint"]?.jsonPrimitive?.contentOrNull
         ?: throw PdsResolutionException("#atproto_pds service has no endpoint")
     val uri = runCatching { URI(endpoint) }.getOrNull()
-    check(uri?.scheme == "https" && !uri.isOpaque && uri.userInfo == null && uri.query == null && uri.fragment == null) {
+    check(
+        uri?.scheme == "https" &&
+            uri.host != null &&
+            !uri.isOpaque &&
+            uri.userInfo == null &&
+            uri.query == null &&
+            uri.fragment == null &&
+            (uri.path.isNullOrEmpty() || uri.path == "/")
+    ) {
         "#atproto_pds endpoint must be an HTTPS URL"
     }
     return endpoint.trimEnd('/')
