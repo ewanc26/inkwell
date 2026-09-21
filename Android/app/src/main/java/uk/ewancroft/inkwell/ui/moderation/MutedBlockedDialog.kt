@@ -34,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -43,6 +44,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import uk.ewancroft.inkwell.data.repository.BlockedActorEntry
 import uk.ewancroft.inkwell.data.repository.ModeratedActor
+import uk.ewancroft.inkwell.R
 
 /**
  * "Muted & Blocked Accounts" screen — two lists, fetched from
@@ -71,10 +73,10 @@ fun MutedBlockedDialog(
             Scaffold(
                 topBar = {
                     TopAppBar(
-                        title = { Text("Muted & Blocked") },
+                        title = { Text(stringResource(R.string.moderation_muted_blocked_title)) },
                         navigationIcon = {
                             IconButton(onClick = onDismiss) {
-                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Close")
+                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.close))
                             }
                         },
                     )
@@ -123,7 +125,7 @@ fun MutedBlockedDialog(
                         state.isLoading -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             CircularProgressIndicator(
                                 modifier = Modifier.semantics {
-                                    contentDescription = "Loading moderation settings"
+                                    contentDescription = stringResource(R.string.moderation_loading_settings)
                                 },
                             )
                         }
