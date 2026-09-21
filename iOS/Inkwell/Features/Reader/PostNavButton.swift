@@ -20,7 +20,7 @@ struct PostNavButton: View {
     var body: some View {
         HStack(spacing: 8) {
             if direction == .previous {
-                Image(systemName: "chevron.left")
+                Image(systemName: "chevron.backward")
                     .font(.caption.weight(.semibold))
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Previous")
@@ -47,7 +47,7 @@ struct PostNavButton: View {
                         .multilineTextAlignment(.trailing)
                 }
                 .layoutPriority(1)
-                Image(systemName: "chevron.right")
+                Image(systemName: "chevron.forward")
                     .font(.caption.weight(.semibold))
             }
         }
