@@ -175,7 +175,7 @@
     <string name="credits_search_detail">Cross-platform Standard.site search index</string>
     <string name="credits_formats_summary">Inkwell reads and writes Leaflet, Markpub, pckt, and Offprint content alongside the shared site.standard.* records.</string>
     <string name="credits_supporters">Supporters</string>
-    <string name="credits_supporters_summary">Everyone who&apos;s tipped Inkwell via Ko-fi or GitHub Sponsors, listed on Bluesky. Thank you.</string>
+    <string name="credits_supporters_summary">Everyone who has tipped Inkwell via Ko-fi or GitHub Sponsors, listed on Bluesky. Thank you.</string>
     <string name="credits_support">Support</string>
     <string name="credits_license">AGPL-3.0 with App Store Exception</string>
     <string name="credits_license_detail">Open-source licence and store-distribution permission</string>
