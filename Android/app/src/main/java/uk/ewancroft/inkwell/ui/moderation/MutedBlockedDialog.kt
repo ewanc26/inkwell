@@ -60,6 +60,7 @@ fun MutedBlockedDialog(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var selectedTab by remember { mutableIntStateOf(0) }
+    val loadingDescription = stringResource(R.string.moderation_loading_settings)
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -125,7 +126,7 @@ fun MutedBlockedDialog(
                         state.isLoading -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             CircularProgressIndicator(
                                 modifier = Modifier.semantics {
-                                    contentDescription = stringResource(R.string.moderation_loading_settings)
+                                    contentDescription = loadingDescription
                                 },
                             )
                         }
