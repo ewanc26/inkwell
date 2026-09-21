@@ -311,7 +311,6 @@
     <string name="settings_system">System</string>
     <string name="settings_light">Light</string>
     <string name="settings_dark">Dark</string>
-    <string name="settings_reset_defaults">Reset to Defaults</string>
     <string name="profile_followers">Followers</string>
     <string name="profile_following">Following</string>
     <string name="profile_posts">Posts</string>
