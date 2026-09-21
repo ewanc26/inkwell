@@ -224,7 +224,7 @@ class WriterViewModel @Inject constructor(
                     ?: blobRef["link"]?.jsonPrimitive?.content
                     ?: throw Exception("Missing blob reference in upload response")
 
-                val markdown = "\n![${altText.trim()}]($blobLink)\n"
+                val markdown = markdownImageReference(altText, blobLink)
                 val newBlobs = uiStateInternal.value.uploadedBlobs + (blobLink to blobRef)
                 uiStateInternal.value = uiStateInternal.value.copy(
                     markdown = uiStateInternal.value.markdown + markdown,
@@ -243,3 +243,6 @@ class WriterViewModel @Inject constructor(
         uiStateInternal.value = uiStateInternal.value.copy(publishError = message)
     }
 }
+
+internal fun markdownImageReference(altText: String, blobLink: String): String =
+    "\n![${altText.trim()}]($blobLink)\n"
