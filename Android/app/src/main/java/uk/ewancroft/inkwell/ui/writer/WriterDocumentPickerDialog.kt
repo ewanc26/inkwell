@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
@@ -31,6 +32,7 @@ import uk.ewancroft.inkwell.data.remote.readBoundedUtf8
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
 import uk.ewancroft.inkwell.shared.validation.JsonSafety
+import uk.ewancroft.inkwell.R
 
 @Composable
 internal fun DocumentPickerDialog(
@@ -75,7 +77,7 @@ internal fun DocumentPickerDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Select a document to edit") },
+        title = { Text(stringResource(R.string.writer_select_document)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (error != null) {
@@ -86,7 +88,7 @@ internal fun DocumentPickerDialog(
                         CircularProgressIndicator(Modifier.size(24.dp))
                     }
                 } else if (documents.isEmpty()) {
-                    Text("No documents found.", style = MaterialTheme.typography.bodyMedium)
+                    Text(stringResource(R.string.writer_no_documents), style = MaterialTheme.typography.bodyMedium)
                 } else {
                     LazyColumn(
                         modifier = Modifier.heightIn(max = 300.dp),
@@ -106,7 +108,7 @@ internal fun DocumentPickerDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         },
     )
