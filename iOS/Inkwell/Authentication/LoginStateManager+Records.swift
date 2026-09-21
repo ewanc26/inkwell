@@ -16,6 +16,17 @@ private let userLexiconNSID = "uk.ewancroft.inkwell.user"
 private let userLexiconAppURI = "https://inkwell.ewancroft.uk"
 private let maxDocumentRecordBytes = 900 * 1024
 
+internal struct CreateRecordRequestBody: Encodable {
+    let repo: String
+    let collection: String
+    let record: UnknownType
+    let validate: Bool?
+
+    enum CodingKeys: String, CodingKey {
+        case repo, collection, record, validate
+    }
+}
+
 extension LoginStateManager {
     /// Checks the encoded record before it reaches an XRPC write endpoint.
     func ensureDocumentRecordFits(_ record: UnknownType) throws {
@@ -40,18 +51,7 @@ extension LoginStateManager {
             throw LoginError.notAuthenticated
         }
 
-        struct CreateRecordBody: Encodable {
-            let repo: String
-            let collection: String
-            let record: UnknownType
-            let validate: Bool?
-
-            enum CodingKeys: String, CodingKey {
-                case repo, collection, record, validate
-            }
-        }
-
-        let body = CreateRecordBody(
+        let body = CreateRecordRequestBody(
             repo: did,
             collection: collection,
             record: record,

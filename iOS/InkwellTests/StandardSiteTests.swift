@@ -13,6 +13,8 @@ import Foundation
 import ImageIO
 import UIKit
 import XCTest
+import ATProtoKit
+@testable import Inkwell
 import UniformTypeIdentifiers
 @testable import Inkwell
 
@@ -20,6 +22,36 @@ import UniformTypeIdentifiers
 
 @MainActor
 final class StandardSiteTests: XCTestCase {
+
+    func testCreateRecordRequestOmitsValidationByDefault() throws {
+        let data = try JSONEncoder().encode(
+            CreateRecordRequestBody(
+                repo: "did:plc:author",
+                collection: "site.standard.document",
+                record: .unknown(["title": .string("Example")]),
+                validate: nil
+            )
+        )
+        let object = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+
+        XCTAssertNil(object["validate"])
+    }
+
+    func testCreateRecordRequestPreservesExplicitValidationModes() throws {
+        for value in [true, false] {
+            let data = try JSONEncoder().encode(
+                CreateRecordRequestBody(
+                    repo: "did:plc:author",
+                    collection: "site.standard.document",
+                    record: .unknown(["title": .string("Example")]),
+                    validate: value
+                )
+            )
+            let object = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+
+            XCTAssertEqual(object["validate"] as? Bool, value)
+        }
+    }
     func testInkwellNSIDNamespace() {
         XCTAssertEqual(InkwellIdentifiers.lexiconNamespace, "uk.ewancroft.inkwell")
         XCTAssertEqual(BackgroundRefreshManager.taskIdentifier, "uk.ewancroft.inkwell.refresh")
