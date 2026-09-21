@@ -169,20 +169,20 @@ fun SettingsDialog(
     if (isConfirmingSignOut) {
         AlertDialog(
             onDismissRequest = { isConfirmingSignOut = false },
-            title = { Text("Sign out of Inkwell?") },
-            text = { Text("Your publications and subscriptions stay in your PDS. You can sign back in at any time.") },
+            title = { Text(stringResource(R.string.settings_sign_out_title)) },
+            text = { Text(stringResource(R.string.settings_sign_out_message)) },
             confirmButton = {
                 TextButton(onClick = {
                     isConfirmingSignOut = false
                     haptics.medium()
                     onSignOut()
                 }) {
-                    Text("Sign Out")
+                    Text(stringResource(R.string.settings_sign_out))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { isConfirmingSignOut = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             },
         )
@@ -194,8 +194,8 @@ fun SettingsDialog(
                 showCustomisationTipPrompt = false
                 CustomisationPreferences.markTipPromptShown(context)
             },
-            title = { Text("Enjoying Customisation?") },
-            text = { Text("These overrides are free for everyone. If you find them useful, consider a tip to support ongoing development.") },
+            title = { Text(stringResource(R.string.settings_customisation_tip_title)) },
+            text = { Text(stringResource(R.string.settings_customisation_tip_message)) },
             confirmButton = {
                 TextButton(onClick = {
                     showCustomisationTipPrompt = false
@@ -203,7 +203,7 @@ fun SettingsDialog(
                     val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://ko-fi.com/ewancroft"))
                     context.startActivity(intent)
                 }) {
-                    Text("Tip Me")
+                    Text(stringResource(R.string.settings_tip_me))
                 }
             },
             dismissButton = {
@@ -211,7 +211,7 @@ fun SettingsDialog(
                     showCustomisationTipPrompt = false
                     CustomisationPreferences.markTipPromptShown(context)
                 }) {
-                    Text("Maybe Later")
+                    Text(stringResource(R.string.settings_maybe_later))
                 }
             },
         )
