@@ -15,6 +15,7 @@ import androidx.compose.material.icons.outlined.FiberManualRecord
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import uk.ewancroft.inkwell.data.model.common.StrongRef
 import uk.ewancroft.inkwell.data.model.content.LeafletBlock
 import uk.ewancroft.inkwell.data.model.content.ListItem as ListItemModel
+import uk.ewancroft.inkwell.R
 import uk.ewancroft.inkwell.shared.content.LeafletTypes
 
 @Composable
@@ -79,9 +81,13 @@ fun ListItem(
     onLoadPoll: suspend (StrongRef) -> Unit = {},
     onCastVote: suspend (String, List<String>) -> Unit = { _, _ -> },
 ) {
+    val listItemPosition = stringResource(R.string.reader_list_item_position, position ?: 0, total ?: 0)
+    val completedLabel = stringResource(
+        if (item.checked == true) R.string.reader_checklist_completed else R.string.reader_checklist_not_completed,
+    )
     val accessibilityContext = buildList {
-        if (position != null && total != null) add("Item $position of $total")
-        if (item.type == LeafletTypes.BLOCKS_CHECKLIST) add(if (item.checked == true) "Completed" else "Not completed")
+        if (position != null && total != null) add(listItemPosition)
+        if (item.type == LeafletTypes.BLOCKS_CHECKLIST) add(completedLabel)
     }.joinToString(", ")
     Row(
         modifier = if (accessibilityContext.isEmpty()) Modifier else Modifier.semantics {
