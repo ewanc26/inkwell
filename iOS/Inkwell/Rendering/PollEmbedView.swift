@@ -276,12 +276,10 @@ struct PollEmbedView: View {
         .accessibilityValue({
             let status = hasVoted ? "Voted" : "Not voted"
             if state.totalVotes > 0 {
-                let percentage = Int((fraction * 100).rounded())
                 return Text("\(status), ")
                     + Text("^[\(count) vote](inflect: true)")
                     + Text(", ")
-                    + Text(percentage, format: .number)
-                    + Text(" percent")
+                    + Text(Double(fraction), format: .percent.precision(.fractionLength(0)))
             } else {
                 return Text("\(status), no votes yet")
             }

@@ -42,6 +42,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import uk.ewancroft.inkwell.data.model.common.StrongRef
 import uk.ewancroft.inkwell.data.model.content.LeafletBlock
+import uk.ewancroft.inkwell.util.formatAsPercentage
 
 @Composable
 internal fun PollBlock(
@@ -117,7 +118,7 @@ internal fun PollBlock(
                         stringResource(R.string.poll_no_votes)
                     }
                     val percentageLabel = if (totalVotes > 0) {
-                        stringResource(R.string.poll_percentage, (fraction * 100).toInt())
+                        fraction.formatAsPercentage()
                     } else {
                         ""
                     }
