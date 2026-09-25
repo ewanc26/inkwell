@@ -10,9 +10,8 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
+import uk.ewancroft.inkwell.shared.validation.RecordSizePolicy
 import uk.ewancroft.inkwell.shared.validation.StandardSiteValidation
-
-private const val MAX_DOCUMENT_RECORD_BYTES = 900 * 1024
 
 fun WriterViewModel.publish() {
     val state = uiStateInternal.value
@@ -153,8 +152,9 @@ fun WriterViewModel.publish() {
 
 internal fun ensureDocumentRecordFits(record: JsonObject) {
     val encodedBytes = Json.encodeToString(JsonObject.serializer(), record).encodeToByteArray().size
-    check(encodedBytes <= MAX_DOCUMENT_RECORD_BYTES) {
-        "Document is too large to publish (${encodedBytes} bytes; limit is $MAX_DOCUMENT_RECORD_BYTES bytes). Use a shorter document or a blob-backed format."
+    check(!RecordSizePolicy.exceedsLimit(encodedBytes)) {
+        "Document is too large to publish (${encodedBytes} bytes; limit is " +
+            "${RecordSizePolicy.MAX_DOCUMENT_RECORD_BYTES} bytes). Use a shorter document or a blob-backed format."
     }
 }
 
