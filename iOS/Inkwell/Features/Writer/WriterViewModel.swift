@@ -365,7 +365,9 @@ final class WriterViewModel {
                     lostFeatures = []
                 }
             } catch {
-                publishError = "Failed to publish: \(error.localizedDescription)"
+                publishError = editingDocumentURI == nil
+                    ? "Failed to publish: \(error.localizedDescription)"
+                    : writerEditErrorMessage(error)
             }
             isPublishing = false
         }
@@ -391,5 +393,9 @@ func preservingUnknownFields(from existing: UnknownType?, with updated: UnknownT
     }
     var merged = existingFields
     updatedFields.forEach { merged[$0.key] = $0.value }
+    if case let .string(publishedAt)? = existingFields["publishedAt"],
+       !publishedAt.isEmpty {
+        merged["publishedAt"] = .string(publishedAt)
+    }
     return .unknown(merged)
 }
