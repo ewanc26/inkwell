@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
     name: "SharedKMP",
     platforms: [
-        .iOS(.v26),
+        .iOS(.v17),
     ],
     products: [
         .library(
