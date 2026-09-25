@@ -104,8 +104,9 @@ jobs:
           # version the original author has locally) — pick the
           # highest-versioned iPhone runtime available, then separately
           # decide whether it's new enough to actually run tests on.
-          best=$(xcrun simctl list devices available iOS -j | jq -r '
-            [.devices | to_entries[] | . as $e | $e.value[] | select(.name | startswith("iPhone")) |
+          best=$(xcrun simctl list devices available -j | jq -r '
+            [.devices | to_entries[] | . as $e | select($e.key | contains(".iOS-")) | $e.value[] |
+              select(.name | startswith("iPhone")) |
               {name: .name, runtimeId: $e.key}] |
             sort_by(.runtimeId) | last
           ')
@@ -162,7 +163,7 @@ jobs:
       - name: Build, lint, and test
         timeout-minutes: 15
         working-directory: Android
-        run: ./gradlew --no-daemon --console=plain --stacktrace clean assembleDebug assembleRelease lint test :shared:jvmTest
+        run: ./gradlew --no-daemon --max-workers=2 --console=plain --stacktrace clean assembleDebug assembleRelease lint test :shared:jvmTest
 
       - name: Assert release permission allowlist
         working-directory: Android

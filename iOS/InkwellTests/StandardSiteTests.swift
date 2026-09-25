@@ -13,6 +13,8 @@ import Foundation
 import ImageIO
 import UIKit
 import XCTest
+import ATProtoKit
+@testable import Inkwell
 import UniformTypeIdentifiers
 @testable import Inkwell
 
@@ -20,6 +22,46 @@ import UniformTypeIdentifiers
 
 @MainActor
 final class StandardSiteTests: XCTestCase {
+
+    func testCreateRecordRequestOmitsValidationByDefault() throws {
+        let data = try JSONEncoder().encode(
+            CreateRecordRequestBody(
+                repo: "did:plc:author",
+                collection: "site.standard.document",
+                record: .unknown(["title": .string("Example")]),
+                validate: nil
+            )
+        )
+        let object = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+
+        XCTAssertNil(object["validate"])
+    }
+
+    func testCreateRecordRequestPreservesExplicitValidationModes() throws {
+        for value in [true, false] {
+            let data = try JSONEncoder().encode(
+                CreateRecordRequestBody(
+                    repo: "did:plc:author",
+                    collection: "site.standard.document",
+                    record: .unknown(["title": .string("Example")]),
+                    validate: value
+                )
+            )
+            let object = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+
+            XCTAssertEqual(object["validate"] as? Bool, value)
+        }
+    }
+
+    func testCreateRecordResponseExposesValidationStatus() throws {
+        let response = Data(#"{"uri":"at://did:plc:author/site.standard.document/abc","cid":"bafyrecord","validationStatus":"valid"}"#.utf8)
+
+        let decoded = try decodeCreateRecordResponse(response)
+
+        XCTAssertEqual(decoded.reference.recordURI, "at://did:plc:author/site.standard.document/abc")
+        XCTAssertEqual(decoded.reference.recordCID, "bafyrecord")
+        XCTAssertEqual(decoded.validationStatus, "valid")
+    }
     func testInkwellNSIDNamespace() {
         XCTAssertEqual(InkwellIdentifiers.lexiconNamespace, "uk.ewancroft.inkwell")
         XCTAssertEqual(BackgroundRefreshManager.taskIdentifier, "uk.ewancroft.inkwell.refresh")
