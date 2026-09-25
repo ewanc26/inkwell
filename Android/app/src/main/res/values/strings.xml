@@ -144,6 +144,9 @@
     <string name="writer_no_publications">No publications found.</string>
     <string name="writer_create_publication">Create a Publication</string>
     <string name="writer_new_publication">New Publication</string>
+    <string name="writer_preview">Preview</string>
+    <string name="writer_publish">Publish</string>
+    <string name="writer_update">Update</string>
     <string name="reader_posts">Posts</string>
     <string name="reader_all_posts">All posts</string>
     <string name="reader_unsupported_content">Unsupported content format</string>
