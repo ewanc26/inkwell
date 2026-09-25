@@ -358,6 +358,9 @@
     <string name="profile_following">Following</string>
     <string name="profile_posts">Posts</string>
     <string name="reader_reveal_article">Reveal article</string>
+    <string name="reader_list_item_position">Item %1$d of %2$d</string>
+    <string name="reader_checklist_completed">Completed</string>
+    <string name="reader_checklist_not_completed">Not completed</string>
     <plurals name="notification_new_documents">
         <item quantity="one">1 new document</item>
         <item quantity="other">%d new documents</item>

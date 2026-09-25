@@ -162,7 +162,7 @@ jobs:
       - name: Build, lint, and test
         timeout-minutes: 15
         working-directory: Android
-        run: ./gradlew clean assembleDebug assembleRelease lint test :shared:jvmTest
+        run: ./gradlew --no-daemon --console=plain --stacktrace clean assembleDebug assembleRelease lint test :shared:jvmTest
 
       - name: Assert release permission allowlist
         working-directory: Android
