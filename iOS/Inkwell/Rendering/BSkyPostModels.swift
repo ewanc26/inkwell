@@ -87,7 +87,16 @@ struct BSkyExternalEmbed: Decodable, Sendable {
         let title: String?
         let description: String?
         let thumb: String?
+        let readingTime: Int?
+        let createdAt: String?
+        let updatedAt: String?
+        let associatedRefs: [BSkyStrongRef]?
     }
+}
+
+struct BSkyStrongRef: Decodable, Sendable {
+    let uri: String?
+    let cid: String?
 }
 
 struct BSkyRecordEmbed: Decodable, Sendable {
