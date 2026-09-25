@@ -417,7 +417,7 @@ fun WriterScreen(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(
-                    "Preview",
+                    stringResource(R.string.writer_preview),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -522,7 +522,7 @@ fun WriterScreen(
                 }
                 Icon(Icons.AutoMirrored.Outlined.Send, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
-                Text(if (uiState.editingDocumentUri != null) "Update" else "Publish")
+                Text(stringResource(if (uiState.editingDocumentUri != null) R.string.writer_update else R.string.writer_publish))
             }
         }
 
