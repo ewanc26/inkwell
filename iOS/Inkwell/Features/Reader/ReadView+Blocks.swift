@@ -278,6 +278,8 @@ extension ReadView {
                                 }
                             }
                         }
+                        .accessibilityElement(children: .combine)
+                        .accessibilityValue(Text("Item \(index + 1) of \(items.count)"))
                     }
                 }
                 .padding(.leading, 4)
