@@ -8,13 +8,12 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
 import uk.ewancroft.inkwell.shared.validation.JsonSafety
-import okhttp3.OkHttpClient
 import okhttp3.Request
 import uk.ewancroft.inkwell.data.model.bluesky.BSkyPostView
 import uk.ewancroft.inkwell.data.model.bluesky.GetPostsResponse
+import uk.ewancroft.inkwell.di.SharedHttpClient
 import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.TimeUnit
 
 /**
  * Fetches Bluesky posts from the public API (public.api.bsky.app).
@@ -27,10 +26,7 @@ object BSkyPostFetcher {
 
     private val cache = ConcurrentHashMap<String, BSkyPostView>()
 
-    private val client = OkHttpClient.Builder()
-        .connectTimeout(10, TimeUnit.SECONDS)
-        .readTimeout(10, TimeUnit.SECONDS)
-        .build()
+    private val client = SharedHttpClient.client
 
     /**
      * Fetches a single Bluesky post by its AT-URI.

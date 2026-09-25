@@ -28,7 +28,6 @@ import uk.ewancroft.inkwell.shared.content.SearchBackendUrl
 import uk.ewancroft.inkwell.data.repository.PdsRepository
 import uk.ewancroft.inkwell.data.remote.readBoundedUtf8
 import uk.ewancroft.inkwell.shared.validation.JsonSafety
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /** Which facet of the Standard.site network a Discover search targets. */
@@ -51,16 +50,13 @@ data class DiscoverUiState(
 @HiltViewModel
 class DiscoverViewModel @Inject constructor(
     private val pdsRepository: PdsRepository,
+    private val client: OkHttpClient,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DiscoverUiState())
     val uiState: StateFlow<DiscoverUiState> = _uiState.asStateFlow()
 
     private val json = Json { ignoreUnknownKeys = true }
-    private val client = OkHttpClient.Builder()
-        .connectTimeout(15, TimeUnit.SECONDS)
-        .readTimeout(15, TimeUnit.SECONDS)
-        .build()
 
     fun onQueryChanged(query: String) {
         _uiState.value = _uiState.value.copy(query = query)

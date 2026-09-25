@@ -28,6 +28,7 @@ import java.io.IOException
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import uk.ewancroft.inkwell.di.SharedHttpClient
 import uk.ewancroft.inkwell.data.model.atproto.DocumentRecord
 import uk.ewancroft.inkwell.data.model.atproto.PublicationRecord
 import uk.ewancroft.inkwell.shared.verification.DocumentLinkScanner
@@ -49,8 +50,17 @@ internal fun interface VerificationHttpClient {
     fun get(url: HttpUrl): VerificationHttpResponse
 }
 
-private class OkHttpVerificationClient : VerificationHttpClient {
-    private val client = OkHttpClient.Builder()
+/**
+ * Derives its client from [SharedHttpClient] — via `newBuilder()` — so the
+ * connection pool and dispatcher are shared with the rest of the app, while
+ * still overriding redirects: silently following a redirect here would let
+ * a verification target hand back an "at://..." response from a host it
+ * doesn't control, defeating the whole point of the check.
+ */
+private class OkHttpVerificationClient(
+    baseClient: OkHttpClient = SharedHttpClient.client,
+) : VerificationHttpClient {
+    private val client = baseClient.newBuilder()
         .connectTimeout(10, TimeUnit.SECONDS)
         .readTimeout(10, TimeUnit.SECONDS)
         .followRedirects(false)

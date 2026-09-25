@@ -5,13 +5,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
-import okhttp3.OkHttpClient
 import okhttp3.Request
 import uk.ewancroft.inkwell.data.model.bluesky.BlueskyProfile
 import uk.ewancroft.inkwell.data.model.bluesky.GetListResponse
+import uk.ewancroft.inkwell.di.SharedHttpClient
 import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
 import uk.ewancroft.inkwell.shared.validation.JsonSafety
-import java.util.concurrent.TimeUnit
 
 /**
  * Fetches Bluesky list members from the public API (public.api.bsky.app).
@@ -24,10 +23,7 @@ object BSkyListFetcher {
 
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
 
-    private val client = OkHttpClient.Builder()
-        .connectTimeout(10, TimeUnit.SECONDS)
-        .readTimeout(10, TimeUnit.SECONDS)
-        .build()
+    private val client = SharedHttpClient.client
 
     /**
      * Fetches every member of the list at [listUri], following pagination

@@ -38,7 +38,6 @@ import java.io.IOException
 import java.io.InputStream
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -177,13 +176,12 @@ internal object PdsResponseBodyReader {
 class PdsRepository @Inject constructor(
     internal val atOAuth: AtOAuth,
     internal val sessionStore: OAuthSessionStore,
+    okHttpClient: OkHttpClient,
 ) {
     internal val json = Json { ignoreUnknownKeys = true; isLenient = true }
 
-    internal val publicHttpClient = OkHttpClient.Builder()
-        .connectTimeout(15, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
-        .build()
+    /** The shared, DI-provided client — see `di/NetworkModule.provideOkHttpClient`. */
+    internal val publicHttpClient = okHttpClient
 
     private val ktorHttpClient = HttpClient(CIO)
     private val rateLimitCooldowns = mutableMapOf<String, Long>()
