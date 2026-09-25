@@ -37,6 +37,8 @@ iOS/*.moved-aside
 iOS/*.pbxuser
 !iOS/Inkwell.xcodeproj/
 iOS/.swiftpm/
+.build/
+SharedKMP_Package/.build/
 Packages/
 Package.resolved
 
