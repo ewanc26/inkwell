@@ -18,11 +18,11 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
-import java.net.URLEncoder
 import java.util.concurrent.TimeUnit
 import uk.ewancroft.inkwell.data.model.bluesky.ConstellationBacklink
 import uk.ewancroft.inkwell.data.model.bluesky.ConstellationResponse
@@ -42,11 +42,6 @@ object ConstellationClient {
 
     // ── Backlink Query ───────────────────────────────────────────────────
 
-    /** URL-encodes a query param value — subjects/sources/cursors can contain
-     * `:`, `/`, `#`, `[`, `]` (AT-URIs, NSID paths) which must not be
-     * interpolated raw into the query string. */
-    private fun enc(value: String): String = URLEncoder.encode(value, "UTF-8")
-
     /** Finds all records that link to the given subject via the given source. */
     suspend fun getBacklinks(
         subject: String,
@@ -54,13 +49,17 @@ object ConstellationClient {
         limit: Int = 50,
         cursor: String? = null
     ): ConstellationResponse = withContext(Dispatchers.IO) {
-        val urlBuilder = StringBuilder("${XrpcEndpoints.CONSTELLATION_API}${XrpcEndpoints.MICROCOSM_GET_BACKLINKS}")
-            .append("?subject=").append(enc(subject))
-            .append("&source=").append(enc(source))
-            .append("&limit=").append(limit)
-        cursor?.let { urlBuilder.append("&cursor=").append(enc(it)) }
+        val url = "${XrpcEndpoints.CONSTELLATION_API}${XrpcEndpoints.MICROCOSM_GET_BACKLINKS}"
+            .toHttpUrlOrNull()
+            ?.newBuilder()
+            ?.addQueryParameter("subject", subject)
+            ?.addQueryParameter("source", source)
+            ?.addQueryParameter("limit", limit.toString())
+            ?.apply { cursor?.let { addQueryParameter("cursor", it) } }
+            ?.build()
+            ?: throw java.io.IOException("Invalid Constellation endpoint")
 
-        val request = Request.Builder().url(urlBuilder.toString()).get().build()
+        val request = Request.Builder().url(url).get().build()
         client.newCall(request).execute().use { response ->
             val bodyString = response.body?.readBoundedUtf8()
             if (!response.isSuccessful || bodyString == null) {
