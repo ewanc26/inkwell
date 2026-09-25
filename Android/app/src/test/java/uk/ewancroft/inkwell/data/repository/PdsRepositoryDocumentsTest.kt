@@ -136,6 +136,23 @@ class PdsRepositoryDocumentsTest {
     }
 
     @Test
+    fun `update input carries record CID as swapRecord not swapCommit`() {
+        val input = updateRecordInput(
+            repo = "did:plc:author",
+            collection = "site.standard.document",
+            rkey = "post",
+            record = buildJsonObject { put("title", "Updated") },
+            recordCID = "bafyreighost",
+        )
+
+        assertEquals("did:plc:author", input["repo"]?.toString()?.trim('"'))
+        assertEquals("site.standard.document", input["collection"]?.toString()?.trim('"'))
+        assertEquals("post", input["rkey"]?.toString()?.trim('"'))
+        assertEquals("bafyreighost", input["swapRecord"]?.toString()?.trim('"'))
+        assertEquals(null, input["swapCommit"])
+    }
+
+    @Test
     fun `upload response validation accepts exact blob shape`() {
         val response = buildJsonObject {
             put("blob", buildJsonObject {

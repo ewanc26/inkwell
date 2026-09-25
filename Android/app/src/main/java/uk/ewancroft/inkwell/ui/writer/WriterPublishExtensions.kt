@@ -141,7 +141,11 @@ fun WriterViewModel.publish() {
         } catch (e: Exception) {
             uiStateInternal.value = uiStateInternal.value.copy(
                 isPublishing = false,
-                publishError = "Failed to publish: ${e.message}"
+                publishError = if (state.editingDocumentUri != null) {
+                    editDocumentErrorMessage(e)
+                } else {
+                    "Failed to publish: ${e.message}"
+                },
             )
         }
     }

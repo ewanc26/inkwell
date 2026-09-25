@@ -19,4 +19,20 @@ class WriterDocumentEditingExtensionsTest {
             deleteDocumentErrorMessage(IllegalStateException("cancelled")),
         )
     }
+
+    @Test
+    fun invalidSwapDuringEditIsReportedAsReloadConflict() {
+        assertEquals(
+            "This document changed elsewhere. Reload it before saving.",
+            editDocumentErrorMessage(IllegalStateException("InvalidSwap")),
+        )
+    }
+
+    @Test
+    fun editFailureKeepsGenericError() {
+        assertEquals(
+            "Failed to update document: cancelled",
+            editDocumentErrorMessage(IllegalStateException("cancelled")),
+        )
+    }
 }

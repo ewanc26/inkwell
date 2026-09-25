@@ -24,6 +24,16 @@ internal fun deleteDocumentErrorMessage(error: Throwable): String {
     }
 }
 
+internal fun editDocumentErrorMessage(error: Throwable): String {
+    return if (error.message.orEmpty().contains("swap", ignoreCase = true)
+        || error.message.orEmpty().contains("invalidswap", ignoreCase = true)
+    ) {
+        "This document changed elsewhere. Reload it before saving."
+    } else {
+        "Failed to update document: ${error.message}"
+    }
+}
+
 fun WriterViewModel.loadDocumentForEditing(uri: String) {
     viewModelScope.launch {
         uiStateInternal.value = uiStateInternal.value.copy(isEditing = true, publishError = null)

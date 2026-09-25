@@ -378,14 +378,13 @@ class PdsRepository @Inject constructor(
             nsid = "com.atproto.repo.putRecord",
             params = Unit,
             paramsSerializer = Unit.serializer(),
-            input = buildJsonObject {
-                put("repo", session.did)
-                put("collection", parsed.collection)
-                put("rkey", parsed.recordKey)
-                put("record", record)
-                put("validate", true)
-                put("swapRecord", recordCID)
-            },
+            input = updateRecordInput(
+                repo = session.did,
+                collection = parsed.collection,
+                rkey = parsed.recordKey,
+                record = record,
+                recordCID = recordCID,
+            ),
             inputSerializer = JsonObject.serializer(),
             responseSerializer = JsonObject.serializer(),
         )
@@ -460,6 +459,21 @@ class PdsRepository @Inject constructor(
             throw PdsResolutionException("Unable to resolve PDS for $did", error)
         }
     }
+}
+
+internal fun updateRecordInput(
+    repo: String?,
+    collection: String,
+    rkey: String,
+    record: JsonObject,
+    recordCID: String,
+): JsonObject = buildJsonObject {
+    put("repo", repo)
+    put("collection", collection)
+    put("rkey", rkey)
+    put("record", record)
+    put("validate", true)
+    put("swapRecord", recordCID)
 }
 
 internal data class BlobUploadRequest(
