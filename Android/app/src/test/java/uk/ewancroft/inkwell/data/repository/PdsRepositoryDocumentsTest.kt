@@ -162,4 +162,25 @@ class PdsRepositoryDocumentsTest {
             validateUploadBlobResponse(response, "image/png", 3)
         }
     }
+
+    @Test
+    fun `upload response validation rejects a missing blob object`() {
+        assertFailsWith<IllegalStateException> {
+            validateUploadBlobResponse(buildJsonObject {}, "image/png", 3)
+        }
+    }
+
+    @Test
+    fun `upload response validation rejects a missing cid reference`() {
+        val response = buildJsonObject {
+            put("blob", buildJsonObject {
+                put("mimeType", "image/png")
+                put("size", 3)
+            })
+        }
+
+        assertFailsWith<IllegalStateException> {
+            validateUploadBlobResponse(response, "image/png", 3)
+        }
+    }
 }
