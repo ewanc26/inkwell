@@ -12,13 +12,31 @@ import kotlinx.serialization.Serializable
 
 // ── Primitives ───────────────────────────────────────────────────────────
 
-/** Reference to an uploaded blob (image, file) — CBOR-encoded $link in AT Proto. */
+/**
+ * Reference to an uploaded blob (image, file).
+ *
+ * The canonical AT Protocol shape nests the CID under `ref`:
+ * `{"$type": "blob", "ref": {"$link": "bafy…"}, "mimeType": …, "size": …}`.
+ * Older records (and some clients) put `$link` at the top level instead, so both
+ * are decoded and [link] resolves whichever is present. Encoding always emits the
+ * canonical nested form.
+ */
 @Serializable
 data class BlobRef(
-    @SerialName("\$link") val link: String,
+    val ref: BlobLink? = null,
+    @SerialName("\$link") val legacyLink: String? = null,
     val size: Int = 0,
     @SerialName("\$type") val type: String = "blob",
     val mimeType: String? = null
+) {
+    /** The blob's CID, from either the canonical `ref.$link` or the legacy top-level `$link`. */
+    val link: String get() = ref?.link ?: legacyLink.orEmpty()
+}
+
+/** The `{"$link": "<cid>"}` wrapper inside a canonical AT Protocol blob reference. */
+@Serializable
+data class BlobLink(
+    @SerialName("\$link") val link: String
 )
 
 /**

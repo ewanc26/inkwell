@@ -27,7 +27,7 @@ fun BlobRef.toShared(): SharedBlobRef = SharedBlobRef(
 )
 
 fun SharedBlobRef.toAndroid(): BlobRef = BlobRef(
-    link = link,
+    ref = link.takeIf { it.isNotEmpty() }?.let { BlobLink(it) },
     size = size,
     type = type,
     mimeType = mimeType
