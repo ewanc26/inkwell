@@ -41,7 +41,7 @@ internal suspend fun PostDetailViewModel.parseContent(
                         declaredSize = leaflet.blobPages.size.takeIf { it > 0 }?.toLong(),
                         expectedMimeType = "application/json"
                     )
-                    contentParsingJson.decodeFromString<List<LeafletPage>>(blobData.decodeToString())
+                    decodeSafeLeafletPages(blobData.decodeToString())
                 }.getOrNull()
             }
             if (!pages.isNullOrEmpty()) {
@@ -72,6 +72,12 @@ internal suspend fun PostDetailViewModel.parseContent(
 
     return ParseResult(DocumentContent.Empty)
 }
+
+internal fun decodeSafeLeafletPages(raw: String): List<LeafletPage>? = runCatching {
+    val element = contentParsingJson.parseToJsonElement(raw)
+    if (!JsonSafety.isSafe(element)) return@runCatching null
+    contentParsingJson.decodeFromJsonElement<List<LeafletPage>>(element)
+}.getOrNull()
 
 private const val MAX_PLAINTEXT_DEPTH = 32
 private const val MAX_PLAINTEXT_CHARS = 200_000
