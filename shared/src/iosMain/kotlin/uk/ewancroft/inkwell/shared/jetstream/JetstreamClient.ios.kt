@@ -49,7 +49,7 @@ class JetstreamClientIos : uk.ewancroft.inkwell.shared.jetstream.JetstreamClient
                         val text = frame.readText()
                         try {
                             val event = json.decodeFromString<JetstreamEvent>(text)
-                            if (event.payload.operation == "commit") {
+                            if (event.payload.isValidCommitOperation()) {
                                 emit(event.payload)
                             }
                         } catch (_: Exception) {
