@@ -324,7 +324,8 @@ final class WriterViewModel {
                         description: description.isEmpty ? nil : description,
                         coverImage: nil,
                         content: contentRecord,
-                        textContent: plainText
+                        textContent: plainText,
+                        updatedAt: Date()
                     )
 
                     try loginStateManager.ensureDocumentRecordFits(UnknownType.record(document))
