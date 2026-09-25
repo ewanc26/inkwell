@@ -67,6 +67,16 @@ data class BSkyExternal(
     val title: String? = null,
     val description: String? = null,
     val thumb: String? = null,
+    val readingTime: Int? = null,
+    val createdAt: String? = null,
+    val updatedAt: String? = null,
+    val associatedRefs: List<BSkyStrongRef>? = null,
+)
+
+@Serializable
+data class BSkyStrongRef(
+    val uri: String? = null,
+    val cid: String? = null,
 )
 
 @Serializable
