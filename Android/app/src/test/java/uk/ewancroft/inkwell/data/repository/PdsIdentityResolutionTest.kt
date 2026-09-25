@@ -31,4 +31,15 @@ class PdsIdentityResolutionTest {
         val malformed = json.parseToJsonElement("""{"service":[{"id":"#atproto_pds","type":"Other","serviceEndpoint":"http://pds.example"}]}""").jsonObject
         assertFailsWith<PdsResolutionException> { extractAtprotoPdsEndpoint(malformed, "did:web:example.com") }
     }
+
+    @Test
+    fun `rejects path bearing pds endpoints`() {
+        val document = json.parseToJsonElement(
+            """{"service":[{"id":"#atproto_pds","type":"AtprotoPersonalDataServer","serviceEndpoint":"https://pds.example/xrpc"}]}""",
+        ).jsonObject
+
+        assertFailsWith<IllegalStateException> {
+            extractAtprotoPdsEndpoint(document, "did:web:example.com")
+        }
+    }
 }
