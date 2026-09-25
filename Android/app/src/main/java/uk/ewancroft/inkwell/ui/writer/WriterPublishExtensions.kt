@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -72,7 +73,7 @@ fun WriterViewModel.publish() {
                      put("\$type", CollectionNsids.DOCUMENT)
                     put("site", pub.uri)
                     put("title", state.title.trim())
-                    put("publishedAt", now)
+                    applyEditTimestamps(this, state.editingDocumentRecord, now)
                     if (state.description.isNotBlank()) {
                         put("description", state.description.trim())
                     }
@@ -159,6 +160,17 @@ internal fun mergeExistingDocumentRecord(
 ): JsonObject = buildJsonObject {
     existing?.forEach { (key, value) -> put(key, value) }
     overrides()
+}
+
+internal fun applyEditTimestamps(
+    builder: JsonObjectBuilder,
+    existing: JsonObject?,
+    now: String,
+) {
+    if (existing?.containsKey("publishedAt") != true) {
+        builder.put("publishedAt", now)
+    }
+    builder.put("updatedAt", now)
 }
 
 internal fun markdownToPlaintext(markdown: String): String {

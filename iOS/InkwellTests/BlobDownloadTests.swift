@@ -1,4 +1,5 @@
 import XCTest
+import ATProtoKit
 @testable import Inkwell
 
 final class BlobDownloadTests: XCTestCase {
@@ -16,6 +17,28 @@ final class BlobDownloadTests: XCTestCase {
         XCTAssertEqual(request.value(forHTTPHeaderField: "Accept"), "application/json")
         XCTAssertEqual(request.httpBody, data)
         XCTAssertNil(request.value(forHTTPHeaderField: "Content-Disposition"))
+    }
+
+    func testBlobUploadResponseRejectsMismatchedMetadata() {
+        let blob = ComAtprotoLexicon.Repository.UploadBlobOutput(
+            type: "blob",
+            reference: .init(link: "bafyblob"),
+            mimeType: "image/jpeg",
+            size: 4
+        )
+
+        XCTAssertThrowsError(try validateUploadedBlob(blob, expectedMimeType: "image/png", expectedSize: 4))
+    }
+
+    func testBlobUploadResponseRejectsMissingReference() {
+        let blob = ComAtprotoLexicon.Repository.UploadBlobOutput(
+            type: "blob",
+            reference: .init(link: ""),
+            mimeType: "image/png",
+            size: 4
+        )
+
+        XCTAssertThrowsError(try validateUploadedBlob(blob, expectedMimeType: "image/png", expectedSize: 4))
     }
 
     func testDeclaredBlobSizeAtLimitIsAccepted() throws {
