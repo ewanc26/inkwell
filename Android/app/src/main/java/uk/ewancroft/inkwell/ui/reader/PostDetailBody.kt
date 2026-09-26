@@ -19,6 +19,7 @@ import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -80,17 +81,27 @@ internal fun PostDetailContent(
         contentPadding = PaddingValues(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        if (uiState.coverUrl != null) {
+        if (uiState.coverImageCid != null) {
             item {
-                AsyncImage(
-                    model = uiState.coverUrl,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(16f / 9f)
-                        .clip(MaterialTheme.shapes.medium),
-                    contentScale = ContentScale.Crop,
-                )
+                val authorDid = uiState.authorDid
+                val coverBytes by androidx.compose.runtime.produceState<ByteArray?>(
+                    initialValue = null,
+                    uiState.coverImageCid,
+                    authorDid,
+                ) {
+                    value = authorDid?.let { onLoadImage(it, uiState.coverImageCid) }
+                }
+                if (coverBytes != null) {
+                    AsyncImage(
+                        model = coverBytes,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(16f / 9f)
+                            .clip(MaterialTheme.shapes.medium),
+                        contentScale = ContentScale.Crop,
+                    )
+                }
             }
         }
 

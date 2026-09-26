@@ -2,12 +2,15 @@ package uk.ewancroft.inkwell.data.repository
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonPrimitive
 import okio.Buffer
 import okhttp3.ResponseBody
 import okhttp3.Request
 import uk.ewancroft.inkwell.data.model.bluesky.BlueskyProfile
+import uk.ewancroft.inkwell.data.model.common.BlobRef
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 import uk.ewancroft.inkwell.shared.util.HandleUtils
 import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
@@ -54,6 +57,32 @@ suspend fun PdsRepository.downloadBlob(
         readBoundedBlob(body)
     }
 }
+
+/**
+ * Downloads the blob a record field points at, given the field's raw JSON.
+ *
+ * Blob-backed long-form content (Markpub `text.textBlob`, Leaflet `blobPages`) is
+ * read by both the Reader and the Writer, so the ref decoding lives here rather
+ * than in each caller. [BlobRef] already tolerates the canonical
+ * `{"ref": {"$link": …}}` shape and the legacy top-level `{"$link": …}` one.
+ */
+suspend fun PdsRepository.downloadBlobRef(
+    blob: JsonObject,
+    fromDID: String,
+    expectedMimeType: String? = null,
+): ByteArray {
+    val ref = runCatching { blobRefJson.decodeFromJsonElement<BlobRef>(blob) }.getOrNull()
+    val cid = ref?.link?.takeIf { it.isNotEmpty() }
+        ?: throw java.io.IOException("Blob reference had no CID")
+    return downloadBlob(
+        cid = cid,
+        fromDID = fromDID,
+        declaredSize = ref.size.takeIf { it > 0 }?.toLong(),
+        expectedMimeType = expectedMimeType,
+    )
+}
+
+private val blobRefJson = Json { ignoreUnknownKeys = true; isLenient = true }
 
 internal fun validateBlobContentType(actual: String?, expected: String?) {
     if (expected == null) return

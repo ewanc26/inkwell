@@ -46,7 +46,12 @@ fun WriterViewModel.loadDocumentForEditing(uri: String) {
             val description = value["description"]?.jsonPrimitive?.contentOrNull ?: ""
             val path = value["path"]?.jsonPrimitive?.contentOrNull ?: ""
 
-            val content = value["content"]?.jsonObject
+            // Blob-backed documents keep their payload in a PDS blob rather than
+            // inline, so resolve it before converting to markdown — otherwise the
+            // editor would open empty and a re-save would blank the document.
+            val authorDid = uk.ewancroft.inkwell.shared.AtUri.parse(uri)?.did
+                ?: throw IllegalArgumentException("Invalid document URI")
+            val content = pdsRepository.resolveBlobBackedContent(value["content"]?.jsonObject, authorDid)
             val contentType = content?.get("\$type")?.jsonPrimitive?.contentOrNull
             val format = when (contentType) {
                 ContentFormatDetector.MARKPUB -> "Markpub"

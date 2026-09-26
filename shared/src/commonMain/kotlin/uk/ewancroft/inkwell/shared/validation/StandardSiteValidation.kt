@@ -1,5 +1,7 @@
 package uk.ewancroft.inkwell.shared.validation
 
+import uk.ewancroft.inkwell.shared.model.DocumentMetadata
+
 /** Field-level validation shared by the Standard.site writers. */
 object StandardSiteValidation {
     data class Error(val field: String, val message: String)
@@ -27,6 +29,38 @@ object StandardSiteValidation {
             }
         }
         if (input.publishedAt.isBlank()) add(Error("publishedAt", "Published date is required"))
+    }
+
+    /**
+     * Validates the document's optional metadata layer.
+     *
+     * Kept separate from [validateDocument] so a Writer can surface a bad tag or
+     * contributor against the field the user was editing rather than failing the
+     * whole publish with one message. Limits come from the Lexicon: tags 128
+     * graphemes / 1,280 bytes, contributor role and displayName 100 graphemes /
+     * 1,000 bytes.
+     */
+    fun validateMetadata(metadata: DocumentMetadata): List<Error> = buildList {
+        metadata.tags.forEachIndexed { index, tag ->
+            checkText("tags[$index]", tag, 128, 1_280)
+        }
+        metadata.contributors.forEachIndexed { index, contributor ->
+            if (contributor.did.isBlank()) {
+                add(Error("contributors[$index].did", "Contributor DID is required"))
+            } else if (!contributor.did.startsWith("did:")) {
+                add(Error("contributors[$index].did", "Contributor must be a DID (did:plc:… or did:web:…)"))
+            }
+            checkOptionalText("contributors[$index].role", contributor.role, 100, 1_000)
+            checkOptionalText("contributors[$index].displayName", contributor.displayName, 100, 1_000)
+        }
+        metadata.bskyPostRef?.let { ref ->
+            if (!ref.uri.startsWith("at://")) {
+                add(Error("bskyPostRef", "Bluesky post reference must be an at:// URI"))
+            }
+        }
+        metadata.labels.forEachIndexed { index, label ->
+            checkText("labels[$index]", label, 128, 640)
+        }
     }
 
     fun validatePublication(url: String, name: String, description: String?): List<Error> = buildList {

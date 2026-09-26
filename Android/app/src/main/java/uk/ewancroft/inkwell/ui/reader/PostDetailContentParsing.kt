@@ -11,6 +11,8 @@ import kotlinx.serialization.json.jsonPrimitive
 import uk.ewancroft.inkwell.data.model.content.LeafletContent
 import uk.ewancroft.inkwell.data.model.content.LeafletPage
 import uk.ewancroft.inkwell.data.repository.downloadBlob
+import uk.ewancroft.inkwell.data.repository.downloadBlobRef
+import uk.ewancroft.inkwell.shared.content.BlobBackedContent
 import uk.ewancroft.inkwell.shared.content.ContentFormatDetector
 import uk.ewancroft.inkwell.shared.validation.JsonSafety
 
@@ -39,7 +41,7 @@ internal suspend fun PostDetailViewModel.parseContent(
                         cid = leaflet.blobPages.link,
                         fromDID = authorDid,
                         declaredSize = leaflet.blobPages.size.takeIf { it > 0 }?.toLong(),
-                        expectedMimeType = "application/json"
+                        expectedMimeType = BlobBackedContent.LEAFLET_BLOB_MIME
                     )
                     decodeSafeLeafletPages(blobData.decodeToString())
                 }.getOrNull()
@@ -50,8 +52,24 @@ internal suspend fun PostDetailViewModel.parseContent(
         }
 
         if (formatType == ContentFormatDetector.MARKPUB) {
-            val markdown = contentObj["text"]?.jsonObject?.get("markdown")?.jsonPrimitive?.contentOrNull
+            val text = contentObj["text"]?.jsonObject
+            val markdown = text?.get("markdown")?.jsonPrimitive?.contentOrNull
             if (!markdown.isNullOrBlank()) return ParseResult(DocumentContent.Markdown(markdown))
+
+            // A Markpub document too large for its record keeps the markdown source in
+            // `text.textBlob` instead. Without this the record's `textContent` — which is
+            // only a truncated indexing aid — would be all the reader ever showed.
+            val textBlob = text?.get("textBlob")?.jsonObject
+            if (textBlob != null) {
+                val spilled = runCatching {
+                    pdsRepository.downloadBlobRef(
+                        blob = textBlob,
+                        fromDID = authorDid,
+                        expectedMimeType = BlobBackedContent.MARKPUB_BLOB_MIME,
+                    ).decodeToString()
+                }.getOrNull()
+                if (!spilled.isNullOrBlank()) return ParseResult(DocumentContent.Markdown(spilled))
+            }
         }
 
         if (PcktOffprintConverter.isSupported(formatType)) {

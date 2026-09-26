@@ -3,6 +3,7 @@ package uk.ewancroft.inkwell.ui.reader
 import uk.ewancroft.inkwell.data.model.atproto.BasicTheme
 import uk.ewancroft.inkwell.data.model.atproto.PublicationTheme
 import uk.ewancroft.inkwell.data.model.content.LeafletPage
+import uk.ewancroft.inkwell.shared.model.DocumentMetadata
 import uk.ewancroft.inkwell.shared.verification.VerificationResult
 
 sealed class DocumentContent {
@@ -26,7 +27,14 @@ data class PostDetailUiState(
     val publishedAt: String? = null,
     val updatedAt: String? = null,
     val path: String? = null,
-    val coverUrl: String? = null,
+    /**
+     * CID of the document's `coverImage` blob, resolved to bytes on demand
+     * through the detail screen's blob loader. It is not a URL: the blob lives
+     * on the author's PDS, which only the ViewModel can resolve.
+     */
+    val coverImageCid: String? = null,
+    /** The document's optional Standard.site metadata layer, as published. */
+    val metadata: DocumentMetadata = DocumentMetadata(),
     val content: DocumentContent = DocumentContent.Empty,
     val lostContent: List<String> = emptyList(),
     val publicationUri: String? = null,
