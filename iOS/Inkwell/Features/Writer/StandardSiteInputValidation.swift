@@ -19,8 +19,8 @@ enum StandardSiteInputValidation {
     }
 
     private static func textError(field: String, value: String, graphemes: Int, bytes: Int) -> String? {
-        if value.count > graphemes { return "(field): Must be at most (graphemes) characters" }
-        if value.utf8.count > bytes { return "(field): Must be at most (bytes) UTF-8 bytes" }
+        if value.count > graphemes { return "\(field): Must be at most \(graphemes) characters" }
+        if value.utf8.count > bytes { return "\(field): Must be at most \(bytes) UTF-8 bytes" }
         return nil
     }
 }
