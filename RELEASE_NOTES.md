@@ -4,6 +4,40 @@ This is the release history for Inkwell. The current releases are unified across
 
 The older history is a bit messier because Inkwell started as separate iOS and Android projects. Some of those releases were backfilled after the monorepo was created, and the old `ios-v*` / `android-v*` tags are kept around as historical references. I have left the awkward bits documented rather than pretending the history was cleaner than it actually was.
 
+## 2.7.0 — 2026-09-26
+
+[GitHub release](https://github.com/ewanc26/inkwell/releases/tag/v2.7.0)
+
+2.7.0 is a large release focused on making the Writer genuinely useful for Standard.site's full document model, keeping your unpublished work safe, and tightening the foundation across the stack.
+
+### Writer improvements
+
+The Writer on both iOS and Android can now edit the full Standard.site document metadata. Tags, contributors (with optional role and display name), cover images, a Bluesky post reference, and self-labels/content warnings are all editable without touching fields the Writer doesn't know about. Unknown metadata fields are preserved on edit so nothing is accidentally lost.
+
+Autosave is also in. Your draft survives an app kill, a crash, or an accidental swipe away. It is scoped to your account, debounced so typing doesn't hit disk on every keystroke, and cleared only after a successful publish or an explicit discard. If the remote document changed since you started editing on another device, you will see a conflict prompt instead of a silent overwrite.
+
+iOS Writer documents that exceed Standard.site's record-size ceiling are now spilled into blob-backed content rather than failing the publish.
+
+### Deep links
+
+Both platforms now handle `inkwell://document?uri=` AT-URI custom-scheme links, with strict validation against malformed and publication URIs. HTTPS universal link / App Link infrastructure is also in place — the website serves the AASA and assetlinks files, and both apps verify the hand-off before routing into the Reader. Two placeholders (Apple Team ID and Android release certificate SHA-256) need filling before OS-level verification goes live.
+
+### Security and auth
+
+Android OAuth sessions are now sealed with AES-256-GCM under a non-exportable Android Keystore key. The Standard.site `authFull`/`authSocial` permission sets are declared in client metadata on all three surfaces; the runtime OAuth request is conservatively unchanged until someone verifies the switch against a real PDS.
+
+Android's APK permission surface has been audited. Legacy `READ/WRITE_EXTERNAL_STORAGE` and `READ_PHONE_STATE` permissions are removed at merge time via explicit `tools:node="remove"` rules; CI validates the exact permission allowlist against the assembled release APK.
+
+### Accessibility and internationalisation
+
+iOS now has real XCUITest coverage for the unauthenticated launch surface, and two real bugs were found and fixed (missing heading trait and accessible name on the login screen). The website runs pa11y-ci against all marketing and legal pages and fixed real colour-contrast failures. Android has a Compose instrumentation accessibility suite.
+
+Android ships French as its first full non-English locale, with a custom lint rule that catches hardcoded strings in Compose `Text()` calls. The website serves locale-aware routes and metadata with British English as the canonical path.
+
+### Infrastructure
+
+The Android instrumentation test harness is now in CI on a real emulator (API 34, KVM-backed, cached AVD). Standard.site Lexicon drift is caught in CI before it can break a build. The release workflow attests a release manifest and SBOMs rather than the binaries themselves, which are still assembled and signed locally.
+
 ## 2.6.1 — 2026-08-30
 
 [GitHub release](https://github.com/ewanc26/inkwell/releases/tag/v2.6.1)
