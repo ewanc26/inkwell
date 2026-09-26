@@ -244,7 +244,7 @@
     align-items: center;
     min-height: var(--control-size);
     text-decoration: none;
-    color: var(--color-text-600);
+    color: var(--color-text-800);
     padding: var(--space-sm) 0;
     font-family: var(--font-mono);
     font-size: var(--text-xs);
@@ -357,7 +357,7 @@
     display: inline-flex;
     align-items: center;
     min-height: var(--control-size);
-    color: var(--color-text-600);
+    color: var(--color-text-800);
     text-decoration: none;
     white-space: nowrap;
     padding: var(--space-sm) 0;
@@ -384,7 +384,7 @@
 
   .footer-langs-label {
     font-family: var(--font-mono);
-    color: var(--color-text-500);
+    color: var(--color-text-800);
     text-transform: uppercase;
     letter-spacing: 0.06em;
   }
