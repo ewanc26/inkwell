@@ -1,5 +1,6 @@
 package uk.ewancroft.inkwell.ui.reader
 
+import uk.ewancroft.inkwell.R
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -207,9 +209,10 @@ private fun AssociatedRefsRow(refs: List<BSkyStrongRef>, accent: Color, onNaviga
     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         items(refs) { ref ->
             val uri = ref.uri ?: return@items
+            val describedRelatedContent = stringResource(R.string.reader_bsky_related_content_description)
             AssistChip(
                 onClick = { onNavigateToDocument(uri) },
-                label = { Text("Related") },
+                label = { Text(stringResource(R.string.reader_bsky_related_content)) },
                 leadingIcon = {
                     Icon(Icons.AutoMirrored.Outlined.Article, contentDescription = null, modifier = Modifier.size(14.dp))
                 },
@@ -219,7 +222,7 @@ private fun AssociatedRefsRow(refs: List<BSkyStrongRef>, accent: Color, onNaviga
                     leadingIconContentColor = accent,
                 ),
                 modifier = Modifier.semantics {
-                    contentDescription = "Related Standard.site content. Opens the associated document in Inkwell."
+                    contentDescription = describedRelatedContent
                 },
             )
         }
