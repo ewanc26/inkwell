@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import OSLog
 import ATProtoKit
 import OAuthenticator
 
@@ -59,6 +60,65 @@ extension LoginStateManager {
             guard data.count <= maxReaderBlobBytes else { throw BlobDownloadError.oversized }
             return data
         }
+    }
+
+    // MARK: - Blob-backed Content
+
+    /// Resolves a content object that stores its body in a blob rather than
+    /// inline — Leaflet `blobPages` or markpub `textBlob` — returning content
+    /// with the body inlined so the ordinary providers can read it.
+    ///
+    /// Returns the content untouched when the body is already readable inline
+    /// (`contentBodyNeedsBlobDownload` is the matching predicate), and falls
+    /// back to the original (rather than throwing) when the blob can't be
+    /// fetched, so a failed download degrades instead of losing the record.
+    func resolveBlobBackedContent(_ content: UnknownType?, authorDID: String? = nil) async -> UnknownType? {
+        guard let content else { return nil }
+
+        if let leaflet = content.getRecord(ofType: LeafletContent.self),
+           let blobRef = leaflet.blobPages,
+           (leaflet.pages?.isEmpty ?? true) {
+            do {
+                let blobData = try await blobData(for: blobRef, authorDID: authorDID)
+                try JSONSafety.validateResponse(blobData)
+                let pages = try JSONDecoder().decode([LeafletPage].self, from: blobData)
+                return UnknownType.record(LeafletContent(pages: pages, blobPages: nil))
+            } catch {
+                logger.error("[resolveBlobBackedContent] leaflet blobPages fetch failed: \(error)")
+                return content
+            }
+        }
+
+        if let markpub = content.getRecord(ofType: MarkpubContent.self),
+           let blobRef = markpub.text.textBlob,
+           (markpub.text.markdown?.isEmpty ?? true) {
+            do {
+                let blobData = try await blobData(for: blobRef, authorDID: authorDID)
+                let markdown = String(decoding: blobData, as: UTF8.self)
+                return UnknownType.record(
+                    MarkpubContent(text: MarkpubText(type: markpub.text.type, markdown: markdown))
+                )
+            } catch {
+                logger.error("[resolveBlobBackedContent] markpub textBlob fetch failed: \(error)")
+                return content
+            }
+        }
+
+        return content
+    }
+
+    private func blobData(
+        for blob: ComAtprotoLexicon.Repository.UploadBlobOutput,
+        authorDID: String?
+    ) async throws -> Data {
+        if let authorDID {
+            return try await downloadBlob(
+                cid: blob.reference.link,
+                fromDID: authorDID,
+                declaredSize: blob.size
+            )
+        }
+        return try await downloadBlob(cid: blob.reference.link, declaredSize: blob.size)
     }
 
     // MARK: - Blob Upload

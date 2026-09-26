@@ -48,6 +48,12 @@ final class WriterViewModel {
     var editingDocumentURI: String?
     var editingDocumentRecordCID: String?
     var editingDocumentRawRecord: UnknownType?
+    /// The loaded document's content with any blob-backed body resolved
+    /// inline. Feeds `WriteContext.previousContent` so image blobs reattach.
+    var editingDocumentContent: UnknownType?
+    /// True when the loaded document stored its body in the format's
+    /// blob-backed representation. Re-saving must not force it back inline.
+    var editingDocumentIsBlobBacked = false
     var isEditing: Bool { editingDocumentURI != nil }
     var showDeleteConfirmation = false
 
@@ -204,7 +210,26 @@ final class WriterViewModel {
             }
 
             if let content = document.content {
-                let contentDict = unknownTypeToDict(content)
+                editingDocumentIsBlobBacked = contentIsBlobBacked(content)
+                // A blob-backed body has to come back off the PDS before the
+                // shared converter can turn it into editable markdown.
+                var resolved = content
+                if contentBodyNeedsBlobDownload(content) {
+                    let fetched = await loginStateManager.resolveBlobBackedContent(
+                        content,
+                        authorDID: parsed.did
+                    )
+                    guard let fetched, !contentBodyNeedsBlobDownload(fetched) else {
+                        cancelEditing()
+                        publishError = "Couldn't download this document's stored content. "
+                            + "Editing it now would publish an empty document."
+                        return
+                    }
+                    resolved = fetched
+                }
+                editingDocumentContent = resolved
+
+                let contentDict = unknownTypeToDict(resolved)
                 let contentType = contentDict["$type"] as? String
                 if let formatName = ContentFormatDispatcher.shared.formatForContentType(type: contentType) {
                     selectedProviderId = formatName.lowercased() == "markpub" ? "markpub" : formatName
@@ -223,6 +248,8 @@ final class WriterViewModel {
         editingDocumentURI = nil
         editingDocumentRecordCID = nil
         editingDocumentRawRecord = nil
+        editingDocumentContent = nil
+        editingDocumentIsBlobBacked = false
         title = ""
         description = ""
         path = ""
@@ -259,119 +286,13 @@ final class WriterViewModel {
         }
     }
 
-    // MARK: - Publishing
-
-    func publish() {
-        guard let pub = selectedPublication,
-              let provider = ProviderRegistry.providerById(selectedProviderId) else {
-            publishError = "Select a publication and format."
-            return
-        }
-
-        guard !title.isEmpty else {
-            publishError = "Title is required."
-            return
-        }
-
-        if let validationError = StandardSiteInputValidation.firstDocumentError(
-            site: pub.uri,
-            title: title,
-            description: description.isEmpty ? nil : description,
-            path: path.isEmpty ? nil : path
-        ) {
-            publishError = validationError
-            return
-        }
-
-        guard verifiedPublicationURI == pub.uri else {
-            publishError = "Verify the publication domain before publishing."
-            return
-        }
-
-        isPublishing = true
-        publishError = nil
-        publishSuccess = nil
-
-        Task {
-            do {
-                if let editURI = editingDocumentURI, let revision = editingDocumentRecordCID {
-                    let parsed = parseAtUri(editURI)
-                    guard let parsed else {
-                        publishError = "Invalid document URI."
-                        isPublishing = false
-                        return
-                    }
-
-                    let writeCtx = WriteContext(previousContent: nil)
-                    guard let contentRecord = provider.fromMarkdown(markdown, ctx: writeCtx) else {
-                        throw LoginError.contentConversionFailed
-                    }
-
-                    var normalizedSite = pub.uri
-                    while normalizedSite.hasSuffix("/") {
-                        normalizedSite.removeLast()
-                    }
-                    let normalizedPath = path.isEmpty ? nil : (path.hasPrefix("/") ? path : "/\(path)")
-                    let plainText = (try? AttributedString(markdown: markdown))
-                        .map { String($0.characters) }
-                        .flatMap { $0.isEmpty ? nil : $0 }
-
-                    let document = SiteStandardLexicon.DocumentRecord(
-                        site: normalizedSite,
-                        title: title,
-                        publishedAt: Date(),
-                        path: normalizedPath,
-                        description: description.isEmpty ? nil : description,
-                        coverImage: nil,
-                        content: contentRecord,
-                        textContent: plainText,
-                        updatedAt: Date()
-                    )
-
-                    try loginStateManager.ensureDocumentRecordFits(UnknownType.record(document))
-
-                    let updatedRecord = preservingUnknownFields(
-                        from: editingDocumentRawRecord,
-                        with: UnknownType.record(document)
-                    )
-                    try await loginStateManager.updateRecord(
-                        collection: SiteStandardLexicon.DocumentRecord.type,
-                        recordKey: parsed.recordKey,
-                        record: updatedRecord,
-                        recordCID: revision
-                    )
-                    publishSuccess = "Document updated."
-                    InkwellHaptics.success()
-                } else {
-                    let reference = try await loginStateManager.createDocument(
-                        title: title,
-                        description: description.isEmpty ? nil : description,
-                        path: path.isEmpty ? nil : path,
-                        site: pub.uri,
-                        markdown: markdown,
-                        provider: provider,
-                        previousContent: nil
-                    )
-                    let linkTag = SiteStandardLexicon.Verification.discoveryLinkTag(
-                        forRecordURI: reference.recordURI,
-                        relation: SiteStandardLexicon.DocumentRecord.type
-                    )
-                    publishSuccess = linkTag
-                    InkwellHaptics.success()
-
-                    title = ""
-                    description = ""
-                    path = ""
-                    markdown = ""
-                    lostFeatures = []
-                }
-            } catch {
-                publishError = editingDocumentURI == nil
-                    ? "Failed to publish: \(error.localizedDescription)"
-                    : writerEditErrorMessage(error)
-            }
-            isPublishing = false
-        }
+    /// Resets the editor after a successful first publish.
+    func resetAfterPublish() {
+        title = ""
+        description = ""
+        path = ""
+        markdown = ""
+        lostFeatures = []
     }
 }
 
