@@ -161,6 +161,7 @@ extension WriterViewModel {
         )
         InkwellHaptics.success()
         resetAfterPublish()
+        onDraftPublished()
     }
 
     private func performUpdate(publication: PublicationEntry, provider: ContentProvider) async throws {
@@ -195,5 +196,6 @@ extension WriterViewModel {
         editingDocumentIsBlobBacked = contentIsBlobBacked(document.content)
         publishSuccess = "Document updated."
         InkwellHaptics.success()
+        onDraftPublished()
     }
 }

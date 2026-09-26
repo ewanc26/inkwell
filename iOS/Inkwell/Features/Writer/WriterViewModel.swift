@@ -87,6 +87,25 @@ final class WriterViewModel {
     var showCreatePublication = false
     var showAbout = false
 
+    // MARK: - Draft autosave (see WriterViewModel+Draft.swift)
+
+    var draftRestored = false
+    var showDraftBanner = false
+    /// True while a draft of the loaded document is held back because the
+    /// document changed on the PDS after the draft was based on it.
+    var draftConflict = false
+    @ObservationIgnored let draftStore: WriterDraftStore
+    @ObservationIgnored var heldConflictDraft: WriterDraft?
+    @ObservationIgnored var draftAccountDID: String?
+    @ObservationIgnored var draftBaseline: WriterDraft?
+    @ObservationIgnored var draftWritten = false
+    @ObservationIgnored var draftAutosaveReady = false
+    @ObservationIgnored var draftAutosaveSuspended = false
+    @ObservationIgnored var draftAutosaveTask: Task<Void, Never>?
+    @ObservationIgnored var pendingDraftPublicationURI: String?
+    /// Image CIDs a restored draft carried; kept so re-saving doesn't drop them.
+    @ObservationIgnored var restoredBlobKeys: Set<String> = []
+
     // MARK: - Computed
 
     var canPublish: Bool {
@@ -108,8 +127,9 @@ final class WriterViewModel {
 
     // MARK: - Init
 
-    init(loginStateManager: LoginStateManager) {
+    init(loginStateManager: LoginStateManager, draftStore: WriterDraftStore = .shared) {
         self.loginStateManager = loginStateManager
+        self.draftStore = draftStore
     }
 
     // MARK: - Publication Loading
@@ -118,9 +138,10 @@ final class WriterViewModel {
         isLoadingPublications = true
         do {
             publications = try await loginStateManager.fetchPublicationsWithURIs()
-            selectedPublication = uri.flatMap { selectedURI in
+            selectedPublication = (uri ?? pendingDraftPublicationURI).flatMap { selectedURI in
                 publications.first(where: { $0.uri == selectedURI })
             } ?? publications.first
+            pendingDraftPublicationURI = nil
         } catch {
             publishError = "Failed to load publications: \(error.localizedDescription)"
         }
@@ -196,6 +217,10 @@ final class WriterViewModel {
     // MARK: - Document Editing
 
     func loadDocumentForEditing(uri: String) async {
+        draftAutosaveTask?.cancel()
+        draftAutosaveSuspended = true
+        defer { draftAutosaveSuspended = false }
+        let storedDraft = await storedDraft(forDocument: uri)
         do {
             let entry = try await loginStateManager.fetchDocument(uri: uri)
 
@@ -259,6 +284,7 @@ final class WriterViewModel {
                 markdown = convertResult.markdown
                 lostFeatures = convertResult.lost
             }
+            reconcileDraft(storedDraft, loadedDocument: uri)
         } catch {
             publishError = "Failed to load document: \(error.localizedDescription)"
         }
@@ -298,6 +324,8 @@ final class WriterViewModel {
                 )
                 await OfflineContentStore.shared.remove(uri: documentURI)
                 cancelEditing()
+                // A draft of a deleted document has nothing left to publish into.
+                onDraftPublished()
                 publishSuccess = "Document deleted."
                 InkwellHaptics.success()
             } catch {

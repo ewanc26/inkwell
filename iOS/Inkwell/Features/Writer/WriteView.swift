@@ -48,6 +48,10 @@ struct WriteView: View {
                 }
             } else {
                 Form {
+                    if viewModel.showDraftBanner {
+                        WriterDraftBanner(viewModel: viewModel)
+                    }
+
                     // MARK: - Publication
                     Section {
                         if viewModel.isLoadingPublications {
@@ -290,6 +294,7 @@ struct WriteView: View {
                     }
                 }
                 .accountToolbar(showAbout: $viewModel.showAbout)
+                .writerDraftLifecycle(viewModel: viewModel, accountDID: loginStateManager.currentDID)
                 .alert(
                     "Couldn't Publish",
                     isPresented: Binding(
