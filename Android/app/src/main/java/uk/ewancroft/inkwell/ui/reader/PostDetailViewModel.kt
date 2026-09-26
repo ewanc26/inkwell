@@ -24,7 +24,10 @@ import kotlinx.serialization.json.jsonPrimitive
 import uk.ewancroft.inkwell.data.model.atproto.DocumentRecord
 import uk.ewancroft.inkwell.data.model.atproto.PublicationRecord
 import uk.ewancroft.inkwell.data.model.atproto.PublicationTheme
+import uk.ewancroft.inkwell.data.model.common.BlobRef
 import uk.ewancroft.inkwell.shared.AtUri
+import uk.ewancroft.inkwell.shared.content.JsonMapBridge
+import uk.ewancroft.inkwell.shared.model.DocumentMetadata
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 import uk.ewancroft.inkwell.data.model.content.LeafletPollDefinition
 import uk.ewancroft.inkwell.data.model.graph.LeafletComment
@@ -139,8 +142,13 @@ class PostDetailViewModel @Inject constructor(
                 val updatedAt = value["updatedAt"]?.jsonPrimitive?.contentOrNull
                 val path = value["path"]?.jsonPrimitive?.contentOrNull
                 val site = value["site"]?.jsonPrimitive?.contentOrNull
-                val coverUrl = value["coverImage"]?.jsonObject?.get("link")?.jsonPrimitive?.contentOrNull
-                    ?: value["coverImage"]?.jsonObject?.get("\$link")?.jsonPrimitive?.contentOrNull
+                // `coverImage` is a blob ref, not a URL. Keep the CID and let the
+                // screen resolve bytes through the author's PDS on demand.
+                val coverImageCid = value["coverImage"]?.jsonObject
+                    ?.let { runCatching { json.decodeFromJsonElement<BlobRef>(it) }.getOrNull() }
+                    ?.link?.takeIf(String::isNotEmpty)
+
+                val metadata = DocumentMetadata.read(JsonMapBridge.jsonToMap(value))
 
                 val textContent = value["textContent"]?.jsonPrimitive?.contentOrNull
                 val documentLabels = value["labels"]?.jsonObject?.get("values")?.jsonArray
@@ -213,7 +221,8 @@ class PostDetailViewModel @Inject constructor(
                     publishedAt = publishedAt,
                     updatedAt = updatedAt,
                     path = path,
-                    coverUrl = coverUrl,
+                    coverImageCid = coverImageCid,
+                    metadata = metadata,
                     content = parseResult.content,
                     lostContent = parseResult.lost,
                     publicationUri = pubUri,
