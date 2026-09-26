@@ -63,9 +63,11 @@ enum DocumentRecordComposer {
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty && seen.insert($0).inserted }
         guard !cleaned.isEmpty else { return nil }
-        return ComAtprotoLexicon.Label.SelfLabelsDefinition(
-            values: cleaned.map { ComAtprotoLexicon.Label.SelfLabelDefinition(from: $0) }
-        )
+        let defs = cleaned.compactMap { val -> ComAtprotoLexicon.Label.SelfLabelDefinition? in
+            let json = Data("{\"val\":\"\(val)\"}".utf8)
+            return try? JSONDecoder().decode(ComAtprotoLexicon.Label.SelfLabelDefinition.self, from: json)
+        }
+        return defs.isEmpty ? nil : ComAtprotoLexicon.Label.SelfLabelsDefinition(values: defs)
     }
 
     /// Contributors with blank optional fields dropped, or nil when none have a DID.
