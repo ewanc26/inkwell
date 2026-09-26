@@ -36,6 +36,20 @@ extension WriterViewModel {
             return
         }
 
+        if let metadataError = StandardSiteInputValidation.firstMetadataError(
+            tags: tags,
+            contributors: contributors,
+            bskyPostURI: bskyPostURI
+        ) {
+            publishError = metadataError
+            return
+        }
+
+        guard !isUploadingCoverImage else {
+            publishError = "Wait for the cover image to finish uploading."
+            return
+        }
+
         guard verifiedPublicationURI == publication.uri else {
             publishError = "Verify the publication domain before publishing."
             return
@@ -66,6 +80,10 @@ extension WriterViewModel {
            let description = spill.errorDescription {
             return description
         }
+        if let metadata = error as? WriterMetadataError,
+           let description = metadata.errorDescription {
+            return description
+        }
         return isEditing
             ? writerEditErrorMessage(error)
             : "Failed to publish: \(error.localizedDescription)"
@@ -73,8 +91,8 @@ extension WriterViewModel {
 
     // MARK: - Record composition
 
-    private func draft(for publication: PublicationEntry, isEdit: Bool) -> DocumentDraft {
-        DocumentDraft(
+    private func draft(for publication: PublicationEntry, isEdit: Bool) async throws -> DocumentDraft {
+        var draft = DocumentDraft(
             site: publication.uri,
             title: title,
             description: description.isEmpty ? nil : description,
@@ -82,6 +100,8 @@ extension WriterViewModel {
             publishedAt: Date(),
             updatedAt: isEdit ? Date() : nil
         )
+        try await applyMetadata(to: &draft)
+        return draft
     }
 
     /// Builds the record that will be written, spilling content into the
@@ -104,7 +124,7 @@ extension WriterViewModel {
             throw LoginError.contentConversionFailed
         }
 
-        let draft = draft(for: publication, isEdit: isEdit)
+        let draft = try await draft(for: publication, isEdit: isEdit)
         let fitted = try await DocumentContentSpill.fit(
             draft: draft,
             provider: provider,
@@ -160,7 +180,8 @@ extension WriterViewModel {
             document,
             recordKey: parsed.recordKey,
             recordCID: revision,
-            existingRawRecord: editingDocumentRawRecord
+            existingRawRecord: editingDocumentRawRecord,
+            clearingAbsent: DocumentRecordComposer.metadataKeys
         )
 
         // The editor stays open on this document, so its edit baseline has to

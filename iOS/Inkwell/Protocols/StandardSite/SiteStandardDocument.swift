@@ -170,7 +170,7 @@ extension SiteStandardLexicon {
             try container.encodeIfPresent(self.bskyPostRef, forKey: .bskyPostRef)
             try container.encodeIfPresent(self.tags, forKey: .tags)
             try container.encodeIfPresent(self.links, forKey: .links)
-            try container.encodeIfPresent(self.labels, forKey: .labels)
+            try container.encodeIfPresent(self.labels.map { SelfLabelsWire(values: $0.values.map(\.value)) }, forKey: .labels)
             try container.encodeIfPresent(self.contributors, forKey: .contributors)
             try container.encodeDateIfPresent(self.updatedAt, forKey: .updatedAt)
         }
@@ -192,6 +192,32 @@ extension SiteStandardLexicon {
             case labels
             case contributors
             case updatedAt
+        }
+    }
+}
+
+/// `com.atproto.label.defs#selfLabels` as written into a document's `labels`.
+///
+/// Carries `$type` on the object and each value — the canonical shape shared
+/// `DocumentMetadata.labelsWire` writes — so readers that treat `labels` as a
+/// union can dispatch on it regardless of how ATProtoKit encodes the type.
+private struct SelfLabelsWire: Encodable {
+    let values: [String]
+
+    private enum CodingKeys: String, CodingKey {
+        case type = "$type"
+        case values
+        case val
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode("com.atproto.label.defs#selfLabels", forKey: .type)
+        var list = container.nestedUnkeyedContainer(forKey: .values)
+        for value in values {
+            var entry = list.nestedContainer(keyedBy: CodingKeys.self)
+            try entry.encode("com.atproto.label.defs#selfLabel", forKey: .type)
+            try entry.encode(value, forKey: .val)
         }
     }
 }

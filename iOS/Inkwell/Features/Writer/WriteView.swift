@@ -121,6 +121,12 @@ struct WriteView: View {
                             }
                         }
                         .disabled(viewModel.isEditing)
+                        Button {
+                            viewModel.showMetadata = true
+                        } label: {
+                            Label("Tags, Cover & More", systemImage: "tag")
+                        }
+                        .accessibilityHint("Edits the cover image, tags, content warnings, contributors, and Bluesky discussion post.")
                     }
 
                     // MARK: - Editing indicator
@@ -330,6 +336,9 @@ struct WriteView: View {
                     } onCancel: {
                         pendingImage = nil
                     }
+                }
+                .sheet(isPresented: $viewModel.showMetadata) {
+                    WriterMetadataSheet(viewModel: viewModel)
                 }
                 .task {
                     await viewModel.loadPublications()

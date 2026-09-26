@@ -37,6 +37,25 @@ final class WriterViewModel {
     var selectedProviderId: String = ProviderRegistry.defaultProvider.id
     var markdown = ""
 
+    // MARK: - Standard.site metadata (see WriterViewModel+Metadata.swift)
+
+    var tags: [String] = []
+    var contributors: [ContributorDraft] = []
+    /// Self-label values, including any the loaded record carried that the
+    /// Writer doesn't offer, so an edit never drops them.
+    var selfLabels: [String] = []
+    var bskyPostURI = ""
+    /// The reference as last loaded or resolved. Reused while `bskyPostURI`
+    /// still names it, so an unchanged reference keeps its CID exactly.
+    var resolvedBskyPostRef: ComAtprotoLexicon.Repository.StrongReference?
+    var coverImage: ComAtprotoLexicon.Repository.UploadBlobOutput?
+    /// Local bytes of a newly picked cover; the PDS won't serve a blob until a
+    /// record references it, so the preview can't be fetched back yet.
+    var coverImagePreview: Data?
+    var isUploadingCoverImage = false
+    var metadataError: String?
+    var showMetadata = false
+
     // MARK: - Editor state
 
     var showPreview = true
@@ -71,7 +90,7 @@ final class WriterViewModel {
     // MARK: - Computed
 
     var canPublish: Bool {
-        !isPublishing && !publications.isEmpty && !title.isEmpty
+        !isPublishing && !isUploadingCoverImage && !publications.isEmpty && !title.isEmpty
             && verifiedPublicationURI == selectedPublication?.uri
     }
 
@@ -202,6 +221,7 @@ final class WriterViewModel {
             title = document.title
             description = document.description ?? ""
             path = document.path ?? ""
+            loadMetadata(from: document)
 
             if let siteURI = document.site as? String {
                 if let matchingPub = publications.first(where: { $0.uri == siteURI }) {
@@ -255,6 +275,7 @@ final class WriterViewModel {
         path = ""
         markdown = ""
         lostFeatures = []
+        resetMetadata()
         selectedProviderId = ProviderRegistry.defaultProvider.id
     }
 
@@ -293,6 +314,7 @@ final class WriterViewModel {
         path = ""
         markdown = ""
         lostFeatures = []
+        resetMetadata()
     }
 }
 
@@ -307,13 +329,25 @@ private func unknownTypeToDict(_ value: UnknownType) -> [String: Any] {
     return dict
 }
 
-func preservingUnknownFields(from existing: UnknownType?, with updated: UnknownType) -> UnknownType {
+/// Merges `updated` over `existing` so fields Inkwell doesn't model survive.
+///
+/// `clearingAbsent` names keys the caller owns: when one is missing from
+/// `updated`, the author cleared it, so it is removed rather than resurrected
+/// from `existing`.
+func preservingUnknownFields(
+    from existing: UnknownType?,
+    with updated: UnknownType,
+    clearingAbsent ownedKeys: Set<String> = []
+) -> UnknownType {
     guard let existing,
           let existingFields = try? existing.asCodableValue(),
           let updatedFields = try? updated.asCodableValue() else {
         return updated
     }
     var merged = existingFields
+    for key in ownedKeys where updatedFields[key] == nil {
+        merged.removeValue(forKey: key)
+    }
     updatedFields.forEach { merged[$0.key] = $0.value }
     if case let .string(publishedAt)? = existingFields["publishedAt"],
        !publishedAt.isEmpty {
