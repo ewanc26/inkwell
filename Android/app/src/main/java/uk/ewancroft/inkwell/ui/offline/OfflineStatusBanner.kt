@@ -15,23 +15,24 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-
-private const val OfflineMessage = "You’re offline. Search and new content may be unavailable."
+import uk.ewancroft.inkwell.R
 
 @Composable
 fun OfflineStatusBanner(modifier: Modifier = Modifier) {
+    val offlineMessage = stringResource(R.string.offline_status_message)
     Surface(
         color = MaterialTheme.colorScheme.errorContainer,
         contentColor = MaterialTheme.colorScheme.onErrorContainer,
         modifier = modifier
             .fillMaxWidth()
             .semantics(mergeDescendants = true) {
-                contentDescription = OfflineMessage
+                contentDescription = offlineMessage
                 liveRegion = LiveRegionMode.Polite
             },
     ) {
@@ -42,7 +43,7 @@ fun OfflineStatusBanner(modifier: Modifier = Modifier) {
         ) {
             Icon(Icons.Outlined.WifiOff, contentDescription = null)
             Spacer(Modifier.width(10.dp))
-            Text(OfflineMessage, style = MaterialTheme.typography.bodyMedium)
+            Text(offlineMessage, style = MaterialTheme.typography.bodyMedium)
         }
     }
 }

@@ -300,6 +300,7 @@ private fun SearchResultRow(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     if (result.handle != null) {
+                        // noinspection ComposeHardcodedText - decorative separator glyph, not translatable text.
                         Text("·", color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text(
                             result.handle,

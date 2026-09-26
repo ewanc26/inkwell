@@ -154,14 +154,15 @@ private fun MutedList(
     onUnmute: (String) -> Unit,
 ) {
     if (mutes.isEmpty()) {
-        EmptyState("No muted accounts.")
+        EmptyState(stringResource(R.string.moderation_no_muted_accounts))
         return
     }
+    val unmuteLabel = stringResource(R.string.moderation_unmute)
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(mutes, key = { it.did }) { actor ->
             ActorRow(
                 actor = actor,
-                actionLabel = "Unmute",
+                actionLabel = unmuteLabel,
                 isRemoving = actor.did in removingKeys,
                 onAction = { onUnmute(actor.did) },
             )
@@ -177,14 +178,15 @@ private fun BlockedList(
     onUnblock: (BlockedActorEntry) -> Unit,
 ) {
     if (blocks.isEmpty()) {
-        EmptyState("No blocked accounts.")
+        EmptyState(stringResource(R.string.moderation_no_blocked_accounts))
         return
     }
+    val unblockLabel = stringResource(R.string.moderation_unblock)
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(blocks, key = { it.rkey }) { entry ->
             ActorRow(
                 actor = entry.actor,
-                actionLabel = "Unblock",
+                actionLabel = unblockLabel,
                 isRemoving = entry.rkey in removingKeys,
                 onAction = { onUnblock(entry) },
             )
@@ -221,19 +223,22 @@ private fun ActorRow(
             )
         }
         if (isRemoving) {
+            val actionInProgressDescription =
+                stringResource(R.string.moderation_action_in_progress, actionLabel, actor.handle)
             CircularProgressIndicator(
                 modifier = Modifier
                     .size(20.dp)
                     .semantics {
-                        contentDescription = "$actionLabel @${actor.handle} in progress"
+                        contentDescription = actionInProgressDescription
                     },
                 strokeWidth = 2.dp,
             )
         } else {
+            val actionDescription = stringResource(R.string.moderation_action_description, actionLabel, actor.handle)
             TextButton(
                 onClick = onAction,
                 modifier = Modifier.semantics {
-                    contentDescription = "$actionLabel @${actor.handle}"
+                    contentDescription = actionDescription
                 },
             ) {
                 Text(actionLabel)

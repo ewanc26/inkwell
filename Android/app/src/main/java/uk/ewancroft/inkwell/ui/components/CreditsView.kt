@@ -101,6 +101,7 @@ fun CreditsView(
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Spacer(Modifier.height(12.dp))
+                // noinspection ComposeHardcodedText - "Inkwell" is the product/brand name, not translatable copy.
                 Text("Inkwell", style = MaterialTheme.typography.titleLarge)
                 Text(
                     appVersion,

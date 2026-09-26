@@ -206,7 +206,7 @@ fun PostCard(
                             )
                             if (isCached) {
                                 Text(
-                                    "Cached",
+                                    stringResource(R.string.reader_cached_label),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = secondaryForeground,
                                 )
@@ -245,7 +245,7 @@ fun PostCard(
                             )
                             if (isCached) {
                                 Text(
-                                    "Cached",
+                                    stringResource(R.string.reader_cached_label),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = secondaryForeground,
                                 )
