@@ -61,22 +61,80 @@ data class BSkyImage(
     val alt: String? = null,
 )
 
+/**
+ * An `app.bsky.embed.external#viewExternal` view. Bluesky's May 2026
+ * Standard.site integration enriches this shape with [readingTime],
+ * [labels], [source], [associatedRefs], and [associatedProfiles] on
+ * external links backed by a standard.site publication. Plain Bluesky
+ * external cards simply omit all of these, so every enriched field is
+ * nullable and decoding degrades gracefully either way (the fetcher's
+ * `Json { ignoreUnknownKeys = true }` config also means fields this class
+ * doesn't yet model won't break decoding).
+ */
 @Serializable
 data class BSkyExternal(
     val uri: String? = null,
     val title: String? = null,
     val description: String? = null,
     val thumb: String? = null,
-    val readingTime: Int? = null,
     val createdAt: String? = null,
     val updatedAt: String? = null,
+    val readingTime: Int? = null,
+    val labels: List<BSkyLabel>? = null,
+    val source: BSkyExternalSource? = null,
     val associatedRefs: List<BSkyStrongRef>? = null,
+    val associatedProfiles: List<BSkyAuthor>? = null,
 )
 
 @Serializable
 data class BSkyStrongRef(
     val uri: String? = null,
     val cid: String? = null,
+)
+
+/**
+ * `com.atproto.label.defs#label` — only the fields Inkwell surfaces (the
+ * short value and whether it's a negation) are decoded; the rest of the
+ * label envelope isn't currently rendered.
+ */
+@Serializable
+data class BSkyLabel(
+    val src: String? = null,
+    val uri: String? = null,
+    @SerialName("val") val value: String? = null,
+    val neg: Boolean? = null,
+    val cts: String? = null,
+)
+
+/**
+ * `app.bsky.embed.external#viewExternalSource` — identifies the
+ * standard.site (or other) publication that backs an enriched external
+ * embed.
+ */
+@Serializable
+data class BSkyExternalSource(
+    val uri: String? = null,
+    val icon: String? = null,
+    val title: String? = null,
+    val description: String? = null,
+    val theme: BSkyExternalSourceTheme? = null,
+)
+
+/** `app.bsky.embed.external#viewExternalSourceTheme`. */
+@Serializable
+data class BSkyExternalSourceTheme(
+    val backgroundRGB: BSkyColorRGB? = null,
+    val foregroundRGB: BSkyColorRGB? = null,
+    val accentRGB: BSkyColorRGB? = null,
+    val accentForegroundRGB: BSkyColorRGB? = null,
+)
+
+/** `app.bsky.embed.external#colorRGB`. */
+@Serializable
+data class BSkyColorRGB(
+    val r: Int? = null,
+    val g: Int? = null,
+    val b: Int? = null,
 )
 
 @Serializable

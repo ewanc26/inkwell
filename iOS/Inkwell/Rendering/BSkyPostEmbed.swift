@@ -132,47 +132,11 @@ struct BSkyPostEmbedView: View {
             }
 
         case .external(let externalEmbed):
-            HStack(spacing: 12) {
-                VStack(alignment: .leading, spacing: 4) {
-                    if let title = externalEmbed.external.title {
-                        Text(title)
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(foregroundColor)
-                            .lineLimit(2)
-                    }
-                    if let desc = externalEmbed.external.description {
-                        Text(desc)
-                            .font(.caption)
-                            .foregroundStyle(foregroundColor.opacity(0.6))
-                            .lineLimit(2)
-                    }
-                    if let uri = externalEmbed.external.uri {
-                        Text(host(from: uri))
-                            .font(.caption2)
-                            .foregroundStyle(foregroundColor.opacity(0.4))
-                    }
-                }
-                Spacer()
-                if let thumb = externalEmbed.external.thumb {
-                    AsyncImage(url: URL(string: thumb)) { phase in
-                        if let image = phase.image {
-                            image.resizable().scaledToFill()
-                                .frame(width: 60, height: 60)
-                                .clipShape(RoundedRectangle(cornerRadius: 6))
-                        }
-                    }
-                    .accessibilityHidden(true)
-                }
-            }
-            .padding(10)
-            .background(foregroundColor.opacity(0.03))
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(foregroundColor.opacity(0.08), lineWidth: 1)
+            BSkyExternalCardView(
+                card: externalEmbed.external,
+                foregroundColor: foregroundColor,
+                accentColor: accentColor
             )
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel(externalCardAccessibilityLabel(externalEmbed.external))
 
         case .record(let recordEmbed):
             VStack(alignment: .leading, spacing: 4) {
@@ -233,24 +197,12 @@ struct BSkyPostEmbedView: View {
         }
     }
 
-    private func externalCardAccessibilityLabel(_ card: BSkyExternalEmbed.BSkyExternal) -> String {
-        var parts = ["External link"]
-        if let title = card.title, !title.isEmpty { parts.append(title) }
-        if let description = card.description, !description.isEmpty { parts.append(description) }
-        if let uri = card.uri { parts.append(host(from: uri)) }
-        return parts.joined(separator: ". ")
-    }
-
     private func quotedPostAccessibilityLabel(_ record: BSkyRecordEmbed.BSkyEmbeddedRecord) -> String {
         var label = "Quoted post by \(record.author?.displayName ?? "unknown author")"
         if let text = record.value?.text, !text.isEmpty {
             label += ". \(text)"
         }
         return label
-    }
-
-    private func host(from urlString: String) -> String {
-        URL(string: urlString)?.host ?? urlString
     }
 
     // MARK: - States
