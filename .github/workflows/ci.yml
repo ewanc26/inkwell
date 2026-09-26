@@ -266,8 +266,7 @@ jobs:
           script: |
             adb logcat -c || true
             adb logcat > "${{ github.workspace }}/logcat.txt" 2>&1 &
-            ./gradlew --no-daemon --max-workers=2 --console=plain --stacktrace \
-              :app:connectedDebugAndroidTest
+            ./gradlew --no-daemon --max-workers=2 --console=plain --stacktrace :app:connectedDebugAndroidTest
 
       - name: Upload instrumentation reports and logcat
         if: always()

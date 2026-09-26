@@ -10,6 +10,7 @@
 
 import SwiftUI
 import PhotosUI
+import ATProtoKit
 
 struct WriterMetadataSheet: View {
     @Bindable var viewModel: WriterViewModel

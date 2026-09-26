@@ -64,7 +64,7 @@ enum DocumentRecordComposer {
             .filter { !$0.isEmpty && seen.insert($0).inserted }
         guard !cleaned.isEmpty else { return nil }
         return ComAtprotoLexicon.Label.SelfLabelsDefinition(
-            values: cleaned.map { ComAtprotoLexicon.Label.SelfLabelDefinition(value: $0) }
+            values: cleaned.map { ComAtprotoLexicon.Label.SelfLabelDefinition(from: $0) }
         )
     }
 
