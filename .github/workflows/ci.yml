@@ -128,12 +128,19 @@ jobs:
           fi
 
       - name: Build (and test, if a compatible Simulator runtime is available)
-        timeout-minutes: 15
+        timeout-minutes: 20
         working-directory: iOS
         run: |
+          extra_args=()
           action=build
           if [ "${{ steps.destination.outputs.runnable }}" = "true" ]; then
+            # Name both test bundles explicitly rather than relying on the
+            # scheme's default test-action membership — InkwellUITests now
+            # carries real accessibility coverage (see InkwellUITests/) and
+            # must actually run in CI, not silently ride along with (or
+            # drop out of) whatever an autocreated scheme happens to include.
             action="build test"
+            extra_args=(-only-testing:InkwellTests -only-testing:InkwellUITests)
           else
             echo "::warning::No installed Simulator runtime satisfies InkwellTests' deployment target — building only, not running tests."
           fi
@@ -142,6 +149,7 @@ jobs:
             -scheme Inkwell \
             -destination "platform=iOS Simulator,name=${{ steps.destination.outputs.name }}" \
             -parallel-testing-enabled NO \
+            "${extra_args[@]}" \
             $action
 
   android:
@@ -211,3 +219,15 @@ jobs:
       - name: Build
         working-directory: website
         run: pnpm build
+
+      - name: Accessibility audit (pa11y-ci against the built site)
+        working-directory: website
+        run: |
+          pnpm preview --port 4173 --strictPort &
+          preview_pid=$!
+          trap 'kill "$preview_pid" 2>/dev/null || true' EXIT
+          for _ in $(seq 1 30); do
+            curl -sf http://localhost:4173/ -o /dev/null && break
+            sleep 1
+          done
+          pnpm exec pa11y-ci --config .pa11yci.json
