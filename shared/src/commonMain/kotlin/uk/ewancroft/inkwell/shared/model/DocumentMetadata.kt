@@ -61,6 +61,9 @@ data class DocumentMetadata(
         const val SELF_LABELS_TYPE: String = "com.atproto.label.defs#selfLabels"
         const val SELF_LABEL_TYPE: String = "com.atproto.label.defs#selfLabel"
 
+        /** `coverImage.maxSize` from the `site.standard.document` Lexicon. */
+        const val COVER_IMAGE_MAX_BYTES: Int = 1_000_000
+
         /**
          * Keys this object owns. Everything else in a record is left untouched.
          *
