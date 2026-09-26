@@ -28,5 +28,6 @@ dependencyResolutionManagement {
 rootProject.name = "inkwell-android"
 include(":app")
 include(":shared")
+include(":lint-rules")
 
 project(":shared").projectDir = java.io.File(rootDir, "../shared")
