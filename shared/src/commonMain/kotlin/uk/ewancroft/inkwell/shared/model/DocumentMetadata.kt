@@ -61,10 +61,27 @@ data class DocumentMetadata(
         const val SELF_LABELS_TYPE: String = "com.atproto.label.defs#selfLabels"
         const val SELF_LABEL_TYPE: String = "com.atproto.label.defs#selfLabel"
 
-        /** Keys this object owns. Everything else in a record is left untouched. */
-        private val OWNED_KEYS = listOf(
+        /**
+         * Keys this object owns. Everything else in a record is left untouched.
+         *
+         * Public so a platform writer holding a typed record (rather than the
+         * `Map` [applyTo] takes) can clear exactly these keys before writing
+         * the metadata back, without re-encoding the fields it doesn't own.
+         */
+        val OWNED_KEYS: List<String> = listOf(
             "tags", "contributors", "labels", "coverImage", "bskyPostRef", "links",
         )
+
+        /**
+         * The content-warning values an author can self-apply, in display order.
+         *
+         * These are the author-applicable values from the Bluesky label
+         * vocabulary (`com.atproto.label.defs#labelValue` known values plus
+         * Bluesky's `graphic-media`) — the set that the network's own composers
+         * offer as self-labels. Other values already on a record are kept by
+         * [read]/[applyTo]; this list is only what a Writer offers to add.
+         */
+        val SELF_LABEL_VALUES: List<String> = listOf("sexual", "nudity", "porn", "graphic-media")
 
         /** Property names a `links` variant might use for its target URI. */
         private val URI_KEYS = listOf("uri", "url", "href")
