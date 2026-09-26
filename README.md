@@ -44,13 +44,14 @@ The complete release history is available in the [changelog](RELEASE_NOTES.md).
 ## Features
 
 - Reads `site.standard.publication` and `site.standard.document` records from the author's PDS.
-- Renders Markpub Markdown plus Leaflet, pckt, and Offprint content. Uses `textContent` as a fallback. Native block rendering for Leaflet (including blob-stored pages), Markdown for everything else.
+- Renders Markpub Markdown plus Leaflet, pckt, and Offprint content. Uses `textContent` as a fallback. Native block rendering for Leaflet (including blob-stored pages), Markdown for everything else. iOS also resolves Markpub bodies stored in `textBlob`.
 - Representative app screenshots are checked in under `iOS/screenshots/`, `Android/fastlane/metadata/.../images/phoneScreenshots/`, and `website/static/screenshots/`, captured in testing mode — `-testing` (iOS) / `--ez testing true` (Android). Testing mode uses the real signed-in session and real network reads; it intercepts every write and shows a "Testing mode" notice instead. Captures therefore require being logged in.
 - Theme resolution: Leaflet's light/dark palette → `basicTheme` → system defaults. Publication-level by default, overridable per document.
 - Split-pane editor with live markdown preview, formatting toolbar, and selectable content formats.
 - Image upload directly into the editor.
 - Loss reporting when converting between formats that don't round-trip perfectly.
 - Publishes Standard.site documents with portable metadata and selectable content formats.
+- Measures the final record before submitting it, and moves oversized bodies into the content format's own blob-backed representation — Markpub `textBlob`, Leaflet `blobPages` — rather than failing at the PDS. Formats with no such representation (pckt, Offprint) say so instead of inventing a private field. iOS only for now; Android still rejects oversized records at the preflight.
 - Creates and removes `site.standard.graph.subscription` records and recommends.
 - Searches the cross-platform Standard.site public index, fetches records directly from the author.
 - Publication `.well-known` and document `<link>` verification.
