@@ -1,0 +1,3577 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "": {},
+    "—, %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "—, %@"
+          }
+        }
+      }
+    },
+    ", ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": ", "
+          }
+        }
+      }
+    },
+    ".": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "."
+          }
+        }
+      }
+    },
+    ". ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": ". "
+          }
+        }
+      }
+    },
+    ". ^[%lld post](inflect: true)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": ". ^[%lld post](inflect: true)"
+          }
+        }
+      }
+    },
+    ". Following ^[%lld account](inflect: true)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": ". Following ^[%lld account](inflect: true)"
+          }
+        }
+      }
+    },
+    "·": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "·"
+          }
+        }
+      }
+    },
+    "· Voted": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "· Voted"
+          }
+        }
+      }
+    },
+    "@%@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "@%@"
+          }
+        }
+      }
+    },
+    "%@ @%@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ @%2$@"
+          }
+        }
+      }
+    },
+    "%@ display": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%@ display"
+          }
+        }
+      }
+    },
+    "%@ in progress": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%@ in progress"
+          }
+        }
+      }
+    },
+    "%@, ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%@, "
+          }
+        }
+      }
+    },
+    "%@, no votes yet": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%@, no votes yet"
+          }
+        }
+      }
+    },
+    "%@. @%@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@. @%2$@"
+          }
+        }
+      }
+    },
+    "%@. %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@. %2$@"
+          }
+        }
+      }
+    },
+    "%lld.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%lld."
+          }
+        }
+      }
+    },
+    "•": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "•"
+          }
+        }
+      }
+    },
+    "^[%d new document](inflect: true)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "^[%d new document](inflect: true)"
+          }
+        }
+      }
+    },
+    "^[%lld change](inflect: true)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "^[%lld change](inflect: true)"
+          }
+        }
+      }
+    },
+    "^[%lld change](inflect: true) waiting to sync": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "^[%lld change](inflect: true) waiting to sync"
+          }
+        }
+      }
+    },
+    "^[%lld follower](inflect: true)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "^[%lld follower](inflect: true)"
+          }
+        }
+      }
+    },
+    "^[%lld like](inflect: true)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "^[%lld like](inflect: true)"
+          }
+        }
+      }
+    },
+    "^[%lld post](inflect: true)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "^[%lld post](inflect: true)"
+          }
+        }
+      }
+    },
+    "^[%lld reply](inflect: true)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "^[%lld reply](inflect: true)"
+          }
+        }
+      }
+    },
+    "^[%lld repost](inflect: true)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "^[%lld repost](inflect: true)"
+          }
+        }
+      }
+    },
+    "^[%lld vote](inflect: true)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "^[%lld vote](inflect: true)"
+          }
+        }
+      }
+    },
+    "$$ %@ $$": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "$$ %@ $$"
+          }
+        }
+      }
+    },
+    "A": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "A"
+          }
+        }
+      }
+    },
+    "A native reader and writer for the Standard.site publishing ecosystem on AT Protocol — read, discover, and publish portable writing from your own PDS.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "A native reader and writer for the Standard.site publishing ecosystem on AT Protocol — read, discover, and publish portable writing from your own PDS."
+          }
+        }
+      }
+    },
+    "About": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "About"
+          }
+        }
+      }
+    },
+    "About Inkwell": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "About Inkwell"
+          }
+        }
+      }
+    },
+    "Accent Color": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Accent Color"
+          }
+        }
+      }
+    },
+    "Accessibility": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Accessibility"
+          }
+        }
+      }
+    },
+    "Account": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Account"
+          }
+        }
+      }
+    },
+    "Accounts you block will appear here.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Accounts you block will appear here."
+          }
+        }
+      }
+    },
+    "Accounts you mute will appear here.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Accounts you mute will appear here."
+          }
+        }
+      }
+    },
+    "Add": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Add"
+          }
+        }
+      }
+    },
+    "Add a comment…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Add a comment…"
+          }
+        }
+      }
+    },
+    "Add alt text for people using a screen reader, or mark the image as decorative.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Add alt text for people using a screen reader, or mark the image as decorative."
+          }
+        }
+      }
+    },
+    "Add Contributor": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Add Contributor"
+          }
+        }
+      }
+    },
+    "Add labels used by a publication or labeler service, then choose how they should appear.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Add labels used by a publication or labeler service, then choose how they should appear."
+          }
+        }
+      }
+    },
+    "Add tag": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Add tag"
+          }
+        }
+      }
+    },
+    "Add this tag to the document page's <head> so readers can discover the record.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Add this tag to the document page's <head> so readers can discover the record."
+          }
+        }
+      }
+    },
+    "Additional context": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Additional context"
+          }
+        }
+      }
+    },
+    "Alt text": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Alt text"
+          }
+        }
+      }
+    },
+    "Appearance": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Appearance"
+          }
+        }
+      }
+    },
+    "Article and post links open in an in-app browser instead of leaving Inkwell. This doesn't affect sign-in or the links above, which always open in your default browser.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Article and post links open in an in-app browser instead of leaving Inkwell. This doesn't affect sign-in or the links above, which always open in your default browser."
+          }
+        }
+      }
+    },
+    "Articles and documents": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Articles and documents"
+          }
+        }
+      }
+    },
+    "at://did:…/app.bsky.feed.post/…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "at://did:…/app.bsky.feed.post/…"
+          }
+        }
+      }
+    },
+    "Blocked (%lld)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Blocked (%lld)"
+          }
+        }
+      }
+    },
+    "Bluesky": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Bluesky"
+          }
+        }
+      }
+    },
+    "Bluesky Discussion": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Bluesky Discussion"
+          }
+        }
+      }
+    },
+    "Bluesky post AT-URI": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Bluesky post AT-URI"
+          }
+        }
+      }
+    },
+    "Bluesky post unavailable": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Bluesky post unavailable"
+          }
+        }
+      }
+    },
+    "Bold Text": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Bold Text"
+          }
+        }
+      }
+    },
+    "Browse Discover": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Browse Discover"
+          }
+        }
+      }
+    },
+    "Built On": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Built On"
+          }
+        }
+      }
+    },
+    "Cached": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Cached"
+          }
+        }
+      }
+    },
+    "Cancel": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Cancel"
+          }
+        }
+      }
+    },
+    "Change Document": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Change Document"
+          }
+        }
+      }
+    },
+    "Choose Cover Image": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Choose Cover Image"
+          }
+        }
+      }
+    },
+    "Choose whether content with each label is shown, shown behind a warning, or hidden until you reveal it.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Choose whether content with each label is shown, shown behind a warning, or hidden until you reveal it."
+          }
+        }
+      }
+    },
+    "Clear All": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Clear All"
+          }
+        }
+      }
+    },
+    "Clear Cached Content": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Clear Cached Content"
+          }
+        }
+      }
+    },
+    "Close": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Close"
+          }
+        }
+      }
+    },
+    "Comment (optional)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Comment (optional)"
+          }
+        }
+      }
+    },
+    "Comments": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Comments"
+          }
+        }
+      }
+    },
+    "Completed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Completed"
+          }
+        }
+      }
+    },
+    "Content": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Content"
+          }
+        }
+      }
+    },
+    "Content Filters": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Content Filters"
+          }
+        }
+      }
+    },
+    "Content Hidden": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Content Hidden"
+          }
+        }
+      }
+    },
+    "Content Warning": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Content Warning"
+          }
+        }
+      }
+    },
+    "Content warnings": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Content warnings"
+          }
+        }
+      }
+    },
+    "Content Warnings": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Content Warnings"
+          }
+        }
+      }
+    },
+    "Continue": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Continue"
+          }
+        }
+      }
+    },
+    "Contributor DID": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Contributor DID"
+          }
+        }
+      }
+    },
+    "Contributor display name": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Contributor display name"
+          }
+        }
+      }
+    },
+    "Contributor role": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Contributor role"
+          }
+        }
+      }
+    },
+    "Contributors": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Contributors"
+          }
+        }
+      }
+    },
+    "Controls the order documents appear in your reader feed.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Controls the order documents appear in your reader feed."
+          }
+        }
+      }
+    },
+    "Controls whether Inkwell uses labels from this source": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Controls whether Inkwell uses labels from this source"
+          }
+        }
+      }
+    },
+    "Copy Link Tag": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Copy Link Tag"
+          }
+        }
+      }
+    },
+    "Couldn't Publish": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Couldn't Publish"
+          }
+        }
+      }
+    },
+    "Cover image": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Cover image"
+          }
+        }
+      }
+    },
+    "Cover Image": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Cover Image"
+          }
+        }
+      }
+    },
+    "Create": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Create"
+          }
+        }
+      }
+    },
+    "Create a Publication": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Create a Publication"
+          }
+        }
+      }
+    },
+    "Custom labels": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Custom labels"
+          }
+        }
+      }
+    },
+    "Customisation": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Customisation"
+          }
+        }
+      }
+    },
+    "Dark": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Dark"
+          }
+        }
+      }
+    },
+    "Data": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Data"
+          }
+        }
+      }
+    },
+    "Declare me as an Inkwell user": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Declare me as an Inkwell user"
+          }
+        }
+      }
+    },
+    "Decorative image": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Decorative image"
+          }
+        }
+      }
+    },
+    "Delete %@?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Delete %@?"
+          }
+        }
+      }
+    },
+    "Delete Document": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Delete Document"
+          }
+        }
+      }
+    },
+    "Describe Image": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Describe Image"
+          }
+        }
+      }
+    },
+    "Describe the image's purpose, not its filename.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Describe the image's purpose, not its filename."
+          }
+        }
+      }
+    },
+    "Description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Description"
+          }
+        }
+      }
+    },
+    "Details": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Details"
+          }
+        }
+      }
+    },
+    "Details (optional)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Details (optional)"
+          }
+        }
+      }
+    },
+    "DID": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "DID"
+          }
+        }
+      }
+    },
+    "DID (did:plc:…)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "DID (did:plc:…)"
+          }
+        }
+      }
+    },
+    "Discard": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Discard"
+          }
+        }
+      }
+    },
+    "Discover": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Discover"
+          }
+        }
+      }
+    },
+    "Discover Publications": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Discover Publications"
+          }
+        }
+      }
+    },
+    "Dismiss": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Dismiss"
+          }
+        }
+      }
+    },
+    "Display name (optional)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Display name (optional)"
+          }
+        }
+      }
+    },
+    "Document Unavailable": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Document Unavailable"
+          }
+        }
+      }
+    },
+    "Documents": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Documents"
+          }
+        }
+      }
+    },
+    "Done": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Done"
+          }
+        }
+      }
+    },
+    "Double tap to vote for this option.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Double tap to vote for this option."
+          }
+        }
+      }
+    },
+    "Draft restored": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Draft restored"
+          }
+        }
+      }
+    },
+    "Edit Existing Document": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Edit Existing Document"
+          }
+        }
+      }
+    },
+    "Editing existing document": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Editing existing document"
+          }
+        }
+      }
+    },
+    "Edits the cover image, tags, content warnings, contributors, and Bluesky discussion post.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Edits the cover image, tags, content warnings, contributors, and Bluesky discussion post."
+          }
+        }
+      }
+    },
+    "Empty Document": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Empty Document"
+          }
+        }
+      }
+    },
+    "Enjoying Customisation?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Enjoying Customisation?"
+          }
+        }
+      }
+    },
+    "Enjoying Inkwell?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Enjoying Inkwell?"
+          }
+        }
+      }
+    },
+    "Error: %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Error: %@"
+          }
+        }
+      }
+    },
+    "Everyone who's tipped Inkwell via Ko-fi or GitHub Sponsors, listed on Bluesky. Thank you.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Everyone who's tipped Inkwell via Ko-fi or GitHub Sponsors, listed on Bluesky. Thank you."
+          }
+        }
+      }
+    },
+    "Export Data": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Export Data"
+          }
+        }
+      }
+    },
+    "Exports your locally tracked read and bookmarked articles as a versioned JSON file. This never leaves your device unless you choose to share it.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Exports your locally tracked read and bookmarked articles as a versioned JSON file. This never leaves your device unless you choose to share it."
+          }
+        }
+      }
+    },
+    "Failed to load content": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Failed to load content"
+          }
+        }
+      }
+    },
+    "Fetching documents…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Fetching documents…"
+          }
+        }
+      }
+    },
+    "Fetching from the author's PDS…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Fetching from the author's PDS…"
+          }
+        }
+      }
+    },
+    "Find Standard.site writing from Leaflet, pckt, Offprint, and independent publishers.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Find Standard.site writing from Leaflet, pckt, Offprint, and independent publishers."
+          }
+        }
+      }
+    },
+    "Following ^[%lld account](inflect: true)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Following ^[%lld account](inflect: true)"
+          }
+        }
+      }
+    },
+    "Format": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Format"
+          }
+        }
+      }
+    },
+    "Handle": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Handle"
+          }
+        }
+      }
+    },
+    "Haptics": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Haptics"
+          }
+        }
+      }
+    },
+    "https://mysite.com": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "https://mysite.com"
+          }
+        }
+      }
+    },
+    "If you find Inkwell useful, consider buying me a coffee to support ongoing development.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "If you find Inkwell useful, consider buying me a coffee to support ongoing development."
+          }
+        }
+      }
+    },
+    "Image": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Image"
+          }
+        }
+      }
+    },
+    "Image Cache": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Image Cache"
+          }
+        }
+      }
+    },
+    "Import ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Import "
+          }
+        }
+      }
+    },
+    "Import Data": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Import Data"
+          }
+        }
+      }
+    },
+    "Import reading data?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Import reading data?"
+          }
+        }
+      }
+    },
+    "Imported ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Imported "
+          }
+        }
+      }
+    },
+    "Increase Contrast": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Increase Contrast"
+          }
+        }
+      }
+    },
+    "Inkwell": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Inkwell"
+          }
+        }
+      }
+    },
+    "Inkwell autosaved this on your device. Discarding it can't be undone.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Inkwell autosaved this on your device. Discarding it can't be undone."
+          }
+        }
+      }
+    },
+    "Inkwell checks that %@ points back at this record before letting you publish to it.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Inkwell checks that %@ points back at this record before letting you publish to it."
+          }
+        }
+      }
+    },
+    "Inkwell for Android is also available on GitHub.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Inkwell for Android is also available on GitHub."
+          }
+        }
+      }
+    },
+    "Inkwell polls your subscriptions in the background and notifies you about new documents. Turning this off keeps the in-app notification list working but stops system banners. The system permission (above) controls whether banners can appear at all.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Inkwell polls your subscriptions in the background and notifies you about new documents. Turning this off keeps the in-app notification list working but stops system banners. The system permission (above) controls whether banners can appear at all."
+          }
+        }
+      }
+    },
+    "Inkwell reads and writes Leaflet, Markpub, pckt, and Offprint content alongside the shared site.standard.* records.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Inkwell reads and writes Leaflet, Markpub, pckt, and Offprint content alongside the shared site.standard.* records."
+          }
+        }
+      }
+    },
+    "Inkwell uses OAuth to sign in to your PDS securely.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Inkwell uses OAuth to sign in to your PDS securely."
+          }
+        }
+      }
+    },
+    "Insert": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Insert"
+          }
+        }
+      }
+    },
+    "Item %lld of %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Item %1$lld of %2$lld"
+          }
+        }
+      }
+    },
+    "Keep Draft": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Keep Draft"
+          }
+        }
+      }
+    },
+    "Keywords are matched case-insensitively against article titles, summaries, and available text.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Keywords are matched case-insensitively against article titles, summaries, and available text."
+          }
+        }
+      }
+    },
+    "Keywords to hide": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Keywords to hide"
+          }
+        }
+      }
+    },
+    "Labeler services": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Labeler services"
+          }
+        }
+      }
+    },
+    "Labels come from the publication or document record. The choice only affects how Inkwell presents them.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Labels come from the publication or document record. The choice only affects how Inkwell presents them."
+          }
+        }
+      }
+    },
+    "Latest Posts": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Latest Posts"
+          }
+        }
+      }
+    },
+    "Legal": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Legal"
+          }
+        }
+      }
+    },
+    "Light": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Light"
+          }
+        }
+      }
+    },
+    "Links the Bluesky post where this document is discussed. Inkwell looks up the post when you publish.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Links the Bluesky post where this document is discussed. Inkwell looks up the post when you publish."
+          }
+        }
+      }
+    },
+    "Loading moderation settings…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Loading moderation settings…"
+          }
+        }
+      }
+    },
+    "Loading more…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Loading more…"
+          }
+        }
+      }
+    },
+    "Loading poll…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Loading poll…"
+          }
+        }
+      }
+    },
+    "Loading post…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Loading post…"
+          }
+        }
+      }
+    },
+    "Loading profile…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Loading profile…"
+          }
+        }
+      }
+    },
+    "Loading publication content...": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Loading publication content..."
+          }
+        }
+      }
+    },
+    "Loading publications…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Loading publications…"
+          }
+        }
+      }
+    },
+    "Loading your posts…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Loading your posts…"
+          }
+        }
+      }
+    },
+    "Loading your reader…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Loading your reader…"
+          }
+        }
+      }
+    },
+    "Loading…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Loading…"
+          }
+        }
+      }
+    },
+    "Markdown. Inkwell converts it to the selected format on publish.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Markdown. Inkwell converts it to the selected format on publish."
+          }
+        }
+      }
+    },
+    "Maybe Later": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Maybe Later"
+          }
+        }
+      }
+    },
+    "Metadata": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Metadata"
+          }
+        }
+      }
+    },
+    "Moderation List": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Moderation List"
+          }
+        }
+      }
+    },
+    "Monospaced": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Monospaced"
+          }
+        }
+      }
+    },
+    "More actions for %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "More actions for %@"
+          }
+        }
+      }
+    },
+    "Muted (%lld)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Muted (%lld)"
+          }
+        }
+      }
+    },
+    "Muted & Blocked": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Muted & Blocked"
+          }
+        }
+      }
+    },
+    "My Publication": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "My Publication"
+          }
+        }
+      }
+    },
+    "Name": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Name"
+          }
+        }
+      }
+    },
+    "New comment": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "New comment"
+          }
+        }
+      }
+    },
+    "New Document Notifications": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "New Document Notifications"
+          }
+        }
+      }
+    },
+    "New Publication": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "New Publication"
+          }
+        }
+      }
+    },
+    "Newest First": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Newest First"
+          }
+        }
+      }
+    },
+    "Next": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Next"
+          }
+        }
+      }
+    },
+    "No Blocked Accounts": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "No Blocked Accounts"
+          }
+        }
+      }
+    },
+    "No comments yet.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "No comments yet."
+          }
+        }
+      }
+    },
+    "No Documents": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "No Documents"
+          }
+        }
+      }
+    },
+    "No documents found.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "No documents found."
+          }
+        }
+      }
+    },
+    "No Muted Accounts": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "No Muted Accounts"
+          }
+        }
+      }
+    },
+    "No Notifications Yet": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "No Notifications Yet"
+          }
+        }
+      }
+    },
+    "No Published Posts": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "No Published Posts"
+          }
+        }
+      }
+    },
+    "Non-Monetary": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Non-Monetary"
+          }
+        }
+      }
+    },
+    "Not completed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Not completed"
+          }
+        }
+      }
+    },
+    "Nothing to Read Yet": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Nothing to Read Yet"
+          }
+        }
+      }
+    },
+    "Notifications": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Notifications"
+          }
+        }
+      }
+    },
+    "Offline. Search and new content may be unavailable.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Offline. Search and new content may be unavailable."
+          }
+        }
+      }
+    },
+    "OK": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "OK"
+          }
+        }
+      }
+    },
+    "Oldest First": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Oldest First"
+          }
+        }
+      }
+    },
+    "Only newer local choices will be changed.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Only newer local choices will be changed."
+          }
+        }
+      }
+    },
+    "Open in Bluesky": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Open in Bluesky"
+          }
+        }
+      }
+    },
+    "Open Links In-App": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Open Links In-App"
+          }
+        }
+      }
+    },
+    "Open original": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Open original"
+          }
+        }
+      }
+    },
+    "Open Reader": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Open Reader"
+          }
+        }
+      }
+    },
+    "Open System Notification Settings": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Open System Notification Settings"
+          }
+        }
+      }
+    },
+    "Open to review or reveal this article.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Open to review or reveal this article."
+          }
+        }
+      }
+    },
+    "Open Writer": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Open Writer"
+          }
+        }
+      }
+    },
+    "Opens Inkwell's Discover tab to find new publications and blogs.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Opens Inkwell's Discover tab to find new publications and blogs."
+          }
+        }
+      }
+    },
+    "Opens the associated document in Inkwell": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Opens the associated document in Inkwell"
+          }
+        }
+      }
+    },
+    "Opens the Inkwell reader to browse posts from your subscribed publications.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Opens the Inkwell reader to browse posts from your subscribed publications."
+          }
+        }
+      }
+    },
+    "Opens the Inkwell writer to compose a new standard.site post.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Opens the Inkwell writer to compose a new standard.site post."
+          }
+        }
+      }
+    },
+    "Opens this article": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Opens this article"
+          }
+        }
+      }
+    },
+    "Opens this publication": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Opens this publication"
+          }
+        }
+      }
+    },
+    "Overrides apply everywhere, including publications that set their own theme. Free — if you find it useful, a tip (About → Support) helps keep Inkwell going.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Overrides apply everywhere, including publications that set their own theme. Free — if you find it useful, a tip (About → Support) helps keep Inkwell going."
+          }
+        }
+      }
+    },
+    "Page %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Page %lld"
+          }
+        }
+      }
+    },
+    "Path (optional)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Path (optional)"
+          }
+        }
+      }
+    },
+    "Pending Changes": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Pending Changes"
+          }
+        }
+      }
+    },
+    "People who worked on this document besides you, such as editors or translators. Swipe to remove.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "People who worked on this document besides you, such as editors or translators. Swipe to remove."
+          }
+        }
+      }
+    },
+    "Posts Unavailable": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Posts Unavailable"
+          }
+        }
+      }
+    },
+    "Posts you publish from Inkwell or another standard.site app will appear here.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Posts you publish from Inkwell or another standard.site app will appear here."
+          }
+        }
+      }
+    },
+    "Previous": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Previous"
+          }
+        }
+      }
+    },
+    "Privacy Policy": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Privacy Policy"
+          }
+        }
+      }
+    },
+    "Profile": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Profile"
+          }
+        }
+      }
+    },
+    "Profile Unavailable": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Profile Unavailable"
+          }
+        }
+      }
+    },
+    "Publication": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Publication"
+          }
+        }
+      }
+    },
+    "Publication not verified": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Publication not verified"
+          }
+        }
+      }
+    },
+    "Publication verified": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Publication verified"
+          }
+        }
+      }
+    },
+    "Publication: %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Publication: %@"
+          }
+        }
+      }
+    },
+    "Publication: %@. %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Publication: %1$@. %2$@"
+          }
+        }
+      }
+    },
+    "Publications": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Publications"
+          }
+        }
+      }
+    },
+    "Publish": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Publish"
+          }
+        }
+      }
+    },
+    "Published": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Published"
+          }
+        }
+      }
+    },
+    "Publishes your comment to the AT Protocol": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Publishes your comment to the AT Protocol"
+          }
+        }
+      }
+    },
+    "Read": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Read"
+          }
+        }
+      }
+    },
+    "Read long-form posts from the AT Protocol network.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Read long-form posts from the AT Protocol network."
+          }
+        }
+      }
+    },
+    "Reader": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Reader"
+          }
+        }
+      }
+    },
+    "Reader feed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Reader feed"
+          }
+        }
+      }
+    },
+    "Reader Unavailable": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Reader Unavailable"
+          }
+        }
+      }
+    },
+    "Reading Font": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Reading Font"
+          }
+        }
+      }
+    },
+    "Reason": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Reason"
+          }
+        }
+      }
+    },
+    "Recommendations, subscriptions, and comments saved while offline sync automatically when you reconnect. They stay attached to the account that made them.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Recommendations, subscriptions, and comments saved while offline sync automatically when you reconnect. They stay attached to the account that made them."
+          }
+        }
+      }
+    },
+    "Refresh": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Refresh"
+          }
+        }
+      }
+    },
+    "Related": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Related"
+          }
+        }
+      }
+    },
+    "Related Standard.site content": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Related Standard.site content"
+          }
+        }
+      }
+    },
+    "Reload": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Reload"
+          }
+        }
+      }
+    },
+    "Remote Document Changed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Remote Document Changed"
+          }
+        }
+      }
+    },
+    "Remove": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Remove"
+          }
+        }
+      }
+    },
+    "Remove %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Remove %@"
+          }
+        }
+      }
+    },
+    "Remove Cover Image": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Remove Cover Image"
+          }
+        }
+      }
+    },
+    "Removes downloaded images, saved feed cards, and full documents and publications available for offline reading. Saved changes waiting to sync are kept.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Removes downloaded images, saved feed cards, and full documents and publications available for offline reading. Saved changes waiting to sync are kept."
+          }
+        }
+      }
+    },
+    "Removes this tag.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Removes this tag."
+          }
+        }
+      }
+    },
+    "Replace Cover Image": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Replace Cover Image"
+          }
+        }
+      }
+    },
+    "Reply": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Reply"
+          }
+        }
+      }
+    },
+    "Report": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Report"
+          }
+        }
+      }
+    },
+    "Report Account": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Report Account"
+          }
+        }
+      }
+    },
+    "Report Post": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Report Post"
+          }
+        }
+      }
+    },
+    "Reports are sent to your account's moderation service.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Reports are sent to your account's moderation service."
+          }
+        }
+      }
+    },
+    "Reset to Defaults": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Reset to Defaults"
+          }
+        }
+      }
+    },
+    "Restoring your session": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Restoring your session"
+          }
+        }
+      }
+    },
+    "Retry": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Retry"
+          }
+        }
+      }
+    },
+    "Reveal Article": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Reveal Article"
+          }
+        }
+      }
+    },
+    "Role (optional)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Role (optional)"
+          }
+        }
+      }
+    },
+    "Rounded": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Rounded"
+          }
+        }
+      }
+    },
+    "Sans-Serif": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Sans-Serif"
+          }
+        }
+      }
+    },
+    "Saved changes": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Saved changes"
+          }
+        }
+      }
+    },
+    "Saved changes need recovery. The damaged queue was preserved for diagnosis.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Saved changes need recovery. The damaged queue was preserved for diagnosis."
+          }
+        }
+      }
+    },
+    "Search scope": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Search scope"
+          }
+        }
+      }
+    },
+    "Search the Open Web": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Search the Open Web"
+          }
+        }
+      }
+    },
+    "Searching the Standard.site network…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Searching the Standard.site network…"
+          }
+        }
+      }
+    },
+    "Select Document": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Select Document"
+          }
+        }
+      }
+    },
+    "Self-labels readers' apps use to blur or hide the document.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Self-labels readers' apps use to blur or hide the document."
+          }
+        }
+      }
+    },
+    "Send": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Send"
+          }
+        }
+      }
+    },
+    "Send comment": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Send comment"
+          }
+        }
+      }
+    },
+    "Send Feedback": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Send Feedback"
+          }
+        }
+      }
+    },
+    "Sent to Inkwell's userinput.app board from your own account — bugs, questions, anything.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Sent to Inkwell's userinput.app board from your own account — bugs, questions, anything."
+          }
+        }
+      }
+    },
+    "Separate several tags with commas.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Separate several tags with commas."
+          }
+        }
+      }
+    },
+    "Serif": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Serif"
+          }
+        }
+      }
+    },
+    "Settings": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Settings"
+          }
+        }
+      }
+    },
+    "Share": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Share"
+          }
+        }
+      }
+    },
+    "Showing a saved copy": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Showing a saved copy"
+          }
+        }
+      }
+    },
+    "Showing a saved copy of this article": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Showing a saved copy of this article"
+          }
+        }
+      }
+    },
+    "Showing saved publication data": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Showing saved publication data"
+          }
+        }
+      }
+    },
+    "Shown as the document's thumbnail. Up to 1 MB; it uploads to your PDS as soon as you choose it.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Shown as the document's thumbnail. Up to 1 MB; it uploads to your PDS as soon as you choose it."
+          }
+        }
+      }
+    },
+    "Sign In": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Sign In"
+          }
+        }
+      }
+    },
+    "Sign In to Write": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Sign In to Write"
+          }
+        }
+      }
+    },
+    "Sign in with your AT Protocol account": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Sign in with your AT Protocol account"
+          }
+        }
+      }
+    },
+    "Sign Out": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Sign Out"
+          }
+        }
+      }
+    },
+    "Sign out of Inkwell?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Sign out of Inkwell?"
+          }
+        }
+      }
+    },
+    "Sign-in error: %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Sign-in error: %@"
+          }
+        }
+      }
+    },
+    "Something Went Wrong": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Something Went Wrong"
+          }
+        }
+      }
+    },
+    "Sort Order": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Sort Order"
+          }
+        }
+      }
+    },
+    "Source verification: unverified": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Source verification: unverified"
+          }
+        }
+      }
+    },
+    "Source verification: verified": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Source verification: verified"
+          }
+        }
+      }
+    },
+    "Standard.site post unavailable": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Standard.site post unavailable"
+          }
+        }
+      }
+    },
+    "Start Writing": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Start Writing"
+          }
+        }
+      }
+    },
+    "Storage": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Storage"
+          }
+        }
+      }
+    },
+    "Subscribe to publications in Discover and their latest posts will appear here.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Subscribe to publications in Discover and their latest posts will appear here."
+          }
+        }
+      }
+    },
+    "Subscribe, comment, and recommend — your data stays in your PDS.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Subscribe, comment, and recommend — your data stays in your PDS."
+          }
+        }
+      }
+    },
+    "Support": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Support"
+          }
+        }
+      }
+    },
+    "Support Inkwell": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Support Inkwell"
+          }
+        }
+      }
+    },
+    "Supporters": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Supporters"
+          }
+        }
+      }
+    },
+    "Sync Saved Changes Now": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Sync Saved Changes Now"
+          }
+        }
+      }
+    },
+    "System": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "System"
+          }
+        }
+      }
+    },
+    "Tag (optional)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Tag (optional)"
+          }
+        }
+      }
+    },
+    "Tag %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Tag %@"
+          }
+        }
+      }
+    },
+    "Tags": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Tags"
+          }
+        }
+      }
+    },
+    "Tags, Cover & More": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Tags, Cover & More"
+          }
+        }
+      }
+    },
+    "Tap to add": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Tap to add"
+          }
+        }
+      }
+    },
+    "Tap to remove": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Tap to remove"
+          }
+        }
+      }
+    },
+    "Terms of Service": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Terms of Service"
+          }
+        }
+      }
+    },
+    "Testing mode": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Testing mode"
+          }
+        }
+      }
+    },
+    "Text Size": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Text Size"
+          }
+        }
+      }
+    },
+    "Thanks!": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Thanks!"
+          }
+        }
+      }
+    },
+    "The site this publication lives at. You'll verify ownership of the domain before publishing to it.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "The site this publication lives at. You'll verify ownership of the domain before publishing to it."
+          }
+        }
+      }
+    },
+    "These apply on top of your device's own Text Size and accessibility settings, and are always free.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "These apply on top of your device's own Text Size and accessibility settings, and are always free."
+          }
+        }
+      }
+    },
+    "These overrides are free for everyone. If you find them useful, consider a tip to support ongoing development.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "These overrides are free for everyone. If you find them useful, consider a tip to support ongoing development."
+          }
+        }
+      }
+    },
+    "This article has a content label you chose to see behind a warning.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "This article has a content label you chose to see behind a warning."
+          }
+        }
+      }
+    },
+    "This article matches one of your content filters.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "This article matches one of your content filters."
+          }
+        }
+      }
+    },
+    "This cannot be undone. The current record version will be checked before deletion.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "This cannot be undone. The current record version will be checked before deletion."
+          }
+        }
+      }
+    },
+    "This document changed elsewhere after your draft was saved. Keep your draft, replacing those changes when you update, or reload the published version and discard the draft?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "This document changed elsewhere after your draft was saved. Keep your draft, replacing those changes when you update, or reload the published version and discard the draft?"
+          }
+        }
+      }
+    },
+    "This document has no readable content.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "This document has no readable content."
+          }
+        }
+      }
+    },
+    "This permanently removes the document from your repository. Attached images are managed by your PDS.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "This permanently removes the document from your repository. Attached images are managed by your PDS."
+          }
+        }
+      }
+    },
+    "This poll option has already been submitted.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "This poll option has already been submitted."
+          }
+        }
+      }
+    },
+    "This post contains **%@** that markdown can't represent. Saving will drop those.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "This post contains **%@** that markdown can't represent. Saving will drop those."
+          }
+        }
+      }
+    },
+    "This publication hasn't published any documents yet.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "This publication hasn't published any documents yet."
+          }
+        }
+      }
+    },
+    "Tip Me": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Tip Me"
+          }
+        }
+      }
+    },
+    "Title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Title"
+          }
+        }
+      }
+    },
+    "Try Again": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Try Again"
+          }
+        }
+      }
+    },
+    "Turn a source off to ignore labels from that service when the PDS supplies source attribution.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Turn a source off to ignore labels from that service when the PDS supplies source attribution."
+          }
+        }
+      }
+    },
+    "Type your comment and tap the send button to publish": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Type your comment and tap the send button to publish"
+          }
+        }
+      }
+    },
+    "Underline Links": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Underline Links"
+          }
+        }
+      }
+    },
+    "Unsupported content block: %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Unsupported content block: %@"
+          }
+        }
+      }
+    },
+    "Unverified source": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Unverified source"
+          }
+        }
+      }
+    },
+    "Update": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Update"
+          }
+        }
+      }
+    },
+    "Uploading cover image…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Uploading cover image…"
+          }
+        }
+      }
+    },
+    "URL": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "URL"
+          }
+        }
+      }
+    },
+    "Used to categorize the document. No need for a leading #.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Used to categorize the document. No need for a leading #."
+          }
+        }
+      }
+    },
+    "Users": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Users"
+          }
+        }
+      }
+    },
+    "Verification": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Verification"
+          }
+        }
+      }
+    },
+    "Verification required": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Verification required"
+          }
+        }
+      }
+    },
+    "Verified publication": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Verified publication"
+          }
+        }
+      }
+    },
+    "Verified source": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Verified source"
+          }
+        }
+      }
+    },
+    "Verify Again": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Verify Again"
+          }
+        }
+      }
+    },
+    "Version": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Version"
+          }
+        }
+      }
+    },
+    "View Profile": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "View Profile"
+          }
+        }
+      }
+    },
+    "Write": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Write"
+          }
+        }
+      }
+    },
+    "Write and publish your own posts.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Write and publish your own posts."
+          }
+        }
+      }
+    },
+    "Writer": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Writer"
+          }
+        }
+      }
+    },
+    "You need a publication before you can publish a document.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "You need a publication before you can publish a document."
+          }
+        }
+      }
+    },
+    "You need an AT Protocol account to publish documents.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "You need an AT Protocol account to publish documents."
+          }
+        }
+      }
+    },
+    "You'll see new documents from your subscriptions here.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "You'll see new documents from your subscriptions here."
+          }
+        }
+      }
+    },
+    "You're all caught up": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "You're all caught up"
+          }
+        }
+      }
+    },
+    "You're in testing mode, so this action will not hit the network.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "You're in testing mode, so this action will not hit the network."
+          }
+        }
+      }
+    },
+    "You're in testing mode, so this action will not hit the network.\n\n%@ was not sent.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "You're in testing mode, so this action will not hit the network.\n\n%@ was not sent."
+          }
+        }
+      }
+    },
+    "You’re offline. Search and new content may be unavailable.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "You’re offline. Search and new content may be unavailable."
+          }
+        }
+      }
+    },
+    "Your browser will open so you can approve access — no app password needed.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Your browser will open so you can approve access — no app password needed."
+          }
+        }
+      }
+    },
+    "Your feedback was sent.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Your feedback was sent."
+          }
+        }
+      }
+    },
+    "Your publications and subscriptions stay in your PDS. You can sign back in at any time.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Your publications and subscriptions stay in your PDS. You can sign back in at any time."
+          }
+        }
+      }
+    },
+    "yourname.bsky.social": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "yourname.bsky.social"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}
