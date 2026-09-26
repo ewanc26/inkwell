@@ -45,6 +45,23 @@ protocol ContentProvider {
     /// Build a fresh content object from edited markdown, using the write
     /// context to round-trip existing image blobs from the previous content.
     func fromMarkdown(_ markdown: String, ctx: WriteContext) -> UnknownType?
+    /// Whether the upstream lexicon for this format defines a blob-backed
+    /// representation of the document body (markpub `textBlob`, Leaflet
+    /// `blobPages`) that oversized content can spill into.
+    var supportsBlobBackedContent: Bool { get }
+    /// The format's own blob-backed representation of this content, when the
+    /// upstream lexicon defines one (markpub `textBlob`, Leaflet
+    /// `blobPages`). Formats without one return nil — Inkwell does not invent
+    /// private blob fields.
+    func blobBackedContent(for content: UnknownType, markdown: String) -> BlobBackedContent?
+}
+
+extension ContentProvider {
+    var supportsBlobBackedContent: Bool { false }
+
+    func blobBackedContent(for content: UnknownType, markdown: String) -> BlobBackedContent? {
+        nil
+    }
 }
 
 /// Result of converting stored content to markdown.
