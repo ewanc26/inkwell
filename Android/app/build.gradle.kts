@@ -39,6 +39,13 @@ android {
         versionName = "2.6.1"
 
         manifestPlaceholders["appAuthRedirectScheme"] = "uk.ewancroft.inkwell"
+
+        // Hilt-aware instrumentation runner: it swaps InkwellApp for the
+        // generated HiltTestApplication so androidTest can install
+        // @TestInstallIn replacements at the DI boundary (see
+        // app/src/androidTest/.../testing/). Without this, @HiltAndroidTest
+        // fails at runtime with "did not attach the correct application".
+        testInstrumentationRunner = "uk.ewancroft.inkwell.HiltTestRunner"
     }
 
     signingConfigs {
@@ -80,6 +87,26 @@ android {
 
     buildFeatures {
         compose = true
+    }
+
+    testOptions {
+        // Instrumentation tests assert on Compose semantics, not on animation
+        // timing. Leaving system animations on makes emulator runs slower and
+        // intermittently flaky for no coverage gain.
+        animationsDisabled = true
+    }
+
+    packaging {
+        resources {
+            // JUnit/Hilt/ktor test artifacts ship overlapping licence metadata,
+            // which otherwise fails the androidTest APK merge.
+            excludes += setOf(
+                "META-INF/AL2.0",
+                "META-INF/LGPL2.1",
+                "META-INF/LICENSE.md",
+                "META-INF/LICENSE-notice.md",
+            )
+        }
     }
 }
 
@@ -148,6 +175,30 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation("org.robolectric:robolectric:4.14.1")
+
+    // -- Instrumentation tests (app/src/androidTest) --
+    // Real Activity lifecycle, real Compose, real Hilt graph — the things
+    // Robolectric can't speak to: singleTask intent delivery, process
+    // recreation, and on-device accessibility semantics.
+    androidTestImplementation(composeBom)
+    androidTestImplementation(libs.compose.ui.test.junit4)
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.rules)
+    androidTestImplementation(libs.androidx.test.core)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
+    androidTestImplementation(libs.hilt.android.testing)
+    kspAndroidTest(libs.hilt.compiler)
+    // Substitutes a scripted transport for ktor/OkHttp so no instrumentation
+    // test ever reaches a real PDS. See testing/TestOAuthModule.kt.
+    androidTestImplementation(libs.ktor.client.mock)
+    // InkwellApp (and with it WorkManager.initialize) is replaced by
+    // HiltTestApplication under test, and the manifest deliberately removes
+    // WorkManager's androidx.startup initializer — so tests initialise it
+    // themselves rather than leaving WorkManager.getInstance() to throw.
+    androidTestImplementation(libs.work.testing)
+    debugImplementation(libs.compose.ui.test.manifest)
 
     // -- Shared KMP core --
     implementation(project(":shared"))
