@@ -11,6 +11,29 @@ enum StandardSiteInputValidation {
         return nil
     }
 
+    /// Mirrors shared `StandardSiteValidation.validateMetadata`, which the
+    /// checked-in `InkwellShared.xcframework` predates. Switch to the shared
+    /// call once the framework is rebuilt.
+    static func firstMetadataError(tags: [String], contributors: [ContributorDraft], bskyPostURI: String) -> String? {
+        for (index, tag) in tags.enumerated() {
+            if let error = textError(field: "tags[\(index)]", value: tag, graphemes: 128, bytes: 1_280) { return error }
+        }
+        for (index, contributor) in contributors.enumerated() {
+            let did = contributor.did.trimmingCharacters(in: .whitespacesAndNewlines)
+            if did.isEmpty { return "contributors[\(index)].did: Contributor DID is required" }
+            if !did.hasPrefix("did:") {
+                return "contributors[\(index)].did: Contributor must be a DID (did:plc:… or did:web:…)"
+            }
+            if let error = textError(field: "contributors[\(index)].role", value: contributor.role, graphemes: 100, bytes: 1_000) { return error }
+            if let error = textError(field: "contributors[\(index)].displayName", value: contributor.displayName, graphemes: 100, bytes: 1_000) { return error }
+        }
+        let uri = bskyPostURI.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !uri.isEmpty, !uri.hasPrefix("at://") {
+            return "bskyPostRef: Bluesky post reference must be an at:// URI"
+        }
+        return nil
+    }
+
     static func firstPublicationError(url: String, name: String, description: String?) -> String? {
         guard URL(string: url)?.scheme?.lowercased() == "https" else { return "url: Publication URL must use HTTPS" }
         if let error = textError(field: "name", value: name, graphemes: 500, bytes: 5_000) { return error }

@@ -98,20 +98,23 @@ extension LoginStateManager {
     }
 
     /// Updates an existing document record, preserving fields Inkwell doesn't
-    /// model so an edit never strips another client's data.
+    /// model so an edit never strips another client's data. Keys in
+    /// `clearingAbsent` that `document` omits are removed instead of kept.
     @discardableResult
     func updateDocument(
         _ document: SiteStandardLexicon.DocumentRecord,
         recordKey: String,
         recordCID: String,
-        existingRawRecord: UnknownType?
+        existingRawRecord: UnknownType?,
+        clearingAbsent ownedKeys: Set<String> = []
     ) async throws -> DocumentWriteResult {
         guard currentDID != nil else { throw LoginError.notAuthenticated }
         try validateDocumentSite(document.site)
 
         let merged = preservingUnknownFields(
             from: existingRawRecord,
-            with: UnknownType.record(document)
+            with: UnknownType.record(document),
+            clearingAbsent: ownedKeys
         )
         try ensureDocumentRecordFits(merged)
 

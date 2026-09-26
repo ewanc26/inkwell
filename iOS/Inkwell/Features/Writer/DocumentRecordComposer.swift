@@ -21,9 +21,65 @@ struct DocumentDraft {
     var publishedAt: Date
     /// Set only when saving an edit; nil for a first publish.
     var updatedAt: Date?
+    var coverImage: ComAtprotoLexicon.Repository.UploadBlobOutput? = nil
+    var bskyPostRef: ComAtprotoLexicon.Repository.StrongReference? = nil
+    var tags: [String]? = nil
+    var labels: ComAtprotoLexicon.Label.SelfLabelsDefinition? = nil
+    var contributors: [SiteStandardLexicon.DocumentRecord.Contributor]? = nil
 }
 
 enum DocumentRecordComposer {
+
+    /// Record keys the Writer's metadata sheet owns. On an edit, a key in this
+    /// set that the composed record leaves out has been cleared by the author,
+    /// so it must be removed from the merged record rather than carried over
+    /// from the stored one.
+    ///
+    /// Mirrors shared `DocumentMetadata.OWNED_KEYS` minus `links`: the Writer
+    /// doesn't edit `links`, so it stays on the unknown-field path and is
+    /// written back verbatim. Declared locally because the checked-in
+    /// `InkwellShared.xcframework` predates `DocumentMetadata`; switch to the
+    /// shared constant once the framework is rebuilt.
+    static let metadataKeys: Set<String> = [
+        "tags", "contributors", "labels", "coverImage", "bskyPostRef",
+    ]
+
+    /// Trimmed, de-duplicated tags with any leading `#` removed (Standard.site
+    /// asks for no hashtags), or nil when none remain — absent, not `[]`.
+    static func normalizedTags(_ tags: [String]) -> [String]? {
+        var seen = Set<String>()
+        let cleaned = tags
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .map { String($0.drop(while: { $0 == "#" })) }
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty && seen.insert($0).inserted }
+        return cleaned.isEmpty ? nil : cleaned
+    }
+
+    /// Self-label values as the record's `labels`, or nil when there are none.
+    static func selfLabels(_ values: [String]) -> ComAtprotoLexicon.Label.SelfLabelsDefinition? {
+        var seen = Set<String>()
+        let cleaned = values
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty && seen.insert($0).inserted }
+        guard !cleaned.isEmpty else { return nil }
+        return ComAtprotoLexicon.Label.SelfLabelsDefinition(
+            values: cleaned.map { ComAtprotoLexicon.Label.SelfLabelDefinition(value: $0) }
+        )
+    }
+
+    /// Contributors with blank optional fields dropped, or nil when none have a DID.
+    static func contributors(_ drafts: [ContributorDraft]) -> [SiteStandardLexicon.DocumentRecord.Contributor]? {
+        func nonEmpty(_ value: String) -> String? {
+            let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+            return trimmed.isEmpty ? nil : trimmed
+        }
+        let contributors = drafts.compactMap { draft -> SiteStandardLexicon.DocumentRecord.Contributor? in
+            guard let did = nonEmpty(draft.did) else { return nil }
+            return .init(did: did, role: nonEmpty(draft.role), displayName: nonEmpty(draft.displayName))
+        }
+        return contributors.isEmpty ? nil : contributors
+    }
 
     /// Standard.site asks for no trailing slash on `site`.
     static func normalizedSite(_ site: String) -> String {
@@ -63,9 +119,13 @@ enum DocumentRecordComposer {
             publishedAt: draft.publishedAt,
             path: normalizedPath(draft.path),
             description: draft.description.flatMap { $0.isEmpty ? nil : $0 },
-            coverImage: nil,
+            coverImage: draft.coverImage,
             content: content,
             textContent: textContent,
+            bskyPostRef: draft.bskyPostRef,
+            tags: draft.tags,
+            labels: draft.labels,
+            contributors: draft.contributors,
             updatedAt: draft.updatedAt
         )
     }
@@ -85,6 +145,10 @@ func encodedDocumentRecordSize(
     let composed = UnknownType.record(record)
     let submitted = existingRawRecord == nil
         ? composed
-        : preservingUnknownFields(from: existingRawRecord, with: composed)
+        : preservingUnknownFields(
+            from: existingRawRecord,
+            with: composed,
+            clearingAbsent: DocumentRecordComposer.metadataKeys
+        )
     return try JSONEncoder().encode(submitted).count
 }
