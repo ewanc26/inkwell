@@ -22,6 +22,7 @@ import kotlinx.serialization.json.long
 import kotlinx.serialization.json.put
 import okhttp3.OkHttpClient
 import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.Request
 import uk.ewancroft.inkwell.TestingConfig
 import uk.ewancroft.inkwell.TestingModeException
@@ -37,7 +38,6 @@ import java.io.IOException
 import java.io.InputStream
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -109,6 +109,40 @@ internal object RateLimitRetryPolicy {
     }
 }
 
+/** Builds the `com.atproto.repo.listRecords` query via [HttpUrl.Builder] so
+ *  every value is encoded per RFC 3986 instead of hand-interpolated. */
+internal fun listRecordsUrl(
+    baseUrl: String,
+    did: String,
+    collection: String,
+    limit: Int,
+    cursor: String?,
+): HttpUrl {
+    val builder = "$baseUrl${XrpcEndpoints.REPO_LIST_RECORDS}".toHttpUrlOrNull()?.newBuilder()
+        ?: throw PdsResolutionException("Invalid PDS endpoint: $baseUrl")
+    builder.addQueryParameter("repo", did)
+        .addQueryParameter("collection", collection)
+        .addQueryParameter("limit", limit.toString())
+    cursor?.let { builder.addQueryParameter("cursor", it) }
+    return builder.build()
+}
+
+/** Builds the `com.atproto.repo.getRecord` query via [HttpUrl.Builder] so
+ *  every value is encoded per RFC 3986 instead of hand-interpolated. */
+internal fun getRecordUrl(
+    baseUrl: String,
+    did: String,
+    collection: String,
+    rkey: String,
+): HttpUrl {
+    val builder = "$baseUrl${XrpcEndpoints.REPO_GET_RECORD}".toHttpUrlOrNull()?.newBuilder()
+        ?: throw PdsResolutionException("Invalid PDS endpoint: $baseUrl")
+    return builder.addQueryParameter("repo", did)
+        .addQueryParameter("collection", collection)
+        .addQueryParameter("rkey", rkey)
+        .build()
+}
+
 internal fun rateLimitOrigin(url: HttpUrl): String {
     val defaultPort = (url.scheme == "https" && url.port == 443)
         || (url.scheme == "http" && url.port == 80)
@@ -142,13 +176,12 @@ internal object PdsResponseBodyReader {
 class PdsRepository @Inject constructor(
     internal val atOAuth: AtOAuth,
     internal val sessionStore: OAuthSessionStore,
+    okHttpClient: OkHttpClient,
 ) {
     internal val json = Json { ignoreUnknownKeys = true; isLenient = true }
 
-    internal val publicHttpClient = OkHttpClient.Builder()
-        .connectTimeout(15, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
-        .build()
+    /** The shared, DI-provided client — see `di/NetworkModule.provideOkHttpClient`. */
+    internal val publicHttpClient = okHttpClient
 
     private val ktorHttpClient = HttpClient(CIO)
     private val rateLimitCooldowns = mutableMapOf<String, Long>()
@@ -258,27 +291,16 @@ class PdsRepository @Inject constructor(
         pdsUrl: String? = null,
     ): JsonObject {
         val baseUrl = pdsUrl ?: resolvePdsUrl(did)
-        val urlStr = buildString {
-            append("$baseUrl${XrpcEndpoints.REPO_LIST_RECORDS}")
-            append("?repo=").append(enc(did))
-            append("&collection=").append(enc(collection))
-            append("&limit=$limit")
-            cursor?.let { append("&cursor=").append(enc(it)) }
-        }
+        val url = listRecordsUrl(baseUrl, did, collection, limit, cursor)
         val pageBudget = (DEFAULT_RESPONSE_BYTES + limit.coerceIn(1, 100) * 8 * 1024).coerceAtMost(8 * 1024 * 1024)
-        return decodeSafe(executeGet(urlStr, pageBudget))
+        return decodeSafe(executeGet(url.toString(), pageBudget))
     }
 
     suspend fun getRecord(uri: String, pdsUrl: String? = null): JsonObject {
         val parsed = requireNotNull(AtUri.parse(uri))
         val baseUrl = pdsUrl ?: resolvePdsUrl(parsed.did)
-        val urlStr = buildString {
-            append("$baseUrl${XrpcEndpoints.REPO_GET_RECORD}")
-            append("?repo=").append(enc(parsed.did))
-            append("&collection=").append(enc(parsed.collection))
-            append("&rkey=").append(enc(parsed.recordKey))
-        }
-        return decodeSafe(executeGet(urlStr))
+        val url = getRecordUrl(baseUrl, parsed.did, parsed.collection, parsed.recordKey)
+        return decodeSafe(executeGet(url.toString()))
     }
 
     suspend fun createRecord(

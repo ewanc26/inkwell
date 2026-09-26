@@ -43,6 +43,7 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import uk.ewancroft.inkwell.data.model.content.LeafletBlock
+import uk.ewancroft.inkwell.di.SharedHttpClient
 import uk.ewancroft.inkwell.shared.AtUri
 import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
 import uk.ewancroft.inkwell.util.formatPublishedDate
@@ -113,10 +114,7 @@ private data class StandardSitePostData(
 private suspend fun fetchStandardSitePost(uri: String): StandardSitePostData? {
     return try {
         val parsed = AtUri.parse(uri) ?: return null
-        val client = okhttp3.OkHttpClient.Builder()
-            .connectTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
-            .readTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
-            .build()
+        val client = SharedHttpClient.client
 
         // Fetch the document record
         val docUrl = "${XrpcEndpoints.PUBLIC_BSKY_API}${XrpcEndpoints.REPO_GET_RECORD}?repo=${parsed.did}&collection=${parsed.collection}&rkey=${parsed.recordKey}"
