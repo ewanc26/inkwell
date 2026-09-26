@@ -6,7 +6,7 @@
 #import <Foundation/NSString.h>
 #import <Foundation/NSValue.h>
 
-@class FacetConverter, InkwellSharedAtUri, InkwellSharedAtUriCompanion, InkwellSharedBasicTheme, InkwellSharedBlobRef, InkwellSharedBlockLossLabels, InkwellSharedBlueskyEmbedTypes, InkwellSharedByteSlice, InkwellSharedCachedFeedItem, InkwellSharedCachedFeedItemCompanion, InkwellSharedCachedOfflineRecord, InkwellSharedCachedOfflineRecordCompanion, InkwellSharedCdnUrls, InkwellSharedCollectionNsids, InkwellSharedColorValue, InkwellSharedConstellationBacklink, InkwellSharedConstellationPagination, InkwellSharedConstellationResponse, InkwellSharedConstellationSourcePaths, InkwellSharedContentFilterDecisionHide, InkwellSharedContentFilterDecisionShow, InkwellSharedContentFilterDecisionWarn, InkwellSharedContentFilterEngine, InkwellSharedContentFormatDetector, InkwellSharedContentFormatDispatcher, InkwellSharedDocumentLinkScanner, InkwellSharedDocumentPreferences, InkwellSharedFacetDefinition, InkwellSharedFacetSchema, InkwellSharedFeedCacheIosCompanion, InkwellSharedFeedCacheRetention, InkwellSharedFilterMatch, InkwellSharedFilterMatchKind, InkwellSharedFilterableContent, InkwellSharedHandleUtils, InkwellSharedInlineMarkdownScanner, InkwellSharedInlineSegment, InkwellSharedInlineSegmentBold, InkwellSharedInlineSegmentCode, InkwellSharedInlineSegmentItalic, InkwellSharedInlineSegmentLink, InkwellSharedInlineSegmentPlain, InkwellSharedInlineSegmentStrike, InkwellSharedJetstreamConfig, InkwellSharedJetstreamEvent, InkwellSharedJetstreamEventCompanion, InkwellSharedJetstreamPayload, InkwellSharedJetstreamPayloadCompanion, InkwellSharedJetstreamRetryPolicy, InkwellSharedJsonMapBridge, InkwellSharedJsonSafety, InkwellSharedKotlinArray<T>, InkwellSharedKotlinEnum<E>, InkwellSharedKotlinEnumCompanion, InkwellSharedKotlinException, InkwellSharedKotlinIllegalStateException, InkwellSharedKotlinIntIterator, InkwellSharedKotlinIntProgression, InkwellSharedKotlinIntProgressionCompanion, InkwellSharedKotlinIntRange, InkwellSharedKotlinIntRangeCompanion, InkwellSharedKotlinNothing, InkwellSharedKotlinPair<__covariant A, __covariant B>, InkwellSharedKotlinRuntimeException, InkwellSharedKotlinThrowable, InkwellSharedKotlinx_serialization_coreSerialKind, InkwellSharedKotlinx_serialization_coreSerializersModule, InkwellSharedKotlinx_serialization_jsonJsonElement, InkwellSharedKotlinx_serialization_jsonJsonElementCompanion, InkwellSharedLeafletContentConverter, InkwellSharedLeafletFacet, InkwellSharedLeafletFacetFeature, InkwellSharedLeafletTypes, InkwellSharedLegacyPalette, InkwellSharedLegalDocuments, InkwellSharedMarkdownBlock, InkwellSharedMarkdownBlockBlockquote, InkwellSharedMarkdownBlockCode, InkwellSharedMarkdownBlockHeading, InkwellSharedMarkdownBlockHorizontalRule, InkwellSharedMarkdownBlockImage, InkwellSharedMarkdownBlockMath, InkwellSharedMarkdownBlockOrderedList, InkwellSharedMarkdownBlockParagraph, InkwellSharedMarkdownBlockTaskList, InkwellSharedMarkdownBlockUnorderedList, InkwellSharedMarkdownListItem, InkwellSharedMarkdownParser, InkwellSharedMarkdownSerializer, InkwellSharedMarkpubContentConverter, InkwellSharedMarkpubTypes, InkwellSharedModerationLabel, InkwellSharedModerationLabelCompanion, InkwellSharedModerationPolicy, InkwellSharedModerationPolicyCompanion, InkwellSharedNotificationContentPolicy, InkwellSharedNotificationPolicy, InkwellSharedNotificationStyleNone, InkwellSharedNotificationStyleSingle, InkwellSharedNotificationStyleSummary, InkwellSharedNumberFormat, InkwellSharedOAuthScopes, InkwellSharedOfflineCacheEntry, InkwellSharedOfflineCacheEntryCompanion, InkwellSharedOfflineCacheKind, InkwellSharedOfflineCacheKindCompanion, InkwellSharedOfflineCachePolicy, InkwellSharedOfflineCachePolicyCompanion, InkwellSharedOfflineContentCacheRetention, InkwellSharedOfflineSyncQueueRetention, InkwellSharedOffprintContentConverter, InkwellSharedOffprintTypes, InkwellSharedPcktContentConverter, InkwellSharedPcktTypes, InkwellSharedPublicationMatcher, InkwellSharedPublicationPreferences, InkwellSharedPublicationTheme, InkwellSharedRecordListPolicy, InkwellSharedReportReasonType, InkwellSharedReportSubjectKind, InkwellSharedReportSubmission, InkwellSharedReportSubmissionCompanion, InkwellSharedRgbColor, InkwellSharedRgbaColor, InkwellSharedSearchBackendUrl, InkwellSharedSearchResultClassifier, InkwellSharedSharedConvertResult, InkwellSharedSharedDocumentRecord, InkwellSharedSharedGraphRecommend, InkwellSharedSharedGraphSubscription, InkwellSharedSharedLeafletComment, InkwellSharedSharedLeafletCommentReplyRef, InkwellSharedSharedPublicationRecord, InkwellSharedSharedReaderTheme, InkwellSharedSharedReaderThemeCompanion, InkwellSharedSharedReaderThemeFontFamily, InkwellSharedSharedWriteResult, InkwellSharedStandardModerationLabel, InkwellSharedStandardSiteValidation, InkwellSharedStandardSiteValidationDocumentInput, InkwellSharedStandardSiteValidationError, InkwellSharedStringUtils, InkwellSharedStrongRef, InkwellSharedSupportersList, InkwellSharedSyncMutationKind, InkwellSharedSyncMutationKindCompanion, InkwellSharedSyncQueueEntry, InkwellSharedSyncQueueEntryCompanion, InkwellSharedSyncQueueFile, InkwellSharedTipPromptPolicy, InkwellSharedUrlUtils, InkwellSharedUserInputLexicon, InkwellSharedUserLexicon, InkwellSharedUserLexiconRecord, InkwellSharedUserLexiconUtils, InkwellSharedUtf8Offsets, InkwellSharedVerificationFailure, InkwellSharedVerificationFailureDocumentLinkMissing, InkwellSharedVerificationFailureEndpointUnreachable, InkwellSharedVerificationFailureInvalidDocumentURL, InkwellSharedVerificationFailureInvalidPublicationURL, InkwellSharedVerificationFailureMalformedResponse, InkwellSharedVerificationFailureMismatchedURI, InkwellSharedVerificationFailureUnexpected, InkwellSharedVerificationResult, InkwellSharedVerificationResultFailed, InkwellSharedVerificationResultVerified, InkwellSharedVerificationUrls, InkwellSharedXrpcEndpoints, RichTextFacet, RichTextFeature;
+@class FacetConverter, InkwellSharedAtUri, InkwellSharedAtUriCompanion, InkwellSharedBasicTheme, InkwellSharedBlobBackedContent, InkwellSharedBlobRef, InkwellSharedBlockLossLabels, InkwellSharedBlueskyEmbedTypes, InkwellSharedByteSlice, InkwellSharedCachedFeedItem, InkwellSharedCachedFeedItemCompanion, InkwellSharedCachedOfflineRecord, InkwellSharedCachedOfflineRecordCompanion, InkwellSharedCdnUrls, InkwellSharedCollectionNsids, InkwellSharedColorValue, InkwellSharedConstellationBacklink, InkwellSharedConstellationPagination, InkwellSharedConstellationResponse, InkwellSharedConstellationSourcePaths, InkwellSharedContentFilterDecisionHide, InkwellSharedContentFilterDecisionShow, InkwellSharedContentFilterDecisionWarn, InkwellSharedContentFilterEngine, InkwellSharedContentFormatDetector, InkwellSharedContentFormatDispatcher, InkwellSharedDocumentLinkScanner, InkwellSharedDocumentMetadata, InkwellSharedDocumentMetadataBskyPostRef, InkwellSharedDocumentMetadataCompanion, InkwellSharedDocumentMetadataContributor, InkwellSharedDocumentMetadataLink, InkwellSharedDocumentPreferences, InkwellSharedFacetDefinition, InkwellSharedFacetSchema, InkwellSharedFeedCacheIosCompanion, InkwellSharedFeedCacheRetention, InkwellSharedFilterMatch, InkwellSharedFilterMatchKind, InkwellSharedFilterableContent, InkwellSharedHandleUtils, InkwellSharedInkwellOAuthScopes, InkwellSharedInlineMarkdownScanner, InkwellSharedInlineSegment, InkwellSharedInlineSegmentBold, InkwellSharedInlineSegmentCode, InkwellSharedInlineSegmentItalic, InkwellSharedInlineSegmentLink, InkwellSharedInlineSegmentPlain, InkwellSharedInlineSegmentStrike, InkwellSharedJetstreamConfig, InkwellSharedJetstreamEvent, InkwellSharedJetstreamEventCompanion, InkwellSharedJetstreamPayload, InkwellSharedJetstreamPayloadCompanion, InkwellSharedJetstreamRetryPolicy, InkwellSharedJsonMapBridge, InkwellSharedJsonSafety, InkwellSharedKotlinArray<T>, InkwellSharedKotlinEnum<E>, InkwellSharedKotlinEnumCompanion, InkwellSharedKotlinException, InkwellSharedKotlinIllegalStateException, InkwellSharedKotlinIntIterator, InkwellSharedKotlinIntProgression, InkwellSharedKotlinIntProgressionCompanion, InkwellSharedKotlinIntRange, InkwellSharedKotlinIntRangeCompanion, InkwellSharedKotlinNothing, InkwellSharedKotlinPair<__covariant A, __covariant B>, InkwellSharedKotlinRuntimeException, InkwellSharedKotlinThrowable, InkwellSharedKotlinx_serialization_coreSerialKind, InkwellSharedKotlinx_serialization_coreSerializersModule, InkwellSharedKotlinx_serialization_jsonJsonElement, InkwellSharedKotlinx_serialization_jsonJsonElementCompanion, InkwellSharedLeafletContentConverter, InkwellSharedLeafletFacet, InkwellSharedLeafletFacetFeature, InkwellSharedLeafletTypes, InkwellSharedLegacyPalette, InkwellSharedLegalDocuments, InkwellSharedMarkdownBlock, InkwellSharedMarkdownBlockBlockquote, InkwellSharedMarkdownBlockCode, InkwellSharedMarkdownBlockHeading, InkwellSharedMarkdownBlockHorizontalRule, InkwellSharedMarkdownBlockImage, InkwellSharedMarkdownBlockMath, InkwellSharedMarkdownBlockOrderedList, InkwellSharedMarkdownBlockParagraph, InkwellSharedMarkdownBlockTaskList, InkwellSharedMarkdownBlockUnorderedList, InkwellSharedMarkdownListItem, InkwellSharedMarkdownParser, InkwellSharedMarkdownSerializer, InkwellSharedMarkpubContentConverter, InkwellSharedMarkpubTypes, InkwellSharedModerationLabel, InkwellSharedModerationLabelCompanion, InkwellSharedModerationPolicy, InkwellSharedModerationPolicyCompanion, InkwellSharedNotificationContentPolicy, InkwellSharedNotificationPolicy, InkwellSharedNotificationStyleNone, InkwellSharedNotificationStyleSingle, InkwellSharedNotificationStyleSummary, InkwellSharedNumberFormat, InkwellSharedOAuthScopes, InkwellSharedOfflineCacheEntry, InkwellSharedOfflineCacheEntryCompanion, InkwellSharedOfflineCacheKind, InkwellSharedOfflineCacheKindCompanion, InkwellSharedOfflineCachePolicy, InkwellSharedOfflineCachePolicyCompanion, InkwellSharedOfflineContentCacheRetention, InkwellSharedOfflineSyncQueueRetention, InkwellSharedOffprintContentConverter, InkwellSharedOffprintTypes, InkwellSharedPcktContentConverter, InkwellSharedPcktTypes, InkwellSharedPublicationMatcher, InkwellSharedPublicationPreferences, InkwellSharedPublicationTheme, InkwellSharedRecordListPolicy, InkwellSharedRecordSizePolicy, InkwellSharedReportReasonType, InkwellSharedReportSubjectKind, InkwellSharedReportSubmission, InkwellSharedReportSubmissionCompanion, InkwellSharedRgbColor, InkwellSharedRgbaColor, InkwellSharedSearchBackendUrl, InkwellSharedSearchResultClassifier, InkwellSharedSharedConvertResult, InkwellSharedSharedDocumentRecord, InkwellSharedSharedGraphRecommend, InkwellSharedSharedGraphSubscription, InkwellSharedSharedLeafletComment, InkwellSharedSharedLeafletCommentReplyRef, InkwellSharedSharedPublicationRecord, InkwellSharedSharedReaderTheme, InkwellSharedSharedReaderThemeCompanion, InkwellSharedSharedReaderThemeFontFamily, InkwellSharedSharedWriteResult, InkwellSharedStandardModerationLabel, InkwellSharedStandardSitePermissionSets, InkwellSharedStandardSiteValidation, InkwellSharedStandardSiteValidationDocumentInput, InkwellSharedStandardSiteValidationError, InkwellSharedStringUtils, InkwellSharedStrongRef, InkwellSharedSupportersList, InkwellSharedSyncMutationKind, InkwellSharedSyncMutationKindCompanion, InkwellSharedSyncQueueEntry, InkwellSharedSyncQueueEntryCompanion, InkwellSharedSyncQueueFile, InkwellSharedTipPromptPolicy, InkwellSharedUrlUtils, InkwellSharedUserInputLexicon, InkwellSharedUserLexicon, InkwellSharedUserLexiconRecord, InkwellSharedUserLexiconUtils, InkwellSharedUtf8Offsets, InkwellSharedVerificationFailure, InkwellSharedVerificationFailureDocumentLinkMissing, InkwellSharedVerificationFailureEndpointUnreachable, InkwellSharedVerificationFailureInvalidDocumentURL, InkwellSharedVerificationFailureInvalidPublicationURL, InkwellSharedVerificationFailureMalformedResponse, InkwellSharedVerificationFailureMismatchedURI, InkwellSharedVerificationFailureUnexpected, InkwellSharedVerificationResult, InkwellSharedVerificationResultFailed, InkwellSharedVerificationResultVerified, InkwellSharedVerificationUrls, InkwellSharedXrpcEndpoints, RichTextFacet, RichTextFeature;
 
 @protocol InkwellSharedContentFilterDecision, InkwellSharedFeedCache, InkwellSharedJetstreamClient, InkwellSharedKotlinAnnotation, InkwellSharedKotlinClosedRange, InkwellSharedKotlinComparable, InkwellSharedKotlinFunction, InkwellSharedKotlinIterable, InkwellSharedKotlinIterator, InkwellSharedKotlinKAnnotatedElement, InkwellSharedKotlinKClass, InkwellSharedKotlinKClassifier, InkwellSharedKotlinKDeclarationContainer, InkwellSharedKotlinOpenEndRange, InkwellSharedKotlinSuspendFunction2, InkwellSharedKotlinx_coroutines_coreFlow, InkwellSharedKotlinx_coroutines_coreFlowCollector, InkwellSharedKotlinx_serialization_coreCompositeDecoder, InkwellSharedKotlinx_serialization_coreCompositeEncoder, InkwellSharedKotlinx_serialization_coreDecoder, InkwellSharedKotlinx_serialization_coreDeserializationStrategy, InkwellSharedKotlinx_serialization_coreEncoder, InkwellSharedKotlinx_serialization_coreKSerializer, InkwellSharedKotlinx_serialization_coreSerialDescriptor, InkwellSharedKotlinx_serialization_coreSerializationStrategy, InkwellSharedKotlinx_serialization_coreSerializersModuleCollector, InkwellSharedNotificationStyle, InkwellSharedOfflineContentCache, InkwellSharedOfflineSyncQueue;
 
@@ -283,6 +283,100 @@ __attribute__((swift_name("ConstellationSourcePaths")))
 
 
 /**
+ * Blob-backed ("spilled") content representations for the formats that define one.
+ *
+ * AT Protocol keeps individual records small — Inkwell preflights every document
+ * record against [uk.ewancroft.inkwell.shared.validation.RecordSizePolicy]. When an
+ * authored document would not fit inline, the two formats that define an upstream
+ * escape hatch move their payload into a PDS blob and reference it from the record:
+ *
+ * - Markpub: `content.text.textBlob` replaces `content.text.markdown`;
+ * - Leaflet: `content.blobPages` replaces the inline `content.pages` array.
+ *
+ * pckt and Offprint define no such field. Inventing a private one would produce
+ * records no other client could read, so those formats surface a Writer error
+ * instead.
+ *
+ * This object owns only the shapes and the policy. Uploading the blob and writing
+ * the record stay on the platform side, which owns the XRPC client.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("BlobBackedContent")))
+@interface InkwellSharedBlobBackedContent : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Blob-backed ("spilled") content representations for the formats that define one.
+ *
+ * AT Protocol keeps individual records small — Inkwell preflights every document
+ * record against [uk.ewancroft.inkwell.shared.validation.RecordSizePolicy]. When an
+ * authored document would not fit inline, the two formats that define an upstream
+ * escape hatch move their payload into a PDS blob and reference it from the record:
+ *
+ * - Markpub: `content.text.textBlob` replaces `content.text.markdown`;
+ * - Leaflet: `content.blobPages` replaces the inline `content.pages` array.
+ *
+ * pckt and Offprint define no such field. Inventing a private one would produce
+ * records no other client could read, so those formats surface a Writer error
+ * instead.
+ *
+ * This object owns only the shapes and the policy. Uploading the blob and writing
+ * the record stay on the platform side, which owns the XRPC client.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)blobBackedContent __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedBlobBackedContent *shared __attribute__((swift_name("shared")));
+
+/** MIME type for [format]'s backing blob, or null when the format defines none. */
+- (NSString * _Nullable)blobMimeTypeFormat:(NSString *)format __attribute__((swift_name("blobMimeType(format:)")));
+
+/** True when [content] already references its payload through a blob. */
+- (BOOL)isBlobBackedContent:(NSDictionary<NSString *, id> *)content __attribute__((swift_name("isBlobBacked(content:)")));
+
+/** Leaflet content whose pages live in `blobPages` instead of the inline `pages` array. */
+- (NSDictionary<NSString *, id> *)leafletBlobContentBlobPages:(NSDictionary<NSString *, id> *)blobPages __attribute__((swift_name("leafletBlobContent(blobPages:)")));
+
+/** Leaflet content rebuilt inline from pages that were resolved out of `blobPages`. */
+- (NSDictionary<NSString *, id> *)leafletInlineContentPages:(NSArray<id> *)pages __attribute__((swift_name("leafletInlineContent(pages:)")));
+
+/** The `pages` array that goes into a Leaflet document's backing blob. */
+- (NSArray<id> *)leafletPagesContent:(NSDictionary<NSString *, id> *)content __attribute__((swift_name("leafletPages(content:)")));
+
+/** Markpub content whose markdown lives in `text.textBlob` instead of `text.markdown`. */
+- (NSDictionary<NSString *, id> *)markpubBlobContentTextBlob:(NSDictionary<NSString *, id> *)textBlob __attribute__((swift_name("markpubBlobContent(textBlob:)")));
+
+/** Markpub content rebuilt inline from markdown that was resolved out of `text.textBlob`. */
+- (NSDictionary<NSString *, id> *)markpubInlineContentMarkdown:(NSString *)markdown __attribute__((swift_name("markpubInlineContent(markdown:)")));
+
+/** Formats with an upstream-defined blob-backed representation. */
+- (BOOL)supportsBlobBackingFormat:(NSString *)format __attribute__((swift_name("supportsBlobBacking(format:)")));
+
+/**
+ * Truncates `textContent` to a UTF-8 byte budget without splitting a character
+ * or a surrogate pair. Returns [text] unchanged when it already fits.
+ */
+- (NSString *)truncateTextContentText:(NSString *)text maxBytes:(int32_t)maxBytes __attribute__((swift_name("truncateTextContent(text:maxBytes:)")));
+
+/** Writer-facing explanation for a format that cannot represent the document within limits. */
+- (NSString *)unsupportedFormatMessageFormat:(NSString *)format encodedBytes:(int32_t)encodedBytes limitBytes:(int32_t)limitBytes __attribute__((swift_name("unsupportedFormatMessage(format:encodedBytes:limitBytes:)")));
+
+/** MIME type of the blob holding a spilled Leaflet document's `pages` array. */
+@property (readonly) NSString *LEAFLET_BLOB_MIME __attribute__((swift_name("LEAFLET_BLOB_MIME")));
+
+/** MIME type of the blob holding a spilled Markpub document's markdown source. */
+@property (readonly) NSString *MARKPUB_BLOB_MIME __attribute__((swift_name("MARKPUB_BLOB_MIME")));
+
+/**
+ * UTF-8 byte budget for the record's portable `textContent` once content has
+ * spilled to a blob. `textContent` is a search/indexing aid, so a truncated
+ * copy stays useful while guaranteeing it cannot push the record back over
+ * the record-size limit on its own.
+ */
+@property (readonly) int32_t MAX_SPILLED_TEXT_CONTENT_BYTES __attribute__((swift_name("MAX_SPILLED_TEXT_CONTENT_BYTES")));
+@end
+
+
+/**
  * Shared loss label maps per content format.
  *
  * Maps block type strings that can't be represented as markdown to
@@ -473,9 +567,19 @@ __attribute__((swift_name("JsonMapBridge")))
 @property (class, readonly, getter=shared) InkwellSharedJsonMapBridge *shared __attribute__((swift_name("shared")));
 
 /**
+ * Recursively converts a [JsonArray] to a list of generic values.
+ */
+- (NSArray<id> *)arrayToListArray:(NSArray<InkwellSharedKotlinx_serialization_jsonJsonElement *> *)array __attribute__((swift_name("arrayToList(array:)")));
+
+/**
  * Recursively converts a [JsonObject] to a [Map].
  */
 - (NSDictionary<NSString *, id> *)jsonToMapObj:(NSDictionary<NSString *, InkwellSharedKotlinx_serialization_jsonJsonElement *> *)obj __attribute__((swift_name("jsonToMap(obj:)")));
+
+/**
+ * Recursively converts a list of generic values to a [JsonArray].
+ */
+- (NSArray<InkwellSharedKotlinx_serialization_jsonJsonElement *> *)listToJsonList:(NSArray<id> *)list __attribute__((swift_name("listToJson(list:)")));
 
 /**
  * Recursively converts a [Map] tree to a [JsonObject].
@@ -2296,6 +2400,238 @@ __attribute__((swift_name("ColorValue")))
 
 
 /**
+ * The optional metadata layer of a `site.standard.document` record.
+ *
+ * Standard.site defines `coverImage`, `bskyPostRef`, `tags`, `links`, `labels`,
+ * `contributors`, `publishedAt` and `updatedAt` alongside the content union
+ * (https://standard.site/docs/lexicons/document/). Both platforms need to read
+ * these for display and write back the subset a user can edit, so the wire
+ * shapes and the tolerance rules live here rather than in each client.
+ *
+ * Two rules matter more than the shapes:
+ *
+ * 1. **Unmodelled data survives.** `links` is an open union with no concrete
+ *    variants published, so entries are kept as their raw maps and only
+ *    *presented* through [Link.displayUri]/[Link.title] when those are
+ *    recognisable. A writer that re-serializes a document must put back exactly
+ *    what it read.
+ * 2. **Absent is not empty.** A field the author never set stays absent rather
+ *    than becoming `[]` or `{}` — see [applyTo].
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("DocumentMetadata")))
+@interface InkwellSharedDocumentMetadata : InkwellSharedBase
+- (instancetype)initWithTags:(NSArray<NSString *> *)tags contributors:(NSArray<InkwellSharedDocumentMetadataContributor *> *)contributors labels:(NSArray<NSString *> *)labels coverImage:(NSDictionary<NSString *, id> * _Nullable)coverImage bskyPostRef:(InkwellSharedDocumentMetadataBskyPostRef * _Nullable)bskyPostRef links:(NSArray<InkwellSharedDocumentMetadataLink *> *)links publishedAt:(NSString * _Nullable)publishedAt updatedAt:(NSString * _Nullable)updatedAt __attribute__((swift_name("init(tags:contributors:labels:coverImage:bskyPostRef:links:publishedAt:updatedAt:)"))) __attribute__((objc_designated_initializer));
+@property (class, readonly, getter=companion) InkwellSharedDocumentMetadataCompanion *companion __attribute__((swift_name("companion")));
+- (InkwellSharedDocumentMetadata *)doCopyTags:(NSArray<NSString *> *)tags contributors:(NSArray<InkwellSharedDocumentMetadataContributor *> *)contributors labels:(NSArray<NSString *> *)labels coverImage:(NSDictionary<NSString *, id> * _Nullable)coverImage bskyPostRef:(InkwellSharedDocumentMetadataBskyPostRef * _Nullable)bskyPostRef links:(NSArray<InkwellSharedDocumentMetadataLink *> *)links publishedAt:(NSString * _Nullable)publishedAt updatedAt:(NSString * _Nullable)updatedAt __attribute__((swift_name("doCopy(tags:contributors:labels:coverImage:bskyPostRef:links:publishedAt:updatedAt:)")));
+
+/**
+ * The optional metadata layer of a `site.standard.document` record.
+ *
+ * Standard.site defines `coverImage`, `bskyPostRef`, `tags`, `links`, `labels`,
+ * `contributors`, `publishedAt` and `updatedAt` alongside the content union
+ * (https://standard.site/docs/lexicons/document/). Both platforms need to read
+ * these for display and write back the subset a user can edit, so the wire
+ * shapes and the tolerance rules live here rather than in each client.
+ *
+ * Two rules matter more than the shapes:
+ *
+ * 1. **Unmodelled data survives.** `links` is an open union with no concrete
+ *    variants published, so entries are kept as their raw maps and only
+ *    *presented* through [Link.displayUri]/[Link.title] when those are
+ *    recognisable. A writer that re-serializes a document must put back exactly
+ *    what it read.
+ * 2. **Absent is not empty.** A field the author never set stays absent rather
+ *    than becoming `[]` or `{}` — see [applyTo].
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * The optional metadata layer of a `site.standard.document` record.
+ *
+ * Standard.site defines `coverImage`, `bskyPostRef`, `tags`, `links`, `labels`,
+ * `contributors`, `publishedAt` and `updatedAt` alongside the content union
+ * (https://standard.site/docs/lexicons/document/). Both platforms need to read
+ * these for display and write back the subset a user can edit, so the wire
+ * shapes and the tolerance rules live here rather than in each client.
+ *
+ * Two rules matter more than the shapes:
+ *
+ * 1. **Unmodelled data survives.** `links` is an open union with no concrete
+ *    variants published, so entries are kept as their raw maps and only
+ *    *presented* through [Link.displayUri]/[Link.title] when those are
+ *    recognisable. A writer that re-serializes a document must put back exactly
+ *    what it read.
+ * 2. **Absent is not empty.** A field the author never set stays absent rather
+ *    than becoming `[]` or `{}` — see [applyTo].
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * The optional metadata layer of a `site.standard.document` record.
+ *
+ * Standard.site defines `coverImage`, `bskyPostRef`, `tags`, `links`, `labels`,
+ * `contributors`, `publishedAt` and `updatedAt` alongside the content union
+ * (https://standard.site/docs/lexicons/document/). Both platforms need to read
+ * these for display and write back the subset a user can edit, so the wire
+ * shapes and the tolerance rules live here rather than in each client.
+ *
+ * Two rules matter more than the shapes:
+ *
+ * 1. **Unmodelled data survives.** `links` is an open union with no concrete
+ *    variants published, so entries are kept as their raw maps and only
+ *    *presented* through [Link.displayUri]/[Link.title] when those are
+ *    recognisable. A writer that re-serializes a document must put back exactly
+ *    what it read.
+ * 2. **Absent is not empty.** A field the author never set stays absent rather
+ *    than becoming `[]` or `{}` — see [applyTo].
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) InkwellSharedDocumentMetadataBskyPostRef * _Nullable bskyPostRef __attribute__((swift_name("bskyPostRef")));
+@property (readonly) NSArray<InkwellSharedDocumentMetadataContributor *> *contributors __attribute__((swift_name("contributors")));
+@property (readonly) NSDictionary<NSString *, id> * _Nullable coverImage __attribute__((swift_name("coverImage")));
+@property (readonly) NSArray<NSString *> *labels __attribute__((swift_name("labels")));
+@property (readonly) NSArray<InkwellSharedDocumentMetadataLink *> *links __attribute__((swift_name("links")));
+@property (readonly) NSString * _Nullable publishedAt __attribute__((swift_name("publishedAt")));
+@property (readonly) NSArray<NSString *> *tags __attribute__((swift_name("tags")));
+@property (readonly) NSString * _Nullable updatedAt __attribute__((swift_name("updatedAt")));
+@end
+
+
+/** Strong reference to the Bluesky post carrying the document's discussion. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("DocumentMetadata.BskyPostRef")))
+@interface InkwellSharedDocumentMetadataBskyPostRef : InkwellSharedBase
+- (instancetype)initWithUri:(NSString *)uri cid:(NSString * _Nullable)cid __attribute__((swift_name("init(uri:cid:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedDocumentMetadataBskyPostRef *)doCopyUri:(NSString *)uri cid:(NSString * _Nullable)cid __attribute__((swift_name("doCopy(uri:cid:)")));
+
+/** Strong reference to the Bluesky post carrying the document's discussion. */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/** Strong reference to the Bluesky post carrying the document's discussion. */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/** Strong reference to the Bluesky post carrying the document's discussion. */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString * _Nullable cid __attribute__((swift_name("cid")));
+@property (readonly) NSString *uri __attribute__((swift_name("uri")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("DocumentMetadata.Companion")))
+@interface InkwellSharedDocumentMetadataCompanion : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedDocumentMetadataCompanion *shared __attribute__((swift_name("shared")));
+
+/**
+ * Returns [record] with this metadata's fields replaced.
+ *
+ * An empty collection removes its key instead of writing `[]`: the
+ * Lexicon's fields are optional, and an empty array is a different
+ * statement from "not set". Keys outside [OWNED_KEYS] pass through
+ * untouched so an editor cannot clobber fields it does not model.
+ *
+ * `publishedAt`/`updatedAt` are deliberately *not* written here — the
+ * Writer owns those timestamps and sets them at submission time.
+ */
+- (NSDictionary<NSString *, id> *)applyToRecord:(NSDictionary<NSString *, id> *)record metadata:(InkwellSharedDocumentMetadata *)metadata __attribute__((swift_name("applyTo(record:metadata:)")));
+
+/** Canonical `com.atproto.repo.strongRef` wire shape. */
+- (NSDictionary<NSString *, id> *)bskyPostRefWireRef:(InkwellSharedDocumentMetadataBskyPostRef *)ref __attribute__((swift_name("bskyPostRefWire(ref:)")));
+
+/** Canonical `site.standard.document#contributor` wire shape. */
+- (NSDictionary<NSString *, id> *)contributorWireContributor:(InkwellSharedDocumentMetadataContributor *)contributor __attribute__((swift_name("contributorWire(contributor:)")));
+
+/** Canonical `com.atproto.label.defs#selfLabels` wire shape, or null when empty. */
+- (NSDictionary<NSString *, id> * _Nullable)labelsWireValues:(NSArray<NSString *> *)values __attribute__((swift_name("labelsWire(values:)")));
+
+/**
+ * Reads the metadata layer out of a decoded document record.
+ *
+ * Every field is optional and every malformed field degrades to its empty
+ * value rather than failing the whole read — a record with one bad
+ * contributor must still show its tags.
+ */
+- (InkwellSharedDocumentMetadata *)readRecord:(NSDictionary<NSString *, id> *)record __attribute__((swift_name("read(record:)")));
+@property (readonly) NSString *CONTRIBUTOR_TYPE __attribute__((swift_name("CONTRIBUTOR_TYPE")));
+@property (readonly) NSString *SELF_LABELS_TYPE __attribute__((swift_name("SELF_LABELS_TYPE")));
+@property (readonly) NSString *SELF_LABEL_TYPE __attribute__((swift_name("SELF_LABEL_TYPE")));
+@end
+
+
+/** A participant on the document beyond the record's author. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("DocumentMetadata.Contributor")))
+@interface InkwellSharedDocumentMetadataContributor : InkwellSharedBase
+- (instancetype)initWithDid:(NSString *)did role:(NSString * _Nullable)role displayName:(NSString * _Nullable)displayName __attribute__((swift_name("init(did:role:displayName:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedDocumentMetadataContributor *)doCopyDid:(NSString *)did role:(NSString * _Nullable)role displayName:(NSString * _Nullable)displayName __attribute__((swift_name("doCopy(did:role:displayName:)")));
+
+/** A participant on the document beyond the record's author. */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/** A participant on the document beyond the record's author. */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/** A participant on the document beyond the record's author. */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString *did __attribute__((swift_name("did")));
+@property (readonly) NSString * _Nullable displayName __attribute__((swift_name("displayName")));
+@property (readonly) NSString * _Nullable role __attribute__((swift_name("role")));
+@end
+
+
+/**
+ * One entry of the open `links` union.
+ *
+ * [raw] is the entry exactly as it appeared on the wire and is what gets
+ * written back; the other properties are presentation hints that are null
+ * for variants this version does not recognise.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("DocumentMetadata.Link")))
+@interface InkwellSharedDocumentMetadataLink : InkwellSharedBase
+- (instancetype)initWithRaw:(NSDictionary<NSString *, id> *)raw type:(NSString * _Nullable)type displayUri:(NSString * _Nullable)displayUri title:(NSString * _Nullable)title __attribute__((swift_name("init(raw:type:displayUri:title:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedDocumentMetadataLink *)doCopyRaw:(NSDictionary<NSString *, id> *)raw type:(NSString * _Nullable)type displayUri:(NSString * _Nullable)displayUri title:(NSString * _Nullable)title __attribute__((swift_name("doCopy(raw:type:displayUri:title:)")));
+
+/**
+ * One entry of the open `links` union.
+ *
+ * [raw] is the entry exactly as it appeared on the wire and is what gets
+ * written back; the other properties are presentation hints that are null
+ * for variants this version does not recognise.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * One entry of the open `links` union.
+ *
+ * [raw] is the entry exactly as it appeared on the wire and is what gets
+ * written back; the other properties are presentation hints that are null
+ * for variants this version does not recognise.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * One entry of the open `links` union.
+ *
+ * [raw] is the entry exactly as it appeared on the wire and is what gets
+ * written back; the other properties are presentation hints that are null
+ * for variants this version does not recognise.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString * _Nullable displayUri __attribute__((swift_name("displayUri")));
+
+/** True when there is nothing to show a reader beyond an opaque `$type`. */
+@property (readonly) BOOL isOpaque __attribute__((swift_name("isOpaque")));
+@property (readonly) NSDictionary<NSString *, id> *raw __attribute__((swift_name("raw")));
+@property (readonly) NSString * _Nullable title __attribute__((swift_name("title")));
+@property (readonly) NSString * _Nullable type __attribute__((swift_name("type")));
+@end
+
+
+/**
  * Neutral shared model for per-document display preferences.
  */
 __attribute__((objc_subclassing_restricted))
@@ -3321,6 +3657,130 @@ __attribute__((swift_name("StandardModerationLabel")))
 @property (readonly) NSString *reference __attribute__((swift_name("reference")));
 @end
 
+
+/**
+ * The single source of truth for Inkwell's OAuth scope request and for the maximum
+ * scope its hosted `client-metadata.json` declares.
+ *
+ * ## The superset invariant
+ *
+ * The reference Authorization Server checks a requested scope by plain string
+ * membership against the `scope` field of the client metadata document
+ * (`oauth-provider/src/client/client.ts`: `Scope "<x>" is not declared in the client
+ * metadata`). It does **not** expand permission sets before that check, and it does not
+ * parse individual metadata scope tokens at registration time beyond requiring
+ * `atproto` and rejecting duplicates
+ * (`oauth-provider/src/client/client-manager.ts`).
+ *
+ * Two consequences drive the design here:
+ *
+ * 1. [runtimeScopes] must be a literal string subset of [clientMetadataScopes]. Not an
+ *    "effectively equivalent" subset — the same strings.
+ * 2. Declaring `include:site.standard.authFull` in client metadata is inert on an
+ *    Authorization Server that does not understand permission sets, because nothing
+ *    validates metadata scope tokens. So metadata can safely declare both the
+ *    permission set and the granular scopes it expands to, and the runtime can pick
+ *    either without a metadata redeploy.
+ *
+ * The three hosted copies of the metadata document must all carry
+ * [clientMetadataScopeString]:
+ *  - `website/src/routes/client-metadata.json/+server.ts` (the live one PDSes fetch)
+ *  - `iOS/oauth/client-metadata.json`
+ *  - `Android/docs/oauth/client-metadata.json`
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("InkwellOAuthScopes")))
+@interface InkwellSharedInkwellOAuthScopes : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * The single source of truth for Inkwell's OAuth scope request and for the maximum
+ * scope its hosted `client-metadata.json` declares.
+ *
+ * ## The superset invariant
+ *
+ * The reference Authorization Server checks a requested scope by plain string
+ * membership against the `scope` field of the client metadata document
+ * (`oauth-provider/src/client/client.ts`: `Scope "<x>" is not declared in the client
+ * metadata`). It does **not** expand permission sets before that check, and it does not
+ * parse individual metadata scope tokens at registration time beyond requiring
+ * `atproto` and rejecting duplicates
+ * (`oauth-provider/src/client/client-manager.ts`).
+ *
+ * Two consequences drive the design here:
+ *
+ * 1. [runtimeScopes] must be a literal string subset of [clientMetadataScopes]. Not an
+ *    "effectively equivalent" subset — the same strings.
+ * 2. Declaring `include:site.standard.authFull` in client metadata is inert on an
+ *    Authorization Server that does not understand permission sets, because nothing
+ *    validates metadata scope tokens. So metadata can safely declare both the
+ *    permission set and the granular scopes it expands to, and the runtime can pick
+ *    either without a metadata redeploy.
+ *
+ * The three hosted copies of the metadata document must all carry
+ * [clientMetadataScopeString]:
+ *  - `website/src/routes/client-metadata.json/+server.ts` (the live one PDSes fetch)
+ *  - `iOS/oauth/client-metadata.json`
+ *  - `Android/docs/oauth/client-metadata.json`
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)inkwellOAuthScopes __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedInkwellOAuthScopes *shared __attribute__((swift_name("shared")));
+
+/**
+ * The maximum scope declared in hosted client metadata: every scope the runtime
+ * could request under either setting of
+ * [StandardSitePermissionSets.USE_PERMISSION_SET].
+ *
+ * Declaring more than the app currently requests costs the user nothing — the
+ * consent screen shows the *requested* scopes, not the declared ones — and removes
+ * the deploy ordering hazard where a client update ships before the metadata that
+ * authorizes it.
+ */
+- (NSArray<NSString *> *)clientMetadataScopes __attribute__((swift_name("clientMetadataScopes()")));
+
+/** Space-joined form of [runtimeScopes], as sent in the OAuth `scope` parameter. */
+- (NSString *)runtimeScopeStringUsePermissionSet:(BOOL)usePermissionSet __attribute__((swift_name("runtimeScopeString(usePermissionSet:)")));
+
+/**
+ * What the app actually asks for at authorization time.
+ *
+ * @param usePermissionSet when `true`, the four `repo:site.standard.*` scopes are
+ *   replaced by the single `include:site.standard.authFull` invocation. The
+ *   effective grant is identical either way — see
+ *   [StandardSitePermissionSets.AUTH_FULL_EXPANSION].
+ */
+- (NSArray<NSString *> *)runtimeScopesUsePermissionSet:(BOOL)usePermissionSet __attribute__((swift_name("runtimeScopes(usePermissionSet:)")));
+
+/**
+ * Scopes that cannot live in a permission set and must always be requested
+ * directly.
+ *
+ * The permissions spec bars `blob` permissions from permission sets outright:
+ * "Permissions of this type can not be included in permission sets, and must be
+ * requested directly by client apps."
+ */
+@property (readonly) NSArray<NSString *> *ALWAYS_EXPLICIT __attribute__((swift_name("ALWAYS_EXPLICIT")));
+
+/**
+ * Inkwell-specific and third-party record scopes.
+ *
+ * None of these sit under the `site.standard` namespace, so no Standard.site
+ * permission set is allowed to grant them — permission sets may only address
+ * resources in their own NSID hierarchy.
+ */
+@property (readonly) NSArray<NSString *> *APP_RECORD_SCOPES __attribute__((swift_name("APP_RECORD_SCOPES")));
+
+/**
+ * Personal moderation: block records plus the Bluesky AppView RPCs behind the
+ * mute/block/report UI on both platforms.
+ */
+@property (readonly) NSArray<NSString *> *MODERATION_SCOPES __attribute__((swift_name("MODERATION_SCOPES")));
+
+/** Space-joined form of [clientMetadataScopes], as published in `client-metadata.json`. */
+@property (readonly) NSString *clientMetadataScopeString __attribute__((swift_name("clientMetadataScopeString")));
+@end
+
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("OAuthScopes")))
 @interface InkwellSharedOAuthScopes : InkwellSharedBase
@@ -3336,6 +3796,7 @@ __attribute__((swift_name("OAuthScopes")))
 /** Scope for moderation RPCs (report, etc.) proxied through the Bluesky AppView. */
 @property (readonly) NSString *MODERATION __attribute__((swift_name("MODERATION")));
 @property (readonly) NSString *REPO_DOCUMENT __attribute__((swift_name("REPO_DOCUMENT")));
+@property (readonly) NSString *REPO_LEAFLET_COMMENT __attribute__((swift_name("REPO_LEAFLET_COMMENT")));
 @property (readonly) NSString *REPO_PUBLICATION __attribute__((swift_name("REPO_PUBLICATION")));
 @property (readonly) NSString *REPO_RECOMMEND __attribute__((swift_name("REPO_RECOMMEND")));
 @property (readonly) NSString *REPO_SUBSCRIPTION __attribute__((swift_name("REPO_SUBSCRIPTION")));
@@ -3345,6 +3806,223 @@ __attribute__((swift_name("OAuthScopes")))
 
 /** Needed to post feedback to Inkwell's userinput.app board. */
 @property (readonly) NSString *REPO_USERINPUT_DISCUSSION __attribute__((swift_name("REPO_USERINPUT_DISCUSSION")));
+@end
+
+
+/**
+ * Standard.site's published AT Protocol permission sets, and the granular scopes
+ * they expand to.
+ *
+ * A permission set is a `com.atproto.lexicon.schema` record of type `permission-set`
+ * that an Authorization Server resolves at authorization time and expands into
+ * granular permissions. Clients request one with an `include:<nsid>` scope.
+ *
+ * Verified against the live network on 2026-09-26 by resolving the lexicon the same
+ * way a PDS does:
+ *
+ * ```
+ * _lexicon.standard.site TXT -> did=did:plc:re3ebnp5v7ffagz6rb6xfei4
+ *   -> plc.directory -> https://auriporia.us-west.host.bsky.network
+ *   -> com.atproto.repo.getRecord(com.atproto.lexicon.schema, site.standard.authFull)
+ * ```
+ *
+ * Both `site.standard.authFull` and `site.standard.authSocial` exist and carry a
+ * single `repo` permission with no `action` array. Per the permissions spec, a `repo`
+ * permission with no `action` grants create + update + delete — which is exactly what
+ * the bare `repo:<collection>` scope strings Inkwell requests today already grant.
+ *
+ * **That equivalence is the reason adopting the permission set does not require
+ * existing users to re-authorize:** the effective grant is byte-for-byte the same set
+ * of capabilities, only the request string (and therefore the consent screen wording)
+ * differs.
+ *
+ * ## Compatibility
+ *
+ * `include:` scope support landed in `@atproto/oauth-provider` 0.11.0 (2025-08-29);
+ * granular `repo:`/`blob:`/`rpc:` scope support landed in 0.10.x (~2025-08-12). Inkwell
+ * already requires the latter, so the only Authorization Servers that would accept
+ * today's request but reject a permission-set request are ones pinned to a ~2.5 week
+ * window of August 2025 builds.
+ *
+ * The residual risk is not the AS version but *resolution availability*: the spec says
+ * "at the start of a session, if a permission set can not be resolved (and is not
+ * already in a local cache), the auth request will fail". Requesting `include:` makes
+ * login depend on the user's PDS being able to reach standard.site's DNS, plc.directory
+ * and the publishing PDS. Raw scopes have no such dependency.
+ *
+ * Neither OAuth library Inkwell embeds (OAuthenticator on iOS, `AtOAuth` on Android)
+ * exposes a seam to retry a failed pushed-authorization request with a different scope
+ * string — Android fixes the scope string when the singleton `AtOAuth` is constructed in
+ * `OAuthModule`, iOS fixes it in the `AppCredentials` it hands OAuthenticator — and the
+ * authorization server metadata document has no field that advertises permission-set
+ * support (`scopes_supported` is a static list that cannot enumerate the granular scope
+ * space — bsky.social still advertises only `atproto` and the `transition:*` scopes while
+ * happily accepting granular ones). So there is no honest runtime capability probe
+ * available short of issuing a throwaway PAR before every login.
+ *
+ * Requesting the granular scopes *and* `include:site.standard.authFull` together is not a
+ * graceful degradation either: an Authorization Server that cannot resolve or parse the
+ * `include:` token rejects the whole authorization request rather than ignoring the token,
+ * so asking for both makes login strictly more fragile than asking for neither.
+ *
+ * Because of that, [USE_PERMISSION_SET] defaults to `false`: the runtime keeps
+ * requesting the granular scopes, while hosted client metadata declares *both* forms so
+ * the switch is a one-line change that needs no metadata redeploy. See
+ * [InkwellOAuthScopes.clientMetadataScopes].
+ *
+ * Declaring the unused `include:` token in client metadata is itself inert on every
+ * Authorization Server version Inkwell can already authorize against: the reference
+ * provider validates the metadata `scope` field only by splitting on spaces, requiring
+ * `atproto`, and rejecting duplicate tokens — it never parses individual declared tokens.
+ * Checked against `packages/oauth/oauth-provider/src/client/client-manager.ts` at tags
+ * `@atproto/oauth-provider@0.10.0`, `@0.11.0`, and `main`.
+ *
+ * @see <a href="https://atproto.com/specs/permission">AT Protocol permissions spec</a>
+ * @see <a href="https://standard.site/docs/permissions/">standard.site/docs/permissions</a>
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("StandardSitePermissionSets")))
+@interface InkwellSharedStandardSitePermissionSets : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Standard.site's published AT Protocol permission sets, and the granular scopes
+ * they expand to.
+ *
+ * A permission set is a `com.atproto.lexicon.schema` record of type `permission-set`
+ * that an Authorization Server resolves at authorization time and expands into
+ * granular permissions. Clients request one with an `include:<nsid>` scope.
+ *
+ * Verified against the live network on 2026-09-26 by resolving the lexicon the same
+ * way a PDS does:
+ *
+ * ```
+ * _lexicon.standard.site TXT -> did=did:plc:re3ebnp5v7ffagz6rb6xfei4
+ *   -> plc.directory -> https://auriporia.us-west.host.bsky.network
+ *   -> com.atproto.repo.getRecord(com.atproto.lexicon.schema, site.standard.authFull)
+ * ```
+ *
+ * Both `site.standard.authFull` and `site.standard.authSocial` exist and carry a
+ * single `repo` permission with no `action` array. Per the permissions spec, a `repo`
+ * permission with no `action` grants create + update + delete — which is exactly what
+ * the bare `repo:<collection>` scope strings Inkwell requests today already grant.
+ *
+ * **That equivalence is the reason adopting the permission set does not require
+ * existing users to re-authorize:** the effective grant is byte-for-byte the same set
+ * of capabilities, only the request string (and therefore the consent screen wording)
+ * differs.
+ *
+ * ## Compatibility
+ *
+ * `include:` scope support landed in `@atproto/oauth-provider` 0.11.0 (2025-08-29);
+ * granular `repo:`/`blob:`/`rpc:` scope support landed in 0.10.x (~2025-08-12). Inkwell
+ * already requires the latter, so the only Authorization Servers that would accept
+ * today's request but reject a permission-set request are ones pinned to a ~2.5 week
+ * window of August 2025 builds.
+ *
+ * The residual risk is not the AS version but *resolution availability*: the spec says
+ * "at the start of a session, if a permission set can not be resolved (and is not
+ * already in a local cache), the auth request will fail". Requesting `include:` makes
+ * login depend on the user's PDS being able to reach standard.site's DNS, plc.directory
+ * and the publishing PDS. Raw scopes have no such dependency.
+ *
+ * Neither OAuth library Inkwell embeds (OAuthenticator on iOS, `AtOAuth` on Android)
+ * exposes a seam to retry a failed pushed-authorization request with a different scope
+ * string — Android fixes the scope string when the singleton `AtOAuth` is constructed in
+ * `OAuthModule`, iOS fixes it in the `AppCredentials` it hands OAuthenticator — and the
+ * authorization server metadata document has no field that advertises permission-set
+ * support (`scopes_supported` is a static list that cannot enumerate the granular scope
+ * space — bsky.social still advertises only `atproto` and the `transition:*` scopes while
+ * happily accepting granular ones). So there is no honest runtime capability probe
+ * available short of issuing a throwaway PAR before every login.
+ *
+ * Requesting the granular scopes *and* `include:site.standard.authFull` together is not a
+ * graceful degradation either: an Authorization Server that cannot resolve or parse the
+ * `include:` token rejects the whole authorization request rather than ignoring the token,
+ * so asking for both makes login strictly more fragile than asking for neither.
+ *
+ * Because of that, [USE_PERMISSION_SET] defaults to `false`: the runtime keeps
+ * requesting the granular scopes, while hosted client metadata declares *both* forms so
+ * the switch is a one-line change that needs no metadata redeploy. See
+ * [InkwellOAuthScopes.clientMetadataScopes].
+ *
+ * Declaring the unused `include:` token in client metadata is itself inert on every
+ * Authorization Server version Inkwell can already authorize against: the reference
+ * provider validates the metadata `scope` field only by splitting on spaces, requiring
+ * `atproto`, and rejecting duplicate tokens — it never parses individual declared tokens.
+ * Checked against `packages/oauth/oauth-provider/src/client/client-manager.ts` at tags
+ * `@atproto/oauth-provider@0.10.0`, `@0.11.0`, and `main`.
+ *
+ * @see <a href="https://atproto.com/specs/permission">AT Protocol permissions spec</a>
+ * @see <a href="https://standard.site/docs/permissions/">standard.site/docs/permissions</a>
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)standardSitePermissionSets __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedStandardSitePermissionSets *shared __attribute__((swift_name("shared")));
+
+/**
+ * The effective granular permissions a list of requested scopes resolves to, with
+ * every known permission set expanded in place and duplicates collapsed.
+ *
+ * Used to prove that flipping [USE_PERMISSION_SET] does not change what the user
+ * actually grants, and that the runtime request stays within declared metadata.
+ */
+- (NSSet<NSString *> *)effectivePermissionsScopes:(NSArray<NSString *> *)scopes __attribute__((swift_name("effectivePermissions(scopes:)")));
+
+/**
+ * Expands an `include:` scope string into the granular scopes it grants, or returns
+ * `null` if [scope] is not a permission set Inkwell knows about.
+ *
+ * Only the two Standard.site sets are modelled. Inkwell never requests a third
+ * party's permission set, and guessing at an unknown set's contents would be worse
+ * than admitting ignorance.
+ */
+- (NSArray<NSString *> * _Nullable)expandScope:(NSString *)scope __attribute__((swift_name("expand(scope:)")));
+
+/**
+ * The Standard.site portion of Inkwell's OAuth request.
+ *
+ * Inkwell has exactly one sign-in path and it always leads to the Writer tab, so
+ * `authSocial` is never the right request for this app: a reader who only subscribes
+ * and recommends still shares the session with an editor that creates publication
+ * and document records. Requesting `authSocial` would produce an honest-looking
+ * consent screen for an app that then fails on first publish. `authSocial` becomes
+ * applicable only if a genuinely read-only sign-in mode is added.
+ */
+- (NSArray<NSString *> *)standardSiteScopesUsePermissionSet:(BOOL)usePermissionSet __attribute__((swift_name("standardSiteScopes(usePermissionSet:)")));
+
+/**
+ * Granular scopes that `site.standard.authFull` expands to, in the order the
+ * published lexicon lists its collections.
+ */
+@property (readonly) NSArray<NSString *> *AUTH_FULL_EXPANSION __attribute__((swift_name("AUTH_FULL_EXPANSION")));
+
+/** Granular scopes that `site.standard.authSocial` expands to. */
+@property (readonly) NSArray<NSString *> *AUTH_SOCIAL_EXPANSION __attribute__((swift_name("AUTH_SOCIAL_EXPANSION")));
+
+/** `include:site.standard.authFull` — publication, document, subscription, recommend. */
+@property (readonly) NSString *INCLUDE_AUTH_FULL __attribute__((swift_name("INCLUDE_AUTH_FULL")));
+
+/** `include:site.standard.authSocial` — subscription and recommend only. */
+@property (readonly) NSString *INCLUDE_AUTH_SOCIAL __attribute__((swift_name("INCLUDE_AUTH_SOCIAL")));
+
+/** Meta-resource prefix used to invoke a permission set as an OAuth scope. */
+@property (readonly) NSString *INCLUDE_PREFIX __attribute__((swift_name("INCLUDE_PREFIX")));
+
+/**
+ * Master switch for whether the runtime OAuth request uses the permission set
+ * instead of the granular scopes it expands to.
+ *
+ * Kept `false` until a human has confirmed a real authorization flow against at
+ * least one Bluesky-hosted PDS and one self-hosted PDS. Flipping it changes no
+ * effective permission (see [AUTH_FULL_EXPANSION]); hosted client metadata already
+ * declares both forms, so no metadata redeploy is needed.
+ *
+ * iOS mirrors this value as a Swift literal in `LoginStateManager.swift` because the
+ * checked-in `InkwellShared.xcframework` predates this file; keep the two in sync
+ * (same constraint as `sharedOAuthScopeRepoLeafletComment()` in `SharedKMP.swift`).
+ */
+@property (readonly) BOOL USE_PERMISSION_SET __attribute__((swift_name("USE_PERMISSION_SET")));
 @end
 
 
@@ -4047,10 +4725,9 @@ __attribute__((swift_name("NotificationStyleSummary")))
 /**
  * Shared pagination policy for `com.atproto.repo.listRecords`.
  *
- * Both platforms page through a repo's records to completion, capped so a
- * misbehaving PDS returning an endless cursor can't hang the caller forever.
- * Previously iOS capped at 1,000 records and Android at 500 for the same
- * kind of call — this unifies the two.
+ * Both platforms page through a repo's records to completion. Safety against
+ * non-progressing or endless cursors belongs to each transport's page-budget
+ * and repeated-cursor guards, not to a silent record-count truncation.
  */
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("RecordListPolicy")))
@@ -4060,17 +4737,13 @@ __attribute__((swift_name("RecordListPolicy")))
 /**
  * Shared pagination policy for `com.atproto.repo.listRecords`.
  *
- * Both platforms page through a repo's records to completion, capped so a
- * misbehaving PDS returning an endless cursor can't hang the caller forever.
- * Previously iOS capped at 1,000 records and Android at 500 for the same
- * kind of call — this unifies the two.
+ * Both platforms page through a repo's records to completion. Safety against
+ * non-progressing or endless cursors belongs to each transport's page-budget
+ * and repeated-cursor guards, not to a silent record-count truncation.
  */
 + (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
 + (instancetype)recordListPolicy __attribute__((swift_name("init()")));
 @property (class, readonly, getter=shared) InkwellSharedRecordListPolicy *shared __attribute__((swift_name("shared")));
-
-/** Maximum records to accumulate before giving up on further pages. */
-@property (readonly) int32_t MAX_RECORDS __attribute__((swift_name("MAX_RECORDS")));
 
 /** Records requested per page. */
 @property (readonly) int32_t PAGE_LIMIT __attribute__((swift_name("PAGE_LIMIT")));
@@ -4145,31 +4818,13 @@ __attribute__((swift_name("SupportersList")))
 @property (readonly) NSString *URI __attribute__((swift_name("URI")));
 @end
 
-
-/**
- * Shared number formatting utility for displaying counts
- * (likes, reposts, replies) in abbreviated form.
- *
- * Used by both platforms' Bluesky post embed rendering.
- */
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("NumberFormat")))
 @interface InkwellSharedNumberFormat : InkwellSharedBase
 + (instancetype)alloc __attribute__((unavailable));
-
-/**
- * Shared number formatting utility for displaying counts
- * (likes, reposts, replies) in abbreviated form.
- *
- * Used by both platforms' Bluesky post embed rendering.
- */
 + (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
 + (instancetype)numberFormat __attribute__((swift_name("init()")));
 @property (class, readonly, getter=shared) InkwellSharedNumberFormat *shared __attribute__((swift_name("shared")));
-
-/**
- * Abbreviates a count: 1500000 → "1M", 2300 → "2K", 42 → "42".
- */
 - (NSString *)formatCountCount:(int32_t)count __attribute__((swift_name("formatCount(count:)")));
 @end
 
@@ -4382,6 +5037,58 @@ __attribute__((swift_name("JsonSafety")))
 @end
 
 
+/**
+ * Conservative ceiling for an encoded AT Protocol record.
+ *
+ * The protocol treats 1 MiB (1,048,576 bytes) as the practical maximum and
+ * the sync protocol enforces a hard 1,000,000-byte record-block limit in
+ * commit events (see https://atproto.com/specs/sync). Inkwell leaves
+ * headroom below that for record metadata/CBOR-vs-JSON encoding overhead.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("RecordSizePolicy")))
+@interface InkwellSharedRecordSizePolicy : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Conservative ceiling for an encoded AT Protocol record.
+ *
+ * The protocol treats 1 MiB (1,048,576 bytes) as the practical maximum and
+ * the sync protocol enforces a hard 1,000,000-byte record-block limit in
+ * commit events (see https://atproto.com/specs/sync). Inkwell leaves
+ * headroom below that for record metadata/CBOR-vs-JSON encoding overhead.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)recordSizePolicy __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedRecordSizePolicy *shared __attribute__((swift_name("shared")));
+- (BOOL)exceedsLimitEncodedByteCount:(int32_t)encodedByteCount __attribute__((swift_name("exceedsLimit(encodedByteCount:)")));
+
+/**
+ * Truncates [text] to at most [limit] UTF-8 bytes without splitting a
+ * Unicode scalar, appending [TEXT_CONTENT_TRUNCATION_SUFFIX] when the
+ * value was shortened. Returns the input unchanged when it already fits,
+ * and null when nothing meaningful survives the budget.
+ */
+- (NSString * _Nullable)truncateTextContentText:(NSString * _Nullable)text limit:(int32_t)limit __attribute__((swift_name("truncateTextContent(text:limit:)")));
+@property (readonly) int32_t MAX_DOCUMENT_RECORD_BYTES __attribute__((swift_name("MAX_DOCUMENT_RECORD_BYTES")));
+
+/**
+ * Budget for a document record's portable `textContent`.
+ *
+ * `textContent` is an indexing/search convenience, not the document's
+ * canonical content: when authored content spills into a format's
+ * blob-backed representation (markpub `textBlob`, Leaflet `blobPages`)
+ * the plaintext copy must not be the thing keeping the record oversized.
+ * Capping it keeps the field useful — the opening of a document is what
+ * search reads — without letting it dominate the record.
+ */
+@property (readonly) int32_t MAX_INLINE_TEXT_CONTENT_BYTES __attribute__((swift_name("MAX_INLINE_TEXT_CONTENT_BYTES")));
+
+/** Marks a truncated `textContent` so consumers don't read it as complete. */
+@property (readonly) NSString *TEXT_CONTENT_TRUNCATION_SUFFIX __attribute__((swift_name("TEXT_CONTENT_TRUNCATION_SUFFIX")));
+@end
+
+
 /** Field-level validation shared by the Standard.site writers. */
 __attribute__((objc_subclassing_restricted))
 __attribute__((swift_name("StandardSiteValidation")))
@@ -4393,6 +5100,17 @@ __attribute__((swift_name("StandardSiteValidation")))
 + (instancetype)standardSiteValidation __attribute__((swift_name("init()")));
 @property (class, readonly, getter=shared) InkwellSharedStandardSiteValidation *shared __attribute__((swift_name("shared")));
 - (NSArray<InkwellSharedStandardSiteValidationError *> *)validateDocumentInput:(InkwellSharedStandardSiteValidationDocumentInput *)input __attribute__((swift_name("validateDocument(input:)")));
+
+/**
+ * Validates the document's optional metadata layer.
+ *
+ * Kept separate from [validateDocument] so a Writer can surface a bad tag or
+ * contributor against the field the user was editing rather than failing the
+ * whole publish with one message. Limits come from the Lexicon: tags 128
+ * graphemes / 1,280 bytes, contributor role and displayName 100 graphemes /
+ * 1,000 bytes.
+ */
+- (NSArray<InkwellSharedStandardSiteValidationError *> *)validateMetadataMetadata:(InkwellSharedDocumentMetadata *)metadata __attribute__((swift_name("validateMetadata(metadata:)")));
 - (NSArray<InkwellSharedStandardSiteValidationError *> *)validatePublicationUrl:(NSString *)url name:(NSString *)name description:(NSString * _Nullable)description __attribute__((swift_name("validatePublication(url:name:description:)")));
 @end
 
@@ -4620,6 +5338,14 @@ __attribute__((swift_name("XrpcEndpoints")))
  * required fields are missing.
  */
 - (InkwellSharedCachedFeedItem * _Nullable)toCachedFeedItem __attribute__((swift_name("toCachedFeedItem()")));
+@end
+
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("JetstreamEventKt")))
+@interface InkwellSharedJetstreamEventKt : InkwellSharedBase
+
+/** Independent cap for untrusted WebSocket text frames before JSON decoding. */
+@property (class, readonly) int32_t MAX_JETSTREAM_FRAME_BYTES __attribute__((swift_name("MAX_JETSTREAM_FRAME_BYTES")));
 @end
 
 __attribute__((objc_subclassing_restricted))
