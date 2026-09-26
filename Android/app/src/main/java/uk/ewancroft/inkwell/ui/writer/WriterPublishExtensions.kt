@@ -8,6 +8,7 @@ import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
+import uk.ewancroft.inkwell.data.remote.BSkyPostFetcher
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 import uk.ewancroft.inkwell.shared.validation.RecordSizePolicy
 import uk.ewancroft.inkwell.shared.validation.StandardSiteValidation
@@ -30,7 +31,7 @@ fun WriterViewModel.publish() {
             path = state.path.trim().ifBlank { null },
             publishedAt = "pending",
         ),
-    ).firstOrNull()
+    ).plus(StandardSiteValidation.validateMetadata(state.metadata.toDocumentMetadata())).firstOrNull()
     if (validationError != null) {
         uiStateInternal.value = state.copy(publishError = "${validationError.field}: ${validationError.message}")
         return
@@ -54,6 +55,8 @@ fun WriterViewModel.publish() {
                 }
             }
 
+            val metadata = resolveBskyPostRef(state.metadata) { uri -> BSkyPostFetcher.fetchPost(uri)?.cid }
+
             val uploader = BlobUploader { bytes, mimeType -> pdsRepository.uploadBlob(bytes, mimeType) }
 
             if (state.editingDocumentUri != null) {
@@ -72,7 +75,7 @@ fun WriterViewModel.publish() {
                     uploadedBlobs = state.uploadedBlobs,
                     uploader = uploader,
                 ) { content, textContent ->
-                    mergeExistingDocumentRecord(state.editingDocumentRecord) {
+                    val merged = mergeExistingDocumentRecord(state.editingDocumentRecord) {
                         put("\$type", CollectionNsids.DOCUMENT)
                         put("site", pub.uri)
                         put("title", state.title.trim())
@@ -88,6 +91,7 @@ fun WriterViewModel.publish() {
                             put("textContent", textContent)
                         }
                     }
+                    applyDocumentMetadata(merged, metadata)
                 }
 
                 pdsRepository.updateRecord(
@@ -103,6 +107,7 @@ fun WriterViewModel.publish() {
                     editingDocumentUri = null,
                     editingDocumentRecordCID = null,
                 )
+                setMetadata(metadata)
             } else {
                 val record = buildFittingDocumentRecord(
                     markdown = state.markdown,
@@ -110,7 +115,7 @@ fun WriterViewModel.publish() {
                     uploadedBlobs = state.uploadedBlobs,
                     uploader = uploader,
                 ) { content, textContent ->
-                    buildJsonObject {
+                    val built = buildJsonObject {
                         put("\$type", CollectionNsids.DOCUMENT)
                         put("site", pub.uri)
                         put("title", state.title.trim())
@@ -126,6 +131,7 @@ fun WriterViewModel.publish() {
                             put("textContent", textContent)
                         }
                     }
+                    applyDocumentMetadata(built, metadata)
                 }
 
                 val result = pdsRepository.createRecord(
@@ -144,8 +150,14 @@ fun WriterViewModel.publish() {
                     markdown = "",
                     uploadedBlobs = emptyMap(),
                 )
+                setMetadata(WriterMetadataDraft())
             }
         } catch (e: DocumentTooLargeException) {
+            uiStateInternal.value = uiStateInternal.value.copy(
+                isPublishing = false,
+                publishError = e.message,
+            )
+        } catch (e: WriterMetadataException) {
             uiStateInternal.value = uiStateInternal.value.copy(
                 isPublishing = false,
                 publishError = e.message,

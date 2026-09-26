@@ -12,9 +12,17 @@ object ImageUploadSanitizer {
     private const val MAX_DIMENSION = 8_192
     private const val MAX_PIXELS = 40_000_000L
 
+    private const val DOWNSCALE_FACTOR = 0.75f
+    private const val MAX_DOWNSCALE_STEPS = 8
+
     data class Output(val bytes: ByteArray, val mimeType: String)
 
-    fun sanitize(bytes: ByteArray): Output {
+    /**
+     * @param maxOutputBytes when set, the re-encoded image is progressively
+     *   downscaled until it fits — used for fields with a Lexicon `maxSize`,
+     *   such as a document's cover image.
+     */
+    fun sanitize(bytes: ByteArray, maxOutputBytes: Int? = null): Output {
         require(bytes.size <= MAX_INPUT_BYTES) { "That image file is too large to process safely." }
         require(!GifAnimationDetector.isAnimated(bytes)) {
             "Animated images are not supported for upload. Choose a still image."
@@ -39,11 +47,42 @@ object ImageUploadSanitizer {
             Bitmap.CompressFormat.JPEG
         }
         val mimeType = if (format == Bitmap.CompressFormat.PNG) "image/png" else "image/jpeg"
-        val output = ByteArrayOutputStream()
-        check(oriented.compress(format, 90, output)) { "The image could not be prepared for upload." }
         if (oriented !== decoded) decoded.recycle()
+        val encoded = encode(oriented, format)
+        val fitted = if (maxOutputBytes == null) encoded else fitWithin(oriented, format, encoded, maxOutputBytes)
         oriented.recycle()
-        return Output(output.toByteArray(), mimeType)
+        return Output(fitted, mimeType)
+    }
+
+    private fun encode(bitmap: Bitmap, format: Bitmap.CompressFormat): ByteArray {
+        val output = ByteArrayOutputStream()
+        check(bitmap.compress(format, 90, output)) { "The image could not be prepared for upload." }
+        return output.toByteArray()
+    }
+
+    /** Rescales from [source] each step so quality loss does not compound. */
+    private fun fitWithin(
+        source: Bitmap,
+        format: Bitmap.CompressFormat,
+        initial: ByteArray,
+        maxBytes: Int,
+    ): ByteArray {
+        var encoded = initial
+        var scale = 1f
+        repeat(MAX_DOWNSCALE_STEPS) {
+            if (encoded.size <= maxBytes) return encoded
+            scale *= DOWNSCALE_FACTOR
+            val scaled = Bitmap.createScaledBitmap(
+                source,
+                (source.width * scale).toInt().coerceAtLeast(1),
+                (source.height * scale).toInt().coerceAtLeast(1),
+                true,
+            )
+            encoded = encode(scaled, format)
+            if (scaled !== source) scaled.recycle()
+        }
+        require(encoded.size <= maxBytes) { "That image could not be made small enough. Choose a simpler image." }
+        return encoded
     }
 
     private fun containsTransparency(bitmap: Bitmap): Boolean {

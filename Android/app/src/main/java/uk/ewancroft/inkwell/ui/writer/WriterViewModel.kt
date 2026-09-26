@@ -1,6 +1,7 @@
 package uk.ewancroft.inkwell.ui.writer
 
 import android.content.Context
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,10 +28,15 @@ import javax.inject.Inject
 class WriterViewModel @Inject constructor(
     internal val pdsRepository: PdsRepository,
     @ApplicationContext internal val context: Context,
+    internal val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     internal val uiStateInternal = MutableStateFlow(WriterUiState())
     val uiState: StateFlow<WriterUiState> = uiStateInternal.asStateFlow()
+
+    init {
+        restoreMetadataDraft()
+    }
 
     fun selectPublication(publication: PublicationItem) {
         uiStateInternal.value = uiStateInternal.value.copy(
