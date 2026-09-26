@@ -73,6 +73,29 @@
             </intent-filter>
 
             <!--
+              Verified HTTPS hand-off (Android App Links): a canonical
+              https://inkwell.ewancroft.uk/open?uri=<AT-URI> link, distinct
+              from both the inkwell://document custom scheme above and the
+              OAuth callback below. autoVerify requires the domain to serve
+              /.well-known/assetlinks.json (see
+              website/src/routes/.well-known/assetlinks.json/+server.ts).
+              Unlike the custom scheme, a link arriving here is only an *unverified
+              claim* about an AT-URI — HttpsDeepLinkPolicy/HttpsDeepLinkResolver
+              (see the deeplink package) confirm it against the author's own
+              PDS record and published discovery link before routing into the
+              Reader, falling back to the browser otherwise.
+            -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="inkwell.ewancroft.uk"
+                    android:pathPrefix="/open" />
+            </intent-filter>
+
+            <!--
               OAuth redirect: captures the PDS authorization callback.
               The path is part of the contract: do not route arbitrary
               uk.ewancroft.inkwell: links into the OAuth handler.
