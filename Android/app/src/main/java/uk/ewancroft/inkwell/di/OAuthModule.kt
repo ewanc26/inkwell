@@ -11,7 +11,7 @@ import io.github.kikin81.atproto.oauth.OAuthSessionStore
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import uk.ewancroft.inkwell.data.auth.AndroidOAuthSessionStore
-import uk.ewancroft.inkwell.shared.oauth.OAuthScopes
+import uk.ewancroft.inkwell.shared.oauth.InkwellOAuthScopes
 import javax.inject.Singleton
 
 @Module
@@ -22,23 +22,16 @@ object OAuthModule {
         "https://inkwell.ewancroft.uk/client-metadata.json"
     private const val REDIRECT_URI = "uk.ewancroft.inkwell:/callback"
 
-    internal val SCOPE = listOf(
-        OAuthScopes.ATPROTO,
-        OAuthScopes.BLOB_ALL,
-        OAuthScopes.REPO_PUBLICATION,
-        OAuthScopes.REPO_DOCUMENT,
-        OAuthScopes.REPO_SUBSCRIPTION,
-        OAuthScopes.REPO_RECOMMEND,
-        OAuthScopes.REPO_LEAFLET_COMMENT,
-        OAuthScopes.REPO_USERINPUT_DISCUSSION,
-        OAuthScopes.REPO_USER,
-        "repo:app.bsky.graph.block?action=create&action=delete",
-        "rpc:app.bsky.graph.muteActor?aud=did:web:api.bsky.app%23bsky_appview",
-        "rpc:app.bsky.graph.unmuteActor?aud=did:web:api.bsky.app%23bsky_appview",
-        "rpc:app.bsky.graph.getMutes?aud=did:web:api.bsky.app%23bsky_appview",
-        "rpc:app.bsky.graph.getBlocks?aud=did:web:api.bsky.app%23bsky_appview",
-        "rpc:com.atproto.moderation.createReport?aud=did:web:api.bsky.app%23bsky_appview",
-    ).joinToString(" ")
+    /**
+     * The OAuth scope string sent at authorization time.
+     *
+     * Composed in shared KMP so Android, iOS and the three hosted `client-metadata.json`
+     * copies cannot drift. Whether the Standard.site block is requested as four granular
+     * `repo:` scopes or as `include:site.standard.authFull` is decided by
+     * `StandardSitePermissionSets.USE_PERMISSION_SET`; both forms are declared in client
+     * metadata, so flipping it needs no metadata redeploy.
+     */
+    internal val SCOPE = InkwellOAuthScopes.runtimeScopeString()
 
     @Provides
     @Singleton

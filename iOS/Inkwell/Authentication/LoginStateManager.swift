@@ -75,21 +75,6 @@ final class LoginStateManager {
 
     // MARK: - Client Metadata
 
-    /// The OAuth client metadata for Inkwell.
-    ///
-    /// The `clientId` URL must serve the `client-metadata.json` file
-    /// found in the repo's `oauth/` directory. In production this is
-    /// `https://inkwell.ewancroft.uk/client-metadata.json`.
-    ///
-    /// Scopes follow the AT Protocol granular permission model
-    /// (`atproto.com/specs/permission`). Inkwell requests access to:
-    /// - Four `site.standard.*` collections (publications, documents,
-    ///   subscriptions, recommends) for full CRUD.
-    /// - `blob:*/*` for downloading media blobs via `sync.getBlob`.
-    /// - `app.userinput.discussion` for in-app feedback.
-    /// - `uk.ewancroft.inkwell.user` for the Inkwell-user declaration record.
-    /// - Bluesky personal moderation RPCs plus create/delete access to
-    ///   `app.bsky.graph.block`, matching the moderation UI on both platforms.
     /// Percent-encodes the characters that OAuthenticator's PAR form-body
     /// builder fails to encode. The library joins key=value pairs with raw
     /// `&` and `=` — no percent-encoding — so `&`, `=`, `+`, and `%` inside
@@ -102,24 +87,18 @@ final class LoginStateManager {
         return scope.addingPercentEncoding(withAllowedCharacters: allowed) ?? scope
     }
 
+    /// The OAuth client metadata for Inkwell.
+    ///
+    /// The `clientId` URL must serve the `client-metadata.json` file
+    /// found in the repo's `oauth/` directory. In production this is
+    /// `https://inkwell.ewancroft.uk/client-metadata.json`.
+    ///
+    /// Scopes follow the AT Protocol granular permission model
+    /// (`atproto.com/specs/permission`) and are assembled by
+    /// ``InkwellOAuthScopes``, which documents the Standard.site
+    /// permission-set decision and the client-metadata superset rule.
     var appCredentials: AppCredentials {
-        let rawScopes = [
-            sharedOAuthScopeAtproto(),
-            sharedOAuthScopeBlobAll(),
-            sharedOAuthScopeRepoPublication(),
-            sharedOAuthScopeRepoDocument(),
-            sharedOAuthScopeRepoSubscription(),
-            sharedOAuthScopeRepoRecommend(),
-            sharedOAuthScopeRepoLeafletComment(),
-            sharedOAuthScopeRepoUserInputDiscussion(),
-            "repo:uk.ewancroft.inkwell.user",
-            "repo:app.bsky.graph.block?action=create&action=delete",
-            "rpc:app.bsky.graph.muteActor?aud=did:web:api.bsky.app%23bsky_appview",
-            "rpc:app.bsky.graph.unmuteActor?aud=did:web:api.bsky.app%23bsky_appview",
-            "rpc:app.bsky.graph.getMutes?aud=did:web:api.bsky.app%23bsky_appview",
-            "rpc:app.bsky.graph.getBlocks?aud=did:web:api.bsky.app%23bsky_appview",
-            "rpc:com.atproto.moderation.createReport?aud=did:web:api.bsky.app%23bsky_appview",
-        ]
+        let rawScopes = InkwellOAuthScopes.requested()
         return AppCredentials(
             clientId: "https://inkwell.ewancroft.uk/client-metadata.json",
             clientPassword: "",
