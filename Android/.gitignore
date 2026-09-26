@@ -9,6 +9,7 @@
 .cxx
 local.properties
 /app/build
+/lint-rules/build
 gradle/gradle-daemon-jvm.properties
 .letta/
 

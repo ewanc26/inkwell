@@ -146,4 +146,10 @@ dependencies {
 
     // -- Shared KMP core --
     implementation(project(":shared"))
+
+    // -- Custom lint checks --
+    // Registers ComposeHardcodedTextDetector (and any future detectors) into
+    // every `./gradlew :app:lint` run without adding to the app's runtime
+    // dependency graph. See lint-rules/build.gradle.kts.
+    lintChecks(project(":lint-rules"))
 }
