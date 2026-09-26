@@ -1,0 +1,24 @@
+{
+  "id": "site.standard.authFull",
+  "defs": {
+    "main": {
+      "type": "permission-set",
+      "title": "Standard.site",
+      "detail": "Manage your publications, documents, subscriptions, and recommends.",
+      "permissions": [
+        {
+          "type": "permission",
+          "resource": "repo",
+          "collection": [
+            "site.standard.publication",
+            "site.standard.document",
+            "site.standard.graph.subscription",
+            "site.standard.graph.recommend"
+          ]
+        }
+      ]
+    }
+  },
+  "$type": "com.atproto.lexicon.schema",
+  "lexicon": 1
+}

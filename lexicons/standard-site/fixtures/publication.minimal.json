@@ -1,0 +1,5 @@
+{
+  "$type": "site.standard.publication",
+  "url": "https://example.publication.test",
+  "name": "A publication with only the required fields"
+}
