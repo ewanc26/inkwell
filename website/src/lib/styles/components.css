@@ -350,6 +350,33 @@
     text-decoration: none;
   }
 
+  /* Language switcher. Sits on its own row under the footer links, set
+     apart by a hairline rule so it reads as a distinct control rather
+     than more footer navigation. */
+  .footer-langs {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-xs) var(--space-md);
+    border-top: 1px solid var(--surface-color);
+    padding-top: var(--space-sm);
+  }
+
+  .footer-langs-label {
+    font-family: var(--font-mono);
+    color: var(--color-text-500);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* The active language is a link to the page you are already on, so it
+     is marked rather than hidden: still focusable and still navigable,
+     but visibly the current choice. */
+  .footer-langs .footer-link[aria-current="true"] {
+    color: var(--color-text-950);
+    font-weight: 600;
+  }
+
   @media (max-width: 800px) {
     .footer-bottom {
       flex-direction: column;
