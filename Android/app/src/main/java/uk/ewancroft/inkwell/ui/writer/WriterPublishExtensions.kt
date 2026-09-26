@@ -108,6 +108,7 @@ fun WriterViewModel.publish() {
                     editingDocumentRecordCID = null,
                 )
                 setMetadata(metadata)
+                onDraftPublished()
             } else {
                 val record = buildFittingDocumentRecord(
                     markdown = state.markdown,
@@ -151,6 +152,7 @@ fun WriterViewModel.publish() {
                     uploadedBlobs = emptyMap(),
                 )
                 setMetadata(WriterMetadataDraft())
+                onDraftPublished()
             }
         } catch (e: DocumentTooLargeException) {
             uiStateInternal.value = uiStateInternal.value.copy(

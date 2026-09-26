@@ -152,6 +152,9 @@ dependencies {
 
     implementation(libs.work.runtime.ktx)
 
+    // Writer draft autosave (data/draft/WriterDraftStore.kt)
+    implementation(libs.datastore.preferences)
+
     implementation(libs.atproto.runtime)
     implementation(libs.atproto.models)
     implementation(libs.atproto.oauth)

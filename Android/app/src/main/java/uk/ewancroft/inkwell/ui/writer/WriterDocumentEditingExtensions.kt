@@ -1,14 +1,14 @@
 package uk.ewancroft.inkwell.ui.writer
 
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.put
 import uk.ewancroft.inkwell.shared.content.ContentFormatDetector
+import uk.ewancroft.inkwell.shared.draft.WriterDraftPolicy
 import uk.ewancroft.inkwell.shared.content.ContentFormatDispatcher
 import uk.ewancroft.inkwell.shared.content.JsonMapBridge
 import uk.ewancroft.inkwell.shared.markdown.MarkdownSerializer
@@ -35,71 +35,90 @@ internal fun editDocumentErrorMessage(error: Throwable): String {
 }
 
 fun WriterViewModel.loadDocumentForEditing(uri: String) {
-    viewModelScope.launch {
-        uiStateInternal.value = uiStateInternal.value.copy(isEditing = true, publishError = null)
-        try {
-            val record = pdsRepository.getRecord(uri)
-            val value = record["value"]?.jsonObject ?: throw IllegalStateException("Missing document value")
-            val cid = record["cid"]?.jsonPrimitive?.content ?: throw IllegalStateException("Missing revision")
+    viewModelScope.launch { loadDocumentForEditingNow(uri) }
+}
 
-            val title = value["title"]?.jsonPrimitive?.content ?: ""
-            val description = value["description"]?.jsonPrimitive?.contentOrNull ?: ""
-            val path = value["path"]?.jsonPrimitive?.contentOrNull ?: ""
+/**
+ * Loads [uri] into the editor, then reconciles any autosaved draft for it:
+ * a draft based on the current revision is applied on top, while one based
+ * on an older revision is held in [WriterUiState.draftConflict] for the user
+ * to choose rather than silently winning or losing.
+ */
+internal suspend fun WriterViewModel.loadDocumentForEditingNow(uri: String) {
+    uiStateInternal.value = uiStateInternal.value.copy(isEditing = true, publishError = null)
+    try {
+        val record = pdsRepository.getRecord(uri)
+        val value = record["value"]?.jsonObject ?: throw IllegalStateException("Missing document value")
+        val cid = record["cid"]?.jsonPrimitive?.content ?: throw IllegalStateException("Missing revision")
 
-            // Blob-backed documents keep their payload in a PDS blob rather than
-            // inline, so resolve it before converting to markdown — otherwise the
-            // editor would open empty and a re-save would blank the document.
-            val authorDid = uk.ewancroft.inkwell.shared.AtUri.parse(uri)?.did
-                ?: throw IllegalArgumentException("Invalid document URI")
-            val content = pdsRepository.resolveBlobBackedContent(value["content"]?.jsonObject, authorDid)
-            val contentType = content?.get("\$type")?.jsonPrimitive?.contentOrNull
-            val format = when (contentType) {
-                ContentFormatDetector.MARKPUB -> "Markpub"
-                ContentFormatDetector.PCKT -> "pckt"
-                ContentFormatDetector.OFFPRINT -> "Offprint"
-                else -> "Leaflet"
-            }
+        val title = value["title"]?.jsonPrimitive?.content ?: ""
+        val description = value["description"]?.jsonPrimitive?.contentOrNull ?: ""
+        val path = value["path"]?.jsonPrimitive?.contentOrNull ?: ""
 
-            // Convert content to markdown via shared KMP for loss reporting
-            val markdownResult = if (content != null) {
-                val contentMap = JsonMapBridge.jsonToMap(content)
-                ContentFormatDispatcher.toMarkdown(contentMap)
-            } else null
-
-            val markdownText = markdownResult?.let {
-                MarkdownSerializer.serialize(it.blocks)
-            } ?: value["textContent"]?.jsonPrimitive?.contentOrNull ?: ""
-
-            val lostFeatures = markdownResult?.lost?.toList() ?: emptyList()
-
-            val existingBlobs = harvestBlobRefs(markdownText)
-
-            uiStateInternal.value = uiStateInternal.value.copy(
-                editingDocumentUri = uri,
-                editingDocumentTitle = title,
-                editingDocumentDescription = description,
-                editingDocumentPath = path,
-                editingDocumentMarkdown = markdownText,
-                editingDocumentRecordCID = cid,
-                editingDocumentRecord = value,
-                title = title,
-                description = description,
-                path = path,
-                markdown = markdownText,
-                selectedFormat = format,
-                uploadedBlobs = existingBlobs,
-                lostFeatures = lostFeatures,
-                verifiedPublicationUri = null,
-                verificationMessage = null,
-                isEditing = false,
-            )
-            setMetadata(WriterMetadataDraft.fromRecord(value))
-        } catch (e: Exception) {
-            uiStateInternal.value = uiStateInternal.value.copy(
-                isEditing = false,
-                publishError = "Failed to load document: ${e.message}",
-            )
+        // Blob-backed documents keep their payload in a PDS blob rather than
+        // inline, so resolve it before converting to markdown — otherwise the
+        // editor would open empty and a re-save would blank the document.
+        val authorDid = uk.ewancroft.inkwell.shared.AtUri.parse(uri)?.did
+            ?: throw IllegalArgumentException("Invalid document URI")
+        val content = pdsRepository.resolveBlobBackedContent(value["content"]?.jsonObject, authorDid)
+        val contentType = content?.get("\$type")?.jsonPrimitive?.contentOrNull
+        val format = when (contentType) {
+            ContentFormatDetector.MARKPUB -> "Markpub"
+            ContentFormatDetector.PCKT -> "pckt"
+            ContentFormatDetector.OFFPRINT -> "Offprint"
+            else -> "Leaflet"
         }
+
+        // Convert content to markdown via shared KMP for loss reporting
+        val markdownResult = if (content != null) {
+            val contentMap = JsonMapBridge.jsonToMap(content)
+            ContentFormatDispatcher.toMarkdown(contentMap)
+        } else null
+
+        val markdownText = markdownResult?.let {
+            MarkdownSerializer.serialize(it.blocks)
+        } ?: value["textContent"]?.jsonPrimitive?.contentOrNull ?: ""
+
+        val lostFeatures = markdownResult?.lost?.toList() ?: emptyList()
+
+        val existingBlobs = harvestBlobRefs(markdownText)
+
+        // Read before the editor changes, so autosave cannot clear it first.
+        val storedDraft = accountDid?.let { draftStore.load(it) }?.takeIf { it.editingDocumentUri == uri }
+        val conflict = storedDraft?.takeIf { WriterDraftPolicy.hasRevisionConflict(it, uri, cid) }
+
+        uiStateInternal.value = uiStateInternal.value.copy(
+            editingDocumentUri = uri,
+            editingDocumentTitle = title,
+            editingDocumentDescription = description,
+            editingDocumentPath = path,
+            editingDocumentMarkdown = markdownText,
+            editingDocumentRecordCID = cid,
+            editingDocumentRecord = value,
+            title = title,
+            description = description,
+            path = path,
+            markdown = markdownText,
+            selectedFormat = format,
+            uploadedBlobs = existingBlobs,
+            lostFeatures = lostFeatures,
+            verifiedPublicationUri = null,
+            verificationMessage = null,
+            isEditing = false,
+            draftRestored = false,
+            showDraftBanner = false,
+            draftConflict = conflict,
+        )
+        setMetadata(WriterMetadataDraft.fromRecord(value))
+        markDraftSettled()
+        if (storedDraft != null && conflict == null) applyDraft(storedDraft)
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        uiStateInternal.value = uiStateInternal.value.copy(
+            isEditing = false,
+            publishError = "Failed to load document: ${e.message}",
+        )
     }
 }
 
@@ -108,7 +127,7 @@ private fun harvestBlobRefs(markdown: String?): Map<String, JsonObject> {
     val regex = Regex("^!\\[([^\\]]*)\\]\\(([^)]+)\\)$", RegexOption.MULTILINE)
     return regex.findAll(markdown).associate {
         val url = it.groupValues[2]
-        url to buildJsonObject { put("\$link", url) }
+        url to blobRefStub(url)
     }
 }
 
@@ -151,6 +170,8 @@ fun WriterViewModel.deleteDocument() {
                 isPublishing = false,
                 publishSuccess = "Document deleted.",
             )
+            // A draft of a deleted document has nothing left to publish into.
+            onDraftPublished()
         } catch (e: Exception) {
             uiStateInternal.value = uiStateInternal.value.copy(
                 isPublishing = false,

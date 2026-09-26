@@ -13,7 +13,9 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import uk.ewancroft.inkwell.data.draft.WriterDraftStore
 import uk.ewancroft.inkwell.data.model.atproto.PublicationRecord
+import uk.ewancroft.inkwell.shared.draft.WriterDraftSchema
 import uk.ewancroft.inkwell.shared.AtUri
 import uk.ewancroft.inkwell.data.remote.StandardSiteVerifier
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
@@ -29,13 +31,21 @@ class WriterViewModel @Inject constructor(
     internal val pdsRepository: PdsRepository,
     @ApplicationContext internal val context: Context,
     internal val savedStateHandle: SavedStateHandle,
+    internal val draftStore: WriterDraftStore,
 ) : ViewModel() {
 
     internal val uiStateInternal = MutableStateFlow(WriterUiState())
     val uiState: StateFlow<WriterUiState> = uiStateInternal.asStateFlow()
 
+    // Draft autosave bookkeeping; see WriterDraftExtensions.kt.
+    internal var accountDid: String? = null
+    internal var draftBaseline: WriterDraftSchema? = null
+    internal var draftWritten = false
+    internal var pendingDraftPublicationUri: String? = null
+
     init {
         restoreMetadataDraft()
+        restoreDraftAndStartAutosave()
     }
 
     fun selectPublication(publication: PublicationItem) {
@@ -202,11 +212,12 @@ class WriterViewModel @Inject constructor(
                 }
                 uiStateInternal.value = uiStateInternal.value.copy(
                     publications = pubs,
-                    selectedPublication = selecting?.let { uri ->
+                    selectedPublication = (selecting ?: pendingDraftPublicationUri)?.let { uri ->
                         pubs.firstOrNull { it.uri == uri }
                     } ?: pubs.firstOrNull(),
                     isLoadingPublications = false
                 )
+                pendingDraftPublicationUri = null
             } catch (e: Exception) {
                 uiStateInternal.value = uiStateInternal.value.copy(
                     isLoadingPublications = false,
