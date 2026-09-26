@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Instrumentation-only manifest additions.
+
+  HiltTestActivity is an empty @AndroidEntryPoint host for composable-level
+  tests (see HiltTestActivity.kt). It is not part of the shipped app and never
+  reaches the release manifest — this file is merged into the androidTest APK
+  only.
+
+  The theme is a framework one, not @style/Theme.Inkwell: the test APK links
+  against its own resource namespace and cannot see the app's styles. It only
+  has to be a valid no-action-bar host — every screen under test supplies its
+  own colours through InkwellTheme in Compose.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <activity
+            android:name="uk.ewancroft.inkwell.HiltTestActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.Material.Light.NoActionBar" />
+    </application>
+</manifest>
