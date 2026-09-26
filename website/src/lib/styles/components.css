@@ -25,6 +25,17 @@
     padding-inline: clamp(var(--space-md), 4vw, var(--space-lg));
   }
 
+  /* ── Hero wrap — full-width tonal background ────────────────── */
+
+  /* The hero floats on a subtly tinted surface so it reads as the
+     product's entry point rather than just another section. The
+     border-bottom hairline separates it from the download section. */
+  .hero-wrap {
+    background-color: var(--surface-raised);
+    border-bottom: 1px solid var(--surface-color);
+    margin-bottom: var(--space-xl);
+  }
+
   /* ── Page header ───────────────────────────────────────────── */
 
   .page-hd {
@@ -152,6 +163,15 @@
     background-color: var(--surface-sunken);
     border-color: var(--color-primary-500);
     color: var(--color-primary-700);
+  }
+
+  /* Placeholder buttons (store listings not yet live) — rendered as
+     spans, not anchors, so they are non-interactive but still visible.
+     Reduced opacity signals "coming soon" without removing context. */
+  span.btn-outline {
+    opacity: 0.5;
+    cursor: default;
+    user-select: none;
   }
 
   /* ── Site navigation ───────────────────────────────────────── */
@@ -705,6 +725,40 @@
   }
 
   /* ── Screenshot frames ─────────────────────────────────────── */
+
+  /* Horizontal scroll gallery — screenshots sit on one line and scroll
+     rather than wrapping, which produces ragged half-rows on narrow
+     screens. The gradient fade hints that more items exist off-screen. */
+  .screenshot-row {
+    display: flex;
+    gap: var(--space-lg);
+    overflow-x: auto;
+    padding-bottom: var(--space-md);
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    /* Mask the overflow with a right-side fade */
+    mask-image: linear-gradient(to right, black 85%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+  }
+
+  .screenshot-row::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .screenshot-row::-webkit-scrollbar-track {
+    background: var(--surface-raised);
+    border-radius: var(--radius-full);
+  }
+
+  .screenshot-row::-webkit-scrollbar-thumb {
+    background: var(--color-background-300);
+    border-radius: var(--radius-full);
+  }
+
+  .screenshot-fig {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+  }
 
   .screenshot-frame {
     border: 1px solid var(--surface-color);

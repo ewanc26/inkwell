@@ -14,8 +14,6 @@
   import {
     ALTSTORE_SOURCE_LINK,
     FDROID_REPO_LINK,
-    APP_STORE_PLACEHOLDER_LINK,
-    PLAY_STORE_PLACEHOLDER_LINK,
   } from "$lib/config";
   import {
     fmt,
@@ -64,6 +62,7 @@
 </script>
 
 <!-- Hero -->
+<div class="hero-wrap">
 <section class="site-container page-hd">
   <!--
     Wordmark SVG — mirrors InkwellMark.swift in the iOS app.
@@ -75,7 +74,7 @@
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 400 952"
     fill="none"
-    class="hero-mark mb-8 h-20 w-auto sm:h-24"
+    class="hero-mark mb-8 h-28 w-auto sm:h-36"
     aria-label={m.markLabel}
     role="img"
   >
@@ -115,43 +114,8 @@
       {m.hero.viewSource}
     </a>
   </div>
-
-  <div
-    class="hero-item mt-6 flex flex-wrap items-center gap-2"
-    style="--i: 4"
-    role="group"
-    aria-label={m.hero.badgesLabel}
-  >
-    <a href="https://github.com/ewanc26/inkwell/releases/latest">
-      <img
-        src="https://img.shields.io/github/v/release/ewanc26/inkwell?label=iOS&logo=apple&logoColor=white"
-        alt={m.hero.badgeAlt.ios}
-        height="20"
-      />
-    </a>
-    <a href="https://github.com/ewanc26/inkwell/releases/latest">
-      <img
-        src="https://img.shields.io/github/v/release/ewanc26/inkwell?label=Android&logo=android&logoColor=white"
-        alt={m.hero.badgeAlt.android}
-        height="20"
-      />
-    </a>
-    <a href="https://github.com/ewanc26/inkwell/blob/main/LICENSE">
-      <img
-        src="https://img.shields.io/github/license/ewanc26/inkwell"
-        alt={m.hero.badgeAlt.licence}
-        height="20"
-      />
-    </a>
-    <a href="https://github.com/sponsors/ewanc26">
-      <img
-        src="https://img.shields.io/github/sponsors/ewanc26?logo=githubsponsors&logoColor=white&label=sponsors"
-        alt={m.hero.badgeAlt.sponsor}
-        height="20"
-      />
-    </a>
-  </div>
 </section>
+</div>
 
 <!-- Download -->
 <section id="download" class="site-container scroll-mt-24 pb-12">
@@ -170,14 +134,10 @@
           <Download class="h-4 w-4" />
           {m.download.ios.addSource}
         </a>
-        <a
-          href={APP_STORE_PLACEHOLDER_LINK}
-          class="btn btn-outline active-press"
-          aria-label={m.download.ios.storeAria}
-        >
+        <span class="btn btn-outline" aria-label={m.download.ios.storeAria} title={m.download.ios.storeAria}>
           <Apple class="h-4 w-4" />
           {m.download.ios.store}
-        </a>
+        </span>
       </div>
       <p class="mt-3 text-sm text-muted">{@html rich(m.download.ios.note, locale)}</p>
     </div>
@@ -191,14 +151,10 @@
           <Download class="h-4 w-4" />
           {m.download.android.addSource}
         </a>
-        <a
-          href={PLAY_STORE_PLACEHOLDER_LINK}
-          class="btn btn-outline active-press"
-          aria-label={m.download.android.storeAria}
-        >
+        <span class="btn btn-outline" aria-label={m.download.android.storeAria} title={m.download.android.storeAria}>
           <Smartphone class="h-4 w-4" />
           {m.download.android.store}
-        </a>
+        </span>
       </div>
       <p class="mt-3 text-sm text-muted">
         {@html rich(m.download.android.note, locale)}
@@ -218,9 +174,9 @@
     {@const label = m.screenshots.platform[platform.dir]}
     <div class={platformIndex < PLATFORMS.length - 1 ? "mb-16" : ""}>
       <h3 class="section-heading">{label}</h3>
-      <div class="flex flex-wrap items-center justify-start gap-8">
+      <div class="screenshot-row">
         {#each SHOTS as shot, index (shot.key)}
-          <figure class="reveal" use:reveal={index}>
+          <figure class="reveal screenshot-fig" use:reveal={index}>
             <img
               src={`/screenshots/${platform.dir}/${shot.file}.png`}
               alt={fmt(m.screenshots.alt[shot.key], { platform: label })}
