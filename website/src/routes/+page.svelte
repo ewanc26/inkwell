@@ -411,7 +411,7 @@
       </dd>
       <dd class="compare-app">
         <span class="compare-label">In Inkwell</span>
-        Held in the Keychain or EncryptedSharedPreferences
+        Held in the Keychain or the Android Keystore
       </dd>
     </div>
     <div class="compare-row">

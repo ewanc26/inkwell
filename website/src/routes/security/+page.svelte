@@ -15,7 +15,7 @@
   <title>{SITE.title} — Security</title>
   <meta
     name="description"
-    content="How Inkwell handles authentication, key storage, and verification: OAuth 2.1 with DPoP-bound tokens, no app passwords, on-device Keychain/EncryptedSharedPreferences storage, and no analytics or tracking."
+    content="How Inkwell handles authentication, key storage, and verification: OAuth 2.1 with DPoP-bound tokens, no app passwords, on-device Keychain and Android Keystore storage, and no analytics or tracking."
   />
 </svelte:head>
 
@@ -61,10 +61,11 @@
       <p>
         Your OAuth session and DPoP private key are held in the
         platform's secure storage, not app-readable preferences: Apple's
-        Keychain on iOS, and Android's EncryptedSharedPreferences backed
-        by a hardware-backed MasterKey on Android. Android excludes the
-        OAuth session from backup and device transfer because the Keystore
-        key cannot be restored safely. Signing out or
+        Keychain on iOS, and on Android an AES-256-GCM envelope sealed
+        under a non-exportable key that lives in the Android Keystore,
+        hardware-backed where the device has a secure element. Android
+        excludes the OAuth session from backup and device transfer because
+        the Keystore key cannot be restored safely. Signing out or
         uninstalling removes them. Full detail — including backup
         behaviour on each platform — is in the
         <a href="/privacy">Privacy Policy</a>.

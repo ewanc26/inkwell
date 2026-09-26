@@ -2,10 +2,14 @@
 <data-extraction-rules>
     <cloud-backup>
         <!-- The Keystore key is not restorable with the encrypted session. -->
+        <exclude domain="sharedpref" path="inkwell_oauth_session_sealed.xml" />
+        <!-- The superseded EncryptedSharedPreferences file, still on disk until
+             the one-time migration in LegacySessionMigration has run. -->
         <exclude domain="sharedpref" path="inkwell_oauth_session.xml" />
     </cloud-backup>
     <device-transfer>
         <!-- Never transfer OAuth tokens, refresh state, or DPoP material. -->
+        <exclude domain="sharedpref" path="inkwell_oauth_session_sealed.xml" />
         <exclude domain="sharedpref" path="inkwell_oauth_session.xml" />
     </device-transfer>
 </data-extraction-rules>
