@@ -1,4 +1,17 @@
-import type { PageServerLoad } from "./$types";
+// ── Inkwell-user carousel data ───────────────────────────────────
+// Enumerates accounts that have published a `uk.ewancroft.inkwell.user`
+// record by querying Constellation backlinks to the canonical Inkwell app
+// URI, then resolves each DID to a verified handle (Slingshot) and an
+// avatar / display name (Bluesky AppView). Cached per instance for a short
+// window so we don't hammer the third-party services on every request.
+//
+// The landing page and /features both show this carousel, so the loader
+// lives here rather than being copied into each route's +page.server.ts —
+// two copies would drift, and the module-level cache would be duplicated
+// with it.
+//
+// Nothing here is locale-dependent: handles, DIDs, and display names are
+// user data from the network, not site copy.
 
 const CONSTELLATION = "https://constellation.microcosm.blue";
 const SLINGSHOT = "https://slingshot.microcosm.blue";
@@ -8,13 +21,9 @@ const BACKLINK_SOURCE = "uk.ewancroft.inkwell.user:app";
 const MAX_USERS = 48;
 const CACHE_TTL_MS = 10 * 60 * 1000;
 
-export const prerender = false;
+import type { InkwellUser } from "$lib/inkwellUser";
 
-export type InkwellUser = {
-  handle: string;
-  displayName: string | null;
-  avatar: string | null;
-};
+export type { InkwellUser };
 
 type Cache = { at: number; users: InkwellUser[] };
 let cache: Cache | null = null;
@@ -25,10 +34,8 @@ async function fetchJson(url: string): Promise<unknown> {
   return res.json();
 }
 
-export const load: PageServerLoad = async () => {
-  if (cache && Date.now() - cache.at < CACHE_TTL_MS) {
-    return { users: cache.users };
-  }
+export async function loadInkwellUsers(): Promise<InkwellUser[]> {
+  if (cache && Date.now() - cache.at < CACHE_TTL_MS) return cache.users;
 
   let users: InkwellUser[] = [];
   try {
@@ -76,5 +83,5 @@ export const load: PageServerLoad = async () => {
   }
 
   cache = { at: Date.now(), users };
-  return { users };
-};
+  return users;
+}

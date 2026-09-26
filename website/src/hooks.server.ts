@@ -1,4 +1,5 @@
 import type { Handle } from "@sveltejs/kit";
+import { LOCALES, resolveLocale } from "$lib/i18n/locales";
 
 const securityHeaders: Record<string, string> = {
   "Content-Security-Policy":
@@ -11,10 +12,35 @@ const securityHeaders: Record<string, string> = {
 };
 
 export const handle: Handle = async ({ event, resolve }) => {
-  const response = await resolve(event);
+  // Locale is a pure function of the path — no Accept-Language sniffing,
+  // so one URL only ever answers in one language and stays cacheable.
+  const { locale } = resolveLocale(event.url.pathname);
+  const definition = LOCALES[locale];
+  event.locals.locale = locale;
+
+  const response = await resolve(event, {
+    // `%lang%`/`%dir%` are placeholders in src/app.html. They only exist
+    // in the page shell, so endpoints (notably /client-metadata.json) are
+    // untouched by this transform.
+    //
+    // `replaceAll`, not `replace`: a chunk carrying the token twice would
+    // otherwise keep the second one, and a `%lang%` left in the markup is
+    // exactly the bug this attribute exists to prevent.
+    transformPageChunk: ({ html }) =>
+      html
+        .replaceAll("%lang%", definition.htmlLang)
+        .replaceAll("%dir%", definition.dir),
+  });
 
   for (const [name, value] of Object.entries(securityHeaders)) {
     response.headers.set(name, value);
+  }
+
+  // Only documents get Content-Language. /client-metadata.json is a
+  // protocol artefact consumed by PDS servers: its response must keep
+  // exactly the shape and headers it has always had.
+  if (response.headers.get("content-type")?.startsWith("text/html")) {
+    response.headers.set("Content-Language", definition.htmlLang);
   }
 
   return response;
