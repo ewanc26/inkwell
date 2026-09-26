@@ -1,151 +1,161 @@
 {
-  "name": "Inkwell",
-  "subtitle": "AT Protocol reader and writer for Standard.site",
-  "description": "A native SwiftUI reader and writer for the Standard.site publishing ecosystem on AT Protocol. Reads site.standard.publication and site.standard.document records, renders Leaflet and Markdown content, discovers publications via Constellation, and publishes documents with portable metadata.",
-  "website": "https://inkwell.ewancroft.uk",
-  "iconURL": "https://inkwell.ewancroft.uk/altstore/icon.png",
-  "tintColor": "#a6e3a1",
-  "featuredApps": [
-    "uk.ewancroft.Inkwell"
-  ],
-  "apps": [
-    {
-      "name": "Inkwell",
-      "bundleIdentifier": "uk.ewancroft.Inkwell",
-      "developerName": "Ewan Croft",
-      "subtitle": "Read and write on Standard.site via AT Protocol",
-      "localizedDescription": "A native SwiftUI reader and writer for the Standard.site publishing ecosystem on AT Protocol.\n\nRead — Reads site.standard.publication and site.standard.document records from their owning PDS, rendered in a three-tab layout (Read / Discover / Write). Renders Leaflet block content and Markpub/Offprint/pckt markdown formats. Resolves display themes from Leaflet's rich palette through basicTheme to system defaults.\n\nDiscover — Searches the cross-platform public index used by the Standard.site ecosystem, then fetches authoritative records directly from the author. Cross-repo comment discovery via Constellation (microcosm.blue).\n\nWrite — Publishes Standard.site documents with portable metadata and selectable content formats.\n\nAuthentication is OAuth-based with your AT Protocol handle — no app password needed. Silent session restoration from the Keychain on relaunch.",
-      "iconURL": "https://inkwell.ewancroft.uk/altstore/icon.png",
-      "tintColor": "#a6e3a1",
-      "category": "social",
-      "screenshots": [
-        "https://inkwell.ewancroft.uk/screenshots/ios/reader-6.5.png",
-        "https://inkwell.ewancroft.uk/screenshots/ios/discover-6.5.png",
-        "https://inkwell.ewancroft.uk/screenshots/ios/writer-6.5.png",
-        "https://inkwell.ewancroft.uk/screenshots/ios/post.png",
-        "https://inkwell.ewancroft.uk/screenshots/ios/reader-5.5.png"
-      ],
-      "versions": [
+    "name": "Inkwell",
+    "subtitle": "AT Protocol reader and writer for Standard.site",
+    "description": "A native SwiftUI reader and writer for the Standard.site publishing ecosystem on AT Protocol. Reads site.standard.publication and site.standard.document records, renders Leaflet and Markdown content, discovers publications via Constellation, and publishes documents with portable metadata.",
+    "website": "https://inkwell.ewancroft.uk",
+    "iconURL": "https://inkwell.ewancroft.uk/altstore/icon.png",
+    "tintColor": "#a6e3a1",
+    "featuredApps": [
+        "uk.ewancroft.Inkwell"
+    ],
+    "apps": [
         {
-          "version": "2.7.0",
-          "date": "2026-09-26",
-          "localizedDescription": "- fix(ci): repair three CI failures after 2.7.0\n- chore(release): bump versions and add 2.7.0 release notes\n- feat(ios): autosave and recover Writer drafts\n- feat(ios,standard-site): edit document metadata in the Writer\n- refactor(ios): move ImageDescriptionSheet into its own Writer file\n- fix(ios): interpolate field and limit in Standard.site validation errors\n- Merge branch 'worktree-agent-aea6a12bd2fada93c'\n- feat(ios,writer): spill oversized document bodies into blob-backed content\n- Merge branch 'worktree-agent-a3cad9a3538d13a39'\n- Merge branch 'worktree-agent-a565745a3c9585ca5'\n- feat(ios): verify universal-link hand-off before opening documents\n- fix(standard-site): add missing Leaflet page id and relax an unenforceable round-trip assertion\n- Merge branch 'worktree-agent-a38ced7047b0cfaaa'\n- test(ios): add real accessibility UI test coverage for the login screen\n- Merge branch 'worktree-agent-af43f3580ad5d4e5a'\n- test(ios,standard-site): decode canonical Lexicon fixtures in InkwellTests\n- refactor(ios,android,auth): build OAuth scope requests from shared definitions\n- feat(atproto,auth): declare site.standard.authFull in client metadata\n- Merge branch 'worktree-agent-a64ac1a3f5b3f0342'\n- feat(ios,atproto): render enriched Standard.site Bluesky external embeds\n- refactor(atproto): share the document record-size ceiling\n- fix(i18n): use locale-aware percent formatting for poll results\n- fix(ios): cache PDS-resolved blob images\n- fix(ios,a11y): group Leaflet list items and expose position to VoiceOver\n- fix(ios,standard-site): set updatedAt when editing documents\n- Merge branch 'test/ios-record-validation-body' into main\n- feat(atproto): support enriched Standard.site external embeds and associatedRefs\n- test(reader): add unit test suites for Leaflet poll models and state calculations\n- Merge branch 'fix/ios-document-edit-safety'\n- Merge branch 'main' into fix/android-localize-writer-screen\n- fix(ios): inflect new document notifications\n- test(ios): cover Bluesky embed accessibility inputs\n- fix(ios): stream bounded public JSON responses\n- test(ios): cover malformed blob upload responses\n- feat(ios): expose create record validation status\n- test(ios): cover tri-state record validation body\n- fix(ios): preserve document edit timestamps\n- Mirror iOS post navigation chevrons for RTL\n- mirror iOS post navigation chevrons for RTL\n- localize notification summary count (#125)\n- localize poll result counts (#124)\n- fix(ios): wrap reader metadata at accessibility sizes\n- fix(ios): reflow website previews at accessibility sizes\n- test(ios): use a real animated GIF fixture\n- fix(ios): localize moderation tab counts\n- refactor(ios): name document record CID precisely\n- test(ios): cover raw blob upload requests\n- fix(ios): preserve tri-state record validation\n- fix(ios): surface offline queue recovery state\n- fix(ios): validate notification document routes\n- fix(ios): enrich Bluesky embed accessibility labels\n- fix(ios): preserve poll option text at accessibility sizes\n- fix(ios): reject path-bearing DID PDS endpoints\n- fix(ios): bridge comment scope without KMP rebuild\n- fix(auth): authorize Leaflet comment mutations\n- fix(writer): use record CID for CAS updates\n- fix(ios): wrap reader publication labels\n- fix(ios): verify restored session before login state\n- fix(ios): load reader content images from owning PDS\n- fix(ios): load reader covers from owning PDS\n- fix(ios): load embedded covers from owning PDS\n- fix(ios): validate blob-backed page JSON\n- fix(ios): gate repository JSON by safety limits\n- fix(ios): persist Jetstream resume cursors\n- fix(ios): resume Jetstream cursors after reconnect\n- fix(ios): preserve document metadata on edits\n- fix(ios): isolate bidirectional accessibility text\n- fix(ios): use locale-aware sync pluralization\n- test(ios): cover UTF-8 JSON safety limits\n- test(ios): cover writer record size preflight\n- fix(ios): localize bluesky stat accessibility\n- fix(ios): localize import change plurals\n- fix(ios): loc",
-          "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.7.0.ipa",
-          "size": 13333231,
-          "sha256": "733716d0baf33c8091fa31143dd2e1db260921f80fb57f6c3f8bfe16ff28bf21",
-          "buildVersion": "61"
-        },
-        {
-          "version": "2.6.1",
-          "date": "2026-08-29",
-          "localizedDescription": "# Inkwell for iOS 2.6.1\n\n- Fixed Writer authentication: the editor now shares the active account session, so signed-in people can load their publications and publish documents.\n",
-          "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.6.1.ipa",
-          "size": 13022036,
-          "sha256": "5543693fee39880bffb313c0386703847d837546dd4409274051c650d3c72726",
-          "buildVersion": "60"
-        },
-        {
-          "version": "2.6.0",
-          "date": "2026-08-29",
-          "localizedDescription": "# Inkwell for iOS 2.6.0\n\n- New subscribed documents arriving through the Reader's live feed are added to notification history and can trigger a local alert while Inkwell is open.\n- Live events are matched to the exact publications you follow, preventing unrelated publications in the same repository from appearing as subscribed updates.\n- Background refresh polling remains available when the app is not active.\n\n",
-          "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.6.0.ipa",
-          "size": 13022572,
-          "buildVersion": "59"
-        },
-        {
-          "version": "2.5.0",
-          "date": "2026-08-28",
-          "localizedDescription": "# Inkwell 2.5.0 release notes\n\nInkwell 2.5.0 brings the iOS and Android apps closer together, with shared real-time feeds, publication-aware reading, profiles, reporting, moderation, offline support, and accessibility improvements.\n\n## Highlights\n\n- Cross-platform moderation parity: iOS now includes the same Muted & Blocked account management available on Android.\n- Cross-platform reader verification: Android now verifies publication-backed documents using their AT URIs, matching iOS behaviour.\n- Publication-aware reading: full publication views and reader cards use publication names, descriptions, icons, and readable publication themes instead of falling back to hostnames.\n- Account profiles and reporting: both apps include profile views and native account/content reporting flows.\n- Enhanced moderation: labeler preferences, keyword filters, moderation labels, and explicit reveal controls are available on both platforms.\n- Offline-first reading: cached feeds and full documents appear immediately, while queued subscriptions, recommendations, and comments replay after connectivity returns.\n- Accessibility and readability improvements across Reader, Discover, Writer, profiles, and Settings.\n",
-          "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.5.0.ipa",
-          "size": 13730992,
-          "buildVersion": "58"
-        },
-        {
-          "version": "2.4.0",
-          "date": "2026-08-26",
-          "localizedDescription": "Adds native reporting for posts and accounts, the Inkwell-user declaration record with Constellation backlinks, the OAuth permissions required to manage that record, and website integration for the users-of-Inkwell carousel.",
-          "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.4.0.ipa",
-          "size": 11973740,
-          "buildVersion": "57"
-        },
-        {
-          "version": "2.3.0",
-          "date": "2026-08-25",
-          "localizedDescription": "Adds reader sort order (newest/oldest first) that persists across relaunches, in-app link handling so article and post links open in an embedded browser instead of leaving Inkwell (toggle off to restore the system browser; sign-in links always stay external), a Haptics toggle under Accessibility, Storage settings showing the image cache size with a Clear Cache button (the URL cache is now bounded at 150 MB), and article read/bookmark tracking with an Export Data button that produces a shareable JSON. Mute/block management ships on Android in this release and will follow on iOS.",
-          "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.3.0.ipa",
-          "size": 11944828,
-          "buildVersion": "57"
-        },
-        {
-          "version": "2.2.0",
-          "buildVersion": "55",
-          "date": "2026-08-21",
-          "localizedDescription": "Adds a full Settings screen (notifications toggle, legal, about, sign out) and an in-app notification list you can review and clear. Tapping a notification now opens the document directly instead of just opening the app. Notifications also now display while the app is in the foreground, not just in the background.",
-          "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.2.0.ipa",
-          "size": 11167793
-        },
-        {
-          "version": "2.1.1",
-          "buildVersion": "54",
-          "date": "2026-08-21",
-          "localizedDescription": "Rewrites the in-app Privacy Policy and Terms of Service. Corrects stale and inaccurate claims (the app version, Android notification support, and how iOS Keychain items behave in device backups), discloses every third-party service the app contacts, and brings both documents in line with the UK GDPR and UK consumer law.",
-          "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.1.1.ipa",
-          "size": 11467232
-        },
-        {
-          "version": "2.1.0",
-          "buildVersion": "53",
-          "date": "2026-08-21",
-          "localizedDescription": "Adds a Bluesky supporters section to Credits, crediting everyone who's tipped via Ko-fi or GitHub Sponsors. Credits is now reachable from the sign-in screen too, without an account. Fixes three public-API calls (profile lookups, handle resolution, Constellation backlink queries) that were silently failing due to a duplicated /xrpc/ path segment.",
-          "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.1.0.ipa",
-          "size": 11458992
-        },
-        {
-          "version": "2.0.0",
-          "buildVersion": "52",
-          "date": "2026-08-18",
-          "localizedDescription": "Lowers the minimum supported iOS version from 26.0 to 18.0 for broader device compatibility — the two iOS 26-only visual effects used (tab bar minimize-on-scroll, the Reader feed switcher's scroll-edge bar) now fall back gracefully on older versions instead of being required. No other behavior changes from build 51.",
-          "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.0.0.ipa",
-          "size": 11400915
-        },
-        {
-          "version": "2.0.0",
-          "buildVersion": "51",
-          "date": "2026-08-18",
-          "localizedDescription": "Discover is now a persistent tab alongside Read and Write, matching the Android app's navigation. Reader cards show the author's name. Discover publication rows show descriptions and format tags, and subscribed publications are visually distinguished. Internal refactor: large source files split into focused modules per AGENTS.md's file-size guidance, with no behavior changes beyond the fixes above.",
-          "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.0.0.ipa",
-          "size": 11381942
-        },
-        {
-          "version": "1.0",
-          "buildVersion": "50",
-          "date": "2026-08-16",
-          "localizedDescription": "Fixes OAuth token exchange failures on PDS providers that don't expose DPoP nonces on GET requests. The token endpoint is now pre-flown via POST with a sanitized body to obtain the nonce before presenting the real authorization code, preventing invalid_grant errors on retry.",
-          "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-1.0.ipa",
-          "size": 10219763
-        },
-        {
-          "version": "1.0",
-          "buildVersion": "49",
-          "date": "2026-06-27",
-          "localizedDescription": "First AltStore release. Read, Discover, and Write tabs. OAuth sign-in with AT Protocol handle. Leaflet and Markdown rendering. Publication search via Standard.site public index. Background notification polling.",
-          "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-1.0.ipa",
-          "size": 10362393
+            "name": "Inkwell",
+            "bundleIdentifier": "uk.ewancroft.Inkwell",
+            "developerName": "Ewan Croft",
+            "subtitle": "Read and write on Standard.site via AT Protocol",
+            "localizedDescription": "A native SwiftUI reader and writer for the Standard.site publishing ecosystem on AT Protocol.\n\nRead — Reads site.standard.publication and site.standard.document records from their owning PDS, rendered in a three-tab layout (Read / Discover / Write). Renders Leaflet block content and Markpub/Offprint/pckt markdown formats. Resolves display themes from Leaflet's rich palette through basicTheme to system defaults.\n\nDiscover — Searches the cross-platform public index used by the Standard.site ecosystem, then fetches authoritative records directly from the author. Cross-repo comment discovery via Constellation (microcosm.blue).\n\nWrite — Publishes Standard.site documents with portable metadata and selectable content formats.\n\nAuthentication is OAuth-based with your AT Protocol handle — no app password needed. Silent session restoration from the Keychain on relaunch.",
+            "iconURL": "https://inkwell.ewancroft.uk/altstore/icon.png",
+            "tintColor": "#a6e3a1",
+            "category": "social",
+            "screenshots": [
+                "https://inkwell.ewancroft.uk/screenshots/ios/reader-6.5.png",
+                "https://inkwell.ewancroft.uk/screenshots/ios/discover-6.5.png",
+                "https://inkwell.ewancroft.uk/screenshots/ios/writer-6.5.png",
+                "https://inkwell.ewancroft.uk/screenshots/ios/post.png",
+                "https://inkwell.ewancroft.uk/screenshots/ios/reader-5.5.png"
+            ],
+            "versions": [
+                {
+                    "version": "2.7.1",
+                    "date": "2026-09-26",
+                    "localizedDescription": "- fix(ios): add missing ReportReasonType and LoginStateManager+Moderation for content reporting\n- feat(ios,i18n): add Localizable.xcstrings with 357 extracted strings\n- fix(ci): Android APK permission gate (check-release-permissions.sh)\n- chore: merge accessibility, moderation parity, and website fixes from 9 feature branches\n- chore: clean up pbxproj drift from Xcode build cycles",
+                    "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.7.1.ipa",
+                    "size": 13338300,
+                    "sha256": "986fcc27dc0a19700f728038de509d5b7d1aafa9ae9c9e3421f15b362a1111ef",
+                    "buildVersion": "62"
+                },
+                {
+                    "version": "2.7.0",
+                    "date": "2026-09-26",
+                    "localizedDescription": "- fix(ci): repair three CI failures after 2.7.0\n- chore(release): bump versions and add 2.7.0 release notes\n- feat(ios): autosave and recover Writer drafts\n- feat(ios,standard-site): edit document metadata in the Writer\n- refactor(ios): move ImageDescriptionSheet into its own Writer file\n- fix(ios): interpolate field and limit in Standard.site validation errors\n- Merge branch 'worktree-agent-aea6a12bd2fada93c'\n- feat(ios,writer): spill oversized document bodies into blob-backed content\n- Merge branch 'worktree-agent-a3cad9a3538d13a39'\n- Merge branch 'worktree-agent-a565745a3c9585ca5'\n- feat(ios): verify universal-link hand-off before opening documents\n- fix(standard-site): add missing Leaflet page id and relax an unenforceable round-trip assertion\n- Merge branch 'worktree-agent-a38ced7047b0cfaaa'\n- test(ios): add real accessibility UI test coverage for the login screen\n- Merge branch 'worktree-agent-af43f3580ad5d4e5a'\n- test(ios,standard-site): decode canonical Lexicon fixtures in InkwellTests\n- refactor(ios,android,auth): build OAuth scope requests from shared definitions\n- feat(atproto,auth): declare site.standard.authFull in client metadata\n- Merge branch 'worktree-agent-a64ac1a3f5b3f0342'\n- feat(ios,atproto): render enriched Standard.site Bluesky external embeds\n- refactor(atproto): share the document record-size ceiling\n- fix(i18n): use locale-aware percent formatting for poll results\n- fix(ios): cache PDS-resolved blob images\n- fix(ios,a11y): group Leaflet list items and expose position to VoiceOver\n- fix(ios,standard-site): set updatedAt when editing documents\n- Merge branch 'test/ios-record-validation-body' into main\n- feat(atproto): support enriched Standard.site external embeds and associatedRefs\n- test(reader): add unit test suites for Leaflet poll models and state calculations\n- Merge branch 'fix/ios-document-edit-safety'\n- Merge branch 'main' into fix/android-localize-writer-screen\n- fix(ios): inflect new document notifications\n- test(ios): cover Bluesky embed accessibility inputs\n- fix(ios): stream bounded public JSON responses\n- test(ios): cover malformed blob upload responses\n- feat(ios): expose create record validation status\n- test(ios): cover tri-state record validation body\n- fix(ios): preserve document edit timestamps\n- Mirror iOS post navigation chevrons for RTL\n- mirror iOS post navigation chevrons for RTL\n- localize notification summary count (#125)\n- localize poll result counts (#124)\n- fix(ios): wrap reader metadata at accessibility sizes\n- fix(ios): reflow website previews at accessibility sizes\n- test(ios): use a real animated GIF fixture\n- fix(ios): localize moderation tab counts\n- refactor(ios): name document record CID precisely\n- test(ios): cover raw blob upload requests\n- fix(ios): preserve tri-state record validation\n- fix(ios): surface offline queue recovery state\n- fix(ios): validate notification document routes\n- fix(ios): enrich Bluesky embed accessibility labels\n- fix(ios): preserve poll option text at accessibility sizes\n- fix(ios): reject path-bearing DID PDS endpoints\n- fix(ios): bridge comment scope without KMP rebuild\n- fix(auth): authorize Leaflet comment mutations\n- fix(writer): use record CID for CAS updates\n- fix(ios): wrap reader publication labels\n- fix(ios): verify restored session before login state\n- fix(ios): load reader content images from owning PDS\n- fix(ios): load reader covers from owning PDS\n- fix(ios): load embedded covers from owning PDS\n- fix(ios): validate blob-backed page JSON\n- fix(ios): gate repository JSON by safety limits\n- fix(ios): persist Jetstream resume cursors\n- fix(ios): resume Jetstream cursors after reconnect\n- fix(ios): preserve document metadata on edits\n- fix(ios): isolate bidirectional accessibility text\n- fix(ios): use locale-aware sync pluralization\n- test(ios): cover UTF-8 JSON safety limits\n- test(ios): cover writer record size preflight\n- fix(ios): localize bluesky stat accessibility\n- fix(ios): localize import change plurals\n- fix(ios): loc",
+                    "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.7.0.ipa",
+                    "size": 13333231,
+                    "sha256": "733716d0baf33c8091fa31143dd2e1db260921f80fb57f6c3f8bfe16ff28bf21",
+                    "buildVersion": "61"
+                },
+                {
+                    "version": "2.6.1",
+                    "date": "2026-08-29",
+                    "localizedDescription": "# Inkwell for iOS 2.6.1\n\n- Fixed Writer authentication: the editor now shares the active account session, so signed-in people can load their publications and publish documents.\n",
+                    "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.6.1.ipa",
+                    "size": 13022036,
+                    "sha256": "5543693fee39880bffb313c0386703847d837546dd4409274051c650d3c72726",
+                    "buildVersion": "60"
+                },
+                {
+                    "version": "2.6.0",
+                    "date": "2026-08-29",
+                    "localizedDescription": "# Inkwell for iOS 2.6.0\n\n- New subscribed documents arriving through the Reader's live feed are added to notification history and can trigger a local alert while Inkwell is open.\n- Live events are matched to the exact publications you follow, preventing unrelated publications in the same repository from appearing as subscribed updates.\n- Background refresh polling remains available when the app is not active.\n\n",
+                    "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.6.0.ipa",
+                    "size": 13022572,
+                    "buildVersion": "59"
+                },
+                {
+                    "version": "2.5.0",
+                    "date": "2026-08-28",
+                    "localizedDescription": "# Inkwell 2.5.0 release notes\n\nInkwell 2.5.0 brings the iOS and Android apps closer together, with shared real-time feeds, publication-aware reading, profiles, reporting, moderation, offline support, and accessibility improvements.\n\n## Highlights\n\n- Cross-platform moderation parity: iOS now includes the same Muted & Blocked account management available on Android.\n- Cross-platform reader verification: Android now verifies publication-backed documents using their AT URIs, matching iOS behaviour.\n- Publication-aware reading: full publication views and reader cards use publication names, descriptions, icons, and readable publication themes instead of falling back to hostnames.\n- Account profiles and reporting: both apps include profile views and native account/content reporting flows.\n- Enhanced moderation: labeler preferences, keyword filters, moderation labels, and explicit reveal controls are available on both platforms.\n- Offline-first reading: cached feeds and full documents appear immediately, while queued subscriptions, recommendations, and comments replay after connectivity returns.\n- Accessibility and readability improvements across Reader, Discover, Writer, profiles, and Settings.\n",
+                    "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.5.0.ipa",
+                    "size": 13730992,
+                    "buildVersion": "58"
+                },
+                {
+                    "version": "2.4.0",
+                    "date": "2026-08-26",
+                    "localizedDescription": "Adds native reporting for posts and accounts, the Inkwell-user declaration record with Constellation backlinks, the OAuth permissions required to manage that record, and website integration for the users-of-Inkwell carousel.",
+                    "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.4.0.ipa",
+                    "size": 11973740,
+                    "buildVersion": "57"
+                },
+                {
+                    "version": "2.3.0",
+                    "date": "2026-08-25",
+                    "localizedDescription": "Adds reader sort order (newest/oldest first) that persists across relaunches, in-app link handling so article and post links open in an embedded browser instead of leaving Inkwell (toggle off to restore the system browser; sign-in links always stay external), a Haptics toggle under Accessibility, Storage settings showing the image cache size with a Clear Cache button (the URL cache is now bounded at 150 MB), and article read/bookmark tracking with an Export Data button that produces a shareable JSON. Mute/block management ships on Android in this release and will follow on iOS.",
+                    "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.3.0.ipa",
+                    "size": 11944828,
+                    "buildVersion": "57"
+                },
+                {
+                    "version": "2.2.0",
+                    "buildVersion": "55",
+                    "date": "2026-08-21",
+                    "localizedDescription": "Adds a full Settings screen (notifications toggle, legal, about, sign out) and an in-app notification list you can review and clear. Tapping a notification now opens the document directly instead of just opening the app. Notifications also now display while the app is in the foreground, not just in the background.",
+                    "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.2.0.ipa",
+                    "size": 11167793
+                },
+                {
+                    "version": "2.1.1",
+                    "buildVersion": "54",
+                    "date": "2026-08-21",
+                    "localizedDescription": "Rewrites the in-app Privacy Policy and Terms of Service. Corrects stale and inaccurate claims (the app version, Android notification support, and how iOS Keychain items behave in device backups), discloses every third-party service the app contacts, and brings both documents in line with the UK GDPR and UK consumer law.",
+                    "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.1.1.ipa",
+                    "size": 11467232
+                },
+                {
+                    "version": "2.1.0",
+                    "buildVersion": "53",
+                    "date": "2026-08-21",
+                    "localizedDescription": "Adds a Bluesky supporters section to Credits, crediting everyone who's tipped via Ko-fi or GitHub Sponsors. Credits is now reachable from the sign-in screen too, without an account. Fixes three public-API calls (profile lookups, handle resolution, Constellation backlink queries) that were silently failing due to a duplicated /xrpc/ path segment.",
+                    "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.1.0.ipa",
+                    "size": 11458992
+                },
+                {
+                    "version": "2.0.0",
+                    "buildVersion": "52",
+                    "date": "2026-08-18",
+                    "localizedDescription": "Lowers the minimum supported iOS version from 26.0 to 18.0 for broader device compatibility — the two iOS 26-only visual effects used (tab bar minimize-on-scroll, the Reader feed switcher's scroll-edge bar) now fall back gracefully on older versions instead of being required. No other behavior changes from build 51.",
+                    "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.0.0.ipa",
+                    "size": 11400915
+                },
+                {
+                    "version": "2.0.0",
+                    "buildVersion": "51",
+                    "date": "2026-08-18",
+                    "localizedDescription": "Discover is now a persistent tab alongside Read and Write, matching the Android app's navigation. Reader cards show the author's name. Discover publication rows show descriptions and format tags, and subscribed publications are visually distinguished. Internal refactor: large source files split into focused modules per AGENTS.md's file-size guidance, with no behavior changes beyond the fixes above.",
+                    "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.0.0.ipa",
+                    "size": 11381942
+                },
+                {
+                    "version": "1.0",
+                    "buildVersion": "50",
+                    "date": "2026-08-16",
+                    "localizedDescription": "Fixes OAuth token exchange failures on PDS providers that don't expose DPoP nonces on GET requests. The token endpoint is now pre-flown via POST with a sanitized body to obtain the nonce before presenting the real authorization code, preventing invalid_grant errors on retry.",
+                    "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-1.0.ipa",
+                    "size": 10219763
+                },
+                {
+                    "version": "1.0",
+                    "buildVersion": "49",
+                    "date": "2026-06-27",
+                    "localizedDescription": "First AltStore release. Read, Discover, and Write tabs. OAuth sign-in with AT Protocol handle. Leaflet and Markdown rendering. Publication search via Standard.site public index. Background notification polling.",
+                    "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-1.0.ipa",
+                    "size": 10362393
+                }
+            ],
+            "appPermissions": {
+                "entitlements": [],
+                "privacy": {}
+            },
+            "version": "2.7.1",
+            "buildVersion": "61",
+            "versionDate": "2026-09-26",
+            "size": 13338300,
+            "sha256": "733716d0baf33c8091fa31143dd2e1db260921f80fb57f6c3f8bfe16ff28bf21",
+            "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.7.1.ipa",
+            "versionDescription": "- fix(ios): add missing ReportReasonType and LoginStateManager+Moderation for content reporting\n- feat(ios,i18n): add Localizable.xcstrings with 357 extracted strings\n- fix(ci): Android APK permission gate (check-release-permissions.sh)\n- chore: merge accessibility, moderation parity, and website fixes from 9 feature branches\n- chore: clean up pbxproj drift from Xcode build cycles"
         }
-      ],
-      "appPermissions": {
-        "entitlements": [],
-        "privacy": {}
-      },
-      "version": "2.7.0",
-      "buildVersion": "61",
-      "versionDate": "2026-09-26",
-      "size": 13333231,
-      "sha256": "733716d0baf33c8091fa31143dd2e1db260921f80fb57f6c3f8bfe16ff28bf21",
-      "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.7.0.ipa"
-    }
-  ],
-  "news": [],
-  "version": "2.4.0",
-  "buildVersion": "57"
+    ],
+    "news": [],
+    "version": "2.4.0",
+    "buildVersion": "57"
 }
