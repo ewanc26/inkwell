@@ -1,6 +1,7 @@
 package uk.ewancroft.inkwell.ui.writer
 
 import kotlinx.serialization.json.JsonObject
+import uk.ewancroft.inkwell.shared.draft.WriterDraftSchema
 
 data class PublicationItem(
     val uri: String,
@@ -47,4 +48,10 @@ data class WriterUiState(
     val isUploadingCover: Boolean = false,
     /** A rejected metadata edit, shown beside the metadata controls rather than the publish button. */
     val metadataError: String? = null,
+    /** The editor holds an autosaved draft recovered from local storage. */
+    val draftRestored: Boolean = false,
+    /** Show the "Draft restored — Discard" banner. */
+    val showDraftBanner: Boolean = false,
+    /** A saved draft for the document being edited whose base revision no longer matches the PDS. */
+    val draftConflict: WriterDraftSchema? = null,
 )
