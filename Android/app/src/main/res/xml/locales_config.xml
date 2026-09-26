@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Declares the locales Inkwell ships translated resources for, so Android's
+  system-managed per-app language picker (Settings > System > Languages >
+  App languages, API 33+) offers exactly these choices instead of every
+  locale installed on the device.
+
+  British English (the untagged `res/values/` default) is the source/default
+  copy; `fr` (`res/values-fr/`) is the first full end-to-end translation.
+  Add a `<locale>` entry here whenever a new `values-<locale>/strings.xml`
+  is added, and vice versa — this file and the values-* directories must
+  stay in lockstep.
+-->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="en-GB" />
+    <locale android:name="fr" />
+</locale-config>
