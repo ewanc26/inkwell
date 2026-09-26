@@ -44,7 +44,7 @@ import uk.ewancroft.inkwell.data.model.content.LeafletBlock
 import uk.ewancroft.inkwell.shared.text.NumberFormat
 
 @Composable
-fun BskyPostBlock(block: LeafletBlock) {
+fun BskyPostBlock(block: LeafletBlock, onNavigateToDocument: (String) -> Unit = {}) {
     val subject = block.subject ?: return
     val uri = subject.uri
 
@@ -88,14 +88,17 @@ fun BskyPostBlock(block: LeafletBlock) {
                 }
             }
             post != null -> {
-                BSkyPostContent(post = post!!)
+                BSkyPostContent(post = post!!, onNavigateToDocument = onNavigateToDocument)
             }
         }
     }
 }
 
 @Composable
-private fun BSkyPostContent(post: uk.ewancroft.inkwell.data.model.bluesky.BSkyPostView) {
+private fun BSkyPostContent(
+    post: uk.ewancroft.inkwell.data.model.bluesky.BSkyPostView,
+    onNavigateToDocument: (String) -> Unit = {},
+) {
     Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         // Author row
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -150,39 +153,7 @@ private fun BSkyPostContent(post: uk.ewancroft.inkwell.data.model.bluesky.BSkyPo
 
         // External link embed
         if (embed is uk.ewancroft.inkwell.data.model.bluesky.BSkyEmbed.External) {
-            Card(
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)),
-            ) {
-                Row(Modifier.padding(10.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        if (embed.external.title != null) {
-                            Text(embed.external.title, style = MaterialTheme.typography.labelMedium, maxLines = 2)
-                        }
-                        if (embed.external.description != null) {
-                            Text(
-                                embed.external.description,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                                maxLines = 2,
-                            )
-                        }
-                        if (embed.external.uri != null) {
-                            val host = try { java.net.URI(embed.external.uri).host ?: embed.external.uri } catch (_: Exception) { embed.external.uri }
-                            Text(host, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f))
-                        }
-                    }
-                    if (embed.external.thumb != null) {
-                        AsyncImage(
-                            model = embed.external.thumb,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(60.dp)
-                                .clip(MaterialTheme.shapes.small),
-                            contentScale = ContentScale.Crop,
-                        )
-                    }
-                }
-            }
+            BSkyExternalCard(external = embed.external, onNavigateToDocument = onNavigateToDocument)
         }
 
         // Record embed (quoted post)
