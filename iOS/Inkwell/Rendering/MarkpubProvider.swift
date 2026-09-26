@@ -34,4 +34,22 @@ struct MarkpubProvider: ContentProvider {
         let content = MarkpubContent(text: text)
         return UnknownType.record(content)
     }
+
+    var supportsBlobBackedContent: Bool { true }
+
+    /// markpub's `at.markpub.text` defines `textBlob` as the alternative to
+    /// inline `markdown`: the same GFM source, stored as a blob.
+    func blobBackedContent(for content: UnknownType, markdown: String) -> BlobBackedContent? {
+        let text = content.getRecord(ofType: MarkpubContent.self)?.text
+        let source = text?.markdown ?? markdown
+        // Keep whatever `$type` the content already declared — the record has
+        // to round-trip exactly, and only the body moves into the blob.
+        let textType = text?.type ?? "at.markpub.text"
+        guard let data = source.data(using: .utf8) else { return nil }
+        return BlobBackedContent(data: data, mimeType: "text/markdown") { blob in
+            UnknownType.record(
+                MarkpubContent(text: MarkpubText(type: textType, markdown: nil, textBlob: blob))
+            )
+        }
+    }
 }

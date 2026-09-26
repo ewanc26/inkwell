@@ -181,6 +181,23 @@ struct LeafletProvider: ContentProvider {
         return UnknownType.record(content)
     }
 
+    var supportsBlobBackedContent: Bool { true }
+
+    /// `pub.leaflet.content` defines `blobPages` as the alternative to an
+    /// inline `pages` array: the same JSON page list, stored as a blob. The
+    /// Reader (and `LoginStateManager.resolveBlobBackedContent`) decode it
+    /// back with `JSONDecoder().decode([LeafletPage].self, ...)`, so the
+    /// encoding here has to stay the plain array.
+    func blobBackedContent(for content: UnknownType, markdown: String) -> BlobBackedContent? {
+        guard let leaflet = content.getRecord(ofType: LeafletContent.self),
+              let pages = leaflet.pages,
+              !pages.isEmpty,
+              let data = try? JSONEncoder().encode(pages) else { return nil }
+        return BlobBackedContent(data: data, mimeType: "application/json") { blob in
+            UnknownType.record(LeafletContent(pages: nil, blobPages: blob))
+        }
+    }
+
     private func markdownToLeafletBlock(_ block: MarkdownBlockNode, previousBlobs: [String: ComAtprotoLexicon.Repository.UploadBlobOutput]) -> LeafletBlock? {
         switch block {
         case .heading(let level, let text):

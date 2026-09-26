@@ -16,8 +16,9 @@ private let userLexiconNSID = "uk.ewancroft.inkwell.user"
 private let userLexiconAppURI = "https://inkwell.ewancroft.uk"
 /// Mirrors shared `RecordSizePolicy.MAX_DOCUMENT_RECORD_BYTES`. Declared locally for the
 /// same reason as the constants above: switch to the shared constant once the xcframework
-/// consuming this change is rebuilt.
-private let maxDocumentRecordBytes = 900 * 1024
+/// consuming this change is rebuilt. Internal rather than file-private because the Writer's
+/// spill logic measures against the same ceiling.
+let maxDocumentRecordBytes = 900 * 1024
 
 internal struct DecodedCreateRecordResponse {
     let reference: ComAtprotoLexicon.Repository.StrongReference

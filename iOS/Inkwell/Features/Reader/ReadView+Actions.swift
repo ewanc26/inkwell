@@ -249,45 +249,38 @@ extension ReadView {
     // MARK: - Content Loader
 
     func loadContent() async {
-        guard let contentUnknown = document.content else {
+        guard let storedContent = document.content else {
             self.markdownContent = document.textContent
             isLoading = false
             return
         }
 
-        // Leaflet carries layout, alignment, and PDS blob references that
-        // cannot survive a Markdown round-trip. Render it natively first.
-        if let leaflet = contentUnknown.getRecord(ofType: LeafletContent.self) {
-            if let inlinePages = leaflet.pages, !inlinePages.isEmpty {
-                pages = inlinePages
+        // Large documents store their body in the format's blob-backed
+        // representation (Leaflet `blobPages`, markpub `textBlob`). Pull it
+        // back inline before anything else tries to read the content.
+        var contentUnknown = storedContent
+        if contentBodyNeedsBlobDownload(storedContent) {
+            let resolved = await loginStateManager.resolveBlobBackedContent(
+                storedContent,
+                authorDID: authorDID
+            )
+            guard let resolved, !contentBodyNeedsBlobDownload(resolved) else {
+                errorMessage = "Couldn't download this document's content from its PDS. "
+                    + "Check your connection and try again."
                 isLoading = false
                 return
             }
+            contentUnknown = resolved
+        }
 
-            if let blobPages = leaflet.blobPages {
-                do {
-                    let data: Data
-                    if let authorDID {
-                        data = try await loginStateManager.downloadBlob(
-                            cid: blobPages.reference.link,
-                            fromDID: authorDID,
-                            declaredSize: blobPages.size
-                        )
-                    } else {
-                        data = try await loginStateManager.downloadBlob(
-                            cid: blobPages.reference.link,
-                            declaredSize: blobPages.size
-                        )
-                    }
-                    pages = try JSONDecoder().decode([LeafletPage].self, from: data)
-                    isLoading = false
-                    return
-                } catch {
-                    errorMessage = "Failed to download this Leaflet: \(error.localizedDescription)"
-                    isLoading = false
-                    return
-                }
-            }
+        // Leaflet carries layout, alignment, and PDS blob references that
+        // cannot survive a Markdown round-trip. Render it natively first.
+        if let leaflet = contentUnknown.getRecord(ofType: LeafletContent.self),
+           let inlinePages = leaflet.pages,
+           !inlinePages.isEmpty {
+            pages = inlinePages
+            isLoading = false
+            return
         }
 
         // Other supported formats convert cleanly to the shared Markdown
