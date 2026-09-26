@@ -93,6 +93,7 @@ fun WriterViewModel.loadDocumentForEditing(uri: String) {
                 verificationMessage = null,
                 isEditing = false,
             )
+            setMetadata(WriterMetadataDraft.fromRecord(value))
         } catch (e: Exception) {
             uiStateInternal.value = uiStateInternal.value.copy(
                 isEditing = false,

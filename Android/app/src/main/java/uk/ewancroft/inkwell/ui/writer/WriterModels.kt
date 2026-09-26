@@ -42,4 +42,9 @@ data class WriterUiState(
     val uploadedBlobs: Map<String, JsonObject> = emptyMap(),
     val lostFeatures: List<String> = emptyList(),
     val showPreview: Boolean = true,
+    /** Tags, contributors, labels, cover and Bluesky ref; persisted across process death. */
+    val metadata: WriterMetadataDraft = WriterMetadataDraft(),
+    val isUploadingCover: Boolean = false,
+    /** A rejected metadata edit, shown beside the metadata controls rather than the publish button. */
+    val metadataError: String? = null,
 )

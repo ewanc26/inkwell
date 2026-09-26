@@ -16,7 +16,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.platform.LocalContext
 import android.net.Uri
-import java.io.ByteArrayOutputStream
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextRange
@@ -36,8 +35,6 @@ import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 import uk.ewancroft.inkwell.shared.xrpc.XrpcEndpoints
 import uk.ewancroft.inkwell.ui.reader.MarkdownRendererView
 import uk.ewancroft.inkwell.util.rememberInkwellHaptics
-
-private const val MAX_IMAGE_UPLOAD_BYTES = 10 * 1024 * 1024
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -93,25 +90,11 @@ fun WriterScreen(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri ?: return@rememberLauncherForActivityResult
-        val bytes = context.contentResolver.openInputStream(uri)?.use { input ->
-            val output = ByteArrayOutputStream()
-            val buffer = ByteArray(16 * 1024)
-            var total = 0
-            while (true) {
-                val read = input.read(buffer)
-                if (read == -1) break
-                total += read
-                output.write(buffer, 0, read)
-                if (total > MAX_IMAGE_UPLOAD_BYTES) break
-            }
-            output.toByteArray()
-        }
-        if (bytes != null) {
-            if (bytes.size > MAX_IMAGE_UPLOAD_BYTES) {
+        when (val picked = readPickedImage(context, uri)) {
+            PickedImageBytes.Unreadable -> Unit
+            PickedImageBytes.TooLarge ->
                 viewModel.setPublishError("Image is too large. Choose an image no larger than 10 MiB.")
-                return@rememberLauncherForActivityResult
-            }
-            runCatching { ImageUploadSanitizer.sanitize(bytes) }
+            is PickedImageBytes.Read -> runCatching { ImageUploadSanitizer.sanitize(picked.bytes) }
                 .onSuccess {
                     pendingImage = it
                     imageAltText = ""
@@ -372,6 +355,14 @@ fun WriterScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            WriterMetadataSection(
+                metadata = uiState.metadata,
+                isUploadingCover = uiState.isUploadingCover,
+                metadataError = uiState.metadataError,
+                enabled = !uiState.isPublishing,
+                actions = remember(viewModel) { viewModel.metadataActions() },
+            )
+
             // Loss reporting
             if (uiState.lostFeatures.isNotEmpty()) {
                 Surface(
@@ -512,7 +503,7 @@ fun WriterScreen(
                     haptics.medium()
                     viewModel.publish()
                 },
-                enabled = uiState.title.isNotBlank() && uiState.selectedPublication != null && uiState.verifiedPublicationUri != null && !uiState.isPublishing && !uiState.isVerifyingPublication,
+                enabled = uiState.title.isNotBlank() && uiState.selectedPublication != null && uiState.verifiedPublicationUri != null && !uiState.isPublishing && !uiState.isVerifyingPublication && !uiState.isUploadingCover,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 if (uiState.isPublishing) {
