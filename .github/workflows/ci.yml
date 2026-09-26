@@ -191,7 +191,7 @@ jobs:
 
       - name: Assert release permission allowlist
         working-directory: Android
-        run: bash tools/check-release-permissions.sh
+        run: bash ../tools/check-release-permissions.sh
 
   # Instrumentation tests need a booted emulator, which is an order of
   # magnitude slower than the JVM job above -- hence a separate job behind the
