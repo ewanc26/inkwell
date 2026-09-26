@@ -1,0 +1,212 @@
+name: Release provenance
+
+# Appends SBOMs and a signed provenance attestation to an already-published
+# unified GitHub Release (see AGENTS.md's Releases section and
+# RELEASE_PROCESS.md). This workflow does NOT build, sign, or publish the
+# APK/IPA themselves -- tools/release/publish.mjs still does that, run
+# locally, because release signing keys intentionally never leave the
+# publisher's machine (see the "Signing-key handling must remain
+# least-privilege" note on github.com/ewanc26/inkwell/issues/123).
+#
+# Because the distributed APK/IPA are assembled and signed outside Actions,
+# generating an actions/attest-build-provenance attestation *for those
+# binaries* would falsely claim this workflow built them -- exactly the
+# "misleading attestation for a different CI artefact" failure mode #123
+# asks to avoid (see Android/fdroid-repo/PROVENANCE.md and
+# iOS/altstore/PROVENANCE.md). Instead, this workflow:
+#
+#   1. Generates an SBOM for each platform's dependency graph.
+#   2. Downloads the *exact* APK/IPA bytes already attached to the release
+#      and hashes them.
+#   3. Writes a small release-manifest.json recording those hashes plus the
+#      release commit/tag/workflow-run identity (tools/release/build-release-manifest.mjs).
+#   4. Attests build provenance for the manifest and SBOMs -- files this
+#      workflow genuinely produced -- not for the externally-built binaries.
+#
+# A consumer verifies the chain by checking the manifest's attestation, then
+# confirming their downloaded APK/IPA's sha256 matches the manifest's entry.
+# See RELEASE_PROCESS.md for the exact verification commands.
+
+on:
+  push:
+    tags:
+      - "v*"
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to process (e.g. v2.6.1) -- must already have a published GitHub Release"
+        required: true
+
+concurrency:
+  group: release-provenance-${{ github.event.release.tag_name || github.event.inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  # Normalize the tag across the three trigger shapes (tag push, release
+  # published, manual dispatch) and reject anything that doesn't match the
+  # unified vX.Y.Z convention AGENTS.md's Releases section documents.
+  resolve-tag:
+    name: Resolve release tag
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      tag: ${{ steps.resolve.outputs.tag }}
+    steps:
+      - id: resolve
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF_TAG: ${{ github.ref_name }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          DISPATCH_TAG: ${{ github.event.inputs.tag }}
+        run: |
+          case "$EVENT_NAME" in
+            release) TAG="$RELEASE_TAG" ;;
+            workflow_dispatch) TAG="$DISPATCH_TAG" ;;
+            *) TAG="$REF_TAG" ;;
+          esac
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Resolved tag '$TAG' does not match the unified release-tag convention vX.Y.Z documented in AGENTS.md's Releases section."
+            exit 1
+          fi
+          echo "Resolved tag: $TAG"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+  android-sbom:
+    name: Android SBOM (Gradle dependencies)
+    needs: resolve-tag
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.resolve-tag.outputs.tag }}
+
+      # Scans the Gradle project's declared dependencies (build.gradle.kts,
+      # version catalog, lockfiles) directly -- no build or signing key
+      # needed, so this stays a source-level dependency SBOM rather than a
+      # scan of a differently-signed CI-built APK.
+      - name: Generate Android SBOM (SPDX)
+        uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26 # v0.24.2
+        with:
+          path: Android
+          format: spdx-json
+          output-file: sbom-android-${{ needs.resolve-tag.outputs.tag }}.spdx.json
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: sbom-android
+          path: sbom-android-*.spdx.json
+          retention-days: 14
+          if-no-files-found: error
+
+  ios-sbom:
+    name: iOS SBOM (Swift Package Manager dependencies)
+    needs: resolve-tag
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.resolve-tag.outputs.tag }}
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+
+      # No mature low-friction SPM SBOM Action exists; Package.resolved is
+      # already the exact resolved dependency graph, so a small parser is
+      # simpler and more accurate than standing up a full SPM SBOM tool for
+      # five pinned packages. See tools/release/generate-ios-sbom.mjs.
+      - name: Generate iOS SBOM (SPDX-lite) from Package.resolved
+        run: |
+          node tools/release/generate-ios-sbom.mjs \
+            "iOS/Inkwell.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved" \
+            "sbom-ios-${{ needs.resolve-tag.outputs.tag }}.spdx.json" \
+            --version "${{ needs.resolve-tag.outputs.tag }}"
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: sbom-ios
+          path: sbom-ios-*.spdx.json
+          retention-days: 14
+          if-no-files-found: error
+
+  manifest-and-attest:
+    name: Release manifest, attestation, and release upload
+    needs: [resolve-tag, android-sbom, ios-sbom]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    env:
+      TAG: ${{ needs.resolve-tag.outputs.tag }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.resolve-tag.outputs.tag }}
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: sbom-android
+          path: sbom
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: sbom-ios
+          path: sbom
+
+      # This workflow appends provenance to a release that tools/release/publish.mjs
+      # already created (that script is what actually builds, signs, and
+      # publishes the APK/IPA, locally). If no release exists yet for this
+      # tag, there is nothing correct to attest.
+      - name: Verify a GitHub Release already exists for this tag
+        run: |
+          if ! gh release view "$TAG" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            echo "::error::No GitHub Release found for $TAG. Run 'node tools/release/publish.mjs android --yes' and/or 'node tools/release/publish.mjs ios --ipa <path> --yes' first -- this workflow appends an SBOM and provenance manifest to an already-published release, it does not create one."
+            exit 1
+          fi
+
+      - name: Download the exact published release assets
+        run: |
+          rm -rf release-assets && mkdir release-assets
+          gh release download "$TAG" --repo "${{ github.repository }}" --dir release-assets --pattern "Inkwell-*.apk" --clobber || true
+          gh release download "$TAG" --repo "${{ github.repository }}" --dir release-assets --pattern "Inkwell-*.ipa" --clobber || true
+          ls -la release-assets
+
+      - name: Build release manifest
+        run: |
+          node tools/release/build-release-manifest.mjs \
+            --tag "$TAG" \
+            --assets-dir release-assets \
+            --sbom-dir sbom \
+            --out "release-manifest-${TAG}.json"
+
+      # Attests the manifest and SBOMs -- files this workflow run actually
+      # produced -- never the APK/IPA (see the header comment above).
+      - name: Generate build-provenance attestation for the manifest and SBOMs
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: |
+            release-manifest-${{ needs.resolve-tag.outputs.tag }}.json
+            sbom/sbom-android-*.spdx.json
+            sbom/sbom-ios-*.spdx.json
+
+      - name: Attach manifest and SBOMs to the GitHub Release
+        run: |
+          gh release upload "$TAG" \
+            "release-manifest-${TAG}.json" \
+            sbom/sbom-android-*.spdx.json \
+            sbom/sbom-ios-*.spdx.json \
+            --repo "${{ github.repository }}" --clobber
