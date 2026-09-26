@@ -144,6 +144,7 @@ internal fun PostDetailContent(
                                 onLoadPoll = onLoadPoll,
                                 onCastVote = onCastVote,
                                 onLoadImage = onLoadImage,
+                                onNavigateToDocument = { uri -> onNavigateToPost(uri, null, null, null, null) },
                             )
                         }
                     }
