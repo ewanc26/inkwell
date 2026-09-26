@@ -10,6 +10,7 @@ package uk.ewancroft.inkwell.data.model.atproto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 import uk.ewancroft.inkwell.data.model.common.BlobRef
 import uk.ewancroft.inkwell.data.model.common.StrongRef
@@ -68,5 +69,28 @@ data class DocumentRecord(
     val theme: PublicationTheme? = null,
     val labels: SelfLabels? = null,
     val preferences: DocumentPreferences? = null,
-    val bskyPostRef: StrongRef? = null
+    val bskyPostRef: StrongRef? = null,
+    /**
+     * Additional contributors to this document, beyond the record's author.
+     * Mirrors iOS's `SiteStandardLexicon.DocumentRecord.Contributor` — see
+     * issue #65, which named this field's Android absence as the motivating
+     * example of undetected cross-platform model drift.
+     */
+    val contributors: List<DocumentContributor>? = null,
+    /**
+     * Describes relationships between this document and external resources.
+     * An open union with no concrete Lexicon-declared shape (same rationale
+     * as [content]), so it's kept as a raw [JsonElement] rather than a typed
+     * model, mirroring iOS's `UnknownType` field of the same name.
+     */
+    val links: JsonElement? = null
+)
+
+/** A participant on a document beyond the record's author. */
+@Serializable
+data class DocumentContributor(
+    @SerialName("\$type") val type: String = "site.standard.document#contributor",
+    val did: String,
+    val role: String? = null,
+    val displayName: String? = null
 )
