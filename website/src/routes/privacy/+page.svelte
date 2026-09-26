@@ -38,7 +38,7 @@
   <h2>3. Data stored on your device</h2>
   <ul>
     <li><strong>iOS:</strong> Your OAuth session (access and refresh tokens) and the P-256 DPoP private key are stored in Apple’s Keychain, with the <code>kSecAttrAccessibleAfterFirstUnlock</code> protection class. Your handle, PDS hints, notification state, reader preferences, and a local record of recently seen record URIs are stored in UserDefaults.</li>
-    <li><strong>Android:</strong> Your OAuth session is stored in EncryptedSharedPreferences, backed by a hardware-backed MasterKey, and is explicitly excluded from Android backup and device transfer because its Keystore key cannot be restored safely. Notification state, already-seen record URIs, and preferences are stored in ordinary app-private SharedPreferences.</li>
+    <li><strong>Android:</strong> Your OAuth session (access and refresh tokens, and the DPoP private key) is encrypted on your device with AES-256-GCM under a non-exportable key that Inkwell generates in the Android Keystore, hardware-backed on devices that provide a secure element. Only the resulting ciphertext, its nonce, and a format version are written to app-private storage, so the stored file is unreadable without the key, and the key never leaves the Keystore. The session is explicitly excluded from Android backup and device transfer, because its Keystore key cannot be restored alongside it. Notification state, already-seen record URIs, and preferences are stored in ordinary app-private SharedPreferences.</li>
   </ul>
   <p>This data never leaves your device except as part of a device backup (see section 6). Uninstalling the app, or signing out, removes it.</p>
   <h2>4. Authentication</h2>

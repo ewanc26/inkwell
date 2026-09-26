@@ -131,6 +131,11 @@ dependencies {
     implementation(libs.atproto.compose.material3)
 
     implementation(libs.browser)
+    // Deprecated, and retained solely for LegacySessionMigration to read the
+    // pre-Keystore-envelope EncryptedSharedPreferences session file once. Session
+    // storage itself no longer uses it — see data/auth/SessionEnvelope.kt. Drop
+    // both this and LegacySessionMigration when no install can still hold a
+    // legacy file.
     implementation(libs.security.crypto)
     implementation(libs.core.ktx)
     implementation("androidx.exifinterface:exifinterface:1.4.2")
