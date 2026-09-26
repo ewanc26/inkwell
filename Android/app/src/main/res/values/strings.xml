@@ -53,6 +53,9 @@
     <string name="reader_loading">Loading…</string>
     <string name="reader_loading_post">Loading post…</string>
     <string name="reader_bluesky_post_unavailable">Bluesky post unavailable</string>
+    <string name="reader_quoted_post_by">Quoted post by %1$s</string>
+    <string name="reader_quoted_post_fallback">Quoted post</string>
+    <string name="reader_unknown_author">Unknown author</string>
     <string name="reader_standard_site_post_unavailable">Standard.site post unavailable</string>
     <string name="writer_describe_image">Describe this image</string>
     <string name="writer_alt_text_guidance">Add alt text for people using a screen reader, or mark the image as decorative.</string>
@@ -109,6 +112,12 @@
     <string name="reader_retry">Retry</string>
     <string name="reader_loading_recommendations">Loading recommendations…</string>
     <string name="reader_more_actions_for">More actions for %1$s</string>
+    <string name="reader_cached_label">Cached</string>
+    <string name="reader_cached_detail_banner">Showing a saved copy</string>
+    <string name="reader_loading_subscription">Loading subscription…</string>
+    <string name="reader_empty_content_notice">This post doesn\'t have any content yet.</string>
+    <string name="reader_leaflet_signup_form_notice">Sign-up form — visit the publication\'s website to subscribe.</string>
+    <string name="offline_status_message">You’re offline. Search and new content may be unavailable.</string>
     <string name="reader_tip_title">Enjoying Inkwell?</string>
     <string name="reader_tip_message">If you find Inkwell useful, consider buying me a coffee to support ongoing development.</string>
     <string name="reader_tip_confirm">Tip me</string>
@@ -151,6 +160,7 @@
     <string name="reader_unsupported_content">Unsupported content format</string>
     <string name="auth_feature_write">Write and publish your own posts using the standard.site lexicon.</string>
     <string name="auth_handle">Handle</string>
+    <string name="auth_handle_placeholder">yourname.bsky.social</string>
     <string name="auth_continue">Continue</string>
     <string name="auth_oauth_note">Inkwell uses OAuth to sign in to your PDS securely.</string>
     <string name="auth_browser_note">Your browser will open so you can approve access — no app password needed.</string>
@@ -219,6 +229,12 @@
     <string name="moderation_keyword">Keyword</string>
     <string name="moderation_add_keyword">Add keyword</string>
     <string name="moderation_remove_keyword">Remove</string>
+    <string name="moderation_no_muted_accounts">No muted accounts.</string>
+    <string name="moderation_no_blocked_accounts">No blocked accounts.</string>
+    <string name="moderation_unmute">Unmute</string>
+    <string name="moderation_unblock">Unblock</string>
+    <string name="moderation_action_in_progress">%1$s @%2$s in progress</string>
+    <string name="moderation_action_description">%1$s @%2$s</string>
     <plurals name="moderation_muted_count">
         <item quantity="one">Muted (1)</item>
         <item quantity="other">Muted (%d)</item>
@@ -364,4 +380,10 @@
         <item quantity="one">1 new document</item>
         <item quantity="other">%d new documents</item>
     </plurals>
+    <string name="testing_mode_title">Testing mode</string>
+    <string name="testing_mode_message">You\'re in testing mode, so this action will not hit the network.</string>
+    <string name="testing_mode_action_not_sent">%1$s was not sent.</string>
+    <string name="settings_accessibility_override_note">These apply on top of your device\'s own font size and accessibility settings, and are always free.</string>
+    <string name="settings_appearance_override_note">Overrides apply everywhere, including publications that set their own theme. Free — if you find it useful, a tip (About → Support) helps keep Inkwell going.</string>
+    <string name="settings_offline_sync_note">Recommendations, subscriptions, and comments saved while offline sync automatically when you reconnect. They stay attached to the account that made them.</string>
 </resources>

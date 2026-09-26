@@ -187,17 +187,19 @@ private fun BSkyPostContent(post: uk.ewancroft.inkwell.data.model.bluesky.BSkyPo
 
         // Record embed (quoted post)
         if (embed is uk.ewancroft.inkwell.data.model.bluesky.BSkyEmbed.Record) {
+            val quotedAuthorName = embed.record.author?.displayName ?: stringResource(R.string.reader_unknown_author)
+            val quotedPostByDescription = stringResource(R.string.reader_quoted_post_by, quotedAuthorName)
             Card(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)),
                 modifier = Modifier.semantics(mergeDescendants = true) {
-                    contentDescription = "Quoted post by ${embed.record.author?.displayName ?: "unknown author"}"
+                    contentDescription = quotedPostByDescription
                 },
             ) {
                 Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         Icon(Icons.AutoMirrored.Outlined.Article, contentDescription = null, modifier = Modifier.size(12.dp), tint = MaterialTheme.colorScheme.primary)
                         Text(
-                            embed.record.author?.displayName ?: "Quoted post",
+                            embed.record.author?.displayName ?: stringResource(R.string.reader_quoted_post_fallback),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.SemiBold,
                         )
@@ -224,6 +226,7 @@ private fun BSkyPostContent(post: uk.ewancroft.inkwell.data.model.bluesky.BSkyPo
             PostStat(icon = Icons.Outlined.Repeat, count = post.repostCount)
             PostStat(icon = Icons.Outlined.FavoriteBorder, count = post.likeCount)
             Spacer(Modifier.weight(1f))
+            // noinspection ComposeHardcodedText - "Bluesky" is the source platform's brand name, not translatable copy.
             Text("Bluesky", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f))
         }
     }

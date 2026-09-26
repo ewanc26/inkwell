@@ -261,7 +261,7 @@ private fun LoadingState(modifier: Modifier = Modifier) {
 @Composable
 private fun CachedDetailBanner() {
     Text(
-        "Showing a saved copy",
+        stringResource(R.string.reader_cached_detail_banner),
         style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.onSecondaryContainer,
         modifier = Modifier
