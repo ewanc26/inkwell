@@ -150,7 +150,7 @@
             "buildVersion": "61",
             "versionDate": "2026-09-26",
             "size": 13338300,
-            "sha256": "733716d0baf33c8091fa31143dd2e1db260921f80fb57f6c3f8bfe16ff28bf21",
+            "sha256": "986fcc27dc0a19700f728038de509d5b7d1aafa9ae9c9e3421f15b362a1111ef",
             "downloadURL": "https://inkwell.ewancroft.uk/altstore/Inkwell-2.7.1.ipa",
             "versionDescription": "- fix(ios): add missing ReportReasonType and LoginStateManager+Moderation for content reporting\n- feat(ios,i18n): add Localizable.xcstrings with 357 extracted strings\n- fix(ci): Android APK permission gate (check-release-permissions.sh)\n- chore: merge accessibility, moderation parity, and website fixes from 9 feature branches\n- chore: clean up pbxproj drift from Xcode build cycles"
         }
