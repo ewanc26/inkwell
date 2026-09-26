@@ -1,5 +1,26 @@
 {
   "version": "2.0",
   "effectiveDate": "21 August 2026",
-  "effectiveDateISO": "2026-08-21"
+  "effectiveDateISO": "2026-08-21",
+  "sourceLocale": "en-GB",
+  "documents": {
+    "privacy": "privacy.md",
+    "terms": "terms.md"
+  },
+  "translations": {
+    "fr": {
+      "sourceVersion": "2.0",
+      "reviewedOn": "2026-09-26",
+      "documents": {
+        "privacy": {
+          "file": "privacy.fr.md",
+          "sourceDigest": "834a11ae1a717d5573ccd13f04391244123524634080b76ac59df7a5120faabb"
+        },
+        "terms": {
+          "file": "terms.fr.md",
+          "sourceDigest": "6b1a0062951d548268f1551ad1d85afb33eaec00c7e964e05bba45291105a303"
+        }
+      }
+    }
+  }
 }
