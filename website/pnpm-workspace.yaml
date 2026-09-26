@@ -1,6 +1,9 @@
 # ── PNPM workspace config ────────────────────────────────────────
 # esbuild uses a native binary; allow its postinstall build step
-# so Tailwind v4's CSS plugin can compile during install.
+# so Tailwind v4's CSS plugin can compile during install. puppeteer's
+# postinstall downloads its bundled Chromium, needed by pa11y-ci's
+# accessibility audit (see AGENTS.md's Tooling and Validation section).
 
 allowBuilds:
   esbuild: true
+  puppeteer: true

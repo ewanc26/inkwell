@@ -65,6 +65,7 @@ struct LoginView: View {
 
             Text("Inkwell")
                 .font(.largeTitle.weight(.bold))
+                .accessibilityAddTraits(.isHeader)
 
             Text("Sign in with your AT Protocol account")
                 .font(.subheadline)
@@ -150,6 +151,12 @@ struct LoginView: View {
                 .onSubmit(submit)
                 .padding(12)
                 .background(fieldBackground)
+                // SwiftUI's `TextField(_:text:)` placeholder does not
+                // become the field's accessibility label on its own --
+                // without this, VoiceOver announces nothing until text is
+                // entered. Pair it with the "Handle" caption above so the
+                // field has a non-empty accessible name from launch.
+                .accessibilityLabel("Handle")
         }
     }
 
