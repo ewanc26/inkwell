@@ -38,10 +38,15 @@ struct BSkyPinnedPostRef: Decodable, Sendable {
     let uri: String?
 }
 
+/// `com.atproto.label.defs#label`. Shared by actor profiles and by
+/// Standard.site-enriched `app.bsky.embed.external#viewExternal` cards
+/// (see `BSkyExternalEmbed.BSkyExternal` in `BSkyPostModels.swift`) — one
+/// model for the one wire shape, per AGENTS.md's no-duplication rule.
 struct BSkyLabel: Decodable, Sendable {
     let src: String?
     let uri: String?
     let val: String?
+    let neg: Bool?
     let cts: String?
 }
 
