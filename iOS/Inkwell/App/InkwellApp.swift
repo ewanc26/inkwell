@@ -92,6 +92,22 @@ struct InkwellApp: App {
                     notificationNavigation.enqueue(documentURI: documentURI)
                 }
             }
+            // Universal-link hand-off (https://inkwell.ewancroft.uk/open?uri=...).
+            // Unlike the custom scheme above, this URL is not self-trusting — it's
+            // verified against the author's own PDS/discovery link before routing
+            // into the Reader, falling back to the system browser on failure.
+            .onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { userActivity in
+                guard let url = userActivity.webpageURL,
+                      let candidateURI = HttpsDeepLinkPolicy.candidateDocumentURI(from: url) else { return }
+                Task {
+                    await VerifiedDeepLinkResolver.resolve(
+                        candidateDocumentURI: candidateURI,
+                        originalURL: url,
+                        loginStateManager: loginStateManager,
+                        notificationNavigation: notificationNavigation
+                    )
+                }
+            }
         }
     }
 }
