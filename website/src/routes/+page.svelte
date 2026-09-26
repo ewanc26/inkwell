@@ -74,11 +74,11 @@
     Personal Data Server — no silos, no lock-in.
   </p>
 
-  <p class="page-meta hero-item" style="--i: 2" aria-label="Product metadata">
+  <div class="page-meta hero-item" style="--i: 2" role="group" aria-label="Product metadata">
     <span>AT Protocol</span>
     <span>OAuth 2.1</span>
     <span>iOS &amp; Android</span>
-  </p>
+  </div>
 
   <div class="hero-item flex flex-wrap items-center gap-4" style="--i: 3">
     <a href="#download" class="btn btn-primary active-press">
@@ -93,9 +93,10 @@
     </a>
   </div>
 
-  <p
+  <div
     class="hero-item mt-6 flex flex-wrap items-center gap-2"
     style="--i: 4"
+    role="group"
     aria-label="Project badges"
   >
     <a href="https://github.com/ewanc26/inkwell/releases/latest">
@@ -126,7 +127,7 @@
         height="20"
       />
     </a>
-  </p>
+  </div>
 </section>
 
 <!-- Download -->
