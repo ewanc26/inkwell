@@ -8,7 +8,6 @@
 
 import Foundation
 import ATProtoKit
-import InkwellShared
 
 private let blueskyAppViewProxy = "did:web:api.bsky.app#bsky_appview"
 
@@ -159,72 +158,6 @@ extension LoginStateManager {
         }
     }
 
-    // MARK: - Reporting
-
-    func submitReport(
-        subject: String,
-        recordCID: String?,
-        reasonType: ReportReasonType,
-        reason: String?
-    ) async throws {
-        if TestingMode.isEnabled {
-            TestingModeNotice.shared.report("Submit report")
-            throw LoginError.testingMode
-        }
-
-        let resolvedRecordCID: String?
-        if subject.hasPrefix("at://") {
-            if let recordCID {
-                resolvedRecordCID = recordCID
-            } else {
-                resolvedRecordCID = try await fetchDocument(uri: subject).cid
-            }
-        } else {
-            resolvedRecordCID = nil
-        }
-        let report = ReportSubmission(
-            subject: subject,
-            reasonType: reasonType,
-            reason: reason,
-            recordCid: resolvedRecordCID
-        )
-
-        let reportSubject: [String: Any]
-        switch report.subjectKind {
-        case .account:
-            reportSubject = [
-                "$type": "com.atproto.admin.defs#repoRef",
-                "did": report.subject,
-            ]
-        case .record:
-            guard let cid = report.recordCid else {
-                throw LoginError.invalidURI
-            }
-            reportSubject = [
-                "$type": "com.atproto.repo.strongRef",
-                "uri": report.subject,
-                "cid": cid,
-            ]
-        default:
-            throw LoginError.invalidURI
-        }
-
-        var bodyDict: [String: Any] = [
-            "reasonType": report.reasonType.wireValue,
-            "subject": reportSubject,
-        ]
-        if let reason = report.normalizedReason {
-            bodyDict["reason"] = reason
-        }
-        let body = try JSONSerialization.data(withJSONObject: bodyDict)
-        _ = try await authenticatedData(
-            path: sharedXrpcModerationCreateReport(),
-            method: "POST",
-            body: body,
-            proxy: blueskyAppViewProxy
-        )
-    }
-
     private func fetchGraphActors(path: String, list: GraphActorList) async throws -> [ModeratedActor] {
         var all: [ModeratedActor] = []
         var cursor: String?
@@ -240,7 +173,6 @@ extension LoginStateManager {
                 queryItems: queryItems,
                 proxy: blueskyAppViewProxy
             )
-            try JSONSafety.validateResponse(data)
             let page = try JSONDecoder().decode(GraphActorPage.self, from: data)
             let actors: [GraphActorDTO]
             switch list {
