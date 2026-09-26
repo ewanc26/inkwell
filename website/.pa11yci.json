@@ -1,0 +1,19 @@
+{
+  "defaults": {
+    "standard": "WCAG2AA",
+    "runners": ["axe", "htmlcs"],
+    "chromeLaunchConfig": {
+      "args": ["--no-sandbox", "--disable-dev-shm-usage"]
+    },
+    "ignore": ["notice", "warning"],
+    "timeout": 30000
+  },
+  "urls": [
+    "http://localhost:4173/",
+    "http://localhost:4173/features",
+    "http://localhost:4173/about",
+    "http://localhost:4173/security",
+    "http://localhost:4173/privacy",
+    "http://localhost:4173/terms"
+  ]
+}
