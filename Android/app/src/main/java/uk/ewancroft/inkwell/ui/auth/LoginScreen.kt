@@ -74,6 +74,7 @@ fun LoginScreen(
             color = MaterialTheme.colorScheme.onBackground,
         )
         Spacer(Modifier.height(16.dp))
+        // noinspection ComposeHardcodedText - "Inkwell" is the product/brand name, not translatable copy.
         Text("Inkwell", style = MaterialTheme.typography.headlineLarge)
         Text(
             stringResource(R.string.auth_sign_in_subtitle),
@@ -105,7 +106,7 @@ fun LoginScreen(
             OutlinedTextField(
                 value = handle,
                 onValueChange = { handle = it },
-                placeholder = { Text("yourname.bsky.social") },
+                placeholder = { Text(stringResource(R.string.auth_handle_placeholder)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Uri,

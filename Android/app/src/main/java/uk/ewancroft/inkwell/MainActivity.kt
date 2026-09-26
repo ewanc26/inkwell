@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -40,6 +41,7 @@ import uk.ewancroft.inkwell.shared.AtUri
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 
 import uk.ewancroft.inkwell.util.TipPromptManager
+import uk.ewancroft.inkwell.R
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -159,10 +161,16 @@ class MainActivity : ComponentActivity() {
                     if (blockedAction != null) {
                         AlertDialog(
                             onDismissRequest = { TestingConfig.clear() },
-                            title = { Text("Testing mode") },
-                            text = { Text("${TestingConfig.MESSAGE}\n\n$blockedAction was not sent.") },
+                            title = { Text(stringResource(R.string.testing_mode_title)) },
+                            text = {
+                                Text(
+                                    stringResource(R.string.testing_mode_message) +
+                                        "\n\n" +
+                                        stringResource(R.string.testing_mode_action_not_sent, blockedAction.orEmpty()),
+                                )
+                            },
                             confirmButton = {
-                                TextButton(onClick = { TestingConfig.clear() }) { Text("OK") }
+                                TextButton(onClick = { TestingConfig.clear() }) { Text(stringResource(R.string.ok)) }
                             },
                         )
                     }

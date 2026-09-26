@@ -434,7 +434,7 @@ private fun SubscribeRow(uiState: PostDetailUiState, onToggleSubscription: () ->
 
         if (uiState.isLoadingSubscriptionState) {
             Text(
-                "Loading subscription…",
+                stringResource(R.string.reader_loading_subscription),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -536,7 +536,7 @@ private fun UnsupportedFormatNotice(formatType: String?) {
 @Composable
 private fun EmptyContentNotice() {
     Text(
-        "This post doesn't have any content yet.",
+        stringResource(R.string.reader_empty_content_notice),
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )

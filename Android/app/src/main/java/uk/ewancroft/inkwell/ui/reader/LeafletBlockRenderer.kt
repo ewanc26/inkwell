@@ -285,6 +285,7 @@ fun MathBlock(block: LeafletBlock) {
         color = MaterialTheme.colorScheme.surfaceVariant,
     ) {
         Column(Modifier.padding(12.dp)) {
+            // noinspection ComposeHardcodedText - "TeX" is the name of the markup/typesetting system, not translatable copy.
             Text(
                 "TeX",
                 style = MaterialTheme.typography.labelSmall,
@@ -523,7 +524,7 @@ fun SignupBlock() {
         ) {
             Icon(Icons.Outlined.MailOutline, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(
-                "Sign-up form — visit the publication's website to subscribe.",
+                stringResource(R.string.reader_leaflet_signup_form_notice),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

@@ -393,7 +393,7 @@ fun SettingsDialog(
                         },
                     )
                     Text(
-                        "These apply on top of your device's own font size and accessibility settings, and are always free.",
+                        stringResource(R.string.settings_accessibility_override_note),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -494,7 +494,7 @@ fun SettingsDialog(
                         },
                     )
                     Text(
-                        "Overrides apply everywhere, including publications that set their own theme. Free — if you find it useful, a tip (About → Support) helps keep Inkwell going.",
+                        stringResource(R.string.settings_appearance_override_note),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -548,7 +548,7 @@ fun SettingsDialog(
                         }
                     }
                     Text(
-                        "Recommendations, subscriptions, and comments saved while offline sync automatically when you reconnect. They stay attached to the account that made them.",
+                        stringResource(R.string.settings_offline_sync_note),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
