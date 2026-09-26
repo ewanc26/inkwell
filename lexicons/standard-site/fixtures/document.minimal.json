@@ -1,0 +1,6 @@
+{
+  "$type": "site.standard.document",
+  "site": "https://example.publication.test",
+  "title": "A loose document with only the required fields",
+  "publishedAt": "2026-01-02T03:04:05.000Z"
+}
