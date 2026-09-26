@@ -245,4 +245,31 @@ class DocumentMetadataTest {
 
         assertEquals(blob, result["coverImage"])
     }
+
+    @Test
+    fun `owned keys are exactly the keys applyTo can write`() {
+        val full = DocumentMetadata(
+            tags = listOf("t"),
+            contributors = listOf(DocumentMetadata.Contributor(did = "did:plc:x")),
+            labels = listOf("nudity"),
+            coverImage = mapOf("\$type" to "blob"),
+            bskyPostRef = DocumentMetadata.BskyPostRef(uri = "at://did:plc:x/app.bsky.feed.post/1", cid = "c"),
+            links = listOf(DocumentMetadata.Link(raw = mapOf("\$type" to "x"))),
+        )
+
+        val written = DocumentMetadata.applyTo(emptyMap(), full)
+
+        assertEquals(DocumentMetadata.OWNED_KEYS.toSet(), written.keys)
+    }
+
+    @Test
+    fun `offered self labels are distinct and written in the selfLabels shape`() {
+        val values = DocumentMetadata.SELF_LABEL_VALUES
+        assertEquals(values.distinct(), values)
+
+        val wire = DocumentMetadata.labelsWire(values)
+        @Suppress("UNCHECKED_CAST")
+        val written = (wire?.get("values") as List<Map<String, Any?>>).map { it["val"] }
+        assertEquals(values, written)
+    }
 }
