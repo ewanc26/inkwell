@@ -28,6 +28,16 @@ object JsonMapBridge {
         jsonElementToAny(value)
     }
 
+    /**
+     * Recursively converts a [JsonArray] to a list of generic values.
+     */
+    fun arrayToList(array: JsonArray): List<Any?> = array.map { jsonElementToAny(it) }
+
+    /**
+     * Recursively converts a list of generic values to a [JsonArray].
+     */
+    fun listToJson(list: List<Any?>): JsonArray = JsonArray(list.map { anyToJson(it) })
+
     private fun anyToJson(value: Any?): JsonElement = when (value) {
         null -> JsonNull
         is Map<*, *> -> {

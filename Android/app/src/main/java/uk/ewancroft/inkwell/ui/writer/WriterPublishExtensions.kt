@@ -6,7 +6,6 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import uk.ewancroft.inkwell.shared.graph.CollectionNsids
@@ -55,8 +54,7 @@ fun WriterViewModel.publish() {
                 }
             }
 
-            val content = MarkdownConverter.convert(state.markdown, state.selectedFormat, state.uploadedBlobs)
-            val plaintext = markdownToPlaintext(state.markdown)
+            val uploader = BlobUploader { bytes, mimeType -> pdsRepository.uploadBlob(bytes, mimeType) }
 
             if (state.editingDocumentUri != null) {
                 val recordCID = state.editingDocumentRecordCID
@@ -68,26 +66,31 @@ fun WriterViewModel.publish() {
                     return@launch
                 }
 
-                val record = mergeExistingDocumentRecord(state.editingDocumentRecord) {
-                     put("\$type", CollectionNsids.DOCUMENT)
-                    put("site", pub.uri)
-                    put("title", state.title.trim())
-                    applyEditTimestamps(this, state.editingDocumentRecord, now)
-                    if (state.description.isNotBlank()) {
-                        put("description", state.description.trim())
-                    }
-                    if (normalizedPath.isNotBlank()) {
-                        put("path", normalizedPath)
-                    }
-                    put("content", content)
-                    if (plaintext.isNotBlank()) {
-                        put("textContent", plaintext)
+                val record = buildFittingDocumentRecord(
+                    markdown = state.markdown,
+                    format = state.selectedFormat,
+                    uploadedBlobs = state.uploadedBlobs,
+                    uploader = uploader,
+                ) { content, textContent ->
+                    mergeExistingDocumentRecord(state.editingDocumentRecord) {
+                        put("\$type", CollectionNsids.DOCUMENT)
+                        put("site", pub.uri)
+                        put("title", state.title.trim())
+                        applyEditTimestamps(this, state.editingDocumentRecord, now)
+                        if (state.description.isNotBlank()) {
+                            put("description", state.description.trim())
+                        }
+                        if (normalizedPath.isNotBlank()) {
+                            put("path", normalizedPath)
+                        }
+                        put("content", content)
+                        if (textContent.isNotBlank()) {
+                            put("textContent", textContent)
+                        }
                     }
                 }
 
-                ensureDocumentRecordFits(record)
-
-                val result = pdsRepository.updateRecord(
+                pdsRepository.updateRecord(
                     uri = state.editingDocumentUri,
                     record = record,
                     recordCID = recordCID,
@@ -101,27 +104,32 @@ fun WriterViewModel.publish() {
                     editingDocumentRecordCID = null,
                 )
             } else {
-                val record = buildJsonObject {
-                     put("\$type", CollectionNsids.DOCUMENT)
-                    put("site", pub.uri)
-                    put("title", state.title.trim())
-                    put("publishedAt", now)
-                    if (state.description.isNotBlank()) {
-                        put("description", state.description.trim())
-                    }
-                    if (normalizedPath.isNotBlank()) {
-                        put("path", normalizedPath)
-                    }
-                    put("content", content)
-                    if (plaintext.isNotBlank()) {
-                        put("textContent", plaintext)
+                val record = buildFittingDocumentRecord(
+                    markdown = state.markdown,
+                    format = state.selectedFormat,
+                    uploadedBlobs = state.uploadedBlobs,
+                    uploader = uploader,
+                ) { content, textContent ->
+                    buildJsonObject {
+                        put("\$type", CollectionNsids.DOCUMENT)
+                        put("site", pub.uri)
+                        put("title", state.title.trim())
+                        put("publishedAt", now)
+                        if (state.description.isNotBlank()) {
+                            put("description", state.description.trim())
+                        }
+                        if (normalizedPath.isNotBlank()) {
+                            put("path", normalizedPath)
+                        }
+                        put("content", content)
+                        if (textContent.isNotBlank()) {
+                            put("textContent", textContent)
+                        }
                     }
                 }
 
-                ensureDocumentRecordFits(record)
-
                 val result = pdsRepository.createRecord(
-                     collection = CollectionNsids.DOCUMENT,
+                    collection = CollectionNsids.DOCUMENT,
                     record = record,
                 )
 
@@ -137,6 +145,11 @@ fun WriterViewModel.publish() {
                     uploadedBlobs = emptyMap(),
                 )
             }
+        } catch (e: DocumentTooLargeException) {
+            uiStateInternal.value = uiStateInternal.value.copy(
+                isPublishing = false,
+                publishError = e.message,
+            )
         } catch (e: Exception) {
             uiStateInternal.value = uiStateInternal.value.copy(
                 isPublishing = false,
@@ -150,17 +163,31 @@ fun WriterViewModel.publish() {
     }
 }
 
+/**
+ * A document that cannot be represented inside the AT Protocol record-size limit.
+ *
+ * Extends [IllegalStateException] so `check`-style preflight failures and
+ * format-cannot-fit failures surface through the same Writer error path.
+ */
+internal class DocumentTooLargeException(message: String) : IllegalStateException(message)
+
+/** Encoded size, in bytes, of the record as it will be submitted over XRPC. */
+internal fun encodedRecordSize(record: JsonObject): Int =
+    Json.encodeToString(JsonObject.serializer(), record).encodeToByteArray().size
+
 internal fun ensureDocumentRecordFits(record: JsonObject) {
-    val encodedBytes = Json.encodeToString(JsonObject.serializer(), record).encodeToByteArray().size
-    check(!RecordSizePolicy.exceedsLimit(encodedBytes)) {
-        "Document is too large to publish (${encodedBytes} bytes; limit is " +
-            "${RecordSizePolicy.MAX_DOCUMENT_RECORD_BYTES} bytes). Use a shorter document or a blob-backed format."
+    val encodedBytes = encodedRecordSize(record)
+    if (RecordSizePolicy.exceedsLimit(encodedBytes)) {
+        throw DocumentTooLargeException(
+            "Document is too large to publish ($encodedBytes bytes; limit is " +
+                "${RecordSizePolicy.MAX_DOCUMENT_RECORD_BYTES} bytes). Use a shorter document or a blob-backed format.",
+        )
     }
 }
 
 internal fun mergeExistingDocumentRecord(
     existing: JsonObject?,
-    overrides: kotlinx.serialization.json.JsonObjectBuilder.() -> Unit,
+    overrides: JsonObjectBuilder.() -> Unit,
 ): JsonObject = buildJsonObject {
     existing?.forEach { (key, value) -> put(key, value) }
     overrides()
