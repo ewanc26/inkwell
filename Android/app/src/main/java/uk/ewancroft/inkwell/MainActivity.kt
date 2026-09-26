@@ -48,6 +48,7 @@ import uk.ewancroft.inkwell.shared.graph.CollectionNsids
 
 import uk.ewancroft.inkwell.util.TipPromptManager
 import uk.ewancroft.inkwell.R
+import java.security.MessageDigest
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -56,16 +57,35 @@ class MainActivity : ComponentActivity() {
     @Inject
     internal lateinit var httpsDeepLinkResolver: HttpsDeepLinkResolver
 
-    private val pendingIntent = mutableStateOf<Intent?>(null)
-    private val pendingDocumentUri = mutableStateOf<String?>(null)
+    // `internal` rather than `private` so the instrumentation suite in
+    // app/src/androidTest can assert on real singleTask intent delivery
+    // (cold start vs onNewIntent, duplicate suppression, process recreation)
+    // without reaching through reflection. Nothing outside this class writes
+    // them.
+    internal val pendingIntent = mutableStateOf<Intent?>(null)
+    internal val pendingDocumentUri = mutableStateOf<String?>(null)
 
     // Set only after a verified https hand-off fails — see handleHttpsDeepLink().
     // Never trusted directly into the Reader; only ever opened in the browser.
-    private val pendingBrowserUri = mutableStateOf<Uri?>(null)
-    private var handledOAuthCallback: String? = null
+    internal val pendingBrowserUri = mutableStateOf<Uri?>(null)
+
+    /**
+     * Fingerprint of the OAuth callback already handed to the OAuth library, or
+     * null if none has been. Survives configuration change/process recreation
+     * via [onSaveInstanceState] so a rotation cannot replay a spent
+     * authorization code — `getIntent()` still returns the callback intent
+     * after recreation, and a fresh instance would otherwise re-exchange it.
+     *
+     * A digest, not the URI: the raw callback carries the authorization `code`
+     * and PKCE `state`, which must not be written into a bundle the system may
+     * persist. See [OAuthCallbackPolicy.deliveryFingerprint].
+     */
+    internal var handledOAuthCallback: String? = null
+        private set
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        handledOAuthCallback = savedInstanceState?.getString(STATE_HANDLED_OAUTH_CALLBACK)
         TipPromptManager.recordLaunch(this)
         enableEdgeToEdge()
         TestingConfig.enabled = intent.getBooleanExtra("testing", false)
@@ -88,9 +108,9 @@ class MainActivity : ComponentActivity() {
             val intentToHandle = pendingIntent.value ?: intent
             LaunchedEffect(intentToHandle) {
                 intentToHandle?.data?.let { data ->
-                    val callback = data.toString()
-                    if (OAuthCallbackPolicy.isCallback(data) && callback != handledOAuthCallback) {
-                        handledOAuthCallback = callback
+                    val fingerprint = OAuthCallbackPolicy.deliveryFingerprint(data)
+                    if (fingerprint != null && fingerprint != handledOAuthCallback) {
+                        handledOAuthCallback = fingerprint
                         // Consume this delivery before starting the async exchange.
                         pendingIntent.value = null
                         viewModel.completeLogin(data.toString())
@@ -205,7 +225,15 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onNewIntent(intent: Intent) {
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        handledOAuthCallback?.let { outState.putString(STATE_HANDLED_OAUTH_CALLBACK, it) }
+    }
+
+    // `public` rather than inheriting `protected`: the instrumentation suite
+    // drives the warm singleTask delivery path directly, which is the only way
+    // to test it without a second Activity to launch from.
+    public override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
         pendingIntent.value = intent
@@ -261,11 +289,36 @@ class MainActivity : ComponentActivity() {
         }
         runCatching { startActivity(intent) }
     }
+
+    private companion object {
+        const val STATE_HANDLED_OAUTH_CALLBACK = "handledOAuthCallback"
+    }
 }
 
 internal object OAuthCallbackPolicy {
     fun isCallback(uri: android.net.Uri): Boolean =
         uri.scheme?.equals("uk.ewancroft.inkwell", ignoreCase = true) == true && uri.path == "/callback"
+
+    /**
+     * A stable, non-secret identity for one OAuth callback delivery, or null if
+     * [uri] is not an OAuth callback at all.
+     *
+     * Used to recognise a redelivery of the *same* callback — the warm
+     * `singleTask` `onNewIntent()` path, a recomposition, or a configuration
+     * change that hands `getIntent()` back to a fresh Activity instance — so a
+     * spent authorization code is exchanged exactly once.
+     *
+     * It is a SHA-256 digest rather than the URI itself because the raw
+     * callback carries the authorization `code` and PKCE `state`, and this
+     * value is persisted in the saved-instance bundle. Comparing digests is
+     * enough to spot a duplicate without ever storing the credential material.
+     */
+    fun deliveryFingerprint(uri: android.net.Uri): String? {
+        if (!isCallback(uri)) return null
+        return MessageDigest.getInstance("SHA-256")
+            .digest(uri.toString().toByteArray(Charsets.UTF_8))
+            .joinToString("") { byte -> "%02x".format(byte) }
+    }
 }
 
 internal object ContentDeepLinkPolicy {
