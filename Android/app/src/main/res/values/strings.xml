@@ -68,6 +68,8 @@
     <string name="writer_change_document">Change document</string>
     <string name="writer_edit_existing_document">Edit existing document</string>
     <string name="reader_recommend">Recommend</string>
+    <string name="reader_bsky_related_content">Related</string>
+    <string name="reader_bsky_related_content_description">Related Standard.site content. Opens the associated document in Inkwell.</string>
     <string name="reader_unrecommend">Unrecommend</string>
     <string name="reader_subscribe">Subscribe to publication</string>
     <string name="reader_unsubscribe">Unsubscribe</string>
