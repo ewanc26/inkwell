@@ -1,0 +1,26 @@
+{
+  "$type": "site.standard.publication",
+  "url": "https://standard.site",
+  "name": "Standard.site",
+  "description": "Standard.site provides shared lexicons for long-form publishing on AT Protocol. Making content easier to discover, index, and move across the ATmosphere.",
+  "icon": {
+    "$type": "blob",
+    "ref": { "$link": "bafkreicccrcq574fdbug4ebyx6w327xo7hkqo5wqhidlfvlpnz7qronqqy" },
+    "mimeType": "image/png",
+    "size": 1696
+  },
+  "basicTheme": {
+    "$type": "site.standard.theme.basic",
+    "background": { "$type": "site.standard.theme.color#rgb", "r": 255, "g": 255, "b": 255 },
+    "foreground": { "$type": "site.standard.theme.color#rgb", "r": 16, "g": 16, "b": 16 },
+    "accent": { "$type": "site.standard.theme.color#rgb", "r": 0, "g": 102, "b": 204 },
+    "accentForeground": { "$type": "site.standard.theme.color#rgb", "r": 255, "g": 255, "b": 255 }
+  },
+  "labels": {
+    "$type": "com.atproto.label.defs#selfLabels",
+    "values": [{ "val": "!no-unauthenticated" }]
+  },
+  "preferences": {
+    "showInDiscover": true
+  }
+}

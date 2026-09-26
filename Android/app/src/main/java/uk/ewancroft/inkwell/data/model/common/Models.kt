@@ -26,7 +26,7 @@ data class BlobRef(
     val ref: BlobLink? = null,
     @SerialName("\$link") val legacyLink: String? = null,
     val size: Int = 0,
-    @SerialName("\$type") val type: String = "blob",
+    val type: String = "blob",
     val mimeType: String? = null
 ) {
     /** The blob's CID, from either the canonical `ref.$link` or the legacy top-level `$link`. */

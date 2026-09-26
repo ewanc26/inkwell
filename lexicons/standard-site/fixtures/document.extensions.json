@@ -1,0 +1,25 @@
+{
+  "$type": "site.standard.document",
+  "site": "at://did:plc:re3ebnp5v7ffagz6rb6xfei4/site.standard.publication/3me5vykp6lf2y",
+  "title": "Recommend Lexicon",
+  "publishedAt": "2026-05-19T00:00:00.000Z",
+  "path": "/docs/lexicons/recommend",
+  "description": "Carries the fields Standard.site publishers emit in the wild that the published Lexicon does not declare. See ../inkwell-extensions.json.",
+  "canonicalUrl": "https://standard.site/docs/lexicons/recommend",
+  "theme": {
+    "$type": "pub.leaflet.publication#theme",
+    "backgroundColor": { "$type": "pub.leaflet.theme.color#rgb", "r": 255, "g": 250, "b": 240 },
+    "primary": { "$type": "pub.leaflet.theme.color#rgb", "r": 20, "g": 20, "b": 20 },
+    "showPageBackground": true,
+    "pageWidth": 640,
+    "headingFont": "serif",
+    "bodyFont": "serif"
+  },
+  "preferences": {
+    "showComments": true,
+    "showMentions": false,
+    "showRecommends": true,
+    "showPrevNext": true,
+    "showInDiscover": true
+  }
+}

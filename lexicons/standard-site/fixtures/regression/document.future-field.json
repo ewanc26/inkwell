@@ -1,0 +1,8 @@
+{
+  "$comment": "Regression fixture for issue #65. Simulates a site.standard.document field that no pinned Lexicon declares yet -- a stand-in for whatever Standard.site adds next. Deliberately lives under fixtures/regression/ rather than fixtures/ directly: tools/lexicons/update-standard-site.mjs's listFixtureFiles() only reads the top level of fixtures/, so this file is invisible to (and never expected to pass) the schema-conformance check -- by construction, no pinned schema will ever declare futureField. Both platforms' decode-edit-encode round trip must still leave it and $comment untouched.",
+  "$type": "site.standard.document",
+  "site": "at://did:plc:re3ebnp5v7ffagz6rb6xfei4/site.standard.publication/3me5vykp6lf2y",
+  "title": "A document from a future Standard.site schema revision",
+  "publishedAt": "2026-09-01T00:00:00.000Z",
+  "futureField": "This value must survive an edit round-trip even though no client models it yet."
+}

@@ -1,0 +1,7 @@
+{
+  "$type": "site.standard.theme.basic",
+  "background": { "$type": "site.standard.theme.color#rgb", "r": 14, "g": 14, "b": 18 },
+  "foreground": { "$type": "site.standard.theme.color#rgb", "r": 236, "g": 236, "b": 238 },
+  "accent": { "$type": "site.standard.theme.color#rgb", "r": 120, "g": 180, "b": 255 },
+  "accentForeground": { "$type": "site.standard.theme.color#rgb", "r": 0, "g": 0, "b": 0 }
+}

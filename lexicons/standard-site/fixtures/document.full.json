@@ -1,0 +1,68 @@
+{
+  "$type": "site.standard.document",
+  "site": "at://did:plc:re3ebnp5v7ffagz6rb6xfei4/site.standard.publication/3me5vykp6lf2y",
+  "title": "Every field Inkwell claims to preserve",
+  "publishedAt": "2026-05-19T00:00:00.000Z",
+  "updatedAt": "2026-09-21T11:30:00.000Z",
+  "path": "/conformance/document-full",
+  "description": "Exercises every property declared by the pinned site.standard.document Lexicon, so a model that silently drops one fails its round-trip test.",
+  "textContent": "Every field Inkwell claims to preserve.\n\nPlaintext has no markdown.",
+  "tags": [
+    "conformance",
+    "lexicon",
+    "standard.site"
+  ],
+  "coverImage": {
+    "$type": "blob",
+    "ref": {
+      "$link": "bafkreibyshzq4yiashq67ajipj3eo6n2dybbvsdmzspox7mpgoxtfimoeq"
+    },
+    "mimeType": "image/png",
+    "size": 113475
+  },
+  "content": {
+    "$type": "pub.leaflet.content",
+    "pages": [
+      {
+        "$type": "pub.leaflet.pages.linearDocument",
+        "blocks": [
+          {
+            "block": {
+              "$type": "pub.leaflet.blocks.text",
+              "plaintext": "Every field Inkwell claims to preserve."
+            }
+          }
+        ],
+        "id": "page-1"
+      }
+    ]
+  },
+  "links": {
+    "$type": "site.standard.document#link",
+    "rel": "canonical",
+    "uri": "https://standard.site/conformance/document-full"
+  },
+  "labels": {
+    "$type": "com.atproto.label.defs#selfLabels",
+    "values": [
+      {
+        "val": "!no-unauthenticated"
+      }
+    ]
+  },
+  "contributors": [
+    {
+      "$type": "site.standard.document#contributor",
+      "did": "did:plc:re3ebnp5v7ffagz6rb6xfei4",
+      "role": "editor",
+      "displayName": "Standard.site"
+    },
+    {
+      "did": "did:plc:z72i7hdynmk6r22z27h6tvur"
+    }
+  ],
+  "bskyPostRef": {
+    "uri": "at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3lbvbzbpt2k2p",
+    "cid": "bafyreibyshzq4yiashq67ajipj3eo6n2dybbvsdmzspox7mpgoxtfimoeq"
+  }
+}
