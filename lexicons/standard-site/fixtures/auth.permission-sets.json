@@ -1,0 +1,25 @@
+{
+  "$comment": "Derived from the pinned site.standard.auth* permission-set Lexicons by tools/lexicons/update-standard-site.mjs. Do not hand-edit -- --check rebuilds and compares it. Both platforms' OAuth scope constants are asserted against this file.",
+  "permissionSets": {
+    "site.standard.authFull": {
+      "scope": "include:site.standard.authFull",
+      "title": "Standard.site",
+      "detail": "Manage your publications, documents, subscriptions, and recommends.",
+      "collections": [
+        "site.standard.document",
+        "site.standard.graph.recommend",
+        "site.standard.graph.subscription",
+        "site.standard.publication"
+      ]
+    },
+    "site.standard.authSocial": {
+      "scope": "include:site.standard.authSocial",
+      "title": "Standard.site",
+      "detail": "Manage your publication subscriptions and document recommendations.",
+      "collections": [
+        "site.standard.graph.recommend",
+        "site.standard.graph.subscription"
+      ]
+    }
+  }
+}

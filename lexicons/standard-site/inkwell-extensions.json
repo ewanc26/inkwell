@@ -1,0 +1,35 @@
+{
+  "$comment": [
+    "Record properties Inkwell reads or preserves that the pinned Standard.site Lexicons do not declare.",
+    "Hand-authored; tools/lexicons/update-standard-site.mjs reads this file but never rewrites it.",
+    "Every entry is a deliberate decision that needed writing down somewhere: without it, a fixture",
+    "carrying one of these fields would look like schema drift, and a reader would have no way to tell",
+    "'the Lexicon grew a field we haven't modelled yet' apart from 'publishers emit this and always have'.",
+    "`modelledBy` records which clients have a typed property for it; an empty list means the field only",
+    "survives via the non-destructive edit merge path, never through a typed model."
+  ],
+  "site.standard.document": {
+    "theme": {
+      "modelledBy": ["ios", "android"],
+      "note": "Rich Leaflet-style per-document theme override. Emitted by Leaflet-family publishers and cascaded by both readers, but absent from the published site.standard.document Lexicon."
+    },
+    "preferences": {
+      "modelledBy": ["android"],
+      "note": "Per-document display toggles (showComments/showMentions/showRecommends/showPrevNext/showInDiscover). site.standard.publication declares a #preferences def; the document Lexicon does not, so this is an extension on both platforms -- iOS does not model it at all."
+    },
+    "canonicalUrl": {
+      "modelledBy": [],
+      "note": "Absolute document URL, emitted by Standard.site's own publisher. Inkwell derives the canonical URL from site + path instead, so nothing reads this; it must still survive an edit untouched."
+    }
+  },
+  "site.standard.publication": {
+    "theme": {
+      "modelledBy": ["ios", "android"],
+      "note": "Rich Leaflet-style publication theme. The Lexicon declares only basicTheme; the reader theme cascade is Leaflet theme -> basicTheme -> system."
+    },
+    "createdAt": {
+      "modelledBy": [],
+      "note": "Emitted by Standard.site's own publisher on publication records. Not declared by the Lexicon and not read by Inkwell."
+    }
+  }
+}
