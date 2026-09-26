@@ -29,6 +29,22 @@ jobs:
           node-version: 22
       - run: node tools/legal/render.mjs --check
 
+  # Cheap and correctness-critical for the same reason as legal-sync: catches
+  # a checked-in Standard.site schema/fixture drifting from its pinned CID or
+  # digest (see tools/lexicons/update-standard-site.mjs). Offline and
+  # deterministic, so it runs unconditionally rather than being gated by the
+  # path filter below -- it never touches the network and never auto-updates
+  # the pins, it only fails when the working tree no longer matches them.
+  standard-site-lexicons:
+    name: Standard.site Lexicon conformance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+      - run: node tools/lexicons/update-standard-site.mjs --check
+
   # Detect which part of the monorepo actually changed so an
   # iOS-only or Android-only commit doesn't pay for the other
   # platform's (much slower) build.
