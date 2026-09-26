@@ -3,10 +3,12 @@
 // and navigation structure lives in one place rather than scattered
 // across components.
 
+// Per-route titles and descriptions moved into the message catalogues
+// (src/lib/i18n/messages/) when the site became multilingual, because they
+// are visible copy. What stays here is what is *not* language-dependent:
+// the product name and the canonical origin.
 export const SITE = {
   title: "Inkwell",
-  description:
-    "A native reader and writer for the Standard.site publishing ecosystem on AT Protocol. Read, discover, and publish portable writing from your own PDS.",
   url: "https://inkwell.ewancroft.uk",
 };
 
@@ -21,6 +23,10 @@ export const SITE = {
 // finishes downloading — without them the embed reflows or falls back
 // to a small thumbnail.
 
+// `alt` is not in the message catalogues on purpose: it has to describe
+// what tools/og-cover/template.html actually renders, and that artwork is
+// a single English-language PNG shared by every locale. Localising the
+// alt text would make it describe words the image does not contain.
 export const OG_IMAGE = {
   path: "/og-cover.png",
   type: "image/png",
@@ -29,13 +35,31 @@ export const OG_IMAGE = {
   alt: "The Inkwell mark beside the Inkwell wordmark and the line: Read, discover, and publish Standard.site writing from your own PDS.",
 } as const;
 
+// ── Navigation structure ─────────────────────────────────────────
+// Structure (order, targets, which links leave the site) lives here;
+// the labels live in the message catalogues under `nav.links` and
+// `footer.links`, keyed by `key`. Internal `url`s are written in
+// source-locale form and run through `localizeHref` at render time.
+
 export const NAV_LINKS = [
-  { label: "Home", url: "/" },
-  { label: "Features", url: "/features" },
-  { label: "Security", url: "/security" },
-  { label: "About", url: "/about" },
-  { label: "Get Inkwell", url: "/#download" },
-  { label: "Source", url: "https://github.com/ewanc26/inkwell" },
+  { key: "home", url: "/" },
+  { key: "features", url: "/features" },
+  { key: "security", url: "/security" },
+  { key: "about", url: "/about" },
+  { key: "download", url: "/#download" },
+  { key: "source", url: "https://github.com/ewanc26/inkwell" },
+] as const;
+
+export const FOOTER_LINKS = [
+  { key: "privacy", url: "/privacy", external: false },
+  { key: "terms", url: "/terms", external: false },
+  { key: "github", url: "https://github.com/ewanc26/inkwell", external: true },
+  { key: "kofi", url: "https://ko-fi.com/ewancroft", external: true },
+  {
+    key: "sponsors",
+    url: "https://github.com/sponsors/ewanc26",
+    external: true,
+  },
 ] as const;
 
 // ── Install sources ──────────────────────────────────────────────

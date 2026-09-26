@@ -2,7 +2,12 @@
 <!-- SvelteKit app shell for Inkwell.
      The %sveltekit.*% placeholders are replaced at build time with
      the rendered head and body from the active route. -->
-<html lang="en-gb" style="color-scheme: light dark">
+<!-- The lang and dir placeholders below are filled in per request by
+     src/hooks.server.ts from the locale the URL names; see
+     src/lib/i18n/locales.ts. Don't write either token anywhere else in
+     this file: the hook substitutes by token, so a second occurrence
+     would be indistinguishable from the real one. -->
+<html lang="%lang%" dir="%dir%" style="color-scheme: light dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
