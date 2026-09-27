@@ -134,10 +134,10 @@
           <Download class="h-4 w-4" />
           {m.download.ios.addSource}
         </a>
-        <span class="btn btn-outline" aria-label={m.download.ios.storeAria} title={m.download.ios.storeAria}>
+        <button class="btn btn-outline btn-placeholder" disabled aria-label={m.download.ios.storeAria}>
           <Apple class="h-4 w-4" />
           {m.download.ios.store}
-        </span>
+        </button>
       </div>
       <p class="mt-3 text-sm text-muted">{@html rich(m.download.ios.note, locale)}</p>
     </div>
@@ -151,10 +151,10 @@
           <Download class="h-4 w-4" />
           {m.download.android.addSource}
         </a>
-        <span class="btn btn-outline" aria-label={m.download.android.storeAria} title={m.download.android.storeAria}>
+        <button class="btn btn-outline btn-placeholder" disabled aria-label={m.download.android.storeAria}>
           <Smartphone class="h-4 w-4" />
           {m.download.android.store}
-        </span>
+        </button>
       </div>
       <p class="mt-3 text-sm text-muted">
         {@html rich(m.download.android.note, locale)}

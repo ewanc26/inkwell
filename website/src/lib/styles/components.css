@@ -166,11 +166,13 @@
   }
 
   /* Placeholder buttons (store listings not yet live) — rendered as
-     spans, not anchors, so they are non-interactive but still visible.
+     disabled buttons, so they are non-interactive but still visible.
      Reduced opacity signals "coming soon" without removing context. */
-  span.btn-outline {
+  .btn-placeholder,
+  button[disabled].btn-outline {
     opacity: 0.5;
-    cursor: default;
+    cursor: not-allowed;
+    pointer-events: none;
     user-select: none;
   }
 
