@@ -12,8 +12,6 @@
     SITE,
     ALTSTORE_SOURCE_LINK,
     FDROID_REPO_LINK,
-    APP_STORE_PLACEHOLDER_LINK,
-    PLAY_STORE_PLACEHOLDER_LINK,
   } from "$lib/config";
   import type { PageData } from "./$types";
 
@@ -46,7 +44,7 @@
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 400 952"
     fill="none"
-    class="hero-mark mb-8 h-20 w-auto sm:h-24"
+    class="hero-mark mb-8 h-28 w-auto sm:h-36"
     aria-label="Inkwell"
     role="img"
   >
@@ -74,11 +72,11 @@
     Personal Data Server — no silos, no lock-in.
   </p>
 
-  <p class="page-meta hero-item" style="--i: 2" aria-label="Product metadata">
+  <div class="page-meta hero-item" style="--i: 2" role="group" aria-label="Product metadata">
     <span>AT Protocol</span>
     <span>OAuth 2.1</span>
     <span>iOS &amp; Android</span>
-  </p>
+  </div>
 
   <div class="hero-item flex flex-wrap items-center gap-4" style="--i: 3">
     <a href="#download" class="btn btn-primary active-press">
@@ -93,40 +91,6 @@
     </a>
   </div>
 
-  <p
-    class="hero-item mt-6 flex flex-wrap items-center gap-2"
-    style="--i: 4"
-    aria-label="Project badges"
-  >
-    <a href="https://github.com/ewanc26/inkwell/releases/latest?q=ios-v">
-      <img
-        src="https://img.shields.io/github/v/release/ewanc26/inkwell?filter=ios-v*&label=iOS&logo=apple&logoColor=white"
-        alt="Latest iOS release"
-        height="20"
-      />
-    </a>
-    <a href="https://github.com/ewanc26/inkwell/releases/latest?q=android-v">
-      <img
-        src="https://img.shields.io/github/v/release/ewanc26/inkwell?filter=android-v*&label=Android&logo=android&logoColor=white"
-        alt="Latest Android release"
-        height="20"
-      />
-    </a>
-    <a href="https://github.com/ewanc26/inkwell/blob/main/LICENSE">
-      <img
-        src="https://img.shields.io/github/license/ewanc26/inkwell"
-        alt="AGPL-3.0"
-        height="20"
-      />
-    </a>
-    <a href="https://github.com/sponsors/ewanc26">
-      <img
-        src="https://img.shields.io/github/sponsors/ewanc26?logo=githubsponsors&logoColor=white&label=sponsors"
-        alt="Sponsor"
-        height="20"
-      />
-    </a>
-  </p>
 </section>
 
 <!-- Download -->
@@ -153,14 +117,13 @@
           <Download class="h-4 w-4" />
           Add AltStore source
         </a>
-        <a
-          href={APP_STORE_PLACEHOLDER_LINK}
-          class="btn btn-outline active-press"
-          aria-label="App Store listing placeholder — planned £5 build"
+        <span
+          class="btn btn-outline btn-placeholder"
+          aria-label="App Store listing — planned £5 build, not yet live"
         >
           <Apple class="h-4 w-4" />
           App Store — planned £5
-        </a>
+        </span>
       </div>
       <p class="mt-3 text-sm text-muted">
         This source works with
@@ -185,14 +148,13 @@
           <Download class="h-4 w-4" />
           Add F-Droid repo
         </a>
-        <a
-          href={PLAY_STORE_PLACEHOLDER_LINK}
-          class="btn btn-outline active-press"
-          aria-label="Google Play listing placeholder — planned £5 build"
+        <span
+          class="btn btn-outline btn-placeholder"
+          aria-label="Google Play listing — planned £5 build, not yet live"
         >
           <Smartphone class="h-4 w-4" />
           Google Play — planned £5
-        </a>
+        </span>
       </div>
       <p class="mt-3 text-sm text-muted">
         Or open
