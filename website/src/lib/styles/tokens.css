@@ -103,9 +103,9 @@
   --color-paper-950: var(--color-background-950);
 
   /* Flat aliases — keep existing utility classes working */
-  --color-accent: var(--accent-500);
-  --color-accent-light: var(--accent-400);
-  --color-muted: var(--text-600);
+  --color-accent: var(--accent-800);
+  --color-accent-light: var(--accent-700);
+  --color-muted: var(--text-800);
   --color-border: var(--background-200);
   --color-surface: var(--background-200);
 
