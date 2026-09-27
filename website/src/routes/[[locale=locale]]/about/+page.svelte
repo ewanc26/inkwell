@@ -147,7 +147,7 @@
   .contributors-heading p {
     max-width: var(--measure-copy);
     margin: 0;
-    color: var(--color-text-700);
+    color: var(--color-text-800);
     line-height: 1.65;
     text-wrap: pretty;
   }
@@ -158,7 +158,7 @@
     gap: var(--space-xs);
     flex-shrink: 0;
     min-height: var(--control-size);
-    color: var(--color-primary-600);
+    color: var(--color-primary-800);
     font-family: var(--font-mono);
     font-size: var(--text-xs);
     text-decoration: none;
@@ -227,7 +227,7 @@
   }
 
   .contributor-meta {
-    color: var(--color-text-600);
+    color: var(--color-text-800);
     font-family: var(--font-mono);
     font-size: var(--text-xs);
     line-height: 1.5;
@@ -236,7 +236,7 @@
   .contributor-arrow {
     display: inline-flex;
     flex-shrink: 0;
-    color: var(--color-primary-600);
+    color: var(--color-primary-800);
   }
 
   .contributors-unavailable {
@@ -245,7 +245,7 @@
     padding: var(--space-lg);
     border: 1px dashed var(--surface-color);
     border-radius: var(--radius-lg);
-    color: var(--color-text-700);
+    color: var(--color-text-800);
     line-height: 1.65;
   }
 
@@ -254,7 +254,7 @@
      markup and would prune a plain descendant selector. Still scoped by
      the class, so it can't leak past this block. */
   .contributors-unavailable :global(a) {
-    color: var(--color-primary-600);
+    color: var(--color-primary-800);
   }
 
   @media (max-width: 700px) {

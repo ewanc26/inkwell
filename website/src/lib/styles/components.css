@@ -465,7 +465,7 @@
     justify-content: center;
     border-radius: var(--radius-sm);
     background-color: var(--color-primary-50);
-    color: var(--color-primary-600);
+    color: var(--color-primary-800);
     margin-bottom: var(--space-md);
   }
 
@@ -557,7 +557,7 @@
     gap: var(--space-xs);
     font-size: var(--text-sm);
     font-weight: 600;
-    color: var(--color-primary-600);
+    color: var(--color-primary-800);
     text-decoration: none;
     transition: color var(--duration-fast) var(--ease-out-quart);
   }
@@ -863,7 +863,7 @@
   }
 
   .prose a {
-    color: var(--color-primary-600);
+    color: var(--color-primary-800);
     text-decoration: underline;
     text-decoration-color: color-mix(
       in oklch,
