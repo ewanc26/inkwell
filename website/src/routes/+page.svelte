@@ -117,13 +117,14 @@
           <Download class="h-4 w-4" />
           Add AltStore source
         </a>
-        <span
+        <button
           class="btn btn-outline btn-placeholder"
+          disabled
           aria-label="App Store listing — planned £5 build, not yet live"
         >
           <Apple class="h-4 w-4" />
           App Store — planned £5
-        </span>
+        </button>
       </div>
       <p class="mt-3 text-sm text-muted">
         This source works with
@@ -148,13 +149,14 @@
           <Download class="h-4 w-4" />
           Add F-Droid repo
         </a>
-        <span
+        <button
           class="btn btn-outline btn-placeholder"
+          disabled
           aria-label="Google Play listing — planned £5 build, not yet live"
         >
           <Smartphone class="h-4 w-4" />
           Google Play — planned £5
-        </span>
+        </button>
       </div>
       <p class="mt-3 text-sm text-muted">
         Or open
