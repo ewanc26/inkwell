@@ -24,10 +24,6 @@
         <item quantity="other">%d articles</item>
     </plurals>
     <string name="profile_count_unavailable">Nombre indisponible</string>
-    <plurals name="reader_pending_change_count">
-        <item quantity="one">%d modification</item>
-        <item quantity="other">modifications</item>
-    </plurals>
     <plurals name="reader_reply_count">
         <item quantity="one">%d réponse</item>
         <item quantity="other">%d réponses</item>
@@ -416,9 +412,6 @@
     <string name="settings_system">Système</string>
     <string name="settings_light">Clair</string>
     <string name="settings_dark">Sombre</string>
-    <string name="profile_followers">Abonnés</string>
-    <string name="profile_following">Abonnements</string>
-    <string name="profile_posts">Articles</string>
     <string name="reader_reveal_article">Révéler l\'article</string>
     <string name="reader_list_item_position">Élément %1$d sur %2$d</string>
     <string name="reader_checklist_completed">Terminé</string>
