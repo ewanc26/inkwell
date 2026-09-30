@@ -8,11 +8,24 @@
 # Usage:
 #   bash tools/check-release-permissions.sh [path/to/app.apk]
 #
-# If no path is given the script looks for the standard Gradle output location.
+# If no path is given the script looks for the standard Gradle output location,
+# falling back to the unsigned name AGP uses when no signing config is present
+# (e.g. in CI, which has no keystore.properties secret — see Android/AGENTS.md).
+# Permission declarations are identical either way; signing status is
+# irrelevant to what this script checks.
 
 set -euo pipefail
 
-APK="${1:-app/build/outputs/apk/release/app-release.apk}"
+RELEASE_DIR="app/build/outputs/apk/release"
+APK="${1:-}"
+
+if [[ -z "$APK" ]]; then
+  if [[ -f "$RELEASE_DIR/app-release.apk" ]]; then
+    APK="$RELEASE_DIR/app-release.apk"
+  else
+    APK="$RELEASE_DIR/app-release-unsigned.apk"
+  fi
+fi
 
 if [[ ! -f "$APK" ]]; then
   echo "::error::APK not found at $APK — run assembleRelease first"
