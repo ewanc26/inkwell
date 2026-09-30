@@ -28,6 +28,19 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" tools:node="remove" />
 
+    <!-- Required so MainActivity.openInBrowser()'s queryIntentActivities() can actually
+         see installed browsers on API 30+. Without this, package-visibility filtering
+         makes that query return nothing, silently disabling the explicit-package guard
+         that keeps a failed-verification https hand-off from looping back into
+         inkwell.ewancroft.uk/open's own autoVerify-ed App Link. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https" />
+        </intent>
+    </queries>
+
     <application
         android:name=".InkwellApp"
         android:allowBackup="true"
