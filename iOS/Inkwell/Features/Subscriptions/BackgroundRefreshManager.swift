@@ -100,6 +100,33 @@ final class InkwellAppDelegate: NSObject, UIApplicationDelegate {
         return true
     }
 
+    // MARK: - APNs (see PushNotificationManager)
+
+    func application(
+        _ application: UIApplication,
+        didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
+    ) {
+        PushNotificationManager.shared.didRegister(deviceToken: deviceToken)
+    }
+
+    func application(
+        _ application: UIApplication,
+        didFailToRegisterForRemoteNotificationsWithError error: Error
+    ) {
+        PushNotificationManager.shared.didFailToRegister(error: error)
+    }
+
+    func application(
+        _ application: UIApplication,
+        didReceiveRemoteNotification userInfo: [AnyHashable: Any],
+        fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void
+    ) {
+        Task { @MainActor in
+            await PushNotificationManager.shared.handleSilentPush()
+            completionHandler(.newData)
+        }
+    }
+
     /// AsyncImage rides on URLSession's shared URLCache, which defaults to a
     /// small (~ a few MB) memory cache backed by an unbounded-feeling disk
     /// cache. Set explicit bounds so "cache size" is a real, controllable
