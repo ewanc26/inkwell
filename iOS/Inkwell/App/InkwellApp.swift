@@ -85,6 +85,11 @@ struct InkwellApp: App {
                         )
                     }
                     BackgroundRefreshManager.shared.schedule()
+                    PushNotificationManager.shared.configure {
+                        await NotificationManager.shared.pollForNewDocuments(
+                            loginStateManager: loginStateManager
+                        )
+                    }
                 }
             .preferredColorScheme(customisation.appearanceOverride)
             .onOpenURL { url in

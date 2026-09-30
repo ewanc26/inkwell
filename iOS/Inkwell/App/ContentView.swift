@@ -173,6 +173,9 @@ struct ContentView: View {
         .task {
             if !TestingMode.suppressesInterruptions {
                 await NotificationManager.shared.requestPermission()
+                if let did = loginStateManager.currentDID {
+                    PushNotificationManager.shared.reregisterIfEnabled(accountDID: did)
+                }
                 await NotificationManager.shared.pollForNewDocuments(loginStateManager: loginStateManager)
             }
         }

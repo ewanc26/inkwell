@@ -20,6 +20,7 @@ struct SettingsView: View {
 
     @State private var notificationManager = NotificationManager.shared
     @State private var notificationsEnabled = NotificationManager.shared.notificationsEnabled
+    @State private var realtimeNotificationsEnabled = PushNotificationManager.shared.realtimeNotificationsEnabled
     @State private var isConfirmingSignOut = false
     @State private var legalDocument: LegalDocumentType?
     @State private var showAbout = false
@@ -92,6 +93,10 @@ struct SettingsView: View {
                     Toggle("New Document Notifications", isOn: $notificationsEnabled)
                         .onChange(of: notificationsEnabled) { _, newValue in
                             notificationManager.notificationsEnabled = newValue
+                        }
+                    Toggle("Real-time Notifications", isOn: $realtimeNotificationsEnabled)
+                        .onChange(of: realtimeNotificationsEnabled) { _, newValue in
+                            PushNotificationManager.shared.realtimeNotificationsEnabled = newValue
                         }
                     Button("Open System Notification Settings") {
                         if let url = URL(string: UIApplication.openSettingsURLString) {
