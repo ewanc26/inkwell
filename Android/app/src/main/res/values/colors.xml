@@ -4,7 +4,4 @@
          pure white in light mode, pure black in dark mode. -->
     <color name="paper_light">#FFFFFF</color>
     <color name="paper_dark">#000000</color>
-
-    <!-- Brand green for status bar tinting. -->
-    <color name="inkwell_green">#139500</color>
 </resources>
