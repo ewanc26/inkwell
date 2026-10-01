@@ -266,7 +266,15 @@ jobs:
           arch: x86_64
           profile: pixel_6
           force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          # Deliberately omits -no-snapshot-save: this step's entire purpose
+          # is to produce a boot snapshot for actions/cache above to save.
+          # It previously carried -no-snapshot-save too, which silently
+          # defeated the cache every run -- no snapshot was ever written, so
+          # "Run the instrumentation suite" below always cold-booted instead
+          # of loading a cached warm snapshot, which is the likely cause of
+          # the intermittent "Failed to load snapshot 'default_boot'" /
+          # adb-connectivity failures seen across unrelated PRs (issue #154).
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
           script: echo "AVD created and snapshotted."
 
