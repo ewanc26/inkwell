@@ -6,7 +6,7 @@
 #import <Foundation/NSString.h>
 #import <Foundation/NSValue.h>
 
-@class FacetConverter, InkwellSharedAtUri, InkwellSharedAtUriCompanion, InkwellSharedBasicTheme, InkwellSharedBlobBackedContent, InkwellSharedBlobRef, InkwellSharedBlockLossLabels, InkwellSharedBlueskyEmbedTypes, InkwellSharedByteSlice, InkwellSharedCachedFeedItem, InkwellSharedCachedFeedItemCompanion, InkwellSharedCachedOfflineRecord, InkwellSharedCachedOfflineRecordCompanion, InkwellSharedCdnUrls, InkwellSharedCollectionNsids, InkwellSharedColorValue, InkwellSharedConstellationBacklink, InkwellSharedConstellationPagination, InkwellSharedConstellationResponse, InkwellSharedConstellationSourcePaths, InkwellSharedContentFilterDecisionHide, InkwellSharedContentFilterDecisionShow, InkwellSharedContentFilterDecisionWarn, InkwellSharedContentFilterEngine, InkwellSharedContentFormatDetector, InkwellSharedContentFormatDispatcher, InkwellSharedDocumentLinkScanner, InkwellSharedDocumentMetadata, InkwellSharedDocumentMetadataBskyPostRef, InkwellSharedDocumentMetadataCompanion, InkwellSharedDocumentMetadataContributor, InkwellSharedDocumentMetadataLink, InkwellSharedDocumentPreferences, InkwellSharedFacetDefinition, InkwellSharedFacetSchema, InkwellSharedFeedCacheIosCompanion, InkwellSharedFeedCacheRetention, InkwellSharedFilterMatch, InkwellSharedFilterMatchKind, InkwellSharedFilterableContent, InkwellSharedHandleUtils, InkwellSharedInkwellOAuthScopes, InkwellSharedInlineMarkdownScanner, InkwellSharedInlineSegment, InkwellSharedInlineSegmentBold, InkwellSharedInlineSegmentCode, InkwellSharedInlineSegmentItalic, InkwellSharedInlineSegmentLink, InkwellSharedInlineSegmentPlain, InkwellSharedInlineSegmentStrike, InkwellSharedJetstreamConfig, InkwellSharedJetstreamEvent, InkwellSharedJetstreamEventCompanion, InkwellSharedJetstreamPayload, InkwellSharedJetstreamPayloadCompanion, InkwellSharedJetstreamRetryPolicy, InkwellSharedJsonMapBridge, InkwellSharedJsonSafety, InkwellSharedKotlinArray<T>, InkwellSharedKotlinEnum<E>, InkwellSharedKotlinEnumCompanion, InkwellSharedKotlinException, InkwellSharedKotlinIllegalStateException, InkwellSharedKotlinIntIterator, InkwellSharedKotlinIntProgression, InkwellSharedKotlinIntProgressionCompanion, InkwellSharedKotlinIntRange, InkwellSharedKotlinIntRangeCompanion, InkwellSharedKotlinNothing, InkwellSharedKotlinPair<__covariant A, __covariant B>, InkwellSharedKotlinRuntimeException, InkwellSharedKotlinThrowable, InkwellSharedKotlinx_serialization_coreSerialKind, InkwellSharedKotlinx_serialization_coreSerializersModule, InkwellSharedKotlinx_serialization_jsonJsonElement, InkwellSharedKotlinx_serialization_jsonJsonElementCompanion, InkwellSharedLeafletContentConverter, InkwellSharedLeafletFacet, InkwellSharedLeafletFacetFeature, InkwellSharedLeafletTypes, InkwellSharedLegacyPalette, InkwellSharedLegalDocuments, InkwellSharedMarkdownBlock, InkwellSharedMarkdownBlockBlockquote, InkwellSharedMarkdownBlockCode, InkwellSharedMarkdownBlockHeading, InkwellSharedMarkdownBlockHorizontalRule, InkwellSharedMarkdownBlockImage, InkwellSharedMarkdownBlockMath, InkwellSharedMarkdownBlockOrderedList, InkwellSharedMarkdownBlockParagraph, InkwellSharedMarkdownBlockTaskList, InkwellSharedMarkdownBlockUnorderedList, InkwellSharedMarkdownListItem, InkwellSharedMarkdownParser, InkwellSharedMarkdownSerializer, InkwellSharedMarkpubContentConverter, InkwellSharedMarkpubTypes, InkwellSharedModerationLabel, InkwellSharedModerationLabelCompanion, InkwellSharedModerationPolicy, InkwellSharedModerationPolicyCompanion, InkwellSharedNotificationContentPolicy, InkwellSharedNotificationPolicy, InkwellSharedNotificationStyleNone, InkwellSharedNotificationStyleSingle, InkwellSharedNotificationStyleSummary, InkwellSharedNumberFormat, InkwellSharedOAuthScopes, InkwellSharedOfflineCacheEntry, InkwellSharedOfflineCacheEntryCompanion, InkwellSharedOfflineCacheKind, InkwellSharedOfflineCacheKindCompanion, InkwellSharedOfflineCachePolicy, InkwellSharedOfflineCachePolicyCompanion, InkwellSharedOfflineContentCacheRetention, InkwellSharedOfflineSyncQueueRetention, InkwellSharedOffprintContentConverter, InkwellSharedOffprintTypes, InkwellSharedPcktContentConverter, InkwellSharedPcktTypes, InkwellSharedPublicationMatcher, InkwellSharedPublicationPreferences, InkwellSharedPublicationTheme, InkwellSharedRecordListPolicy, InkwellSharedRecordSizePolicy, InkwellSharedReportReasonType, InkwellSharedReportSubjectKind, InkwellSharedReportSubmission, InkwellSharedReportSubmissionCompanion, InkwellSharedRgbColor, InkwellSharedRgbaColor, InkwellSharedSearchBackendUrl, InkwellSharedSearchResultClassifier, InkwellSharedSharedConvertResult, InkwellSharedSharedDocumentRecord, InkwellSharedSharedGraphRecommend, InkwellSharedSharedGraphSubscription, InkwellSharedSharedLeafletComment, InkwellSharedSharedLeafletCommentReplyRef, InkwellSharedSharedPublicationRecord, InkwellSharedSharedReaderTheme, InkwellSharedSharedReaderThemeCompanion, InkwellSharedSharedReaderThemeFontFamily, InkwellSharedSharedWriteResult, InkwellSharedStandardModerationLabel, InkwellSharedStandardSitePermissionSets, InkwellSharedStandardSiteValidation, InkwellSharedStandardSiteValidationDocumentInput, InkwellSharedStandardSiteValidationError, InkwellSharedStringUtils, InkwellSharedStrongRef, InkwellSharedSupportersList, InkwellSharedSyncMutationKind, InkwellSharedSyncMutationKindCompanion, InkwellSharedSyncQueueEntry, InkwellSharedSyncQueueEntryCompanion, InkwellSharedSyncQueueFile, InkwellSharedTipPromptPolicy, InkwellSharedUrlUtils, InkwellSharedUserInputLexicon, InkwellSharedUserLexicon, InkwellSharedUserLexiconRecord, InkwellSharedUserLexiconUtils, InkwellSharedUtf8Offsets, InkwellSharedVerificationFailure, InkwellSharedVerificationFailureDocumentLinkMissing, InkwellSharedVerificationFailureEndpointUnreachable, InkwellSharedVerificationFailureInvalidDocumentURL, InkwellSharedVerificationFailureInvalidPublicationURL, InkwellSharedVerificationFailureMalformedResponse, InkwellSharedVerificationFailureMismatchedURI, InkwellSharedVerificationFailureUnexpected, InkwellSharedVerificationResult, InkwellSharedVerificationResultFailed, InkwellSharedVerificationResultVerified, InkwellSharedVerificationUrls, InkwellSharedXrpcEndpoints, RichTextFacet, RichTextFeature;
+@class FacetConverter, InkwellSharedAtUri, InkwellSharedAtUriCompanion, InkwellSharedBasicTheme, InkwellSharedBlobBackedContent, InkwellSharedBlobRef, InkwellSharedBlockLossLabels, InkwellSharedBlueskyEmbedTypes, InkwellSharedByteSlice, InkwellSharedCachedFeedItem, InkwellSharedCachedFeedItemCompanion, InkwellSharedCachedOfflineRecord, InkwellSharedCachedOfflineRecordCompanion, InkwellSharedCdnUrls, InkwellSharedCollectionNsids, InkwellSharedColorValue, InkwellSharedConstellationBacklink, InkwellSharedConstellationPagination, InkwellSharedConstellationResponse, InkwellSharedConstellationSourcePaths, InkwellSharedContentFilterDecisionHide, InkwellSharedContentFilterDecisionShow, InkwellSharedContentFilterDecisionWarn, InkwellSharedContentFilterEngine, InkwellSharedContentFormatDetector, InkwellSharedContentFormatDispatcher, InkwellSharedDocumentLinkScanner, InkwellSharedDocumentMetadata, InkwellSharedDocumentMetadataBskyPostRef, InkwellSharedDocumentMetadataCompanion, InkwellSharedDocumentMetadataContributor, InkwellSharedDocumentMetadataLink, InkwellSharedDocumentPreferences, InkwellSharedFacetDefinition, InkwellSharedFacetSchema, InkwellSharedFeedCacheIosCompanion, InkwellSharedFeedCacheRetention, InkwellSharedFilterMatch, InkwellSharedFilterMatchKind, InkwellSharedFilterableContent, InkwellSharedHandleUtils, InkwellSharedInkwellOAuthScopes, InkwellSharedInlineMarkdownScanner, InkwellSharedInlineSegment, InkwellSharedInlineSegmentBold, InkwellSharedInlineSegmentCode, InkwellSharedInlineSegmentItalic, InkwellSharedInlineSegmentLink, InkwellSharedInlineSegmentPlain, InkwellSharedInlineSegmentStrike, InkwellSharedJetstreamConfig, InkwellSharedJetstreamEvent, InkwellSharedJetstreamEventCompanion, InkwellSharedJetstreamPayload, InkwellSharedJetstreamPayloadCompanion, InkwellSharedJetstreamRetryPolicy, InkwellSharedJsonMapBridge, InkwellSharedJsonSafety, InkwellSharedKotlinArray<T>, InkwellSharedKotlinEnum<E>, InkwellSharedKotlinEnumCompanion, InkwellSharedKotlinException, InkwellSharedKotlinIllegalStateException, InkwellSharedKotlinIntIterator, InkwellSharedKotlinIntProgression, InkwellSharedKotlinIntProgressionCompanion, InkwellSharedKotlinIntRange, InkwellSharedKotlinIntRangeCompanion, InkwellSharedKotlinNothing, InkwellSharedKotlinPair<__covariant A, __covariant B>, InkwellSharedKotlinRuntimeException, InkwellSharedKotlinThrowable, InkwellSharedKotlinx_serialization_coreSerialKind, InkwellSharedKotlinx_serialization_coreSerializersModule, InkwellSharedKotlinx_serialization_jsonJsonElement, InkwellSharedKotlinx_serialization_jsonJsonElementCompanion, InkwellSharedLeafletContentConverter, InkwellSharedLeafletFacet, InkwellSharedLeafletFacetFeature, InkwellSharedLeafletTypes, InkwellSharedLegacyPalette, InkwellSharedLegalDocuments, InkwellSharedMarkdownBlock, InkwellSharedMarkdownBlockBlockquote, InkwellSharedMarkdownBlockCode, InkwellSharedMarkdownBlockHeading, InkwellSharedMarkdownBlockHorizontalRule, InkwellSharedMarkdownBlockImage, InkwellSharedMarkdownBlockMath, InkwellSharedMarkdownBlockOrderedList, InkwellSharedMarkdownBlockParagraph, InkwellSharedMarkdownBlockTaskList, InkwellSharedMarkdownBlockUnorderedList, InkwellSharedMarkdownListItem, InkwellSharedMarkdownParser, InkwellSharedMarkdownSerializer, InkwellSharedMarkpubContentConverter, InkwellSharedMarkpubTypes, InkwellSharedModerationLabel, InkwellSharedModerationLabelCompanion, InkwellSharedModerationPolicy, InkwellSharedModerationPolicyCompanion, InkwellSharedNotificationContentPolicy, InkwellSharedNotificationPolicy, InkwellSharedNotificationStyleNone, InkwellSharedNotificationStyleSingle, InkwellSharedNotificationStyleSummary, InkwellSharedNotificationTopic, InkwellSharedNumberFormat, InkwellSharedOAuthScopes, InkwellSharedOfflineCacheEntry, InkwellSharedOfflineCacheEntryCompanion, InkwellSharedOfflineCacheKind, InkwellSharedOfflineCacheKindCompanion, InkwellSharedOfflineCachePolicy, InkwellSharedOfflineCachePolicyCompanion, InkwellSharedOfflineContentCacheRetention, InkwellSharedOfflineSyncQueueRetention, InkwellSharedOffprintContentConverter, InkwellSharedOffprintTypes, InkwellSharedPcktContentConverter, InkwellSharedPcktTypes, InkwellSharedPublicationMatcher, InkwellSharedPublicationPreferences, InkwellSharedPublicationTheme, InkwellSharedPushNotificationType, InkwellSharedPushPayload, InkwellSharedPushPlatform, InkwellSharedPushSubscriptionRequest, InkwellSharedRecordListPolicy, InkwellSharedRecordSizePolicy, InkwellSharedReportReasonType, InkwellSharedReportSubjectKind, InkwellSharedReportSubmission, InkwellSharedReportSubmissionCompanion, InkwellSharedRgbColor, InkwellSharedRgbaColor, InkwellSharedSearchBackendUrl, InkwellSharedSearchResultClassifier, InkwellSharedSharedConvertResult, InkwellSharedSharedDocumentRecord, InkwellSharedSharedGraphRecommend, InkwellSharedSharedGraphSubscription, InkwellSharedSharedLeafletComment, InkwellSharedSharedLeafletCommentReplyRef, InkwellSharedSharedPublicationRecord, InkwellSharedSharedReaderTheme, InkwellSharedSharedReaderThemeCompanion, InkwellSharedSharedReaderThemeFontFamily, InkwellSharedSharedWriteResult, InkwellSharedStandardModerationLabel, InkwellSharedStandardSitePermissionSets, InkwellSharedStandardSiteValidation, InkwellSharedStandardSiteValidationDocumentInput, InkwellSharedStandardSiteValidationError, InkwellSharedStringUtils, InkwellSharedStrongRef, InkwellSharedSupportersList, InkwellSharedSyncMutationKind, InkwellSharedSyncMutationKindCompanion, InkwellSharedSyncQueueEntry, InkwellSharedSyncQueueEntryCompanion, InkwellSharedSyncQueueFile, InkwellSharedTipPromptPolicy, InkwellSharedUrlUtils, InkwellSharedUserInputLexicon, InkwellSharedUserLexicon, InkwellSharedUserLexiconRecord, InkwellSharedUserLexiconUtils, InkwellSharedUtf8Offsets, InkwellSharedVerificationFailure, InkwellSharedVerificationFailureDocumentLinkMissing, InkwellSharedVerificationFailureEndpointUnreachable, InkwellSharedVerificationFailureInvalidDocumentURL, InkwellSharedVerificationFailureInvalidPublicationURL, InkwellSharedVerificationFailureMalformedResponse, InkwellSharedVerificationFailureMismatchedURI, InkwellSharedVerificationFailureUnexpected, InkwellSharedVerificationResult, InkwellSharedVerificationResultFailed, InkwellSharedVerificationResultVerified, InkwellSharedVerificationUrls, InkwellSharedWriterDraftCodec, InkwellSharedWriterDraftPolicy, InkwellSharedWriterDraftSchema, InkwellSharedWriterDraftSchemaCompanion, InkwellSharedXrpcEndpoints, RichTextFacet, RichTextFeature;
 
 @protocol InkwellSharedContentFilterDecision, InkwellSharedFeedCache, InkwellSharedJetstreamClient, InkwellSharedKotlinAnnotation, InkwellSharedKotlinClosedRange, InkwellSharedKotlinComparable, InkwellSharedKotlinFunction, InkwellSharedKotlinIterable, InkwellSharedKotlinIterator, InkwellSharedKotlinKAnnotatedElement, InkwellSharedKotlinKClass, InkwellSharedKotlinKClassifier, InkwellSharedKotlinKDeclarationContainer, InkwellSharedKotlinOpenEndRange, InkwellSharedKotlinSuspendFunction2, InkwellSharedKotlinx_coroutines_coreFlow, InkwellSharedKotlinx_coroutines_coreFlowCollector, InkwellSharedKotlinx_serialization_coreCompositeDecoder, InkwellSharedKotlinx_serialization_coreCompositeEncoder, InkwellSharedKotlinx_serialization_coreDecoder, InkwellSharedKotlinx_serialization_coreDeserializationStrategy, InkwellSharedKotlinx_serialization_coreEncoder, InkwellSharedKotlinx_serialization_coreKSerializer, InkwellSharedKotlinx_serialization_coreSerialDescriptor, InkwellSharedKotlinx_serialization_coreSerializationStrategy, InkwellSharedKotlinx_serialization_coreSerializersModuleCollector, InkwellSharedNotificationStyle, InkwellSharedOfflineContentCache, InkwellSharedOfflineSyncQueue;
 
@@ -1067,6 +1067,219 @@ __attribute__((swift_name("SharedWriteResult")))
 - (NSString *)description __attribute__((swift_name("description()")));
 @property (readonly) NSDictionary<NSString *, id> *content __attribute__((swift_name("content")));
 @property (readonly) NSSet<NSString *> *lost __attribute__((swift_name("lost")));
+@end
+
+
+/** JSON encoding for [WriterDraftSchema], shared so both platforms read each other's rules identically. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("WriterDraftCodec")))
+@interface InkwellSharedWriterDraftCodec : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/** JSON encoding for [WriterDraftSchema], shared so both platforms read each other's rules identically. */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)writerDraftCodec __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedWriterDraftCodec *shared __attribute__((swift_name("shared")));
+
+/** Decodes [raw], or returns null when it is malformed or from an unknown schema version. */
+- (InkwellSharedWriterDraftSchema * _Nullable)decodeRaw:(NSString *)raw __attribute__((swift_name("decode(raw:)")));
+- (NSString *)encodeDraft:(InkwellSharedWriterDraftSchema *)draft __attribute__((swift_name("encode(draft:)")));
+@end
+
+
+/** Autosave timing, expiry, and conflict rules shared by both Writers. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("WriterDraftPolicy")))
+@interface InkwellSharedWriterDraftPolicy : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/** Autosave timing, expiry, and conflict rules shared by both Writers. */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)writerDraftPolicy __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedWriterDraftPolicy *shared __attribute__((swift_name("shared")));
+
+/**
+ * True when [draft] edits [documentUri] but was based on a different
+ * revision than the [remoteRevision] now on the PDS — the document changed
+ * elsewhere, so loading either version silently would lose the other.
+ */
+- (BOOL)hasRevisionConflictDraft:(InkwellSharedWriterDraftSchema *)draft documentUri:(NSString *)documentUri remoteRevision:(NSString *)remoteRevision __attribute__((swift_name("hasRevisionConflict(draft:documentUri:remoteRevision:)")));
+
+/**
+ * True when [savedAt] is more than [MAX_AGE_MS] before [nowMs].
+ *
+ * An unparseable timestamp counts as stale: a draft whose age cannot be
+ * established is not one to resurrect silently.
+ */
+- (BOOL)isDraftStaleSavedAt:(NSString *)savedAt nowMs:(int64_t)nowMs __attribute__((swift_name("isDraftStale(savedAt:nowMs:)")));
+
+/** True when the draft carries nothing the user typed or chose, so saving it is pointless. */
+- (BOOL)isEmptyDraft:(InkwellSharedWriterDraftSchema *)draft __attribute__((swift_name("isEmpty(draft:)")));
+
+/** True when [draft] may be offered to [accountDid] at [nowMs]. */
+- (BOOL)isRestorableDraft:(InkwellSharedWriterDraftSchema *)draft accountDid:(NSString *)accountDid nowMs:(int64_t)nowMs __attribute__((swift_name("isRestorable(draft:accountDid:nowMs:)")));
+
+/** Drafts older than this are discarded rather than offered for recovery. */
+@property (readonly) int64_t MAX_AGE_MS __attribute__((swift_name("MAX_AGE_MS")));
+
+/** Autosave waits this long after the last edit before writing. */
+@property (readonly) int64_t MAX_DEBOUNCE_MS __attribute__((swift_name("MAX_DEBOUNCE_MS")));
+@property (readonly) int32_t SCHEMA_VERSION __attribute__((swift_name("SCHEMA_VERSION")));
+@end
+
+
+/**
+ * A Writer draft as autosaved to local, app-private storage on either platform.
+ *
+ * This is the one on-disk shape: Android writes it to DataStore and iOS to a
+ * file-protected JSON file, both through [WriterDraftCodec], so a draft's
+ * meaning cannot drift between platforms. It never leaves the device and
+ * holds no credentials — only what the user has typed and the non-secret
+ * identifiers needed to put it back in context.
+ *
+ * Everything is a plain string or list so it bridges to Swift without
+ * generics. [metadataContributors] is a JSON array string for the same
+ * reason; [coverImageJson] is the blob ref exactly as the PDS returned it.
+ *
+ * @note annotations
+ *   kotlinx.serialization.Serializable
+*/
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("WriterDraftSchema")))
+@interface InkwellSharedWriterDraftSchema : InkwellSharedBase
+- (instancetype)initWithAccountDid:(NSString *)accountDid publicationUri:(NSString *)publicationUri editingDocumentUri:(NSString * _Nullable)editingDocumentUri editingDocumentRevision:(NSString * _Nullable)editingDocumentRevision title:(NSString *)title description:(NSString *)description path:(NSString *)path format:(NSString *)format markdown:(NSString *)markdown uploadedBlobKeys:(NSArray<NSString *> *)uploadedBlobKeys metadataTags:(NSArray<NSString *> *)metadataTags metadataContributors:(NSString *)metadataContributors bskyPostRefUri:(NSString * _Nullable)bskyPostRefUri selfLabelValues:(NSArray<NSString *> *)selfLabelValues coverImageJson:(NSString * _Nullable)coverImageJson savedAt:(NSString *)savedAt schemaVersion:(int32_t)schemaVersion __attribute__((swift_name("init(accountDid:publicationUri:editingDocumentUri:editingDocumentRevision:title:description:path:format:markdown:uploadedBlobKeys:metadataTags:metadataContributors:bskyPostRefUri:selfLabelValues:coverImageJson:savedAt:schemaVersion:)"))) __attribute__((objc_designated_initializer));
+@property (class, readonly, getter=companion) InkwellSharedWriterDraftSchemaCompanion *companion __attribute__((swift_name("companion")));
+- (InkwellSharedWriterDraftSchema *)doCopyAccountDid:(NSString *)accountDid publicationUri:(NSString *)publicationUri editingDocumentUri:(NSString * _Nullable)editingDocumentUri editingDocumentRevision:(NSString * _Nullable)editingDocumentRevision title:(NSString *)title description:(NSString *)description path:(NSString *)path format:(NSString *)format markdown:(NSString *)markdown uploadedBlobKeys:(NSArray<NSString *> *)uploadedBlobKeys metadataTags:(NSArray<NSString *> *)metadataTags metadataContributors:(NSString *)metadataContributors bskyPostRefUri:(NSString * _Nullable)bskyPostRefUri selfLabelValues:(NSArray<NSString *> *)selfLabelValues coverImageJson:(NSString * _Nullable)coverImageJson savedAt:(NSString *)savedAt schemaVersion:(int32_t)schemaVersion __attribute__((swift_name("doCopy(accountDid:publicationUri:editingDocumentUri:editingDocumentRevision:title:description:path:format:markdown:uploadedBlobKeys:metadataTags:metadataContributors:bskyPostRefUri:selfLabelValues:coverImageJson:savedAt:schemaVersion:)")));
+
+/**
+ * A Writer draft as autosaved to local, app-private storage on either platform.
+ *
+ * This is the one on-disk shape: Android writes it to DataStore and iOS to a
+ * file-protected JSON file, both through [WriterDraftCodec], so a draft's
+ * meaning cannot drift between platforms. It never leaves the device and
+ * holds no credentials — only what the user has typed and the non-secret
+ * identifiers needed to put it back in context.
+ *
+ * Everything is a plain string or list so it bridges to Swift without
+ * generics. [metadataContributors] is a JSON array string for the same
+ * reason; [coverImageJson] is the blob ref exactly as the PDS returned it.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * A Writer draft as autosaved to local, app-private storage on either platform.
+ *
+ * This is the one on-disk shape: Android writes it to DataStore and iOS to a
+ * file-protected JSON file, both through [WriterDraftCodec], so a draft's
+ * meaning cannot drift between platforms. It never leaves the device and
+ * holds no credentials — only what the user has typed and the non-secret
+ * identifiers needed to put it back in context.
+ *
+ * Everything is a plain string or list so it bridges to Swift without
+ * generics. [metadataContributors] is a JSON array string for the same
+ * reason; [coverImageJson] is the blob ref exactly as the PDS returned it.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * A Writer draft as autosaved to local, app-private storage on either platform.
+ *
+ * This is the one on-disk shape: Android writes it to DataStore and iOS to a
+ * file-protected JSON file, both through [WriterDraftCodec], so a draft's
+ * meaning cannot drift between platforms. It never leaves the device and
+ * holds no credentials — only what the user has typed and the non-secret
+ * identifiers needed to put it back in context.
+ *
+ * Everything is a plain string or list so it bridges to Swift without
+ * generics. [metadataContributors] is a JSON array string for the same
+ * reason; [coverImageJson] is the blob ref exactly as the PDS returned it.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+
+/** The signed-in DID the draft belongs to; a draft never restores into another account. */
+@property (readonly) NSString *accountDid __attribute__((swift_name("accountDid")));
+@property (readonly) NSString * _Nullable bskyPostRefUri __attribute__((swift_name("bskyPostRefUri")));
+
+/** Cover image blob ref as JSON, or null. Not in schema v1's original field list; optional so older files decode. */
+@property (readonly) NSString * _Nullable coverImageJson __attribute__((swift_name("coverImageJson")));
+@property (readonly) NSString *description_ __attribute__((swift_name("description_")));
+
+/** CID of [editingDocumentUri] when it was loaded, used to detect remote edits since. */
+@property (readonly) NSString * _Nullable editingDocumentRevision __attribute__((swift_name("editingDocumentRevision")));
+
+/** The document being edited, or null for a new document. */
+@property (readonly) NSString * _Nullable editingDocumentUri __attribute__((swift_name("editingDocumentUri")));
+@property (readonly) NSString *format __attribute__((swift_name("format")));
+@property (readonly) NSString *markdown __attribute__((swift_name("markdown")));
+
+/** JSON array of `{did, role?, displayName?}` objects. */
+@property (readonly) NSString *metadataContributors __attribute__((swift_name("metadataContributors")));
+@property (readonly) NSArray<NSString *> *metadataTags __attribute__((swift_name("metadataTags")));
+@property (readonly) NSString *path __attribute__((swift_name("path")));
+
+/** The selected publication's AT-URI, or empty when none was selected. */
+@property (readonly) NSString *publicationUri __attribute__((swift_name("publicationUri")));
+
+/** ISO-8601 instant the draft was written. */
+@property (readonly) NSString *savedAt __attribute__((swift_name("savedAt")));
+@property (readonly) int32_t schemaVersion __attribute__((swift_name("schemaVersion")));
+@property (readonly) NSArray<NSString *> *selfLabelValues __attribute__((swift_name("selfLabelValues")));
+@property (readonly) NSString *title __attribute__((swift_name("title")));
+
+/** Blob CIDs inserted into [markdown] as images. */
+@property (readonly) NSArray<NSString *> *uploadedBlobKeys __attribute__((swift_name("uploadedBlobKeys")));
+@end
+
+
+/**
+ * A Writer draft as autosaved to local, app-private storage on either platform.
+ *
+ * This is the one on-disk shape: Android writes it to DataStore and iOS to a
+ * file-protected JSON file, both through [WriterDraftCodec], so a draft's
+ * meaning cannot drift between platforms. It never leaves the device and
+ * holds no credentials — only what the user has typed and the non-secret
+ * identifiers needed to put it back in context.
+ *
+ * Everything is a plain string or list so it bridges to Swift without
+ * generics. [metadataContributors] is a JSON array string for the same
+ * reason; [coverImageJson] is the blob ref exactly as the PDS returned it.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("WriterDraftSchema.Companion")))
+@interface InkwellSharedWriterDraftSchemaCompanion : InkwellSharedBase
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * A Writer draft as autosaved to local, app-private storage on either platform.
+ *
+ * This is the one on-disk shape: Android writes it to DataStore and iOS to a
+ * file-protected JSON file, both through [WriterDraftCodec], so a draft's
+ * meaning cannot drift between platforms. It never leaves the device and
+ * holds no credentials — only what the user has typed and the non-secret
+ * identifiers needed to put it back in context.
+ *
+ * Everything is a plain string or list so it bridges to Swift without
+ * generics. [metadataContributors] is a JSON array string for the same
+ * reason; [coverImageJson] is the blob ref exactly as the PDS returned it.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
++ (instancetype)companion __attribute__((swift_name("init()")));
+@property (class, readonly, getter=shared) InkwellSharedWriterDraftSchemaCompanion *shared __attribute__((swift_name("shared")));
+
+/**
+ * A Writer draft as autosaved to local, app-private storage on either platform.
+ *
+ * This is the one on-disk shape: Android writes it to DataStore and iOS to a
+ * file-protected JSON file, both through [WriterDraftCodec], so a draft's
+ * meaning cannot drift between platforms. It never leaves the device and
+ * holds no credentials — only what the user has typed and the non-secret
+ * identifiers needed to put it back in context.
+ *
+ * Everything is a plain string or list so it bridges to Swift without
+ * generics. [metadataContributors] is a JSON array string for the same
+ * reason; [coverImageJson] is the blob ref exactly as the PDS returned it.
+ */
+- (id<InkwellSharedKotlinx_serialization_coreKSerializer>)serializer __attribute__((swift_name("serializer()")));
 @end
 
 __attribute__((objc_subclassing_restricted))
@@ -2556,8 +2769,31 @@ __attribute__((swift_name("DocumentMetadata.Companion")))
  */
 - (InkwellSharedDocumentMetadata *)readRecord:(NSDictionary<NSString *, id> *)record __attribute__((swift_name("read(record:)")));
 @property (readonly) NSString *CONTRIBUTOR_TYPE __attribute__((swift_name("CONTRIBUTOR_TYPE")));
+
+/** `coverImage.maxSize` from the `site.standard.document` Lexicon. */
+@property (readonly) int32_t COVER_IMAGE_MAX_BYTES __attribute__((swift_name("COVER_IMAGE_MAX_BYTES")));
+
+/**
+ * Keys this object owns. Everything else in a record is left untouched.
+ *
+ * Public so a platform writer holding a typed record (rather than the
+ * `Map` [applyTo] takes) can clear exactly these keys before writing
+ * the metadata back, without re-encoding the fields it doesn't own.
+ */
+@property (readonly) NSArray<NSString *> *OWNED_KEYS __attribute__((swift_name("OWNED_KEYS")));
 @property (readonly) NSString *SELF_LABELS_TYPE __attribute__((swift_name("SELF_LABELS_TYPE")));
 @property (readonly) NSString *SELF_LABEL_TYPE __attribute__((swift_name("SELF_LABEL_TYPE")));
+
+/**
+ * The content-warning values an author can self-apply, in display order.
+ *
+ * These are the author-applicable values from the Bluesky label
+ * vocabulary (`com.atproto.label.defs#labelValue` known values plus
+ * Bluesky's `graphic-media`) — the set that the network's own composers
+ * offer as self-labels. Other values already on a record are kept by
+ * [read]/[applyTo]; this list is only what a Writer offers to add.
+ */
+@property (readonly) NSArray<NSString *> *SELF_LABEL_VALUES __attribute__((swift_name("SELF_LABEL_VALUES")));
 @end
 
 
@@ -2859,6 +3095,171 @@ __attribute__((swift_name("PublicationTheme")))
 @property (readonly) InkwellSharedColorValue * _Nullable primary __attribute__((swift_name("primary")));
 @property (readonly) InkwellSharedBoolean * _Nullable showPageBackground __attribute__((swift_name("showPageBackground")));
 @property (readonly) NSString *type __attribute__((swift_name("type")));
+@end
+
+__attribute__((swift_name("KotlinComparable")))
+@protocol InkwellSharedKotlinComparable
+@required
+- (int32_t)compareToOther:(id _Nullable)other __attribute__((swift_name("compareTo(other:)")));
+@end
+
+__attribute__((swift_name("KotlinEnum")))
+@interface InkwellSharedKotlinEnum<E> : InkwellSharedBase <InkwellSharedKotlinComparable>
+- (instancetype)initWithName:(NSString *)name ordinal:(int32_t)ordinal __attribute__((swift_name("init(name:ordinal:)"))) __attribute__((objc_designated_initializer));
+@property (class, readonly, getter=companion) InkwellSharedKotlinEnumCompanion *companion __attribute__((swift_name("companion")));
+- (int32_t)compareToOther:(E)other __attribute__((swift_name("compareTo(other:)")));
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString *name __attribute__((swift_name("name")));
+@property (readonly) int32_t ordinal __attribute__((swift_name("ordinal")));
+@end
+
+
+/** The kind of event a [PushPayload] reports. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PushNotificationType")))
+@interface InkwellSharedPushNotificationType : InkwellSharedKotlinEnum<InkwellSharedPushNotificationType *>
++ (instancetype)alloc __attribute__((unavailable));
+
+/** The kind of event a [PushPayload] reports. */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
+- (instancetype)initWithName:(NSString *)name ordinal:(int32_t)ordinal __attribute__((swift_name("init(name:ordinal:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+@property (class, readonly) InkwellSharedPushNotificationType *theNewDocument __attribute__((swift_name("theNewDocument")));
+@property (class, readonly) InkwellSharedPushNotificationType *theNewComment __attribute__((swift_name("theNewComment")));
+@property (class, readonly) InkwellSharedPushNotificationType *theNewRecommend __attribute__((swift_name("theNewRecommend")));
++ (InkwellSharedKotlinArray<InkwellSharedPushNotificationType *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<InkwellSharedPushNotificationType *> *entries __attribute__((swift_name("entries")));
+@property (readonly) NSString *wireValue __attribute__((swift_name("wireValue")));
+@end
+
+
+/**
+ * The normalized payload a push notification carries, once decoded from
+ * whatever raw shape APNs/FCM delivers it in.
+ *
+ * Deliberately thin: [subjectUri] is enough for a client to re-fetch the
+ * real record over XRPC rather than trusting push-delivered content —
+ * matching how [uk.ewancroft.inkwell.shared.policy.NotificationPolicy]'s
+ * poll path already treats a push wake-up as "go check", not as itself
+ * being the source of truth for what changed.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PushPayload")))
+@interface InkwellSharedPushPayload : InkwellSharedBase
+- (instancetype)initWithType:(InkwellSharedPushNotificationType *)type subjectUri:(NSString *)subjectUri actorDid:(NSString *)actorDid timestampEpochMillis:(int64_t)timestampEpochMillis __attribute__((swift_name("init(type:subjectUri:actorDid:timestampEpochMillis:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedPushPayload *)doCopyType:(InkwellSharedPushNotificationType *)type subjectUri:(NSString *)subjectUri actorDid:(NSString *)actorDid timestampEpochMillis:(int64_t)timestampEpochMillis __attribute__((swift_name("doCopy(type:subjectUri:actorDid:timestampEpochMillis:)")));
+
+/**
+ * The normalized payload a push notification carries, once decoded from
+ * whatever raw shape APNs/FCM delivers it in.
+ *
+ * Deliberately thin: [subjectUri] is enough for a client to re-fetch the
+ * real record over XRPC rather than trusting push-delivered content —
+ * matching how [uk.ewancroft.inkwell.shared.policy.NotificationPolicy]'s
+ * poll path already treats a push wake-up as "go check", not as itself
+ * being the source of truth for what changed.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * The normalized payload a push notification carries, once decoded from
+ * whatever raw shape APNs/FCM delivers it in.
+ *
+ * Deliberately thin: [subjectUri] is enough for a client to re-fetch the
+ * real record over XRPC rather than trusting push-delivered content —
+ * matching how [uk.ewancroft.inkwell.shared.policy.NotificationPolicy]'s
+ * poll path already treats a push wake-up as "go check", not as itself
+ * being the source of truth for what changed.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * The normalized payload a push notification carries, once decoded from
+ * whatever raw shape APNs/FCM delivers it in.
+ *
+ * Deliberately thin: [subjectUri] is enough for a client to re-fetch the
+ * real record over XRPC rather than trusting push-delivered content —
+ * matching how [uk.ewancroft.inkwell.shared.policy.NotificationPolicy]'s
+ * poll path already treats a push wake-up as "go check", not as itself
+ * being the source of truth for what changed.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString *actorDid __attribute__((swift_name("actorDid")));
+@property (readonly) NSString *subjectUri __attribute__((swift_name("subjectUri")));
+@property (readonly) int64_t timestampEpochMillis __attribute__((swift_name("timestampEpochMillis")));
+@property (readonly) InkwellSharedPushNotificationType *type __attribute__((swift_name("type")));
+@end
+
+
+/** Which push provider [PushSubscriptionRequest.deviceToken] is registered with. */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PushPlatform")))
+@interface InkwellSharedPushPlatform : InkwellSharedKotlinEnum<InkwellSharedPushPlatform *>
++ (instancetype)alloc __attribute__((unavailable));
+
+/** Which push provider [PushSubscriptionRequest.deviceToken] is registered with. */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
+- (instancetype)initWithName:(NSString *)name ordinal:(int32_t)ordinal __attribute__((swift_name("init(name:ordinal:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+@property (class, readonly) InkwellSharedPushPlatform *ios __attribute__((swift_name("ios")));
+@property (class, readonly) InkwellSharedPushPlatform *android __attribute__((swift_name("android")));
++ (InkwellSharedKotlinArray<InkwellSharedPushPlatform *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<InkwellSharedPushPlatform *> *entries __attribute__((swift_name("entries")));
+@property (readonly) NSString *wireValue __attribute__((swift_name("wireValue")));
+@end
+
+
+/**
+ * A device's request to register for push delivery, sent to the
+ * registration endpoint at `inkwell.ewancroft.uk/api/push/register`.
+ *
+ * Neutral shared model: no shared networking here (see `AGENTS.md`'s
+ * push-notification plan) — each platform's native client constructs one
+ * of these and does its own HTTP call. Keeping the shape here is what
+ * keeps the two clients and the server aligned on the wire contract.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("PushSubscriptionRequest")))
+@interface InkwellSharedPushSubscriptionRequest : InkwellSharedBase
+- (instancetype)initWithPlatform:(InkwellSharedPushPlatform *)platform deviceToken:(NSString *)deviceToken topics:(NSArray<InkwellSharedNotificationTopic *> *)topics did:(NSString *)did __attribute__((swift_name("init(platform:deviceToken:topics:did:)"))) __attribute__((objc_designated_initializer));
+- (InkwellSharedPushSubscriptionRequest *)doCopyPlatform:(InkwellSharedPushPlatform *)platform deviceToken:(NSString *)deviceToken topics:(NSArray<InkwellSharedNotificationTopic *> *)topics did:(NSString *)did __attribute__((swift_name("doCopy(platform:deviceToken:topics:did:)")));
+
+/**
+ * A device's request to register for push delivery, sent to the
+ * registration endpoint at `inkwell.ewancroft.uk/api/push/register`.
+ *
+ * Neutral shared model: no shared networking here (see `AGENTS.md`'s
+ * push-notification plan) — each platform's native client constructs one
+ * of these and does its own HTTP call. Keeping the shape here is what
+ * keeps the two clients and the server aligned on the wire contract.
+ */
+- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
+
+/**
+ * A device's request to register for push delivery, sent to the
+ * registration endpoint at `inkwell.ewancroft.uk/api/push/register`.
+ *
+ * Neutral shared model: no shared networking here (see `AGENTS.md`'s
+ * push-notification plan) — each platform's native client constructs one
+ * of these and does its own HTTP call. Keeping the shape here is what
+ * keeps the two clients and the server aligned on the wire contract.
+ */
+- (NSUInteger)hash __attribute__((swift_name("hash()")));
+
+/**
+ * A device's request to register for push delivery, sent to the
+ * registration endpoint at `inkwell.ewancroft.uk/api/push/register`.
+ *
+ * Neutral shared model: no shared networking here (see `AGENTS.md`'s
+ * push-notification plan) — each platform's native client constructs one
+ * of these and does its own HTTP call. Keeping the shape here is what
+ * keeps the two clients and the server aligned on the wire contract.
+ */
+- (NSString *)description __attribute__((swift_name("description()")));
+@property (readonly) NSString *deviceToken __attribute__((swift_name("deviceToken")));
+@property (readonly) NSString *did __attribute__((swift_name("did")));
+@property (readonly) InkwellSharedPushPlatform *platform __attribute__((swift_name("platform")));
+@property (readonly) NSArray<InkwellSharedNotificationTopic *> *topics __attribute__((swift_name("topics")));
 @end
 
 
@@ -3357,24 +3758,6 @@ __attribute__((swift_name("FilterMatch")))
 - (NSString *)description __attribute__((swift_name("description()")));
 @property (readonly) InkwellSharedFilterMatchKind *kind __attribute__((swift_name("kind")));
 @property (readonly) NSString *value __attribute__((swift_name("value")));
-@end
-
-__attribute__((swift_name("KotlinComparable")))
-@protocol InkwellSharedKotlinComparable
-@required
-- (int32_t)compareToOther:(id _Nullable)other __attribute__((swift_name("compareTo(other:)")));
-@end
-
-__attribute__((swift_name("KotlinEnum")))
-@interface InkwellSharedKotlinEnum<E> : InkwellSharedBase <InkwellSharedKotlinComparable>
-- (instancetype)initWithName:(NSString *)name ordinal:(int32_t)ordinal __attribute__((swift_name("init(name:ordinal:)"))) __attribute__((objc_designated_initializer));
-@property (class, readonly, getter=companion) InkwellSharedKotlinEnumCompanion *companion __attribute__((swift_name("companion")));
-- (int32_t)compareToOther:(E)other __attribute__((swift_name("compareTo(other:)")));
-- (BOOL)isEqual:(id _Nullable)other __attribute__((swift_name("isEqual(_:)")));
-- (NSUInteger)hash __attribute__((swift_name("hash()")));
-- (NSString *)description __attribute__((swift_name("description()")));
-@property (readonly) NSString *name __attribute__((swift_name("name")));
-@property (readonly) int32_t ordinal __attribute__((swift_name("ordinal")));
 @end
 
 __attribute__((objc_subclassing_restricted))
@@ -4719,6 +5102,36 @@ __attribute__((swift_name("NotificationStyleSummary")))
 - (NSUInteger)hash __attribute__((swift_name("hash()")));
 - (NSString *)description __attribute__((swift_name("description()")));
 @property (readonly) int32_t count __attribute__((swift_name("count")));
+@end
+
+
+/**
+ * Push-notification topics a device can subscribe to. Mirrors the event
+ * kinds [uk.ewancroft.inkwell.shared.model.PushPayload] can carry.
+ *
+ * `wireValue` is what crosses the wire to the registration endpoint and
+ * back — keep it stable; it is a public contract with the server.
+ */
+__attribute__((objc_subclassing_restricted))
+__attribute__((swift_name("NotificationTopic")))
+@interface InkwellSharedNotificationTopic : InkwellSharedKotlinEnum<InkwellSharedNotificationTopic *>
++ (instancetype)alloc __attribute__((unavailable));
+
+/**
+ * Push-notification topics a device can subscribe to. Mirrors the event
+ * kinds [uk.ewancroft.inkwell.shared.model.PushPayload] can carry.
+ *
+ * `wireValue` is what crosses the wire to the registration endpoint and
+ * back — keep it stable; it is a public contract with the server.
+ */
++ (instancetype)allocWithZone:(struct _NSZone *)zone __attribute__((unavailable));
+- (instancetype)initWithName:(NSString *)name ordinal:(int32_t)ordinal __attribute__((swift_name("init(name:ordinal:)"))) __attribute__((objc_designated_initializer)) __attribute__((unavailable));
+@property (class, readonly) InkwellSharedNotificationTopic *subscribe __attribute__((swift_name("subscribe")));
+@property (class, readonly) InkwellSharedNotificationTopic *recommend __attribute__((swift_name("recommend")));
+@property (class, readonly) InkwellSharedNotificationTopic *comment __attribute__((swift_name("comment")));
++ (InkwellSharedKotlinArray<InkwellSharedNotificationTopic *> *)values __attribute__((swift_name("values()")));
+@property (class, readonly) NSArray<InkwellSharedNotificationTopic *> *entries __attribute__((swift_name("entries")));
+@property (readonly) NSString *wireValue __attribute__((swift_name("wireValue")));
 @end
 
 
