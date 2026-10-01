@@ -35,8 +35,8 @@ android {
         applicationId = "uk.ewancroft.inkwell"
         minSdk = 26
         targetSdk = 36
-        versionCode = 16
-        versionName = "2.7.1"
+        versionCode = 17
+        versionName = "2.7.2"
 
         manifestPlaceholders["appAuthRedirectScheme"] = "uk.ewancroft.inkwell"
 
