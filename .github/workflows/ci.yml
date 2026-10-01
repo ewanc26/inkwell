@@ -144,7 +144,7 @@ jobs:
           fi
 
       - name: Build (and test, if a compatible Simulator runtime is available)
-        timeout-minutes: 20
+        timeout-minutes: 45
         working-directory: iOS
         run: |
           extra_args=()
@@ -160,13 +160,34 @@ jobs:
           else
             echo "::warning::No installed Simulator runtime satisfies InkwellTests' deployment target — building only, not running tests."
           fi
-          xcodebuild \
+
+          # The Simulator's service hub occasionally dies mid-run on GitHub's
+          # macOS runners ("DTServiceHubClient failed to bless service hub",
+          # "Restarting after unexpected exit, crash, or test timeout") —
+          # host-level flakiness unrelated to the code under test. xcodebuild
+          # already retries internally within one invocation, but a fully
+          # dead service hub can still take the whole process down with it.
+          # Retry the entire invocation a few times before giving up; a
+          # build-only run (no simulator involved) isn't subject to this and
+          # doesn't need the retry, but gets it for free since it's cheap.
+          attempt=1
+          max_attempts=3
+          until xcodebuild \
             -project Inkwell.xcodeproj \
             -scheme Inkwell \
             -destination "platform=iOS Simulator,name=${{ steps.destination.outputs.name }}" \
             -parallel-testing-enabled NO \
             "${extra_args[@]}" \
-            $action
+            $action; do
+            status=$?
+            if [ "$attempt" -ge "$max_attempts" ]; then
+              echo "::error::xcodebuild failed after $attempt attempts (exit $status)"
+              exit "$status"
+            fi
+            echo "::warning::xcodebuild failed (exit $status, attempt $attempt/$max_attempts) — retrying, likely simulator-host flakiness"
+            attempt=$((attempt + 1))
+            sleep 10
+          done
 
   android:
     name: Android build + lint + test
