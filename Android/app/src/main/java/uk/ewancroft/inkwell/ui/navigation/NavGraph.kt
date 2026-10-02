@@ -59,8 +59,15 @@ fun InkwellNavHost(
         notificationViewModel.refreshUnreadCount()
     }
 
-    LaunchedEffect(pendingDocumentUri) {
-        if (pendingDocumentUri != null) {
+    // Also keyed on navBackStackEntry: on a cold launch with a pending
+    // document URI already set (MainActivity.onCreate sets it synchronously,
+    // before setContent runs), this effect's first run can race NavHost's own
+    // graph attachment below -- navigate() throws if the graph isn't set yet.
+    // A non-null back-stack entry only exists once NavHost has actually
+    // attached a graph and resolved a start destination, so it's a reliable
+    // "safe to navigate now" signal.
+    LaunchedEffect(pendingDocumentUri, navBackStackEntry) {
+        if (pendingDocumentUri != null && navBackStackEntry != null) {
             val encoded = URLEncoder.encode(pendingDocumentUri, StandardCharsets.UTF_8.name())
             navController.navigate("post/$encoded") {
                 launchSingleTop = true

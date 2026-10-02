@@ -10,6 +10,7 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.After
@@ -106,7 +107,7 @@ class MainActivityIntentDeliveryTest {
         val callback = "uk.ewancroft.inkwell:/callback?code=warm-code&state=warm-state"
         val fingerprint = fingerprintOf(callback)
 
-        ActivityScenario.launch<MainActivity>(launcherIntent()).use { scenario ->
+        withScenario(ActivityScenario.launch(launcherIntent())) { scenario ->
             awaitSignInSurface()
             assertNull(readActivity(scenario) { it.handledOAuthCallback })
 
@@ -129,7 +130,7 @@ class MainActivityIntentDeliveryTest {
         val callback = "uk.ewancroft.inkwell:/callback?code=dup-code&state=dup-state"
         val fingerprint = fingerprintOf(callback)
 
-        ActivityScenario.launch<MainActivity>(launcherIntent()).use { scenario ->
+        withScenario(ActivityScenario.launch(launcherIntent())) { scenario ->
             awaitSignInSurface()
 
             scenario.onActivity { it.onNewIntent(viewIntent(callback)) }
@@ -218,7 +219,7 @@ class MainActivityIntentDeliveryTest {
 
     @Test
     fun warmContentDeepLinkHandsTheDocumentToTheReaderSynchronously() {
-        ActivityScenario.launch<MainActivity>(launcherIntent()).use { scenario ->
+        withScenario(ActivityScenario.launch(launcherIntent())) { scenario ->
             awaitSignInSurface()
 
             scenario.onActivity { activity ->
@@ -261,7 +262,7 @@ class MainActivityIntentDeliveryTest {
         // The policy does recognise it as a candidate...
         assertEquals(DOCUMENT_URI, HttpsDeepLinkPolicy.candidateDocumentUri(viewIntent(link)))
 
-        ActivityScenario.launch<MainActivity>(launcherIntent()).use { scenario ->
+        withScenario(ActivityScenario.launch(launcherIntent())) { scenario ->
             awaitSignInSurface()
 
             scenario.onActivity { activity ->
@@ -277,11 +278,18 @@ class MainActivityIntentDeliveryTest {
             // the Reader. There is no positive signal to wait on (the browser
             // hand-off clears itself as soon as it fires), so the invariant is
             // held open across a bounded settle window instead.
+            //
+            // The hand-off genuinely launches a real browser Activity on top of
+            // MainActivity (confirmed via logcat: ActivityTaskManager starts
+            // com.android.fakesystemapp/.browser.StubBrowserActivity on the test
+            // image), which is the correct, intended behaviour — not a bug. That
+            // backgrounds MainActivity for the rest of this test, so nothing
+            // after this point can depend on its Compose content still being the
+            // foreground hierarchy; composeRule has nothing to query once this
+            // fires.
             assertStaysNull(
-                scenario,
                 "an unverified https claim must never reach the Reader",
-            ) { it.pendingDocumentUri.value }
-            awaitSignInSurface()
+            ) { readActivity(scenario) { activity -> activity.pendingDocumentUri.value } }
         }
     }
 
@@ -337,6 +345,45 @@ class MainActivityIntentDeliveryTest {
         composeRule.waitUntil(TIMEOUT_MS) { signInSurfaceNodeCount() == 0 }
     }
 
+    /**
+     * Runs [block] against [scenario], then closes it -- equivalent to
+     * `scenario.use(block)` except it tolerates one specific, confirmed-
+     * harmless `ActivityScenario` limitation.
+     *
+     * `ActivityScenario` matches lifecycle callbacks against the intent it
+     * was launched with to decide which stage updates to trust. A test that
+     * calls `activity.onNewIntent(...)` directly -- the only way to exercise
+     * `singleTask`'s warm-delivery path without a second real launch --
+     * triggers `MainActivity.onNewIntent`'s own `setIntent(intent)` call,
+     * which changes what `activity.getIntent()` returns. From that point on,
+     * every real lifecycle transition logs "ignored because the intent does
+     * not match" and `ActivityScenario`'s internal stage tracker freezes at
+     * whatever it last trusted (typically RESUMED) -- confirmed via logcat's
+     * `LifecycleMonitor` entries, which show the real Activity still reaches
+     * PAUSED -> STOPPED -> DESTROYED correctly regardless. `close()`'s
+     * `waitForActivityToBecomeAnyOf(DESTROYED)` then times out polling a
+     * transition that has already genuinely happened, failing the test on a
+     * teardown artifact rather than anything the test body asserted.
+     *
+     * Only swallows that exact, named AssertionError; anything else from
+     * [block] or from a close() failure for a different reason still fails
+     * the test normally.
+     */
+    private fun withScenario(
+        scenario: ActivityScenario<MainActivity>,
+        block: (ActivityScenario<MainActivity>) -> Unit,
+    ) {
+        try {
+            block(scenario)
+        } finally {
+            try {
+                scenario.close()
+            } catch (e: AssertionError) {
+                if (e.message?.contains("never becomes requested state") != true) throw e
+            }
+        }
+    }
+
     private fun <T> readActivity(
         scenario: ActivityScenario<MainActivity>,
         read: (MainActivity) -> T,
@@ -355,15 +402,25 @@ class MainActivityIntentDeliveryTest {
      * Holds a "this never happens" invariant open across a bounded window,
      * for the asynchronous paths that have no positive signal to wait on.
      */
+    /**
+     * Holds a "this never happens" invariant open across a bounded window.
+     *
+     * Deliberately UI-agnostic: [read] a plain value (not through
+     * `composeRule`), since the Activity under test may legitimately no
+     * longer be the foreground Compose hierarchy by the time this runs (e.g.
+     * a real browser Activity launched on top of it) -- `composeRule` would
+     * throw "No compose hierarchies found" in that case even though the
+     * invariant itself holds perfectly well. `waitForIdleSync` flushes the
+     * main thread's message queue without requiring a live semantics tree.
+     */
     private fun assertStaysNull(
-        scenario: ActivityScenario<MainActivity>,
         description: String,
-        read: (MainActivity) -> Any?,
+        read: () -> Any?,
     ) {
         val deadline = SystemClock.uptimeMillis() + SETTLE_MS
         while (SystemClock.uptimeMillis() < deadline) {
-            composeRule.waitForIdle()
-            assertNull(description, readActivity(scenario, read))
+            InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+            assertNull(description, read())
             SystemClock.sleep(POLL_INTERVAL_MS)
         }
     }
