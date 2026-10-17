@@ -12,7 +12,8 @@ import dagger.hilt.android.AndroidEntryPoint
  * ViewModel factory and nothing else, so a test can mount exactly the
  * composable it means to exercise.
  *
- * Declared in `app/src/androidTest/AndroidManifest.xml`.
+ * Declared in `app/src/debug/AndroidManifest.xml`, so it runs in the app process
+ * that the test rule launches it into.
  */
 @AndroidEntryPoint
 class HiltTestActivity : ComponentActivity()

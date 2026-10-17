@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Debug-only manifest additions.
+
+  HiltTestActivity is an empty @AndroidEntryPoint host for composable-level
+  tests (see HiltTestActivity.kt). It must live in the app APK, not the
+  androidTest APK: the test rule launches it into the app's process, so
+  declaring it only in the test APK makes the launch resolve to a different
+  process ("resolved to different process ...debug.test").
+
+  It is part of the debug variant only and never reaches the release manifest.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <activity
+            android:name="uk.ewancroft.inkwell.HiltTestActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.Material.Light.NoActionBar" />
+    </application>
+</manifest>
