@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -163,7 +164,7 @@ fun ReaderScreen(
                             BadgedBox(badge = { Badge { Text(formatLocalizedInteger(unreadCount)) } }) {
                                 Icon(
                                     Icons.Outlined.Notifications,
-                                    contentDescription = stringResource(R.string.reader_notifications_unread, unreadCount),
+                                    contentDescription = pluralStringResource(R.plurals.reader_notifications_unread, unreadCount, unreadCount),
                                 )
                             }
                         } else {
