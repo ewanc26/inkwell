@@ -401,7 +401,15 @@ private fun RecommendRow(uiState: PostDetailUiState, onToggleRecommend: () -> Un
             )
         } else {
             Text(
-                pluralStringResource(R.plurals.reader_recommendation_count, uiState.recommendCount, uiState.recommendCount),
+                if (uiState.recommendCount == 0) {
+                    stringResource(R.string.reader_recommendations_empty)
+                } else {
+                    pluralStringResource(
+                        R.plurals.reader_recommendation_count,
+                        uiState.recommendCount,
+                        uiState.recommendCount,
+                    )
+                },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
