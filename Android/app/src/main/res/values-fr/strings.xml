@@ -7,10 +7,10 @@
         <item quantity="other">%d votes</item>
     </plurals>
     <plurals name="reader_recommendation_count">
-        <item quantity="zero">Aucune recommandation pour le moment</item>
         <item quantity="one">%d recommandation</item>
         <item quantity="other">%d recommandations</item>
     </plurals>
+    <string name="reader_recommendations_empty">Aucune recommandation pour le moment</string>
     <plurals name="profile_followers_count">
         <item quantity="one">%d abonné</item>
         <item quantity="other">%d abonnés</item>
@@ -89,7 +89,10 @@
     <string name="reader_title">Lecture</string>
     <string name="reader_sign_out">Se déconnecter</string>
     <string name="reader_notifications">Notifications</string>
-    <string name="reader_notifications_unread">Notifications, %1$d non lues</string>
+    <plurals name="reader_notifications_unread">
+        <item quantity="one">Notifications, %1$d non lue</item>
+        <item quantity="other">Notifications, %1$d non lues</item>
+    </plurals>
     <string name="reader_about">À propos</string>
     <string name="reader_settings">Paramètres</string>
     <string name="reader_refresh">Actualiser</string>
