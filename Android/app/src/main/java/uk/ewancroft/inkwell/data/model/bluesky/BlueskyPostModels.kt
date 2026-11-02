@@ -1,8 +1,13 @@
 package uk.ewancroft.inkwell.data.model.bluesky
 
+import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonClassDiscriminator
+import kotlinx.serialization.json.JsonContentPolymorphicSerializer
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonPrimitive
 import uk.ewancroft.inkwell.shared.content.BlueskyEmbedTypes
 
 /**
@@ -36,23 +41,86 @@ data class BSkyPostRecord(
     val createdAt: String? = null,
 )
 
-@Serializable
+/**
+ * Union of possible Bluesky post embeds, selected on the wire `$type` —
+ * which is always a `#view` variant, never a bare record ID. Unknown
+ * present and future embed types decode as [Unknown], so one new embed kind
+ * can never sink the whole post the way the old base-ID sealed mismatch did.
+ */
+@Serializable(with = BSkyEmbedSerializer::class)
 sealed class BSkyEmbed {
     @Serializable
-    @SerialName(BlueskyEmbedTypes.IMAGES)
     data class Images(val images: List<BSkyImage>) : BSkyEmbed()
 
     @Serializable
-    @SerialName(BlueskyEmbedTypes.EXTERNAL)
     data class External(val external: BSkyExternal) : BSkyEmbed()
 
     @Serializable
-    @SerialName(BlueskyEmbedTypes.RECORD)
     data class Record(val record: BSkyEmbeddedRecord) : BSkyEmbed()
+
+    /**
+     * `app.bsky.embed.video#view`, whose fields sit flat on the view (there
+     * is no `video` wrapper object). Decoded so video posts survive the
+     * fetch; playback UI is a follow-up — today these render as unadorned posts.
+     */
+    @Serializable
+    data class Video(
+        val cid: String? = null,
+        val playlist: String? = null,
+        val thumbnail: String? = null,
+        val alt: String? = null,
+    ) : BSkyEmbed()
+
+    @Serializable
+    data class RecordWithMedia(
+        val record: BSkyRecordWithMediaRecord? = null,
+        val media: BSkyEmbedMedia? = null,
+    ) : BSkyEmbed()
 
     @Serializable
     data object Unknown : BSkyEmbed()
 }
+
+object BSkyEmbedSerializer : JsonContentPolymorphicSerializer<BSkyEmbed>(BSkyEmbed::class) {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<BSkyEmbed> =
+        when (embedTypeOf(element)) {
+            BlueskyEmbedTypes.IMAGES_VIEW -> BSkyEmbed.Images.serializer()
+            BlueskyEmbedTypes.EXTERNAL_VIEW -> BSkyEmbed.External.serializer()
+            BlueskyEmbedTypes.RECORD_VIEW -> BSkyEmbed.Record.serializer()
+            BlueskyEmbedTypes.VIDEO_VIEW -> BSkyEmbed.Video.serializer()
+            BlueskyEmbedTypes.RECORD_WITH_MEDIA_VIEW -> BSkyEmbed.RecordWithMedia.serializer()
+            else -> BSkyEmbed.Unknown.serializer()
+        }
+}
+
+/**
+ * Media union nested inside `recordWithMedia#view` (images or external only,
+ * per the lexicon). Same `$type` selection as the top level, same
+ * never-fail fallback.
+ */
+@Serializable(with = BSkyEmbedMediaSerializer::class)
+sealed class BSkyEmbedMedia {
+    @Serializable
+    data class Images(val images: List<BSkyImage>) : BSkyEmbedMedia()
+
+    @Serializable
+    data class External(val external: BSkyExternal) : BSkyEmbedMedia()
+
+    @Serializable
+    data object Unknown : BSkyEmbedMedia()
+}
+
+object BSkyEmbedMediaSerializer : JsonContentPolymorphicSerializer<BSkyEmbedMedia>(BSkyEmbedMedia::class) {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<BSkyEmbedMedia> =
+        when (embedTypeOf(element)) {
+            BlueskyEmbedTypes.IMAGES_VIEW -> BSkyEmbedMedia.Images.serializer()
+            BlueskyEmbedTypes.EXTERNAL_VIEW -> BSkyEmbedMedia.External.serializer()
+            else -> BSkyEmbedMedia.Unknown.serializer()
+        }
+}
+
+private fun embedTypeOf(element: JsonElement): String? =
+    (element as? JsonObject)?.get("\$type")?.jsonPrimitive?.contentOrNull
 
 @Serializable
 data class BSkyImage(
@@ -149,6 +217,12 @@ data class BSkyEmbeddedRecord(
 data class BSkyEmbeddedRecordValue(
     val text: String? = null,
     val createdAt: String? = null,
+)
+
+/** `recordWithMedia#view`'s `record` member — itself a record-view union. */
+@Serializable
+data class BSkyRecordWithMediaRecord(
+    val record: BSkyEmbeddedRecord? = null,
 )
 
 @Serializable
