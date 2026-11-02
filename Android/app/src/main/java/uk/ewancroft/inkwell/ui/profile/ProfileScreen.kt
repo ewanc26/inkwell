@@ -251,9 +251,11 @@ private fun ProfileContent(
 @Composable
 private fun ProfileHeader(profile: BlueskyProfile) {
     val displayName = profile.displayName?.trim()?.takeIf(String::isNotEmpty) ?: profile.handle
+    val pronouns = profile.pronouns?.trim()?.takeIf(String::isNotEmpty)
     val accessibilityLabel = buildList {
         add(displayName)
         add("@${profile.handle}")
+        pronouns?.let { add(it) }
         profile.followersCount?.let { add(pluralStringResource(R.plurals.profile_followers_count, it, it)) }
         profile.followsCount?.let { add(pluralStringResource(R.plurals.profile_following_count, it, it)) }
         profile.postsCount?.let { add(pluralStringResource(R.plurals.profile_posts_count, it, it)) }
@@ -311,6 +313,13 @@ private fun ProfileHeader(profile: BlueskyProfile) {
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+                pronouns?.let {
+                    Text(
+                        it,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         }
 

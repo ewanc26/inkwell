@@ -197,6 +197,10 @@ private struct ProfileHeader: View {
 
     private var accessibilityLabel: Text {
         var label = Text("\(displayName.bidiIsolated). @\(profile.handle.bidiIsolated)")
+        if let pronouns = profile.pronouns?.trimmingCharacters(in: .whitespacesAndNewlines),
+           !pronouns.isEmpty {
+            label = label + Text(". \(pronouns.bidiIsolated)")
+        }
         if let followersCount = profile.followersCount {
             label = label + Text(". ") + Text("^[\(followersCount) follower](inflect: true)")
         }
@@ -242,6 +246,13 @@ private struct ProfileHeader: View {
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .textSelection(.enabled)
+
+                    if let pronouns = profile.pronouns?.trimmingCharacters(in: .whitespacesAndNewlines),
+                       !pronouns.isEmpty {
+                        Text(pronouns)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
