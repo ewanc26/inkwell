@@ -175,6 +175,9 @@ private fun ProfileContent(
     modifier: Modifier = Modifier,
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
+    fun openExternal(url: String) {
+        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+    }
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 32.dp),
@@ -193,6 +196,18 @@ private fun ProfileContent(
                 profile.description?.trim()?.takeIf(String::isNotEmpty)?.let { description ->
                     Text(stringResource(R.string.reader_about), style = MaterialTheme.typography.titleMedium)
                     Text(description, style = MaterialTheme.typography.bodyLarge)
+                }
+
+                profile.links?.filter { isOpenableHttpUrl(it.url) }?.takeIf { it.isNotEmpty() }?.let { links ->
+                    Text(stringResource(R.string.profile_links), style = MaterialTheme.typography.titleMedium)
+                    links.forEach { link ->
+                        ProfileLinkRow(
+                            url = link.url!!,
+                            title = link.title,
+                            icon = link.icon,
+                            onOpen = ::openExternal,
+                        )
+                    }
                 }
 
                 Text(stringResource(R.string.profile_account), style = MaterialTheme.typography.titleMedium)
@@ -307,6 +322,35 @@ private fun ProfileHeader(profile: BlueskyProfile) {
             ProfileStatistic(profile.followsCount, R.plurals.profile_following_count)
             ProfileStatistic(profile.postsCount, R.plurals.profile_posts_count)
         }
+    }
+}
+
+private fun isOpenableHttpUrl(url: String?): Boolean {
+    val scheme = url?.let { Uri.parse(it).scheme }?.lowercase()
+    return scheme == "http" || scheme == "https"
+}
+
+@Composable
+private fun ProfileLinkRow(
+    url: String,
+    title: String?,
+    icon: String?,
+    onOpen: (String) -> Unit,
+) {
+    val label = title?.trim()?.takeIf(String::isNotEmpty) ?: Uri.parse(url).host ?: url
+    TextButton(onClick = { onOpen(url) }) {
+        if (icon != null) {
+            AsyncImage(
+                model = icon,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp),
+                contentScale = ContentScale.Crop,
+            )
+        } else {
+            Icon(Icons.AutoMirrored.Outlined.OpenInNew, contentDescription = null)
+        }
+        Spacer(Modifier.width(8.dp))
+        Text(label)
     }
 }
 

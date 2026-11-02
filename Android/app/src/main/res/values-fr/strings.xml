@@ -216,6 +216,7 @@
     <string name="profile_retry">Réessayer</string>
     <string name="profile_account">Compte</string>
     <string name="profile_open_bluesky">Ouvrir dans Bluesky</string>
+    <string name="profile_links">Liens</string>
     <string name="feedback_thanks">Merci !</string>
     <string name="feedback_sent">Votre message a été envoyé.</string>
     <string name="feedback_done">Terminé</string>

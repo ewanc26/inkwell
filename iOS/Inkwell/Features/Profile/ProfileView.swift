@@ -70,6 +70,25 @@ struct ProfileView: View {
         }
     }
 
+    /// The profile's pinned links, in display order, restricted to what the
+    /// app can open externally. `profileLinkView` destinations are https by
+    /// construction, but the filter keeps a misbehaving server from handing
+    /// the row a scheme `Link` can't handle.
+    private func profileLinks(_ profile: BSkyActorProfile) -> [BSkyProfileLink] {
+        (profile.links ?? []).filter { link in
+            guard let scheme = link.url.flatMap(URL.init(string:))?.scheme?.lowercased() else { return false }
+            return scheme == "http" || scheme == "https"
+        }
+    }
+
+    private func profileLinkTitle(_ link: BSkyProfileLink, host: String?) -> String {
+        if let title = link.title?.trimmingCharacters(in: .whitespacesAndNewlines),
+           !title.isEmpty {
+            return title
+        }
+        return host ?? link.url ?? ""
+    }
+
     private func profileContent(_ profile: BSkyActorProfile) -> some View {
         List {
             Section {
@@ -83,6 +102,51 @@ struct ProfileView: View {
                     Text(description)
                         .font(.body)
                         .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+
+            let links = profileLinks(profile)
+            if !links.isEmpty {
+                Section("Links") {
+                    ForEach(Array(links.enumerated()), id: \.offset) { _, link in
+                        if let destination = link.url.flatMap(URL.init(string:)) {
+                            Link(destination: destination) {
+                                HStack(spacing: 12) {
+                                    if let iconURL = link.icon.flatMap(URL.init(string:)) {
+                                        AsyncImage(url: iconURL) { phase in
+                                            switch phase {
+                                            case .success(let image):
+                                                image.resizable().scaledToFill()
+                                            case .failure, .empty:
+                                                Image(systemName: "link")
+                                                    .resizable()
+                                                    .foregroundStyle(.secondary)
+                                            @unknown default:
+                                                Image(systemName: "link")
+                                                    .resizable()
+                                                    .foregroundStyle(.secondary)
+                                            }
+                                        }
+                                        .frame(width: 28, height: 28)
+                                        .clipShape(.rect(cornerRadius: 6))
+                                        .accessibilityHidden(true)
+                                    }
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(profileLinkTitle(link, host: destination.host))
+                                            .foregroundStyle(.primary)
+                                            .lineLimit(2)
+                                        if let host = destination.host,
+                                           host != profileLinkTitle(link, host: destination.host) {
+                                            Text(host)
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                                .lineLimit(1)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
 

@@ -213,6 +213,7 @@
     <string name="profile_retry">Try again</string>
     <string name="profile_account">Account</string>
     <string name="profile_open_bluesky">Open in Bluesky</string>
+    <string name="profile_links">Links</string>
     <string name="feedback_thanks">Thanks!</string>
     <string name="feedback_sent">Your feedback was sent.</string>
     <string name="feedback_done">Done</string>
