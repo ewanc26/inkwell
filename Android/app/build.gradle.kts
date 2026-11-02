@@ -71,6 +71,11 @@ android {
             isDebuggable = true
             // Separate install from release builds for side-by-side testing
             applicationIdSuffix = ".debug"
+            // Generate the `en-XA` (accented/expanded) and `ar-XB` (RTL)
+            // pseudolocales so layouts, truncation, and bidi can be exercised
+            // on debug builds without a translation in hand (#88). Release
+            // builds stay clean: pseudolocales are a test aid, not content.
+            isPseudoLocalesEnabled = true
         }
     }
 
