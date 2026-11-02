@@ -1,7 +1,5 @@
 package uk.ewancroft.inkwell.ui.reader
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,6 +39,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.semantics.contentDescription
@@ -108,7 +111,6 @@ private fun BSkyPostContent(
     post: uk.ewancroft.inkwell.data.model.bluesky.BSkyPostView,
     onNavigateToDocument: (String) -> Unit = {},
 ) {
-    val context = LocalContext.current
     Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         // Author row
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -175,12 +177,7 @@ private fun BSkyPostContent(
         if (embed is uk.ewancroft.inkwell.data.model.bluesky.BSkyEmbed.Video &&
             (embed.thumbnail != null || embed.playlist != null)
         ) {
-            VideoEmbedCard(
-                video = embed,
-                onOpenVideo = { url ->
-                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                },
-            )
+            VideoEmbedCard(video = embed)
         }
 
         // Record embed (quoted post)
@@ -251,59 +248,85 @@ private fun QuotedPostCard(record: uk.ewancroft.inkwell.data.model.bluesky.BSkyE
 }
 
 /**
- * Video embed: thumbnail with a play affordance that opens the stream URL
- * in the viewer's player. Inline playback would mean a media3 dependency
- * for one card; the external player keeps this dependency-free.
+ * Video embed: thumbnail with a play affordance that swaps in an inline
+ * ExoPlayer (media3) on tap and autoplays. The player is released when the
+ * card leaves composition; without a playlist the thumbnail is static.
  */
 @Composable
 private fun VideoEmbedCard(
     video: uk.ewancroft.inkwell.data.model.bluesky.BSkyEmbed.Video,
-    onOpenVideo: (String) -> Unit,
 ) {
+    val context = LocalContext.current
     val playlist = video.playlist
+    var playingInline by remember { mutableStateOf(false) }
     val playLabel = stringResource(R.string.reader_play_video)
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(200.dp)
-            .clip(MaterialTheme.shapes.medium)
-            .background(MaterialTheme.colorScheme.surface)
-            .then(
-                if (playlist != null) {
-                    Modifier.clickable(
-                        role = Role.Button,
-                        onClickLabel = playLabel,
-                    ) { onOpenVideo(playlist) }
-                } else {
-                    Modifier
-                }
-            )
-            .semantics {
-                contentDescription = video.alt?.takeIf { it.isNotBlank() } ?: playLabel
-            },
-    ) {
-        if (video.thumbnail != null) {
-            AsyncImage(
-                model = video.thumbnail,
-                contentDescription = null,
-                modifier = Modifier.matchParentSize(),
-                contentScale = ContentScale.Crop,
-            )
+    val description = video.alt?.takeIf { it.isNotBlank() } ?: playLabel
+
+    if (playingInline && playlist != null) {
+        val exoPlayer = remember(playlist) {
+            ExoPlayer.Builder(context).build().apply {
+                setMediaItem(MediaItem.fromUri(playlist))
+                prepare()
+                playWhenReady = true
+            }
         }
+        DisposableEffect(playlist) {
+            onDispose { exoPlayer.release() }
+        }
+        AndroidView(
+            factory = { playerContext ->
+                PlayerView(playerContext).apply { player = exoPlayer }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .clip(MaterialTheme.shapes.medium)
+                .semantics { contentDescription = description },
+        )
+    } else {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .size(56.dp)
-                .clip(CircleShape)
-                .background(Color.Black.copy(alpha = 0.45f)),
+                .fillMaxWidth()
+                .height(200.dp)
+                .clip(MaterialTheme.shapes.medium)
+                .background(MaterialTheme.colorScheme.surface)
+                .then(
+                    if (playlist != null) {
+                        Modifier.clickable(
+                            role = Role.Button,
+                            onClickLabel = playLabel,
+                        ) { playingInline = true }
+                    } else {
+                        Modifier
+                    }
+                )
+                .semantics { contentDescription = description },
         ) {
-            Icon(
-                Icons.Filled.PlayArrow,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(32.dp),
-            )
+            if (video.thumbnail != null) {
+                AsyncImage(
+                    model = video.thumbnail,
+                    contentDescription = null,
+                    modifier = Modifier.matchParentSize(),
+                    contentScale = ContentScale.Crop,
+                )
+            }
+            if (playlist != null) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clip(CircleShape)
+                        .background(Color.Black.copy(alpha = 0.45f)),
+                ) {
+                    Icon(
+                        Icons.Filled.PlayArrow,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(32.dp),
+                    )
+                }
+            }
         }
     }
 }
