@@ -23,7 +23,22 @@ data class BlueskyProfile(
     val banner: String? = null,
     val followersCount: Int? = null,
     val followsCount: Int? = null,
-    val postsCount: Int? = null
+    val postsCount: Int? = null,
+    val links: List<BlueskyProfileLink>? = null
+)
+
+/**
+ * A single `app.bsky.actor.defs#profileLinkView` — one of the (up to three)
+ * links a user pins to their Bluesky profile. Only `profileViewDetailed`
+ * (i.e. `app.bsky.actor.getProfile`) carries these; list subjects decode as
+ * `profileView` and simply leave [BlueskyProfile.links] null.
+ */
+@Serializable
+data class BlueskyProfileLink(
+    val uri: String? = null,
+    val url: String? = null,
+    val title: String? = null,
+    val icon: String? = null
 )
 
 // ── Bluesky List (app.bsky.graph.getList) ────────────────────────────────

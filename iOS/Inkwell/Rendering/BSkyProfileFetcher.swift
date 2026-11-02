@@ -26,6 +26,7 @@ struct BSkyActorProfile: Decodable, Sendable, Identifiable {
     let createdAt: String?
     let indexedAt: String?
     let pinnedPost: BSkyPinnedPostRef?
+    let links: [BSkyProfileLink]?
     let labels: [BSkyLabel]?
     let associated: BSkyAssociated?
     let viewer: BSkyViewerState?
@@ -36,6 +37,17 @@ struct BSkyActorProfile: Decodable, Sendable, Identifiable {
 struct BSkyPinnedPostRef: Decodable, Sendable {
     let cid: String?
     let uri: String?
+}
+
+/// `app.bsky.actor.defs#profileLinkView` — one of the (up to three) links a
+/// user pins to their Bluesky profile. Only `profileViewDetailed` (i.e.
+/// `app.bsky.actor.getProfile`) carries these; list subjects decode as
+/// `profileView` and simply leave `links` nil.
+struct BSkyProfileLink: Decodable, Sendable {
+    let uri: String?
+    let url: String?
+    let title: String?
+    let icon: String?
 }
 
 /// `com.atproto.label.defs#label`. Shared by actor profiles and by
