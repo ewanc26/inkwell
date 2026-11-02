@@ -51,6 +51,7 @@
     <string name="reader_bluesky_post_unavailable">Post Bluesky indisponible</string>
     <string name="reader_quoted_post_by">Post cité de %1$s</string>
     <string name="reader_quoted_post_fallback">Post cité</string>
+    <string name="reader_play_video">Lire la vidéo</string>
     <string name="reader_unknown_author">Auteur inconnu</string>
     <string name="reader_standard_site_post_unavailable">Article Standard.site indisponible</string>
     <string name="writer_describe_image">Décrivez cette image</string>

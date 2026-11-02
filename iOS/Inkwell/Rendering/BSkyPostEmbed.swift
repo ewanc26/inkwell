@@ -166,11 +166,66 @@ struct BSkyPostEmbedView: View {
             .accessibilityElement(children: .combine)
             .accessibilityLabel(quotedPostAccessibilityLabel(recordEmbed.record))
 
-        // Video playback and record-with-media rendering are follow-ups;
-        // decoding them (rather than dropping the post) lands first.
-        case .video, .recordWithMedia, .unknown:
+        case .video(let videoEmbed):
+            if videoEmbed.thumbnail != nil || videoEmbed.playlist != nil {
+                videoContent(videoEmbed)
+            }
+
+        // Record-with-media rendering is still a follow-up; decoding it
+        // (rather than dropping the post) landed first.
+        case .recordWithMedia, .unknown:
             EmptyView()
         }
+    }
+
+    // MARK: - Video Content
+
+    /// Video embed: thumbnail with a play affordance that opens the stream
+    /// URL in the system player. Inline playback would mean an AVPlayer
+    /// view for one card; the external player keeps this dependency-free
+    /// and matches Android, which hands the same URL to the viewer.
+    @ViewBuilder
+    private func videoContent(_ video: BSkyVideoEmbed) -> some View {
+        let thumbURL = video.thumbnail.flatMap(URL.init(string:))
+        let playlistURL = video.playlist.flatMap(URL.init(string:))
+        let title: Text = if let alt = video.alt, !alt.isEmpty { Text(alt) } else { Text("Play video") }
+
+        if let playlistURL {
+            Link(destination: playlistURL) {
+                videoThumbnail(thumbURL: thumbURL)
+            }
+            .accessibilityLabel(title)
+        } else {
+            videoThumbnail(thumbURL: thumbURL)
+                .accessibilityLabel(title)
+                .accessibilityHidden(video.alt?.isEmpty != false)
+        }
+    }
+
+    @ViewBuilder
+    private func videoThumbnail(thumbURL: URL?) -> some View {
+        ZStack {
+            if let thumbURL {
+                AsyncImage(url: thumbURL) { phase in
+                    if let image = phase.image {
+                        image.resizable().scaledToFill()
+                    } else {
+                        Color.gray.opacity(0.2)
+                    }
+                }
+            } else {
+                Color.gray.opacity(0.2)
+            }
+            Image(systemName: "play.circle.fill")
+                .font(.system(size: 44))
+                .foregroundStyle(.white)
+                .shadow(radius: 4)
+                .accessibilityHidden(true)
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 200)
+        .clipped()
+        .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 
     // MARK: - Helpers

@@ -51,6 +51,7 @@
     <string name="reader_bluesky_post_unavailable">Bluesky post unavailable</string>
     <string name="reader_quoted_post_by">Quoted post by %1$s</string>
     <string name="reader_quoted_post_fallback">Quoted post</string>
+    <string name="reader_play_video">Play video</string>
     <string name="reader_unknown_author">Unknown author</string>
     <string name="reader_standard_site_post_unavailable">Standard.site post unavailable</string>
     <string name="writer_describe_image">Describe this image</string>
