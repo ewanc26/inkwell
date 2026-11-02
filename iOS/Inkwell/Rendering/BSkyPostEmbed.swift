@@ -117,19 +117,7 @@ struct BSkyPostEmbedView: View {
     private func embedContent(_ embed: BSkyEmbed) -> some View {
         switch embed {
         case .images(let imagesEmbed):
-            if let first = imagesEmbed.images.first, let thumb = first.thumb {
-                AsyncImage(url: URL(string: thumb)) { phase in
-                    if let image = phase.image {
-                        image.resizable().scaledToFill()
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 200)
-                            .clipped()
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                    }
-                }
-                .accessibilityLabel(first.alt?.isEmpty == false ? first.alt! : "")
-                .accessibilityHidden(first.alt?.isEmpty != false)
-            }
+            embedImage(imagesEmbed)
 
         case .external(let externalEmbed):
             BSkyExternalCardView(
@@ -139,43 +127,82 @@ struct BSkyPostEmbedView: View {
             )
 
         case .record(let recordEmbed):
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 6) {
-                    Image(systemName: "quote.bubble")
-                        .font(.caption)
-                        .foregroundStyle(accentColor)
-                        .accessibilityHidden(true)
-                    Text(recordEmbed.record.author?.displayName ?? "Quoted post")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(foregroundColor)
-                }
-                if let text = recordEmbed.record.value?.text {
-                    Text(text)
-                        .font(.caption)
-                        .foregroundStyle(foregroundColor.opacity(0.7))
-                        .lineLimit(3)
+            quotedPost(recordEmbed.record)
+
+        case .recordWithMedia(let recordWithMediaEmbed):
+            if let inner = recordWithMediaEmbed.record?.record {
+                quotedPost(inner)
+            }
+            if let media = recordWithMediaEmbed.media {
+                switch media {
+                case .images(let imagesEmbed):
+                    embedImage(imagesEmbed)
+                case .external(let externalEmbed):
+                    BSkyExternalCardView(
+                        card: externalEmbed.external,
+                        foregroundColor: foregroundColor,
+                        accentColor: accentColor
+                    )
+                case .unknown:
+                    EmptyView()
                 }
             }
-            .padding(10)
-            .background(foregroundColor.opacity(0.03))
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(foregroundColor.opacity(0.08), lineWidth: 1)
-            )
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel(quotedPostAccessibilityLabel(recordEmbed.record))
 
         case .video(let videoEmbed):
             if videoEmbed.thumbnail != nil || videoEmbed.playlist != nil {
                 videoContent(videoEmbed)
             }
 
-        // Record-with-media rendering is still a follow-up; decoding it
-        // (rather than dropping the post) landed first.
-        case .recordWithMedia, .unknown:
+        case .unknown:
             EmptyView()
         }
+    }
+
+    @ViewBuilder
+    private func embedImage(_ imagesEmbed: BSkyImagesEmbed) -> some View {
+        if let first = imagesEmbed.images.first, let thumb = first.thumb {
+            AsyncImage(url: URL(string: thumb)) { phase in
+                if let image = phase.image {
+                    image.resizable().scaledToFill()
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 200)
+                        .clipped()
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                }
+            }
+            .accessibilityLabel(first.alt?.isEmpty == false ? first.alt! : "")
+            .accessibilityHidden(first.alt?.isEmpty != false)
+        }
+    }
+
+    @ViewBuilder
+    private func quotedPost(_ record: BSkyRecordEmbed.BSkyEmbeddedRecord) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 6) {
+                Image(systemName: "quote.bubble")
+                    .font(.caption)
+                    .foregroundStyle(accentColor)
+                    .accessibilityHidden(true)
+                Text(record.author?.displayName ?? "Quoted post")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(foregroundColor)
+            }
+            if let text = record.value?.text {
+                Text(text)
+                    .font(.caption)
+                    .foregroundStyle(foregroundColor.opacity(0.7))
+                    .lineLimit(3)
+            }
+        }
+        .padding(10)
+        .background(foregroundColor.opacity(0.03))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(foregroundColor.opacity(0.08), lineWidth: 1)
+        )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(quotedPostAccessibilityLabel(record))
     }
 
     // MARK: - Video Content
