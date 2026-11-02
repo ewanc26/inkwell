@@ -150,6 +150,12 @@ struct ProfileView: View {
                 }
             }
 
+            if let pinnedURI = profile.pinnedPost?.uri, !pinnedURI.isEmpty {
+                Section("Pinned post") {
+                    BSkyPostEmbedView(postURI: pinnedURI)
+                }
+            }
+
             Section("Account") {
                 LabeledContent("DID") {
                     Text(profile.did)
