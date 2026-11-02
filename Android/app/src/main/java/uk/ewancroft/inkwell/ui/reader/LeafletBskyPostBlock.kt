@@ -148,22 +148,27 @@ private fun BSkyPostContent(
         val embed = post.embed
         if (embed is uk.ewancroft.inkwell.data.model.bluesky.BSkyEmbed.Images) {
             val first = embed.images.firstOrNull()
-            if (first?.thumb != null) {
-                AsyncImage(
-                    model = first.thumb,
-                    contentDescription = first.alt?.takeIf { it.isNotBlank() },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .clip(MaterialTheme.shapes.medium),
-                    contentScale = ContentScale.Crop,
-                )
-            }
+            PostImageThumb(thumb = first?.thumb, alt = first?.alt)
         }
 
         // External link embed
         if (embed is uk.ewancroft.inkwell.data.model.bluesky.BSkyEmbed.External) {
             BSkyExternalCard(external = embed.external, onNavigateToDocument = onNavigateToDocument)
+        }
+
+        // Record with media embed: quoted post plus its attached image/link.
+        if (embed is uk.ewancroft.inkwell.data.model.bluesky.BSkyEmbed.RecordWithMedia) {
+            embed.record?.record?.let { inner -> QuotedPostCard(record = inner) }
+            when (val media = embed.media) {
+                is uk.ewancroft.inkwell.data.model.bluesky.BSkyEmbedMedia.Images -> {
+                    val first = media.images.firstOrNull()
+                    PostImageThumb(thumb = first?.thumb, alt = first?.alt)
+                }
+                is uk.ewancroft.inkwell.data.model.bluesky.BSkyEmbedMedia.External -> {
+                    BSkyExternalCard(external = media.external, onNavigateToDocument = onNavigateToDocument)
+                }
+                else -> {}
+            }
         }
 
         // Video embed
@@ -180,33 +185,7 @@ private fun BSkyPostContent(
 
         // Record embed (quoted post)
         if (embed is uk.ewancroft.inkwell.data.model.bluesky.BSkyEmbed.Record) {
-            val quotedAuthorName = embed.record.author?.displayName ?: stringResource(R.string.reader_unknown_author)
-            val quotedPostByDescription = stringResource(R.string.reader_quoted_post_by, quotedAuthorName)
-            Card(
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)),
-                modifier = Modifier.semantics(mergeDescendants = true) {
-                    contentDescription = quotedPostByDescription
-                },
-            ) {
-                Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Icon(Icons.AutoMirrored.Outlined.Article, contentDescription = null, modifier = Modifier.size(12.dp), tint = MaterialTheme.colorScheme.primary)
-                        Text(
-                            embed.record.author?.displayName ?: stringResource(R.string.reader_quoted_post_fallback),
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                    }
-                    if (embed.record.value?.text != null) {
-                        Text(
-                            embed.record.value.text,
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                            maxLines = 3,
-                        )
-                    }
-                }
-            }
+            QuotedPostCard(record = embed.record)
         }
 
         // Stats row
@@ -221,6 +200,52 @@ private fun BSkyPostContent(
             Spacer(Modifier.weight(1f))
             // noinspection ComposeHardcodedText - "Bluesky" is the source platform's brand name, not translatable copy.
             Text("Bluesky", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f))
+        }
+    }
+}
+
+@Composable
+private fun PostImageThumb(thumb: String?, alt: String?) {
+    if (thumb != null) {
+        AsyncImage(
+            model = thumb,
+            contentDescription = alt?.takeIf { it.isNotBlank() },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .clip(MaterialTheme.shapes.medium),
+            contentScale = ContentScale.Crop,
+        )
+    }
+}
+
+@Composable
+private fun QuotedPostCard(record: uk.ewancroft.inkwell.data.model.bluesky.BSkyEmbeddedRecord) {
+    val quotedAuthorName = record.author?.displayName ?: stringResource(R.string.reader_unknown_author)
+    val quotedPostByDescription = stringResource(R.string.reader_quoted_post_by, quotedAuthorName)
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)),
+        modifier = Modifier.semantics(mergeDescendants = true) {
+            contentDescription = quotedPostByDescription
+        },
+    ) {
+        Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Icon(Icons.AutoMirrored.Outlined.Article, contentDescription = null, modifier = Modifier.size(12.dp), tint = MaterialTheme.colorScheme.primary)
+                Text(
+                    record.author?.displayName ?: stringResource(R.string.reader_quoted_post_fallback),
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+            if (record.value?.text != null) {
+                Text(
+                    record.value.text,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                    maxLines = 3,
+                )
+            }
         }
     }
 }
