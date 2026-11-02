@@ -166,6 +166,11 @@ dependencies {
     implementation(libs.atproto.compose.material3)
 
     implementation(libs.browser)
+
+    // Inline Bluesky video playback (ui/reader video embed card).
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.exoplayer.hls)
+    implementation(libs.media3.ui)
     // Deprecated, and retained solely for LegacySessionMigration to read the
     // pre-Keystore-envelope EncryptedSharedPreferences session file once. Session
     // storage itself no longer uses it — see data/auth/SessionEnvelope.kt. Drop
