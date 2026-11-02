@@ -9,6 +9,7 @@
 //  Post models and the fetcher live in BSkyPostModels.swift.
 //
 
+import AVKit
 import SwiftUI
 
 // MARK: - Renderer
@@ -23,6 +24,7 @@ struct BSkyPostEmbedView: View {
 
     @State private var post: BSkyPostView?
     @State private var loadError: Bool = false
+    @State private var activeVideoPlayer: AVPlayer?
 
     var body: some View {
         Group {
@@ -150,7 +152,7 @@ struct BSkyPostEmbedView: View {
 
         case .video(let videoEmbed):
             if videoEmbed.thumbnail != nil || videoEmbed.playlist != nil {
-                videoContent(videoEmbed)
+                videoContent(videoEmbed, player: $activeVideoPlayer)
             }
 
         case .unknown:
@@ -207,20 +209,32 @@ struct BSkyPostEmbedView: View {
 
     // MARK: - Video Content
 
-    /// Video embed: thumbnail with a play affordance that opens the stream
-    /// URL in the system player. Inline playback would mean an AVPlayer
-    /// view for one card; the external player keeps this dependency-free
-    /// and matches Android, which hands the same URL to the viewer.
+    /// Video embed: thumbnail with a play affordance that swaps in an inline
+    /// `VideoPlayer` on tap and autoplays. The player pauses when the card
+    /// scrolls off; matches Android, which swaps in ExoPlayer the same way.
     @ViewBuilder
-    private func videoContent(_ video: BSkyVideoEmbed) -> some View {
+    private func videoContent(_ video: BSkyVideoEmbed, player: Binding<AVPlayer?>) -> some View {
         let thumbURL = video.thumbnail.flatMap(URL.init(string:))
         let playlistURL = video.playlist.flatMap(URL.init(string:))
         let title: Text = if let alt = video.alt, !alt.isEmpty { Text(alt) } else { Text("Play video") }
 
-        if let playlistURL {
-            Link(destination: playlistURL) {
+        if let current = player.wrappedValue {
+            VideoPlayer(player: current)
+                .frame(maxWidth: .infinity)
+                .frame(height: 200)
+                .clipped()
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .accessibilityLabel(title)
+                .onDisappear { current.pause() }
+        } else if let playlistURL {
+            Button {
+                let created = AVPlayer(url: playlistURL)
+                player.wrappedValue = created
+                created.play()
+            } label: {
                 videoThumbnail(thumbURL: thumbURL)
             }
+            .buttonStyle(.plain)
             .accessibilityLabel(title)
         } else {
             videoThumbnail(thumbURL: thumbURL)
