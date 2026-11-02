@@ -245,6 +245,27 @@ class MainActivityIntentDeliveryTest {
     }
 
     @Test
+    fun recreationDoesNotRedeliverAConsumedDocumentDeepLink() {
+        ActivityScenario.launch<MainActivity>(viewIntent(contentDeepLink(DOCUMENT_URI))).use { scenario ->
+            // The cold-start delivery is consumed by the nav host, which
+            // leaves the sign-in surface and clears the pending URI.
+            awaitNoSignInSurface()
+            awaitActivity(scenario, "the nav host to consume the deep link") {
+                it.pendingDocumentUri.value == null
+            }
+
+            scenario.recreate()
+
+            // getIntent() still carries the deep link after recreation, but
+            // it was already consumed: recreating must not hand it to the
+            // Reader again and yank the user back.
+            assertStaysNull(
+                "a consumed deep link must not be redelivered after recreation",
+            ) { readActivity(scenario) { it.pendingDocumentUri.value } }
+        }
+    }
+
+    @Test
     fun contentDeepLinksForNonDocumentRecordsAreIgnored() {
         val publicationLink = contentDeepLink("at://did:plc:example/site.standard.publication/abc")
 
