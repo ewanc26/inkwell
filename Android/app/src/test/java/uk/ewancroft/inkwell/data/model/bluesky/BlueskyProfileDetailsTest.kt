@@ -23,6 +23,7 @@ class BlueskyProfileDetailsTest {
           "displayName": "Example",
           "pronouns": "they/them",
           "verification": {"verifiedStatus": "valid", "trustedVerifierStatus": "none"},
+          "pinnedPost": {"uri": "at://did:plc:example/app.bsky.feed.post/3mexample", "cid": "bafyreexample"},
           "description": "Testing details",
           "labels": [],
           "createdAt": "2023-04-26T05:22:14.855Z",
@@ -36,6 +37,7 @@ class BlueskyProfileDetailsTest {
 
         assertEquals("they/them", decoded.pronouns)
         assertEquals(true, decoded.isVerifiedAccount())
+        assertEquals("at://did:plc:example/app.bsky.feed.post/3mexample", decoded.pinnedPost?.uri)
     }
 
     @Test
@@ -56,5 +58,6 @@ class BlueskyProfileDetailsTest {
         assertNull(decoded.pronouns)
         assertNull(decoded.verification)
         assertEquals(false, decoded.isVerifiedAccount())
+        assertNull(decoded.pinnedPost)
     }
 }

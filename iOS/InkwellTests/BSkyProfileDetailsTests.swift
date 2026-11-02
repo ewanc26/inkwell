@@ -28,6 +28,7 @@ final class BSkyProfileDetailsTests: XCTestCase {
       "displayName": "Example",
       "pronouns": "they/them",
       "verification": {"verifiedStatus": "valid", "trustedVerifierStatus": "none"},
+      "pinnedPost": {"uri": "at://did:plc:example/app.bsky.feed.post/3mexample", "cid": "bafyreexample"},
       "description": "Testing details",
       "labels": [],
       "createdAt": "2023-04-26T05:22:14.855Z",
@@ -43,6 +44,7 @@ final class BSkyProfileDetailsTests: XCTestCase {
 
         XCTAssertEqual(decoded.pronouns, "they/them")
         XCTAssertTrue(decoded.isVerifiedAccount)
+        XCTAssertEqual(decoded.pinnedPost?.uri, "at://did:plc:example/app.bsky.feed.post/3mexample")
     }
 
     func testNonValidVerificationStatusIsNotAVerifiedAccount() throws {
@@ -63,5 +65,6 @@ final class BSkyProfileDetailsTests: XCTestCase {
         XCTAssertNil(decoded.pronouns)
         XCTAssertNil(decoded.verification)
         XCTAssertFalse(decoded.isVerifiedAccount)
+        XCTAssertNil(decoded.pinnedPost)
     }
 }
