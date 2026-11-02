@@ -17,6 +17,7 @@ struct BSkyActorProfile: Decodable, Sendable, Identifiable {
     let did: String
     let handle: String
     let displayName: String?
+    let pronouns: String?
     let description: String?
     let avatar: String?
     let banner: String?

@@ -18,6 +18,7 @@ data class BlueskyProfile(
     val did: String,
     val handle: String,
     val displayName: String? = null,
+    val pronouns: String? = null,
     val description: String? = null,
     val avatar: String? = null,
     val banner: String? = null,
