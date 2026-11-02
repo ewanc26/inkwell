@@ -216,6 +216,7 @@
     <string name="profile_open_bluesky">Open in Bluesky</string>
     <string name="profile_links">Links</string>
     <string name="profile_verified_account">Verified account</string>
+    <string name="profile_pinned_post">Pinned post</string>
     <string name="feedback_thanks">Thanks!</string>
     <string name="feedback_sent">Your feedback was sent.</string>
     <string name="feedback_done">Done</string>

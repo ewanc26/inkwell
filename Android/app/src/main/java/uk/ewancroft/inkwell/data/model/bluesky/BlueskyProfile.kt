@@ -26,7 +26,8 @@ data class BlueskyProfile(
     val followsCount: Int? = null,
     val postsCount: Int? = null,
     val links: List<BlueskyProfileLink>? = null,
-    val verification: BSkyVerificationState? = null
+    val verification: BSkyVerificationState? = null,
+    val pinnedPost: BSkyStrongRef? = null
 )
 
 /** `true` when the AppView reports a valid account verification. */

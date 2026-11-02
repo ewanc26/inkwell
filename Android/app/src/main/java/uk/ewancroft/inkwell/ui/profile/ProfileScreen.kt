@@ -61,6 +61,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import uk.ewancroft.inkwell.data.model.bluesky.BlueskyProfile
 import uk.ewancroft.inkwell.data.model.bluesky.isVerifiedAccount
+import uk.ewancroft.inkwell.data.model.common.StrongRef
+import uk.ewancroft.inkwell.data.model.content.LeafletBlock
+import uk.ewancroft.inkwell.ui.reader.BskyPostBlock
 import uk.ewancroft.inkwell.ui.moderation.ReportDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -210,6 +213,16 @@ private fun ProfileContent(
                             onOpen = ::openExternal,
                         )
                     }
+                }
+
+                profile.pinnedPost?.uri?.let { pinnedUri ->
+                    Text(stringResource(R.string.profile_pinned_post), style = MaterialTheme.typography.titleMedium)
+                    BskyPostBlock(
+                        block = LeafletBlock(
+                            type = "pub.leaflet.pages.linearDocument#block",
+                            subject = StrongRef(uri = pinnedUri),
+                        ),
+                    )
                 }
 
                 Text(stringResource(R.string.profile_account), style = MaterialTheme.typography.titleMedium)
