@@ -90,8 +90,25 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         TestingConfig.enabled = intent.getBooleanExtra("testing", false)
         TestingConfig.tab = intent.getStringExtra("tab") ?: "reader"
-        pendingDocumentUri.value = ContentDeepLinkPolicy.documentUri(intent) ?: intent.getStringExtra("documentURI")
-        handleHttpsDeepLink(intent)
+        // A recreation (rotation, process death with restored state) re-runs
+        // onCreate with the same launch intent still attached. Re-deriving the
+        // deep-link URI here would hand an already-consumed link back to the
+        // Reader and yank the user away from wherever they are — the nav host
+        // restores its own back stack, so only a fresh launch may set it from
+        // the intent. A recreation restores the still-unconsumed URI, if any,
+        // from the saved bundle instead. Warm deliveries always arrive through
+        // onNewIntent, which (re)populates it directly.
+        pendingDocumentUri.value = if (savedInstanceState == null) {
+            ContentDeepLinkPolicy.documentUri(intent) ?: intent.getStringExtra("documentURI")
+        } else {
+            savedInstanceState.getString(STATE_PENDING_DOCUMENT_URI)
+        }
+        // Same staleness rule as above: on recreation the async verification
+        // would otherwise resolve the launch intent's claim a second time and
+        // re-hand it to the Reader.
+        if (savedInstanceState == null) {
+            handleHttpsDeepLink(intent)
+        }
         setContent {
             val forceDarkTheme = when (CustomisationPreferences.getAppearanceOverride(this)) {
                 CustomisationPreferences.AppearanceOverride.LIGHT -> false
@@ -228,6 +245,7 @@ class MainActivity : ComponentActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         handledOAuthCallback?.let { outState.putString(STATE_HANDLED_OAUTH_CALLBACK, it) }
+        pendingDocumentUri.value?.let { outState.putString(STATE_PENDING_DOCUMENT_URI, it) }
     }
 
     // `public` rather than inheriting `protected`: the instrumentation suite
@@ -292,6 +310,7 @@ class MainActivity : ComponentActivity() {
 
     private companion object {
         const val STATE_HANDLED_OAUTH_CALLBACK = "handledOAuthCallback"
+        const val STATE_PENDING_DOCUMENT_URI = "pendingDocumentUri"
     }
 }
 
