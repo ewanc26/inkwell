@@ -1,6 +1,11 @@
 package uk.ewancroft.inkwell.ui.reader
 
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Article
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -31,6 +37,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.semantics.contentDescription
@@ -99,6 +108,7 @@ private fun BSkyPostContent(
     post: uk.ewancroft.inkwell.data.model.bluesky.BSkyPostView,
     onNavigateToDocument: (String) -> Unit = {},
 ) {
+    val context = LocalContext.current
     Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         // Author row
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -156,6 +166,18 @@ private fun BSkyPostContent(
             BSkyExternalCard(external = embed.external, onNavigateToDocument = onNavigateToDocument)
         }
 
+        // Video embed
+        if (embed is uk.ewancroft.inkwell.data.model.bluesky.BSkyEmbed.Video &&
+            (embed.thumbnail != null || embed.playlist != null)
+        ) {
+            VideoEmbedCard(
+                video = embed,
+                onOpenVideo = { url ->
+                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                },
+            )
+        }
+
         // Record embed (quoted post)
         if (embed is uk.ewancroft.inkwell.data.model.bluesky.BSkyEmbed.Record) {
             val quotedAuthorName = embed.record.author?.displayName ?: stringResource(R.string.reader_unknown_author)
@@ -199,6 +221,64 @@ private fun BSkyPostContent(
             Spacer(Modifier.weight(1f))
             // noinspection ComposeHardcodedText - "Bluesky" is the source platform's brand name, not translatable copy.
             Text("Bluesky", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f))
+        }
+    }
+}
+
+/**
+ * Video embed: thumbnail with a play affordance that opens the stream URL
+ * in the viewer's player. Inline playback would mean a media3 dependency
+ * for one card; the external player keeps this dependency-free.
+ */
+@Composable
+private fun VideoEmbedCard(
+    video: uk.ewancroft.inkwell.data.model.bluesky.BSkyEmbed.Video,
+    onOpenVideo: (String) -> Unit,
+) {
+    val playlist = video.playlist
+    val playLabel = stringResource(R.string.reader_play_video)
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp)
+            .clip(MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.surface)
+            .then(
+                if (playlist != null) {
+                    Modifier.clickable(
+                        role = Role.Button,
+                        onClickLabel = playLabel,
+                    ) { onOpenVideo(playlist) }
+                } else {
+                    Modifier
+                }
+            )
+            .semantics {
+                contentDescription = video.alt?.takeIf { it.isNotBlank() } ?: playLabel
+            },
+    ) {
+        if (video.thumbnail != null) {
+            AsyncImage(
+                model = video.thumbnail,
+                contentDescription = null,
+                modifier = Modifier.matchParentSize(),
+                contentScale = ContentScale.Crop,
+            )
+        }
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(56.dp)
+                .clip(CircleShape)
+                .background(Color.Black.copy(alpha = 0.45f)),
+        ) {
+            Icon(
+                Icons.Filled.PlayArrow,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(32.dp),
+            )
         }
     }
 }
