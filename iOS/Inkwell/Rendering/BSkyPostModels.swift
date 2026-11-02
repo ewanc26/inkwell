@@ -41,24 +41,40 @@ struct BSkyPostRecord: Decodable, Sendable {
     }
 }
 
-/// A union of possible Bluesky post embeds (image, external link, record).
+/// A union of possible Bluesky post embeds (image, external link, record,
+/// video, record with media). Unknown present and future types decode as
+/// `.unknown` so one new embed kind can never sink the whole post.
 enum BSkyEmbed: Decodable, Sendable {
     case images(BSkyImagesEmbed)
     case external(BSkyExternalEmbed)
     case record(BSkyRecordEmbed)
+    case video(BSkyVideoEmbed)
+    case recordWithMedia(BSkyRecordWithMediaEmbed)
     case unknown
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let type = try container.decode(String.self, forKey: .type)
 
-        switch type {
+        // Wire types are always `#view`-suffixed (`images#view`, ...), never
+        // bare record IDs — strip to the base lexicon ID before matching, so
+        // matching never depends on the suffix. `video` and
+        // `recordWithMedia` are mirrored here as literals until the checked-in
+        // XCFramework exports them (see shared `BlueskyEmbedTypes`); the
+        // other three come from shared via `SharedKMP.swift`.
+        let base = type.hasSuffix("#view") ? String(type.dropLast("#view".count)) : type
+
+        switch base {
         case sharedBlueskyEmbedImages():
             self = .images(try BSkyImagesEmbed(from: decoder))
         case sharedBlueskyEmbedExternal():
             self = .external(try BSkyExternalEmbed(from: decoder))
         case sharedBlueskyEmbedRecord():
             self = .record(try BSkyRecordEmbed(from: decoder))
+        case "app.bsky.embed.video":
+            self = .video(try BSkyVideoEmbed(from: decoder))
+        case "app.bsky.embed.recordWithMedia":
+            self = .recordWithMedia(try BSkyRecordWithMediaEmbed(from: decoder))
         default:
             self = .unknown
         }
@@ -184,6 +200,53 @@ struct BSkyRecordEmbed: Decodable, Sendable {
         struct BSkyEmbeddedRecordValue: Decodable, Sendable {
             let text: String?
             let createdAt: String?
+        }
+    }
+}
+
+/// `app.bsky.embed.video#view`, whose fields sit flat on the view (there is
+/// no `video` wrapper object). Decoded so video posts survive the fetch;
+/// playback UI is a follow-up.
+struct BSkyVideoEmbed: Decodable, Sendable {
+    let cid: String?
+    let playlist: String?
+    let thumbnail: String?
+    let alt: String?
+}
+
+/// `app.bsky.embed.recordWithMedia#view`.
+struct BSkyRecordWithMediaEmbed: Decodable, Sendable {
+    let record: BSkyRecordWithMediaRecord?
+    let media: BSkyRecordWithMediaMedia?
+
+    /// The `record` member — itself a record-view union; only `viewRecord`
+    /// carries an inner record.
+    struct BSkyRecordWithMediaRecord: Decodable, Sendable {
+        let record: BSkyRecordEmbed.BSkyEmbeddedRecord?
+    }
+
+    /// The `media` member — images or external only, per the lexicon.
+    enum BSkyRecordWithMediaMedia: Decodable, Sendable {
+        case images(BSkyImagesEmbed)
+        case external(BSkyExternalEmbed)
+        case unknown
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: MediaCodingKeys.self)
+            let type = try container.decode(String.self, forKey: .type)
+            let base = type.hasSuffix("#view") ? String(type.dropLast("#view".count)) : type
+            switch base {
+            case sharedBlueskyEmbedImages():
+                self = .images(try BSkyImagesEmbed(from: decoder))
+            case sharedBlueskyEmbedExternal():
+                self = .external(try BSkyExternalEmbed(from: decoder))
+            default:
+                self = .unknown
+            }
+        }
+
+        enum MediaCodingKeys: String, CodingKey {
+            case type = "$type"
         }
     }
 }

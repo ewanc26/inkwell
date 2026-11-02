@@ -166,7 +166,9 @@ struct BSkyPostEmbedView: View {
             .accessibilityElement(children: .combine)
             .accessibilityLabel(quotedPostAccessibilityLabel(recordEmbed.record))
 
-        case .unknown:
+        // Video playback and record-with-media rendering are follow-ups;
+        // decoding them (rather than dropping the post) lands first.
+        case .video, .recordWithMedia, .unknown:
             EmptyView()
         }
     }
