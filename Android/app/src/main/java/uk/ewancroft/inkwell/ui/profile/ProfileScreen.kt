@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.OpenInNew
+import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Report
@@ -59,6 +60,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import uk.ewancroft.inkwell.data.model.bluesky.BlueskyProfile
+import uk.ewancroft.inkwell.data.model.bluesky.isVerifiedAccount
 import uk.ewancroft.inkwell.ui.moderation.ReportDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -256,6 +258,7 @@ private fun ProfileHeader(profile: BlueskyProfile) {
         add(displayName)
         add("@${profile.handle}")
         pronouns?.let { add(it) }
+        if (profile.isVerifiedAccount()) { add(stringResource(R.string.profile_verified_account)) }
         profile.followersCount?.let { add(pluralStringResource(R.plurals.profile_followers_count, it, it)) }
         profile.followsCount?.let { add(pluralStringResource(R.plurals.profile_following_count, it, it)) }
         profile.postsCount?.let { add(pluralStringResource(R.plurals.profile_posts_count, it, it)) }
@@ -303,11 +306,22 @@ private fun ProfileHeader(profile: BlueskyProfile) {
 
             Spacer(Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    displayName,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.SemiBold,
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        displayName,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    if (profile.isVerifiedAccount()) {
+                        Spacer(Modifier.width(6.dp))
+                        Icon(
+                            Icons.Filled.Verified,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(22.dp),
+                        )
+                    }
+                }
                 Text(
                     "@${profile.handle}",
                     style = MaterialTheme.typography.bodyMedium,

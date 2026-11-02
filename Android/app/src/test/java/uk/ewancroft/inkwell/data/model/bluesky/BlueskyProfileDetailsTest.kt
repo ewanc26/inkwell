@@ -22,6 +22,7 @@ class BlueskyProfileDetailsTest {
           "handle": "example.bsky.social",
           "displayName": "Example",
           "pronouns": "they/them",
+          "verification": {"verifiedStatus": "valid", "trustedVerifierStatus": "none"},
           "description": "Testing details",
           "labels": [],
           "createdAt": "2023-04-26T05:22:14.855Z",
@@ -34,6 +35,16 @@ class BlueskyProfileDetailsTest {
         val decoded = json.decodeFromString<BlueskyProfile>(fixture)
 
         assertEquals("they/them", decoded.pronouns)
+        assertEquals(true, decoded.isVerifiedAccount())
+    }
+
+    @Test
+    fun `non valid verification status is not a verified account`() {
+        val decoded = json.decodeFromString<BlueskyProfile>(
+            """{"did":"did:plc:example","handle":"example.bsky.social","verification":{"verifiedStatus":"invalid"}}""",
+        )
+
+        assertEquals(false, decoded.isVerifiedAccount())
     }
 
     @Test
@@ -43,5 +54,7 @@ class BlueskyProfileDetailsTest {
         )
 
         assertNull(decoded.pronouns)
+        assertNull(decoded.verification)
+        assertEquals(false, decoded.isVerifiedAccount())
     }
 }
