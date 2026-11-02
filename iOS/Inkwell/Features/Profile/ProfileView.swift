@@ -201,6 +201,9 @@ private struct ProfileHeader: View {
            !pronouns.isEmpty {
             label = label + Text(". \(pronouns.bidiIsolated)")
         }
+        if profile.isVerifiedAccount {
+            label = label + Text(". Verified account")
+        }
         if let followersCount = profile.followersCount {
             label = label + Text(". ") + Text("^[\(followersCount) follower](inflect: true)")
         }
@@ -238,9 +241,15 @@ private struct ProfileHeader: View {
                 ProfileAvatar(urlString: profile.avatar, size: avatarSize)
 
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(displayName)
-                        .font(.title2.weight(.semibold))
-                        .fixedSize(horizontal: false, vertical: true)
+                    HStack(spacing: 4) {
+                        Text(displayName)
+                            .font(.title2.weight(.semibold))
+                            .fixedSize(horizontal: false, vertical: true)
+                        if profile.isVerifiedAccount {
+                            Image(systemName: "checkmark.seal.fill")
+                                .foregroundStyle(.blue)
+                        }
+                    }
 
                     Text("@\(profile.handle)")
                         .font(.subheadline)

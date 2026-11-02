@@ -27,6 +27,7 @@ final class BSkyProfileDetailsTests: XCTestCase {
       "handle": "example.bsky.social",
       "displayName": "Example",
       "pronouns": "they/them",
+      "verification": {"verifiedStatus": "valid", "trustedVerifierStatus": "none"},
       "description": "Testing details",
       "labels": [],
       "createdAt": "2023-04-26T05:22:14.855Z",
@@ -41,6 +42,16 @@ final class BSkyProfileDetailsTests: XCTestCase {
         )
 
         XCTAssertEqual(decoded.pronouns, "they/them")
+        XCTAssertTrue(decoded.isVerifiedAccount)
+    }
+
+    func testNonValidVerificationStatusIsNotAVerifiedAccount() throws {
+        let decoded = try JSONDecoder().decode(
+            BSkyActorProfile.self,
+            from: Data(#"{"did":"did:plc:example","handle":"example.bsky.social","verification":{"verifiedStatus":"invalid"}}"#.utf8)
+        )
+
+        XCTAssertFalse(decoded.isVerifiedAccount)
     }
 
     func testMissingPresentationFieldsDecodeAsNilForProfileViewSubjects() throws {
@@ -50,5 +61,7 @@ final class BSkyProfileDetailsTests: XCTestCase {
         )
 
         XCTAssertNil(decoded.pronouns)
+        XCTAssertNil(decoded.verification)
+        XCTAssertFalse(decoded.isVerifiedAccount)
     }
 }
