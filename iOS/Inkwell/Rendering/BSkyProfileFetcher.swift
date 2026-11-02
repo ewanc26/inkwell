@@ -27,6 +27,7 @@ struct BSkyActorProfile: Decodable, Sendable, Identifiable {
     let createdAt: String?
     let indexedAt: String?
     let pinnedPost: BSkyPinnedPostRef?
+    let verification: BSkyVerificationState?
     let links: [BSkyProfileLink]?
     let labels: [BSkyLabel]?
     let associated: BSkyAssociated?
@@ -38,6 +39,20 @@ struct BSkyActorProfile: Decodable, Sendable, Identifiable {
 struct BSkyPinnedPostRef: Decodable, Sendable {
     let cid: String?
     let uri: String?
+}
+
+/// `app.bsky.actor.defs#verificationState` — only the account-level status
+/// is surfaced; individual verifications are not rendered.
+struct BSkyVerificationState: Decodable, Sendable {
+    let verifiedStatus: String?
+    let trustedVerifierStatus: String?
+}
+
+extension BSkyActorProfile {
+    /// True when the AppView reports a valid account verification.
+    var isVerifiedAccount: Bool {
+        verification?.verifiedStatus == "valid"
+    }
 }
 
 /// `app.bsky.actor.defs#profileLinkView` — one of the (up to three) links a

@@ -25,8 +25,27 @@ data class BlueskyProfile(
     val followersCount: Int? = null,
     val followsCount: Int? = null,
     val postsCount: Int? = null,
-    val links: List<BlueskyProfileLink>? = null
+    val links: List<BlueskyProfileLink>? = null,
+    val verification: BSkyVerificationState? = null
 )
+
+/** `true` when the AppView reports a valid account verification. */
+fun BlueskyProfile.isVerifiedAccount(): Boolean =
+    verification?.verifiedStatus == BSkyVerificationState.STATUS_VALID
+
+/**
+ * `app.bsky.actor.defs#verificationState` — only the account-level status
+ * is surfaced; individual verifications are not rendered.
+ */
+@Serializable
+data class BSkyVerificationState(
+    val verifiedStatus: String? = null,
+    val trustedVerifierStatus: String? = null,
+) {
+    companion object {
+        const val STATUS_VALID = "valid"
+    }
+}
 
 /**
  * A single `app.bsky.actor.defs#profileLinkView` — one of the (up to three)
