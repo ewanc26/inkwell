@@ -73,6 +73,24 @@ jobs:
               - 'website/**'
               - '.github/workflows/ci.yml'
 
+  # SwiftUI `Text("…")` resolves through a LocalizedStringKey, so a literal
+  # with no `Localizable.xcstrings` entry renders in untranslated English
+  # without failing — the iOS equivalent of what Android's
+  # `ComposeHardcodedText` lint rule catches. Pure source analysis (node,
+  # no Xcode or simulator), so it runs on ubuntu next to the other cheap
+  # invariant jobs rather than inside the macOS build.
+  ios-strings:
+    name: iOS SwiftUI catalog coverage
+    needs: changes
+    if: needs.changes.outputs.ios == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+      - run: node tools/i18n/check-swiftui-catalog-coverage.mjs
+
   ios:
     name: iOS build + test
     needs: changes

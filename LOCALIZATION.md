@@ -29,7 +29,11 @@ could be interpreted as either a noun or an action.
 1. Keep the English source copy in `en-GB` and add the locale through each
    platform's native mechanism; do not copy generated legal files by hand.
 2. iOS: edit the String Catalog, export/import through Xcode, and verify the
-   target's locale list and plural/select rules.
+   target's locale list and plural/select rules. CI runs
+   `tools/i18n/check-swiftui-catalog-coverage.mjs`: every new literal in a
+   LocalizedStringKey position must be re-extracted into the catalog before
+   pushing (or marked `// inkwell:i18n-verbatim` if it must never be
+   translated).
 3. Android: add translated `values-<locale>` resources, keeping the default
    `values/` resource complete and preserving format placeholders.
 4. Website: add the locale message files and locale-aware routes/metadata;

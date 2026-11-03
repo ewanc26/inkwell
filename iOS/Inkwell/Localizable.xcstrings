@@ -3571,6 +3571,66 @@
           }
         }
       }
+    },
+    ". %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": ". %@"
+          }
+        }
+      }
+    },
+    ". Verified account": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": ". Verified account"
+          }
+        }
+      }
+    },
+    "Play video": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Play video"
+          }
+        }
+      }
+    },
+    "Links": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Links"
+          }
+        }
+      }
+    },
+    "Pinned post": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Pinned post"
+          }
+        }
+      }
+    },
+    "Real-time Notifications": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Real-time Notifications"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
