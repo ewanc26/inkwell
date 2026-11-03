@@ -4,7 +4,7 @@
 // is what every other locale is checked against. Adding a key here makes
 // `pnpm check` fail until each translation supplies it — which is the
 // point: a missing translation should be a build error, not a silent
-// fallback to English inside an otherwise French page.
+// fallback to English inside an otherwise translated page.
 //
 // Strings may carry the small inline markup subset documented in
 // ../rich.ts (`code`, **bold**, [label](linkKey)). Placeholders written
@@ -47,6 +47,23 @@ export const enGB = {
       sponsors: "GitHub Sponsors",
     },
     languageLabel: "Language",
+  },
+
+  // ── Error pages ─────────────────────────────────────────────
+  // The root layout composes the metadata for these; the error route
+  // chooses the status-appropriate body copy.
+  error: {
+    status: "Error {status}",
+    notFound: {
+      title: "Page not found",
+      body: "The page you were looking for doesn't exist, or has moved.",
+    },
+    server: {
+      title: "Something went wrong",
+      body: "The page couldn't be loaded. Please try again.",
+    },
+    home: "Back to Inkwell",
+    features: "Browse features",
   },
 
   // ── Per-route metadata ───────────────────────────────────────

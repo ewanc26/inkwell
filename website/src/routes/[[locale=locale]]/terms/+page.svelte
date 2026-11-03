@@ -7,14 +7,13 @@
   The liability carve-outs in section 6 are not optional boilerplate:
   UK law (CRA 2015 s65, UCTA s2) makes a blanket "as is" disclaimer
   unenforceable without them, which would risk taking the whole clause
-  down with it. Translations must keep them; the provenance notice states
-  that the British English text prevails either way.
+  down with it. Keep them in every future revision.
 
   Nothing on this page is written here. The body is generated from
-  legal/terms.md (British English) and legal/terms.fr.md by
-  `node tools/legal/render.mjs` into $lib/legal/documents.ts, which also
-  regenerates the in-app copy both apps render from the shared KMP
-  module's LegalDocuments.kt. Edit the sources, not this file.
+  legal/terms.md by `node tools/legal/render.mjs` into
+  $lib/legal/documents.ts, which also regenerates the in-app copy both apps
+  render from the shared KMP module's LegalDocuments.kt. Edit the source,
+  not this file.
 
   The <title>/description live in the root layout's route-metadata table.
 -->

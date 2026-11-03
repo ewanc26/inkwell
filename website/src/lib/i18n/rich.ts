@@ -13,8 +13,8 @@
 // translator writes the visible label and nothing else, so no
 // translation can rewrite a protocol identifier, an NSID, or a
 // third-party address. Internal site links resolve through
-// localizeHref, so a French paragraph links to /fr/privacy without the
-// catalogue having to know that.
+// localizeHref, so a translated paragraph links within its own locale without
+// the catalogue having to know that.
 //
 // Everything outside those three forms is HTML-escaped. The catalogues
 // are repository constants rather than user input, but escaping keeps

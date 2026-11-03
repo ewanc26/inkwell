@@ -4,11 +4,11 @@
   slot, and the footer.  Mobile breakpoint is at 800px; the mobile menu
   is an in-flow dropdown panel under the header, matching ewancroft.uk.
 
-  This is also where localisation is resolved for the shell: the active
-  locale is derived from the URL (never from Accept-Language), and every
-  <title>, description, canonical URL, and hreflang alternate on the site
-  is emitted from here rather than per route, so metadata localises in one
-  place. Pages own their own body copy only.
+  This is also where the active locale and page metadata are resolved for
+  the shell. The site currently registers only British English, but locale
+  is still derived from the URL (never from Accept-Language), and every
+  <title>, description, canonical URL, and hreflang alternate is emitted
+  from here rather than per route. Pages own their own body copy only.
 -->
 
 <script lang="ts">
@@ -54,13 +54,27 @@
   });
 
   // ── Locale ───────────────────────────────────────────────────
-  // `path` is the source-locale path (`/fr/privacy` -> `/privacy`), which
-  // is the key route metadata, nav matching, and alternates all work in.
+  // `path` is the source-locale path, which is the key route metadata, nav
+  // matching, and alternates all work in. With no prefixed locale registered
+  // it is simply the request path.
   const resolved = $derived(resolveLocale(page.url.pathname));
   const locale = $derived(resolved.locale);
   const path = $derived(resolved.path);
   const m = $derived(messagesFor(locale));
-  const meta = $derived(routeMeta(m, path));
+
+  // Error pages have no route-table entry, so they get their own
+  // catalogue title and description rather than inheriting the home page's.
+  const errorCopy = $derived(
+    page.status === 404 ? m.error.notFound : m.error.server,
+  );
+  const meta = $derived(
+    page.status >= 400
+      ? {
+          title: `${errorCopy.title} — ${SITE.title}`,
+          description: errorCopy.body,
+        }
+      : routeMeta(m, path),
+  );
 
   // Absolute, per-route URL for canonical + og:url, in the active locale.
   // Built from the configured origin so previews/localhost never leak
@@ -96,14 +110,6 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content={canonical} />
   <meta property="og:locale" content={LOCALES[locale].ogLocale} />
-  {#each alternates as alternate (alternate.locale)}
-    {#if alternate.locale !== locale}
-      <meta
-        property="og:locale:alternate"
-        content={LOCALES[alternate.locale].ogLocale}
-      />
-    {/if}
-  {/each}
   <meta property="og:image" content={ogImage} />
   <meta property="og:image:type" content={OG_IMAGE.type} />
   <meta property="og:image:width" content={String(OG_IMAGE.width)} />
@@ -175,7 +181,7 @@
     <nav class="nav-links" class:open={mobileOpen} id="primary-navigation" aria-label={m.nav.mainLabel}>
       {#each NAV_LINKS as link (link.key)}
         <!-- Active state is compared against the source-locale path, so it
-             works identically at /features and /fr/features. -->
+             keeps working unchanged if a prefixed locale is registered. -->
         {@const isActive =
           path === link.url ||
           (link.url !== "/" && link.url.startsWith("/") && path.startsWith(link.url))}

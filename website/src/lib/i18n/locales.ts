@@ -1,8 +1,9 @@
 // ── Locale registry ──────────────────────────────────────────────
-// British English is the source locale and is served unprefixed, so
-// every URL that existed before localisation still resolves at the
-// same path and stays the canonical one. Additional locales live
-// under a single path segment (`/fr/...`).
+// The site is British English only and is served unprefixed, so every
+// historical URL is still the canonical one. The optional locale route
+// group and this registry remain the mechanism for a future translated
+// locale, but no prefixed locale is currently registered: `/fr`, `/es`,
+// and `/gd` are ordinary 404s.
 //
 // There is deliberately no Accept-Language redirect: a negotiated
 // redirect makes one URL answer with several languages, which is the
@@ -36,14 +37,6 @@ export const LOCALES = {
     dir: "ltr",
     label: "English (UK)",
   },
-  fr: {
-    code: "fr",
-    htmlLang: "fr",
-    ogLocale: "fr_FR",
-    segment: "fr",
-    dir: "ltr",
-    label: "Français",
-  },
 } as const satisfies Record<string, LocaleDefinition>;
 
 export type Locale = keyof typeof LOCALES;
@@ -59,7 +52,7 @@ export function isLocale(value: string): value is Locale {
   return Object.prototype.hasOwnProperty.call(LOCALES, value);
 }
 
-/** True for a path segment that names a non-default locale (`fr`). */
+/** True for a path segment that names a registered non-default locale. */
 export function isLocaleSegment(segment: string): boolean {
   return PREFIXED_LOCALES.some((code) => LOCALES[code].segment === segment);
 }
@@ -72,8 +65,8 @@ function localeForSegment(segment: string): Locale | null {
 
 /**
  * Splits a request path into its locale and the default-locale path it
- * corresponds to. `/fr/privacy` → `{ locale: "fr", path: "/privacy" }`;
- * `/privacy` → `{ locale: "en-GB", path: "/privacy" }`.
+ * corresponds to. With no prefixed locale registered, every path resolves
+ * to `{ locale: "en-GB", path: pathname }`.
  *
  * The returned path is the key every other helper works in, so route
  * tables, canonical URLs, and `hreflang` alternates are written once in
@@ -101,7 +94,7 @@ export function localizeHref(href: string, locale: Locale): string {
   if (segment === null) return href;
   const prefix = `/${segment}`;
   if (href === "/") return prefix;
-  // "/#download" has to become "/fr#download", not "/fr/#download".
+  // "/#download" has to become "/<segment>#download", not "/<segment>/#download".
   if (href.startsWith("/#")) return `${prefix}${href.slice(1)}`;
   return `${prefix}${href}`;
 }
