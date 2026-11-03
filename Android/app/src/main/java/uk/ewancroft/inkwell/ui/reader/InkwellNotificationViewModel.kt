@@ -36,6 +36,26 @@ class InkwellNotificationViewModel @Inject constructor(
         _notificationsEnabled.value = enabled
     }
 
+    private val _realtimeEnabled =
+        MutableStateFlow(notificationManager.isRealtimeNotificationsEnabled())
+
+    /** Backs SettingsDialog's "Real-time" toggle — mirrors iOS
+     *  `PushNotificationManager.realtimeNotificationsEnabled`. Defaults to
+     *  false until the push backend exists (issue #35). */
+    val realtimeNotificationsEnabled: StateFlow<Boolean> = _realtimeEnabled.asStateFlow()
+
+    fun setRealtimeNotificationsEnabled(enabled: Boolean) {
+        notificationManager.setRealtimeNotificationsEnabled(enabled)
+        _realtimeEnabled.value = enabled
+    }
+
+    /** Re-reads the persisted opt-in — call when Settings becomes visible,
+     *  since the active DID (and therefore the scoped prefs file) may have
+     *  changed since this ViewModel was created. */
+    fun refreshRealtimeEnabled() {
+        _realtimeEnabled.value = notificationManager.isRealtimeNotificationsEnabled()
+    }
+
     fun schedulePeriodicPoll() {
         viewModelScope.launch {
             notificationManager.schedulePeriodicPoll()

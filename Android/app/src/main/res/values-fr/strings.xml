@@ -298,6 +298,8 @@
     <string name="notifications_empty">Aucune notification pour le moment</string>
     <string name="settings_new_document_notifications">Notifications de nouveaux documents</string>
     <string name="settings_notifications_description">Inkwell vérifie vos abonnements en arrière-plan et vous notifie des nouveaux documents. Désactiver cette option laisse la liste des notifications dans l\'application fonctionner, mais arrête les bannières système. L\'autorisation système (ci-dessous) contrôle si des bannières peuvent apparaître.</string>
+    <string name="settings_realtime_notifications">Notifications en temps réel</string>
+    <string name="settings_realtime_notifications_description">Réveille l\'application par message push pour afficher les nouveaux documents plus vite. Désactivé par défaut pendant la construction de la livraison push — la vérification ci-dessus reste le mode de livraison dans tous les cas.</string>
     <string name="settings_open_system_notifications">Ouvrir les paramètres de notification du système</string>
     <string name="settings_sort_order">Ordre de tri</string>
     <string name="settings_newest_first">Plus récents en premier</string>

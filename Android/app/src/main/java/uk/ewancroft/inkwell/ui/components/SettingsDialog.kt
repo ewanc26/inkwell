@@ -81,6 +81,8 @@ fun SettingsDialog(
     appVersion: String,
     notificationsEnabled: Boolean,
     onNotificationsEnabledChange: (Boolean) -> Unit,
+    realtimeNotificationsEnabled: Boolean,
+    onRealtimeNotificationsEnabledChange: (Boolean) -> Unit,
     userLexiconEnabled: Boolean,
     userLexiconBusy: Boolean,
     onUserLexiconEnabledChange: (Boolean) -> Unit,
@@ -248,6 +250,18 @@ fun SettingsDialog(
                         trailing = {
                             Switch(checked = notificationsEnabled, onCheckedChange = onNotificationsEnabledChange)
                         },
+                    )
+                    SettingsRow(
+                        title = stringResource(R.string.settings_realtime_notifications),
+                        trailing = {
+                            Switch(checked = realtimeNotificationsEnabled, onCheckedChange = onRealtimeNotificationsEnabledChange)
+                        },
+                    )
+                    Text(
+                        stringResource(R.string.settings_realtime_notifications_description),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     )
                     Text(
                         stringResource(R.string.settings_notifications_description),

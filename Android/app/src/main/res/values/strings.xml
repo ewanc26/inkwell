@@ -295,6 +295,8 @@
     <string name="notifications_empty">No notifications yet</string>
     <string name="settings_new_document_notifications">New Document Notifications</string>
     <string name="settings_notifications_description">Inkwell polls your subscriptions in the background and notifies you about new documents. Turning this off keeps the in-app notification list working but stops system banners. The system permission (below) controls whether banners can appear at all.</string>
+    <string name="settings_realtime_notifications">Real-time Notifications</string>
+    <string name="settings_realtime_notifications_description">Wakes the app with a push message so new documents appear sooner. Off by default while push delivery is being built — polling above remains the delivery path either way.</string>
     <string name="settings_open_system_notifications">Open System Notification Settings</string>
     <string name="settings_sort_order">Sort Order</string>
     <string name="settings_newest_first">Newest First</string>
