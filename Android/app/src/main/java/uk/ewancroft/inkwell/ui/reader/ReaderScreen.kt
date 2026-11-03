@@ -59,6 +59,7 @@ fun ReaderScreen(
     val notifications by notificationViewModel.notifications.collectAsStateWithLifecycle()
     val unreadCount by notificationViewModel.unreadCount.collectAsStateWithLifecycle()
     val notificationsEnabled by notificationViewModel.notificationsEnabled.collectAsStateWithLifecycle()
+    val realtimeNotificationsEnabled by notificationViewModel.realtimeNotificationsEnabled.collectAsStateWithLifecycle()
     val userLexiconEnabled by userLexiconViewModel.isInkwellUser.collectAsStateWithLifecycle()
     val userLexiconBusy by userLexiconViewModel.isBusy.collectAsStateWithLifecycle()
     val isNetworkAvailable = rememberNetworkAvailable()
@@ -279,6 +280,7 @@ fun ReaderScreen(
 
     LaunchedEffect(showSettings) {
         if (showSettings) {
+            notificationViewModel.refreshRealtimeEnabled()
             userLexiconViewModel.load()
             viewModel.refreshPendingMutationCount()
         }
@@ -298,6 +300,8 @@ fun ReaderScreen(
             appVersion = appVersion,
             notificationsEnabled = notificationsEnabled,
             onNotificationsEnabledChange = { notificationViewModel.setNotificationsEnabled(it) },
+            realtimeNotificationsEnabled = realtimeNotificationsEnabled,
+            onRealtimeNotificationsEnabledChange = { notificationViewModel.setRealtimeNotificationsEnabled(it) },
             userLexiconEnabled = userLexiconEnabled,
             userLexiconBusy = userLexiconBusy,
             onUserLexiconEnabledChange = { userLexiconViewModel.setInkwellUser(it) },

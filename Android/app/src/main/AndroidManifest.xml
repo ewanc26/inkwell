@@ -129,6 +129,19 @@
             </intent-filter>
         </activity>
 
+        <!-- FCM wake-ups (issue #152): HANDLED by InkwellMessagingService,
+             which hands every message into the existing WorkManager poll.
+             `stopWithTask=false` keeps the default: a task-swipe does not
+             unregister push. Without a Firebase project configured this
+             service simply never receives messages — polling continues. -->
+        <service
+            android:name=".data.remote.InkwellMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
         <!-- Grants temporary read access to the exported reading-data JSON
              file (Settings -> Export Data) to whatever app the user shares
              it to, without exposing the app's full storage. -->

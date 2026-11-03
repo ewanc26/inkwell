@@ -155,6 +155,15 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
     implementation(libs.hilt.work)
 
+    // FCM client plumbing (issue #152). No `com.google.gms.google-services`
+    // plugin and no committed `google-services.json`: there is no real
+    // Firebase project yet, and the plugin would fail the build without
+    // one. The messaging library alone compiles fine; at runtime
+    // FirebaseApp init / token fetch throws without configuration and the
+    // service below treats that as "push unavailable, keep polling".
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
+
     implementation(libs.work.runtime.ktx)
 
     // Writer draft autosave (data/draft/WriterDraftStore.kt)

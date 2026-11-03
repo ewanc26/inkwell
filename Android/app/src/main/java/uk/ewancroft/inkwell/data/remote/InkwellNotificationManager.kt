@@ -15,7 +15,10 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.Serializable
@@ -65,6 +68,8 @@ class InkwellNotificationManager @Inject constructor(
         const val NOTIFICATIONS_KEY = "notifications"
         const val UNREAD_COUNT_KEY = "unread_count"
         const val NOTIFICATIONS_ENABLED_KEY = "notifications_enabled"
+        const val REALTIME_NOTIFICATIONS_ENABLED_KEY = "realtime_notifications_enabled"
+        const val FCM_TOKEN_KEY = "fcm_device_token"
     }
 
     init {
@@ -259,6 +264,70 @@ class InkwellNotificationManager @Inject constructor(
 
     fun setNotificationsEnabled(enabled: Boolean) {
         prefs.edit().putBoolean(NOTIFICATIONS_ENABLED_KEY, enabled).apply()
+    }
+
+    /** User-facing opt-in for push wake-ups, surfaced in SettingsDialog
+     *  next to the banner toggle. Mirrors iOS
+     *  `PushNotificationManager.realtimeNotificationsEnabled`: defaults to
+     *  `false` because the registration endpoint is an honest 501 stub and
+     *  no Firebase project is configured yet (see InkwellMessagingService).
+     *  Stored in the same DID-scoped prefs file, so it is per-account like
+     *  every other notification state here. Enabling attempts a
+     *  registration; failures stay silent and polling continues. */
+    fun isRealtimeNotificationsEnabled(): Boolean =
+        prefs.getBoolean(REALTIME_NOTIFICATIONS_ENABLED_KEY, false)
+
+    fun setRealtimeNotificationsEnabled(enabled: Boolean) {
+        prefs.edit().putBoolean(REALTIME_NOTIFICATIONS_ENABLED_KEY, enabled).apply()
+        if (!enabled) return
+        // Registration is best-effort and network-bound: run it off the
+        // calling (usually main) thread. Failures stay silent; polling
+        // remains the delivery path.
+        kotlinx.coroutines.CoroutineScope(Dispatchers.IO).launch {
+            runCatching {
+                val token = loadFcmToken() ?: fetchFcmToken() ?: return@launch
+                val did = pdsRepository.getSession()?.did ?: return@launch
+                sendPushRegistration(token, did)
+            }
+        }
+    }
+
+    /** Called from `InkwellMessagingService.onNewToken`. Persists the token
+     *  and registers it only for accounts that opted in; otherwise the
+     *  token just waits until the toggle is flipped. Never throws. */
+    suspend fun onFcmTokenRefresh(token: String) = withContext(Dispatchers.IO) {
+        prefs.edit().putString(FCM_TOKEN_KEY, token).apply()
+        if (!isRealtimeNotificationsEnabled()) return@withContext
+        val did = pdsRepository.getSession()?.did ?: return@withContext
+        sendPushRegistration(token, did)
+    }
+
+    private fun loadFcmToken(): String? =
+        prefs.getString(FCM_TOKEN_KEY, null)?.takeIf { it.isNotBlank() }
+
+    /** Best-effort Firebase token read. Returns null when Firebase is not
+     *  configured (no `google-services.json`) rather than throwing. */
+    private fun fetchFcmToken(): String? = runCatching {
+        com.google.firebase.messaging.FirebaseMessaging.getInstance().token.let { task ->
+            com.google.android.gms.tasks.Tasks.await(task)
+        }
+    }.getOrNull()?.takeIf { it.isNotBlank() }
+
+    /** POSTs the device token to the push registration endpoint. Fire and
+     *  forget: a non-2xx response (the endpoint is an honest 501 stub until
+     *  #35's server side lands) or any transport failure just means polling
+     *  remains the delivery path. Never throws. */
+    private fun sendPushRegistration(token: String, did: String) {
+        runCatching {
+            val body = buildPushRegistrationBody(token, did)
+                .toRequestBody("application/json".toMediaType())
+            val request = okhttp3.Request.Builder()
+                .url(PUSH_REGISTER_URL)
+                .post(body)
+                .header("Content-Type", "application/json")
+                .build()
+            uk.ewancroft.inkwell.di.SharedHttpClient.client.newCall(request).execute().close()
+        }
     }
 
     private fun createNotificationChannel() {

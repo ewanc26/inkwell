@@ -56,6 +56,8 @@ fi
 # android.permission.RECEIVE_BOOT_COMPLETED              — WorkManager restarts after reboot
 # android.permission.FOREGROUND_SERVICE                  — WorkManager foreground task
 # uk.ewancroft.inkwell.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION — internal broadcast guard
+# com.google.android.c2dm.permission.RECEIVE — FCM push delivery (issue #152),
+#                                             merged in from firebase-messaging
 # --------------------------------------------------------------------------
 ALLOWLIST=(
   "android.permission.INTERNET"
@@ -64,6 +66,7 @@ ALLOWLIST=(
   "android.permission.WAKE_LOCK"
   "android.permission.RECEIVE_BOOT_COMPLETED"
   "android.permission.FOREGROUND_SERVICE"
+  "com.google.android.c2dm.permission.RECEIVE"
   # Self-declared internal broadcast guard — declared and consumed by this app only
   "uk.ewancroft.inkwell.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
 )
