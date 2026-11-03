@@ -42,7 +42,9 @@ final class PushRegistrationBodyTests: XCTestCase {
         XCTAssertTrue(jsonString?.contains("\"platform\":\"ios\"") ?? false)
         XCTAssertTrue(jsonString?.contains("\"deviceToken\":\"apns-token-123\"") ?? false)
         XCTAssertTrue(jsonString?.contains("\"did\":\"did:plc:alice\"") ?? false)
-        XCTAssertTrue(jsonString?.contains("\"topics\":[\"comment\",\"recommend\",\"subscribe\"]") ?? false)
+        // Topic order is production order, matching Android's
+        // buildPushRegistrationBody; the endpoint validates membership only.
+        XCTAssertTrue(jsonString?.contains("\"topics\":[\"subscribe\",\"recommend\",\"comment\"]") ?? false)
     }
 
     func testRegistrationBodyEscapesSpecialCharacters() throws {
