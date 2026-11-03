@@ -47,6 +47,7 @@ The complete release history is available in the [changelog](RELEASE_NOTES.md).
 - Renders Markpub Markdown plus Leaflet, pckt, and Offprint content. Uses `textContent` as a fallback. Native block rendering for Leaflet (including blob-stored pages), Markdown for everything else. Both apps resolve blob-backed bodies (Markpub `textBlob`, Leaflet `blobPages`) back into editable content when a document is loaded.
 - Representative app screenshots are checked in under `iOS/screenshots/`, `Android/fastlane/metadata/.../images/phoneScreenshots/`, and `website/static/screenshots/`, captured in testing mode — `-testing` (iOS) / `--ez testing true` (Android). Testing mode uses the real signed-in session and real network reads; it intercepts every write and shows a "Testing mode" notice instead. Captures therefore require being logged in.
 - Theme resolution: Leaflet's light/dark palette → `basicTheme` → system defaults. Publication-level by default, overridable per document.
+- A local Bookmarks feed in the Reader: bookmark any article from its action bar and find it again without leaving the app. Bookmark time is tracked separately from read state, so opening a saved article does not reorder the list.
 - Split-pane editor with live markdown preview, formatting toolbar, and selectable content formats.
 - Image upload directly into the editor.
 - Loss reporting when converting between formats that don't round-trip perfectly.

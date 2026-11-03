@@ -39,6 +39,8 @@ struct FollowingFeedState {
 enum ReaderFeed: String, CaseIterable, Identifiable {
     case following = "Following"
     case yours = "Yours"
+    /// Local bookmarks — see ArticleStateStore and BookmarksFeedView.
+    case bookmarks = "Bookmarks"
 
     var id: Self { self }
 }

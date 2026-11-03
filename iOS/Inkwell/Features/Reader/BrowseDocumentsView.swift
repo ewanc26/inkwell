@@ -124,10 +124,13 @@ struct BrowseDocumentsView: View {
 
     @ViewBuilder
     private var content: some View {
-        if store.selectedFeed == .following {
+        switch store.selectedFeed {
+        case .following:
             followingContent
-        } else {
+        case .yours:
             yoursContent
+        case .bookmarks:
+            BookmarksFeedView()
         }
     }
 
