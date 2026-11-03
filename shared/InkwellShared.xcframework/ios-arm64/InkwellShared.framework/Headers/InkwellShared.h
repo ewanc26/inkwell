@@ -413,8 +413,21 @@ __attribute__((swift_name("BlueskyEmbedTypes")))
 + (instancetype)blueskyEmbedTypes __attribute__((swift_name("init()")));
 @property (class, readonly, getter=shared) InkwellSharedBlueskyEmbedTypes *shared __attribute__((swift_name("shared")));
 @property (readonly) NSString *EXTERNAL __attribute__((swift_name("EXTERNAL")));
+@property (readonly) NSString *EXTERNAL_VIEW __attribute__((swift_name("EXTERNAL_VIEW")));
 @property (readonly) NSString *IMAGES __attribute__((swift_name("IMAGES")));
+
+/**
+ * The `#view` variants, as served by `app.bsky.feed.getPosts`. Views
+ * never use the bare record IDs, so decoders must match these — matching
+ * the bare IDs silently drops (iOS) or hard-fails (Android) every embed.
+ */
+@property (readonly) NSString *IMAGES_VIEW __attribute__((swift_name("IMAGES_VIEW")));
 @property (readonly) NSString *RECORD __attribute__((swift_name("RECORD")));
+@property (readonly) NSString *RECORD_VIEW __attribute__((swift_name("RECORD_VIEW")));
+@property (readonly) NSString *RECORD_WITH_MEDIA __attribute__((swift_name("RECORD_WITH_MEDIA")));
+@property (readonly) NSString *RECORD_WITH_MEDIA_VIEW __attribute__((swift_name("RECORD_WITH_MEDIA_VIEW")));
+@property (readonly) NSString *VIDEO __attribute__((swift_name("VIDEO")));
+@property (readonly) NSString *VIDEO_VIEW __attribute__((swift_name("VIDEO_VIEW")));
 @end
 
 __attribute__((objc_subclassing_restricted))
@@ -653,6 +666,7 @@ __attribute__((swift_name("LeafletTypes")))
 @property (readonly) NSString *BLOCKS_HORIZONTAL_RULE __attribute__((swift_name("BLOCKS_HORIZONTAL_RULE")));
 @property (readonly) NSString *BLOCKS_IFRAME __attribute__((swift_name("BLOCKS_IFRAME")));
 @property (readonly) NSString *BLOCKS_IMAGE __attribute__((swift_name("BLOCKS_IMAGE")));
+@property (readonly) NSString *BLOCKS_IMAGE_GALLERY __attribute__((swift_name("BLOCKS_IMAGE_GALLERY")));
 @property (readonly) NSString *BLOCKS_MATH __attribute__((swift_name("BLOCKS_MATH")));
 @property (readonly) NSString *BLOCKS_ORDERED_LIST __attribute__((swift_name("BLOCKS_ORDERED_LIST")));
 @property (readonly) NSString *BLOCKS_PAGE __attribute__((swift_name("BLOCKS_PAGE")));

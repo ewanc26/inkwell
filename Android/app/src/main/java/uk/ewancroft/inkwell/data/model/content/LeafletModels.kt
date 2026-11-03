@@ -12,6 +12,11 @@ package uk.ewancroft.inkwell.data.model.content
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.JsonTransformingSerializer
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import uk.ewancroft.inkwell.data.model.common.BlobRef
 import uk.ewancroft.inkwell.data.model.common.StrongRef
 
@@ -47,6 +52,32 @@ data class BlockContainer(
 )
 
 // ── Block Types ──────────────────────────────────────────────────────────
+
+/**
+ * Pixel dimensions for an image, gallery image, iframe or HTML embed.
+ *
+ * The lexicon defines this as an object (`{ width, height }`), but records
+ * written before that shape settled stored a string such as `16:9`. Both
+ * decode; the object is what the app writes.
+ */
+@Serializable
+data class LeafletAspectRatio(
+    val width: Int? = null,
+    val height: Int? = null,
+)
+
+object LeafletAspectRatioSerializer : JsonTransformingSerializer<LeafletAspectRatio>(LeafletAspectRatio.serializer()) {
+    override fun transformDeserialize(element: JsonElement): JsonElement {
+        val text = (element as? JsonPrimitive)?.takeIf { it.isString }?.content ?: return element
+        val parts = text.split(':', '/', 'x', '×')
+        val width = parts.getOrNull(0)?.trim()?.toIntOrNull()
+        val height = parts.getOrNull(1)?.trim()?.toIntOrNull()
+        return buildJsonObject {
+            width?.let { put("width", it) }
+            height?.let { put("height", it) }
+        }
+    }
+}
 
 /**
  * A single content block. The $type discriminator determines which fields
@@ -86,14 +117,30 @@ data class LeafletBlock(
     val websiteDescription: String? = null,
     // button
     val text: String? = null,
-    // iframe
+    // iframe / html / image aspect ratio
     val height: Double? = null,
-    val aspectRatio: String? = null,
+    @Serializable(with = LeafletAspectRatioSerializer::class)
+    val aspectRatio: LeafletAspectRatio? = null,
+    // imageGallery
+    val images: List<LeafletGalleryImage>? = null,
+    val format: String? = null,
+    val gap: Int? = null,
+    val maxWidth: Int? = null,
     // page reference
     val pageIndex: Int? = null,
     val pageDocument: String? = null,
     // poll
     val poll: StrongRef? = null
+)
+
+/** One image inside a `pub.leaflet.blocks.imageGallery` block. */
+@Serializable
+data class LeafletGalleryImage(
+    @SerialName("\$type") val type: String = "pub.leaflet.blocks.imageGallery#image",
+    val image: BlobRef? = null,
+    val alt: String? = null,
+    @Serializable(with = LeafletAspectRatioSerializer::class)
+    val aspectRatio: LeafletAspectRatio? = null,
 )
 
 // ── List Items & Facets ──────────────────────────────────────────────────

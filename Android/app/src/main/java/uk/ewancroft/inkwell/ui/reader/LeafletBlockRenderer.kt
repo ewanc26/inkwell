@@ -77,6 +77,7 @@ fun LeafletBlockContent(
         LeafletTypes.BLOCKS_CODE -> CodeBlock(block)
         LeafletTypes.BLOCKS_MATH -> MathBlock(block)
         LeafletTypes.BLOCKS_IMAGE -> ImageBlock(block, authorDid, onLoadImage)
+        LeafletTypes.BLOCKS_IMAGE_GALLERY -> ImageGalleryBlock(block, authorDid, onLoadImage)
         LeafletTypes.BLOCKS_UNORDERED_LIST -> UnorderedListBlock(block, pollData, onLoadPoll, onCastVote)
         LeafletTypes.BLOCKS_ORDERED_LIST -> OrderedListBlock(block, pollData, onLoadPoll, onCastVote)
         LeafletTypes.BLOCKS_CHECKLIST -> ChecklistBlock(block, pollData, onLoadPoll, onCastVote)
@@ -362,6 +363,13 @@ fun IframeEmbedBlock(block: LeafletBlock) {
     val url = block.url ?: return
     val parsedUrl = Uri.parse(url)
     if (!IframeSecurityPolicy.isAllowedInitial(parsedUrl)) return
+    val ratioWidth = block.aspectRatio?.width
+    val ratioHeight = block.aspectRatio?.height
+    val sizeModifier = if (ratioWidth != null && ratioHeight != null && ratioWidth > 0 && ratioHeight > 0) {
+        Modifier.fillMaxWidth().aspectRatio(ratioWidth.toFloat() / ratioHeight)
+    } else {
+        Modifier.fillMaxWidth().height(block.height?.dp ?: 300.dp)
+    }
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
@@ -398,9 +406,7 @@ fun IframeEmbedBlock(block: LeafletBlock) {
                     loadUrl(url)
                 }
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(block.height?.dp ?: 300.dp),
+            modifier = sizeModifier,
             onRelease = { webView ->
                 webView.stopLoading()
                 webView.webChromeClient = null

@@ -13,7 +13,7 @@ import WebKit
 struct IframeBlockView: UIViewRepresentable {
     let url: URL
     let height: Double?
-    let aspectRatio: String?
+    let aspectRatio: LeafletAspectRatio?
     let foregroundColor: Color
 
     func makeUIView(context: Context) -> WKWebView {
