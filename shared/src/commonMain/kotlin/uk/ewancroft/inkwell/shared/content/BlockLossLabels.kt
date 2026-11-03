@@ -20,6 +20,7 @@ object BlockLossLabels {
         LeafletTypes.BLOCKS_BUTTON to "buttons",
         LeafletTypes.BLOCKS_POSTS_LIST to "post lists",
         LeafletTypes.BLOCKS_SIGNUP to "signup forms",
+        LeafletTypes.BLOCKS_IMAGE_GALLERY to "image galleries",
     )
 
     val pckt: Map<String, String> = mapOf(

@@ -289,9 +289,10 @@ class ContentConverterTest {
     @Test
     fun leafletLossLabels() {
         val labels = BlockLossLabels.leaflet
-        assertEquals(9, labels.size)
+        assertEquals(10, labels.size)
         assertEquals("embeds", labels[LeafletTypes.BLOCKS_IFRAME])
         assertEquals("polls", labels[LeafletTypes.BLOCKS_POLL])
+        assertEquals("image galleries", labels[LeafletTypes.BLOCKS_IMAGE_GALLERY])
     }
 
     @Test
@@ -428,6 +429,25 @@ class ContentConverterTest {
 
         assertEquals(2, list.items.size)
         assertTrue(list.items[1].text.contains("sibling"))
+    }
+
+    @Test
+    fun leafletImageGalleryIsReportedAsLost() {
+        val content = mapOf(
+            "pages" to listOf(
+                mapOf(
+                    "\$type" to LeafletTypes.PAGES_LINEAR_DOCUMENT,
+                    "blocks" to listOf(
+                        mapOf("block" to mapOf("\$type" to LeafletTypes.BLOCKS_IMAGE_GALLERY)),
+                    ),
+                ),
+            ),
+        )
+
+        val result = LeafletContentConverter.toMarkdown(content)
+
+        assertTrue(result.blocks.isEmpty())
+        assertTrue(result.lost.contains("image galleries"))
     }
 
     // Helper to avoid unused warning

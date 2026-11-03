@@ -11,6 +11,7 @@ object LeafletTypes {
     const val BLOCKS_CODE = "pub.leaflet.blocks.code"
     const val BLOCKS_MATH = "pub.leaflet.blocks.math"
     const val BLOCKS_IMAGE = "pub.leaflet.blocks.image"
+    const val BLOCKS_IMAGE_GALLERY = "pub.leaflet.blocks.imageGallery"
     const val BLOCKS_HORIZONTAL_RULE = "pub.leaflet.blocks.horizontalRule"
     const val BLOCKS_UNORDERED_LIST = "pub.leaflet.blocks.unorderedList"
     const val BLOCKS_ORDERED_LIST = "pub.leaflet.blocks.orderedList"

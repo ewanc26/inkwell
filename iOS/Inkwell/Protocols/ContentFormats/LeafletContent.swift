@@ -74,6 +74,69 @@ public struct LeafletBlockContainer: Codable, Equatable, Hashable, Sendable {
     }
 }
 
+/// Pixel dimensions for an image, gallery image, iframe or HTML embed.
+///
+/// The lexicon defines this as an object (`{ width, height }`), but records
+/// written before that shape settled stored a string such as `16:9`. Both
+/// decode; the object is what the app writes.
+public struct LeafletAspectRatio: Codable, Equatable, Hashable, Sendable {
+    public let width: Int?
+    public let height: Int?
+
+    public init(width: Int? = nil, height: Int? = nil) {
+        self.width = width
+        self.height = height
+    }
+
+    public init(from decoder: Decoder) throws {
+        if let container = try? decoder.container(keyedBy: CodingKeys.self) {
+            width = try container.decodeIfPresent(Int.self, forKey: .width)
+            height = try container.decodeIfPresent(Int.self, forKey: .height)
+            return
+        }
+
+        let raw = try decoder.singleValueContainer().decode(String.self)
+        let parts = raw.split(whereSeparator: { ":/x×".contains($0) })
+        width = parts.first.flatMap { Int($0.trimmingCharacters(in: .whitespaces)) }
+        height = parts.count > 1 ? Int(parts[1].trimmingCharacters(in: .whitespaces)) : nil
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(width, forKey: .width)
+        try container.encodeIfPresent(height, forKey: .height)
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case width, height
+    }
+}
+
+/// One image inside a `pub.leaflet.blocks.imageGallery` block.
+public struct LeafletGalleryImage: Codable, Equatable, Hashable, Sendable {
+    public let type: String
+    public let image: ComAtprotoLexicon.Repository.UploadBlobOutput?
+    public let alt: String?
+    public let aspectRatio: LeafletAspectRatio?
+
+    public init(
+        type: String = "pub.leaflet.blocks.imageGallery#image",
+        image: ComAtprotoLexicon.Repository.UploadBlobOutput? = nil,
+        alt: String? = nil,
+        aspectRatio: LeafletAspectRatio? = nil
+    ) {
+        self.type = type
+        self.image = image
+        self.alt = alt
+        self.aspectRatio = aspectRatio
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case type = "$type"
+        case image, alt, aspectRatio
+    }
+}
+
 /// A single block within a Leaflet page. Covers all 18 block types defined
 /// by `pub.leaflet.blocks.*` — text, header, image, code, math, embeds,
 /// polls, lists, and layout blocks.
@@ -144,9 +207,15 @@ public struct LeafletBlock: Codable, Equatable, Hashable, Sendable {
     /// AT-URI of the referenced document (when linking across documents).
     public let pageDocument: String?
 
-    // MARK: - iframe
+    // MARK: - iframe / html / image
     public let height: Double?
-    public let aspectRatio: String?
+    public let aspectRatio: LeafletAspectRatio?
+
+    // MARK: - imageGallery
+    public let images: [LeafletGalleryImage]?
+    public let galleryFormat: String?
+    public let galleryGap: Int?
+    public let galleryMaxWidth: Int?
 
     // MARK: - Init
 
@@ -178,7 +247,11 @@ public struct LeafletBlock: Codable, Equatable, Hashable, Sendable {
         pageIndex: Int? = nil,
         pageDocument: String? = nil,
         height: Double? = nil,
-        aspectRatio: String? = nil
+        aspectRatio: LeafletAspectRatio? = nil,
+        images: [LeafletGalleryImage]? = nil,
+        galleryFormat: String? = nil,
+        galleryGap: Int? = nil,
+        galleryMaxWidth: Int? = nil
     ) {
         self.type = type
         self.plaintext = plaintext
@@ -208,6 +281,10 @@ public struct LeafletBlock: Codable, Equatable, Hashable, Sendable {
         self.pageDocument = pageDocument
         self.height = height
         self.aspectRatio = aspectRatio
+        self.images = images
+        self.galleryFormat = galleryFormat
+        self.galleryGap = galleryGap
+        self.galleryMaxWidth = galleryMaxWidth
     }
 
     // MARK: - Decodable
@@ -256,7 +333,11 @@ public struct LeafletBlock: Codable, Equatable, Hashable, Sendable {
         pageDocument = try container.decodeIfPresent(String.self, forKey: .document)
 
         height       = try container.decodeIfPresent(Double.self, forKey: .height)
-        aspectRatio  = try container.decodeIfPresent(String.self, forKey: .aspectRatio)
+        aspectRatio  = try container.decodeIfPresent(LeafletAspectRatio.self, forKey: .aspectRatio)
+        images       = try container.decodeIfPresent([LeafletGalleryImage].self, forKey: .images)
+        galleryFormat = try container.decodeIfPresent(String.self, forKey: .format)
+        galleryGap   = try container.decodeIfPresent(Int.self, forKey: .gap)
+        galleryMaxWidth = try container.decodeIfPresent(Int.self, forKey: .maxWidth)
     }
 
     // MARK: - Encodable
@@ -297,6 +378,10 @@ public struct LeafletBlock: Codable, Equatable, Hashable, Sendable {
         try container.encodeIfPresent(pageDocument, forKey: .document)
         try container.encodeIfPresent(height, forKey: .height)
         try container.encodeIfPresent(aspectRatio, forKey: .aspectRatio)
+        try container.encodeIfPresent(images, forKey: .images)
+        try container.encodeIfPresent(galleryFormat, forKey: .format)
+        try container.encodeIfPresent(galleryGap, forKey: .gap)
+        try container.encodeIfPresent(galleryMaxWidth, forKey: .maxWidth)
     }
 
     // MARK: - Coding Keys
@@ -314,6 +399,7 @@ public struct LeafletBlock: Codable, Equatable, Hashable, Sendable {
         case highlightFirstPost, filterByTags
         case page, document
         case height, aspectRatio
+        case images, format, gap, maxWidth
     }
 }
 

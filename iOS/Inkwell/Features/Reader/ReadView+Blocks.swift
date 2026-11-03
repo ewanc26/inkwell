@@ -142,6 +142,19 @@ extension ReadView {
                     .frame(maxWidth: .infinity)
                 }
 
+            case "pub.leaflet.blocks.imageGallery":
+                if let images = block.images, !images.isEmpty,
+                   let did = authorDID ?? loginStateManager.currentDID {
+                    ImageGalleryBlockView(
+                        images: images,
+                        authorDID: did,
+                        loginStateManager: loginStateManager,
+                        foregroundColor: foregroundColor,
+                        gap: CGFloat(max(0, min(32, block.galleryGap ?? 8))),
+                        maxTileWidth: CGFloat(max(140, min(480, block.galleryMaxWidth ?? 320)))
+                    )
+                }
+
             case "pub.leaflet.blocks.unorderedList":
                 renderList(block.children, ordered: false, startIndex: nil)
 
