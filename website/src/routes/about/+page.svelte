@@ -4,20 +4,19 @@
   lives at standard.site / atproto.com), why a native client rather
   than a web view, who builds it, and honest availability status.
 
-  Copy comes from the message catalogue for `data.locale`; the
+  Copy comes from the English message catalogue; the
   <title>/description live in the root layout's route-metadata table.
 -->
 
 <script lang="ts">
   import type { PageData } from "./$types";
   import { reveal } from "$lib/motion";
-  import { fmt, localizeHref, messagesFor, rich } from "$lib/i18n";
+  import { fmt, messages, rich } from "$lib/i18n";
   import { Heart, ArrowRight, ArrowUpRight } from "@lucide/svelte";
 
   let { data }: { data: PageData } = $props();
 
-  const locale = $derived(data.locale);
-  const m = $derived(messagesFor(locale).about);
+  const m = messages.about;
 </script>
 
 <section class="site-container page-hd">
@@ -27,17 +26,17 @@
 
 <section class="site-container prose py-12">
   <h2>{m.protocol.heading}</h2>
-  <p>{@html rich(m.protocol.atproto, locale)}</p>
-  <p>{@html rich(m.protocol.standardSite, locale)}</p>
+  <p>{@html rich(m.protocol.atproto)}</p>
+  <p>{@html rich(m.protocol.standardSite)}</p>
 
   <h2>{m.native.heading}</h2>
   <p>{m.native.body}</p>
 
   <h2>{m.who.heading}</h2>
-  <p>{@html rich(m.who.body, locale)}</p>
+  <p>{@html rich(m.who.body)}</p>
 
   <h2>{m.status.heading}</h2>
-  <p>{@html rich(m.status.today, locale)}</p>
+  <p>{@html rich(m.status.today)}</p>
   <p>{m.status.plan}</p>
 </section>
 
@@ -96,7 +95,7 @@
     </ul>
   {:else}
     <p class="contributors-unavailable">
-      {@html rich(m.contributors.unavailable, locale)}
+      {@html rich(m.contributors.unavailable)}
     </p>
   {/if}
 </section>

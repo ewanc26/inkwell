@@ -10,7 +10,7 @@
 // two copies would drift, and the module-level cache would be duplicated
 // with it.
 //
-// Nothing here is locale-dependent: handles, DIDs, and display names are
+// Nothing here is language-dependent: handles, DIDs, and display names are
 // user data from the network, not site copy.
 
 const CONSTELLATION = "https://constellation.microcosm.blue";

@@ -1,10 +1,8 @@
-// ── British English message catalogue (source locale) ────────────
+// ── British English message catalogue ─────────────────────────────
 // This file is the source of truth for every piece of visible copy on
-// the site, and its inferred type (`Messages`, exported from ../messages)
-// is what every other locale is checked against. Adding a key here makes
-// `pnpm check` fail until each translation supplies it — which is the
-// point: a missing translation should be a build error, not a silent
-// fallback to English inside an otherwise translated page.
+// the site. Its inferred type (`Messages`, exported from ../messages) is
+// the contract every consumer shares; adding a key here makes it available
+// everywhere without a translation lookup or fallback layer.
 //
 // Strings may carry the small inline markup subset documented in
 // ../rich.ts (`code`, **bold**, [label](linkKey)). Placeholders written
@@ -46,7 +44,6 @@ export const enGB = {
       kofi: "Ko-fi",
       sponsors: "GitHub Sponsors",
     },
-    languageLabel: "Language",
   },
 
   // ── Error pages ─────────────────────────────────────────────
@@ -67,8 +64,8 @@ export const enGB = {
   },
 
   // ── Per-route metadata ───────────────────────────────────────
-  // Keyed by source-locale path. The layout owns every <title> and
-  // description so they localise in one place rather than six.
+  // Keyed by path. The layout owns every <title> and description so they
+  // live in one place rather than six.
   meta: {
     "/": {
       title: "Inkwell — Reader & Writer for Standard.site on AT Protocol",
@@ -429,31 +426,15 @@ export const enGB = {
 
   // ── Legal pages ──────────────────────────────────────────────
   // The document bodies are generated into $lib/legal/documents.ts from
-  // legal/*.md; these are only the headings and the provenance framing
-  // around them, which is why they live in the catalogue like any other
-  // UI copy.
+  // legal/*.md; these are only the headings and version line, which is
+  // why they live in the catalogue like any other UI copy.
   legal: {
     privacyHeading: "Privacy Policy",
     termsHeading: "Terms of Service & EULA",
     /** `{date}` is replaced with a <time> element, so it must appear once. */
     versionLine: "Version {version} — Effective Date: {date}",
-    /** Used when a translation is stale and therefore has no live date. */
-    versionLineUndated: "Translated from version {version}",
-    provenanceLabel: "About this translation",
-    /**
-     * Shown on every translated legal page. Legal effect follows the
-     * British English source, so the translation says so plainly rather
-     * than implying it is independently binding.
-     */
-    translationNotice:
-      "This is a translation of version {version} of the British English source, reviewed on {reviewedOn}. The [British English text](sourceDoc) is the authoritative version; where the two differ, the British English text prevails.",
-    /**
-     * Shown when the source has moved on since the translation was last
-     * reviewed. It deliberately does not present the current effective
-     * date over older wording.
-     */
-    staleNotice:
-      "**This translation is out of date.** It was translated from version {version} of the British English source. Version {currentVersion} has been in force since {currentDate}, and its wording may differ from what you read below. Read the [British English text](sourceDoc) for the terms that currently apply.",
+    /** Fallback when a generated source document has no effective date. */
+    versionLineUndated: "Version {version}",
   },
 };
 

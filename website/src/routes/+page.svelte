@@ -5,7 +5,7 @@
   Deeper content now lives on /features, /security, and /about; this
   page links out rather than cramming everything into one scroll.
 
-  All copy comes from the message catalogue for `data.locale`; the
+  All copy comes from the English message catalogue; the
   <title>/description live in the root layout's route-metadata table.
 -->
 
@@ -15,30 +15,22 @@
     ALTSTORE_SOURCE_LINK,
     FDROID_REPO_LINK,
   } from "$lib/config";
-  import {
-    fmt,
-    localizeHref,
-    messagesFor,
-    rich,
-    splitAt,
-  } from "$lib/i18n";
+  import { fmt, messages, rich, splitAt } from "$lib/i18n";
   import UserCarousel from "$lib/components/UserCarousel.svelte";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
 
-  const locale = $derived(data.locale);
-  const m = $derived(messagesFor(locale).home);
-  const shared = $derived(messagesFor(locale));
+  const m = messages.home;
+  const shared = messages;
 
   // The hero heading wraps its brand name in an accent <span>, so the
-  // translated string is split around the `{brand}` placeholder rather
-  // than being glued together from fragments in English word order.
+  // catalogue string is split around the `{brand}` placeholder rather
+  // than being glued together from fragments in the template.
   const heroTitle = $derived(splitAt(m.hero.title, "brand"));
 
   // Screenshot grid: `dir`/`file` address the committed PNGs under
-  // static/screenshots and are never localised; `key` indexes the
-  // caption/alt catalogues.
+  // static/screenshots; `key` indexes the caption/alt catalogue.
   const PLATFORMS = [
     { dir: "ios", width: 428, height: 930 },
     { dir: "android", width: 412, height: 915 },
@@ -139,7 +131,7 @@
           {m.download.ios.store}
         </button>
       </div>
-      <p class="mt-3 text-sm text-muted">{@html rich(m.download.ios.note, locale)}</p>
+      <p class="mt-3 text-sm text-muted">{@html rich(m.download.ios.note)}</p>
     </div>
 
     <div class="feature-card reveal" use:reveal={0}>
@@ -157,7 +149,7 @@
         </button>
       </div>
       <p class="mt-3 text-sm text-muted">
-        {@html rich(m.download.android.note, locale)}
+        {@html rich(m.download.android.note)}
       </p>
     </div>
   </div>
@@ -215,11 +207,11 @@
     <div class="feature-card reveal" use:reveal={0}>
       <div class="feature-icon"><Shield class="h-5 w-5" /></div>
       <h3>{m.what.verified.heading}</h3>
-      <p>{@html rich(m.what.verified.body, locale)}</p>
+      <p>{@html rich(m.what.verified.body)}</p>
     </div>
   </div>
 
-  <a href={localizeHref("/features", locale)} class="section-link">{m.what.link}</a>
+  <a href="/features" class="section-link">{m.what.link}</a>
 </section>
 
 <!-- Secure by design (teaser) -->
@@ -227,7 +219,7 @@
   <div class="callout reveal" use:reveal={2}>
     <h2>{m.secure.heading}</h2>
     <p>{m.secure.body}</p>
-    <a href={localizeHref("/security", locale)} class="active-press">
+    <a href="/security" class="active-press">
       {m.secure.link} <ArrowRight class="h-3 w-3" />
     </a>
   </div>
@@ -250,11 +242,11 @@
         <dt>{row.label}</dt>
         <dd class="compare-web">
           <span class="compare-label">{m.compare.columnBrowser}</span>
-          {@html rich(row.browser, locale)}
+          {@html rich(row.browser)}
         </dd>
         <dd class="compare-app">
           <span class="compare-label">{m.compare.columnApp}</span>
-          {@html rich(row.app, locale)}
+          {@html rich(row.app)}
         </dd>
       </div>
     {/each}
@@ -268,7 +260,7 @@
     {#each m.faq.items as item (item.question)}
       <details class="faq-item">
         <summary>{item.question}</summary>
-        <p>{@html rich(item.answer, locale)}</p>
+        <p>{@html rich(item.answer)}</p>
       </details>
     {/each}
   </div>
@@ -284,7 +276,7 @@
 </section>
 
 <!-- Users already using Inkwell -->
-<UserCarousel users={data.users} messages={shared} {locale} />
+<UserCarousel users={data.users} messages={shared} />
 
 <!-- Final CTA -->
 <section class="site-container pb-16 text-center">

@@ -1,24 +1,21 @@
 <!--
   The "Users already using Inkwell" carousel, shared by the landing page
-  and /features. It was duplicated in both routes; once its heading, intro,
-  and empty state became translated copy, a second copy would have meant a
-  second place for a translation to go missing.
+  and /features. It was duplicated in both routes; a second copy would
+  have meant a second place for the empty state to go missing.
 -->
 
 <script lang="ts">
   import type { Snippet } from "svelte";
-  import { fmt, rich, type Locale, type Messages } from "$lib/i18n";
+  import { fmt, rich, type Messages } from "$lib/i18n";
   import type { InkwellUser } from "$lib/inkwellUser";
 
   let {
     users,
     messages,
-    locale,
     children,
   }: {
     users: InkwellUser[];
     messages: Messages;
-    locale: Locale;
     /** Optional trailing call to action, rendered under the carousel. */
     children?: Snippet;
   } = $props();
@@ -29,7 +26,7 @@
 <section class="site-container py-12">
   <h2 class="section-title">{m.heading}</h2>
   <p class="mb-6 max-w-[42rem] text-lg leading-relaxed text-pretty">
-    {@html rich(m.intro, locale)}
+    {@html rich(m.intro)}
   </p>
 
   {#if users.length > 0}
@@ -56,7 +53,7 @@
       {/each}
     </div>
   {:else}
-    <div class="user-empty">{@html rich(m.empty, locale)}</div>
+    <div class="user-empty">{@html rich(m.empty)}</div>
   {/if}
 
   {@render children?.()}

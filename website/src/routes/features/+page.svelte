@@ -4,13 +4,13 @@
   Protocol native / verification / accessibility, each with real
   elaboration rather than restated headlines.
 
-  Copy comes from the message catalogue for `data.locale`; the
+  Copy comes from the English message catalogue; the
   <title>/description live in the root layout's route-metadata table.
 -->
 
 <script lang="ts">
   import { reveal } from "$lib/motion";
-  import { localizeHref, messagesFor, rich } from "$lib/i18n";
+  import { messages, rich } from "$lib/i18n";
   import UserCarousel from "$lib/components/UserCarousel.svelte";
   import type { PageData } from "./$types";
   import {
@@ -24,9 +24,8 @@
 
   let { data }: { data: PageData } = $props();
 
-  const locale = $derived(data.locale);
-  const shared = $derived(messagesFor(locale));
-  const m = $derived(shared.features);
+  const shared = messages;
+  const m = shared.features;
 
   // Icon and reveal-stagger group per card, alongside the catalogue key
   // that supplies its heading and body.
@@ -52,14 +51,14 @@
       <div class="feature-card reveal" use:reveal={card.group}>
         <div class="feature-icon"><card.icon class="h-5 w-5" /></div>
         <h3>{copy.heading}</h3>
-        <p>{@html rich(copy.body, locale)}</p>
+        <p>{@html rich(copy.body)}</p>
       </div>
     {/each}
   </div>
 </section>
 
-<UserCarousel users={data.users} messages={shared} {locale}>
-  <a href={localizeHref("/#download", locale)} class="section-link">
+<UserCarousel users={data.users} messages={shared}>
+  <a href="/#download" class="section-link">
     {m.getEither}
   </a>
 </UserCarousel>
@@ -69,7 +68,7 @@
   <p class="mb-6 max-w-[42rem] text-lg leading-relaxed text-pretty">
     {m.differ.body}
   </p>
-  <a href={localizeHref("/#download", locale)} class="section-link">
+  <a href="/#download" class="section-link">
     {m.getEither}
   </a>
 </section>

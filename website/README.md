@@ -24,17 +24,15 @@ pnpm format    # prettier --write
 ## Language
 
 The site is British English only and is served unprefixed, so every address
-the site has ever had remains the canonical one. No prefixed locale is
-currently registered; `/fr`, `/es`, and `/gd` are ordinary 404s.
+the site has ever had remains the canonical one. There is no locale segment,
+language switcher, or `hreflang` alternate table; `/fr`, `/es`, and `/gd` are
+ordinary 404s.
 
-The optional `[[locale=locale]]` route group, the locale registry and the
-message-catalogue contract remain in place if a reviewed translation is
-added later. Copy and per-route `<title>`/description live in
-`src/lib/i18n/messages/`; `en-GB.ts` is the source catalogue and its inferred
-type is the contract any future translation must match. `src/routes/+layout.svelte`
-emits the canonical URL and `x-default` from one route table, shared with
-`/sitemap.xml`. `/client-metadata.json` is an OAuth protocol artefact and is
-never localised.
+All visible copy lives in `src/lib/i18n/messages/en-GB.ts`. `fmt` fills
+placeholders and `rich` renders the small inline-markup subset documented in
+`src/lib/i18n/rich.ts`. Page routes are ordinary SvelteKit routes, and
+`src/routes/+layout.svelte` emits the canonical URL and metadata.
+`/client-metadata.json` is an OAuth protocol artefact and is never localised.
 
 ## Deployment
 

@@ -20,9 +20,6 @@
 
 <script lang="ts">
   import LegalDocument from "$lib/components/LegalDocument.svelte";
-  import type { PageData } from "./$types";
-
-  let { data }: { data: PageData } = $props();
 </script>
 
-<LegalDocument doc="terms" locale={data.locale} />
+<LegalDocument doc="terms" />
