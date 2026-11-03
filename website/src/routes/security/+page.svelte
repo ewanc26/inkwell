@@ -4,14 +4,13 @@
   key storage, no app passwords, no analytics, and the verification
   model. Precise and calm, not marketing hype.
 
-  Copy comes from the message catalogue for `data.locale`; the
+  Copy comes from the English message catalogue; the
   <title>/description live in the root layout's route-metadata table.
 -->
 
 <script lang="ts">
   import { reveal } from "$lib/motion";
-  import { localizeHref, messagesFor, rich } from "$lib/i18n";
-  import type { PageData } from "./$types";
+  import { messages, rich } from "$lib/i18n";
   import {
     KeyRound,
     Lock,
@@ -20,10 +19,7 @@
     ArrowRight,
   } from "@lucide/svelte";
 
-  let { data }: { data: PageData } = $props();
-
-  const locale = $derived(data.locale);
-  const m = $derived(messagesFor(locale).security);
+  const m = messages.security;
 
   const CARDS = [
     { key: "oauth", icon: KeyRound, group: 0 },
@@ -47,7 +43,7 @@
       <div class="feature-card reveal" use:reveal={card.group}>
         <div class="feature-icon"><card.icon class="h-5 w-5" /></div>
         <h3>{copy.heading}</h3>
-        <p>{@html rich(copy.body, locale)}</p>
+        <p>{@html rich(copy.body)}</p>
       </div>
     {/each}
   </div>
@@ -57,10 +53,10 @@
   <div class="callout reveal" use:reveal={2}>
     <h2>{m.legal.heading}</h2>
     <p>{m.legal.body}</p>
-    <a href={localizeHref("/privacy", locale)}>
+    <a href="/privacy">
       {m.legal.privacy} <ArrowRight class="h-3 w-3" />
     </a>
-    <a href={localizeHref("/terms", locale)} class="ml-4">
+    <a href="/terms" class="ml-4">
       {m.legal.terms} <ArrowRight class="h-3 w-3" />
     </a>
   </div>

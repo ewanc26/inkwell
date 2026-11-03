@@ -4,29 +4,15 @@
   slot, and the footer.  Mobile breakpoint is at 800px; the mobile menu
   is an in-flow dropdown panel under the header, matching ewancroft.uk.
 
-  This is also where the active locale and page metadata are resolved for
-  the shell. The site currently registers only British English, but locale
-  is still derived from the URL (never from Accept-Language), and every
-  <title>, description, canonical URL, and hreflang alternate is emitted
-  from here rather than per route. Pages own their own body copy only.
+  This is also where page metadata is resolved for the shell. Every
+  <title>, description and canonical URL is emitted from here rather than
+  per route, so pages own only their body copy.
 -->
 
 <script lang="ts">
   import "../routes/layout.css";
   import { SITE, NAV_LINKS, FOOTER_LINKS, OG_IMAGE } from "$lib/config";
-  import {
-    LOCALES,
-    absoluteUrl,
-    alternatesFor,
-    fmt,
-    isLocalisedPath,
-    localizeHref,
-    messagesFor,
-    resolveLocale,
-    rich,
-    routeMeta,
-    xDefaultFor,
-  } from "$lib/i18n";
+  import { absoluteUrl, fmt, messages, rich, routeMeta } from "$lib/i18n";
   import { page } from "$app/state";
   import { Menu, X } from "@lucide/svelte";
 
@@ -53,14 +39,9 @@
     mobileOpen = false;
   });
 
-  // ── Locale ───────────────────────────────────────────────────
-  // `path` is the source-locale path, which is the key route metadata, nav
-  // matching, and alternates all work in. With no prefixed locale registered
-  // it is simply the request path.
-  const resolved = $derived(resolveLocale(page.url.pathname));
-  const locale = $derived(resolved.locale);
-  const path = $derived(resolved.path);
-  const m = $derived(messagesFor(locale));
+  // ── Metadata ─────────────────────────────────────────────────
+  const path = $derived(page.url.pathname);
+  const m = messages;
 
   // Error pages have no route-table entry, so they get their own
   // catalogue title and description rather than inheriting the home page's.
@@ -73,19 +54,12 @@
           title: `${errorCopy.title} — ${SITE.title}`,
           description: errorCopy.body,
         }
-      : routeMeta(m, path),
+      : routeMeta(path),
   );
 
-  // Absolute, per-route URL for canonical + og:url, in the active locale.
-  // Built from the configured origin so previews/localhost never leak
-  // into metadata.
-  const canonical = $derived(absoluteUrl(path, locale));
-
-  // Alternates are only advertised for paths that genuinely exist in
-  // every locale; a 404 or a static artefact rendered through the shell
-  // must not claim translations it doesn't have.
-  const translated = $derived(isLocalisedPath(path));
-  const alternates = $derived(translated ? alternatesFor(path) : []);
+  // Absolute, per-route URL for canonical + og:url. Built from the
+  // configured origin so previews/localhost never leak into metadata.
+  const canonical = $derived(absoluteUrl(path));
 
   // Scrapers won't resolve a root-relative image path, so the cover is
   // advertised absolutely — same reasoning as og:url above.
@@ -96,20 +70,12 @@
   <title>{meta.title}</title>
   <meta name="description" content={meta.description} />
   <link rel="canonical" href={canonical} />
-  {#each alternates as alternate (alternate.locale)}
-    <link rel="alternate" hreflang={alternate.hreflang} href={alternate.href} />
-  {/each}
-  {#if translated}
-    <!-- British English is the source locale, so it is also the fallback
-         a crawler should offer when it can't match the user's language. -->
-    <link rel="alternate" hreflang="x-default" href={xDefaultFor(path)} />
-  {/if}
   <meta property="og:site_name" content={SITE.title} />
   <meta property="og:title" content={meta.title} />
   <meta property="og:description" content={meta.description} />
   <meta property="og:type" content="website" />
   <meta property="og:url" content={canonical} />
-  <meta property="og:locale" content={LOCALES[locale].ogLocale} />
+  <meta property="og:locale" content="en_GB" />
   <meta property="og:image" content={ogImage} />
   <meta property="og:image:type" content={OG_IMAGE.type} />
   <meta property="og:image:width" content={String(OG_IMAGE.width)} />
@@ -138,7 +104,7 @@
 <!-- Header -->
 <nav class="nav" aria-label={m.nav.primaryLabel}>
   <div class="nav-inner">
-    <a href={localizeHref("/", locale)} class="nav-brand" aria-label={m.nav.brandHome}>
+    <a href="/" class="nav-brand" aria-label={m.nav.brandHome}>
       <!--
         Inline SVG: currentColor & var(--color-accent) resolve because it
         lives in the page DOM, unlike an <img> src. The mark uses the same
@@ -180,13 +146,12 @@
     <!-- Desktop nav + mobile dropdown panel -->
     <nav class="nav-links" class:open={mobileOpen} id="primary-navigation" aria-label={m.nav.mainLabel}>
       {#each NAV_LINKS as link (link.key)}
-        <!-- Active state is compared against the source-locale path, so it
-             keeps working unchanged if a prefixed locale is registered. -->
+        <!-- Active state is compared against the current path. -->
         {@const isActive =
           path === link.url ||
           (link.url !== "/" && link.url.startsWith("/") && path.startsWith(link.url))}
         <a
-          href={localizeHref(link.url, locale)}
+          href={link.url}
           class="nav-link"
           class:active={isActive}
           aria-current={isActive ? "page" : undefined}
@@ -209,13 +174,12 @@
       <p class="footer-copyright">
         {@html rich(
           fmt(m.footer.copyright, { year: new Date().getFullYear() }),
-          locale,
         )}
       </p>
       <nav class="footer-nav" aria-label={m.footer.navLabel}>
         {#each FOOTER_LINKS as link (link.key)}
           <a
-            href={localizeHref(link.url, locale)}
+            href={link.url}
             class="footer-link"
             target={link.external ? "_blank" : undefined}
             rel={link.external ? "noopener" : undefined}
@@ -225,28 +189,5 @@
         {/each}
       </nav>
     </div>
-
-    <!--
-      Language switcher. Plain links, no JavaScript and no cookie: each
-      locale has exactly one address for the current page, so switching
-      language is ordinary navigation. Hidden entirely on pages that have
-      no translated counterpart rather than linking to a 404.
-    -->
-    {#if alternates.length > 1}
-      <nav class="footer-langs" aria-label={m.footer.languageLabel}>
-        <span class="footer-langs-label">{m.footer.languageLabel}</span>
-        {#each alternates as alternate (alternate.locale)}
-          <a
-            href={localizeHref(path, alternate.locale)}
-            class="footer-link"
-            hreflang={alternate.hreflang}
-            lang={alternate.hreflang}
-            aria-current={alternate.locale === locale ? "true" : undefined}
-          >
-            {LOCALES[alternate.locale].label}
-          </a>
-        {/each}
-      </nav>
-    {/if}
   </div>
 </footer>

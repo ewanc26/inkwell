@@ -3,10 +3,9 @@
 // and navigation structure lives in one place rather than scattered
 // across components.
 
-// Per-route titles and descriptions moved into the message catalogues
-// (src/lib/i18n/messages/) when the site became multilingual, because they
-// are visible copy. What stays here is what is *not* language-dependent:
-// the product name and the canonical origin.
+// Per-route titles and descriptions live in the message catalogue
+// (src/lib/i18n/messages/) because they are visible copy. What stays here
+// is what is *not* language-dependent: the product name and canonical origin.
 export const SITE = {
   title: "Inkwell",
   url: "https://inkwell.ewancroft.uk",
@@ -23,10 +22,10 @@ export const SITE = {
 // finishes downloading — without them the embed reflows or falls back
 // to a small thumbnail.
 
-// `alt` is not in the message catalogues on purpose: it has to describe
+// `alt` is not in the message catalogue on purpose: it has to describe
 // what tools/og-cover/template.html actually renders, and that artwork is
-// a single English-language PNG shared by every locale. Localising the
-// alt text would make it describe words the image does not contain.
+// a single English-language PNG. Keeping the description beside the image
+// metadata stops it drifting into words the image does not contain.
 export const OG_IMAGE = {
   path: "/og-cover.png",
   type: "image/png",
@@ -37,9 +36,8 @@ export const OG_IMAGE = {
 
 // ── Navigation structure ─────────────────────────────────────────
 // Structure (order, targets, which links leave the site) lives here;
-// the labels live in the message catalogues under `nav.links` and
-// `footer.links`, keyed by `key`. Internal `url`s are written in
-// source-locale form and run through `localizeHref` at render time.
+// the labels live in the message catalogue under `nav.links` and
+// `footer.links`, keyed by `key`. Internal `url`s are used directly.
 
 export const NAV_LINKS = [
   { key: "home", url: "/" },
