@@ -26,6 +26,18 @@ object ArticleStatePreferences {
         val isRead: Boolean = false,
         val isBookmarked: Boolean = false,
         val updatedAt: Long = System.currentTimeMillis(),
+        // Optional so states written before bookmarks had their own timestamp
+        // still decode; the Bookmarks feed falls back to `updatedAt` for those.
+        val bookmarkedAt: Long? = null,
+    )
+
+    /** One row of the Reader's Bookmarks feed. */
+    data class BookmarkedArticle(
+        val articleId: String,
+        val title: String,
+        val isRead: Boolean,
+        /** When the article was bookmarked, or its last state change for older entries. */
+        val savedAt: Long,
     )
 
     private fun prefs(context: Context) = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -61,9 +73,28 @@ object ArticleStatePreferences {
             title = title,
             isBookmarked = bookmarked,
             updatedAt = System.currentTimeMillis(),
+            bookmarkedAt = if (bookmarked) System.currentTimeMillis() else null,
         )
         writeAll(context, states + (articleId to updated))
     }
+
+    /**
+     * Bookmarked articles, most recently saved first. Reading an article does
+     * not move it: [ArticleState.bookmarkedAt] only changes when the bookmark
+     * does.
+     */
+    fun bookmarks(context: Context): List<BookmarkedArticle> =
+        readAll(context)
+            .mapNotNull { (articleId, state) ->
+                if (!state.isBookmarked) return@mapNotNull null
+                BookmarkedArticle(
+                    articleId = articleId,
+                    title = state.title,
+                    isRead = state.isRead,
+                    savedAt = state.bookmarkedAt ?: state.updatedAt,
+                )
+            }
+            .sortedByDescending { it.savedAt }
 
     @Serializable
     private data class ReadingDataExport(

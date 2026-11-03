@@ -49,7 +49,11 @@ fun ReaderScreen(
     onSignOut: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val tabs = listOf("Following", "Yours")
+    val tabs = listOf(
+        stringResource(R.string.reader_tab_following),
+        stringResource(R.string.reader_tab_yours),
+        stringResource(R.string.reader_tab_bookmarks),
+    )
 
     var showCredits by remember { mutableStateOf(false) }
     var showTipPrompt by remember { mutableStateOf(false) }
@@ -249,6 +253,9 @@ fun ReaderScreen(
                     onReportAccount = { post ->
                         reportTarget = ReaderReportTarget(post.authorDid)
                     },
+                )
+                2 -> BookmarksContent(
+                    onOpenPost = { uri -> onNavigateToPost(uri, null, null, null, null) },
                 )
             }
         }

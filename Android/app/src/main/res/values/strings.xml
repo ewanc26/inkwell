@@ -73,6 +73,14 @@
     <string name="reader_bookmark">Bookmark</string>
     <string name="reader_remove_bookmark">Remove bookmark</string>
     <string name="reader_bookmarked">Bookmarked</string>
+    <string name="reader_bookmark_read">Read</string>
+    <string name="reader_bookmark_saved">Saved %1$s</string>
+    <string name="reader_bookmarks_untitled">Untitled</string>
+    <string name="reader_bookmarks_empty_title">No bookmarks yet</string>
+    <string name="reader_bookmarks_empty_message">Open an article and tap Bookmark to keep it here.</string>
+    <string name="reader_tab_following">Following</string>
+    <string name="reader_tab_yours">Yours</string>
+    <string name="reader_tab_bookmarks">Bookmarks</string>
     <string name="auth_sign_in_subtitle">Sign in with your AT Protocol account</string>
     <string name="auth_feature_read">Read long-form posts from any standard.site blog — directly from the AT Protocol network, no middleman.</string>
     <string name="auth_feature_subscribe">Subscribe to publications, leave comments, and recommend posts. Your data stays in your PDS.</string>

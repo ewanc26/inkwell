@@ -16,6 +16,21 @@ struct ArticleState: Codable {
     var isRead: Bool = false
     var isBookmarked: Bool = false
     var updatedAt: Date = Date()
+    // Optional so states written before bookmarks had their own timestamp
+    // still decode; `savedAt` falls back to `updatedAt` for those.
+    var bookmarkedAt: Date? = nil
+}
+
+/// One row of the Reader's Bookmarks feed.
+struct BookmarkedArticle: Identifiable, Equatable {
+    let articleID: String
+    let title: String
+    let isRead: Bool
+    /// When the article was bookmarked, or its last state change for
+    /// entries that predate `bookmarkedAt`.
+    let savedAt: Date
+
+    var id: String { articleID }
 }
 
 @MainActor
@@ -55,8 +70,24 @@ final class ArticleStateStore {
         state.title = title
         state.isBookmarked = bookmarked
         state.updatedAt = Date()
+        state.bookmarkedAt = bookmarked ? Date() : nil
         states[articleID] = state
         persist()
+    }
+
+    /// Bookmarked articles, most recently saved first. Reading an article
+    /// doesn't move it: `bookmarkedAt` only changes when the bookmark does.
+    func bookmarkedArticles() -> [BookmarkedArticle] {
+        states.compactMap { articleID, state in
+            guard state.isBookmarked else { return nil }
+            return BookmarkedArticle(
+                articleID: articleID,
+                title: state.title,
+                isRead: state.isRead,
+                savedAt: state.bookmarkedAt ?? state.updatedAt
+            )
+        }
+        .sorted { $0.savedAt > $1.savedAt }
     }
 
     /// Versioned portable envelope for the Settings → Export Data action.
@@ -113,7 +144,10 @@ final class ArticleStateStore {
                 title: article.title,
                 isRead: article.isRead,
                 isBookmarked: article.isBookmarked,
-                updatedAt: article.timestamp
+                updatedAt: article.timestamp,
+                // The export format carries no bookmark timestamp; fall back
+                // to the entry's own timestamp in the Bookmarks feed.
+                bookmarkedAt: nil
             )
             changes += 1
         }

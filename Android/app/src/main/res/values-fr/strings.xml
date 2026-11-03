@@ -73,6 +73,14 @@
     <string name="reader_bookmark">Mettre en signet</string>
     <string name="reader_remove_bookmark">Retirer le signet</string>
     <string name="reader_bookmarked">Mis en signet</string>
+    <string name="reader_bookmark_read">Lu</string>
+    <string name="reader_bookmark_saved">Enregistré le %1$s</string>
+    <string name="reader_bookmarks_untitled">Sans titre</string>
+    <string name="reader_bookmarks_empty_title">Aucun signet pour le moment</string>
+    <string name="reader_bookmarks_empty_message">Ouvrez un article et touchez « Mettre en signet » pour le retrouver ici.</string>
+    <string name="reader_tab_following">Abonnements</string>
+    <string name="reader_tab_yours">Vos articles</string>
+    <string name="reader_tab_bookmarks">Signets</string>
     <string name="auth_sign_in_subtitle">Connectez-vous avec votre compte AT Protocol</string>
     <string name="auth_feature_read">Lisez des articles longs depuis n\'importe quel blog standard.site — directement depuis le réseau AT Protocol, sans intermédiaire.</string>
     <string name="auth_feature_subscribe">Abonnez-vous à des publications, laissez des commentaires et recommandez des articles. Vos données restent dans votre PDS.</string>
