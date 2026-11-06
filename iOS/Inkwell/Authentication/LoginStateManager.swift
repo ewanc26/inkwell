@@ -31,6 +31,13 @@ import CryptoKit
 @MainActor
 @Observable
 final class LoginStateManager {
+    /// An isolated `deinit` routes through the runtime's back-deployed executor
+    /// shim on the Swift 6.2 toolchain, and releasing the instance synchronously
+    /// from XCTest aborts there with "pointer being freed was not allocated"
+    /// (swiftlang/swift#87316, fixed in Swift 6.3). Nothing runs at deinit, so
+    /// keep it nonisolated until the CI toolchain moves past the fix.
+    nonisolated deinit {}
+
     let logger = Logger(subsystem: "uk.ewancroft.Inkwell", category: "Auth")
     // MARK: - Public State
     var isAuthenticated = false
