@@ -78,7 +78,11 @@ jobs:
     needs: changes
     if: needs.changes.outputs.ios == 'true'
     runs-on: macos-15
-    timeout-minutes: 20
+    # The build step below allows 45 minutes and retries the whole xcodebuild
+    # invocation up to three times on simulator-host flakiness. A 20-minute
+    # job cap killed the job mid-retry (run 41625699334), so give the job room
+    # for the step's own timeout plus checkout and toolchain setup.
+    timeout-minutes: 55
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
