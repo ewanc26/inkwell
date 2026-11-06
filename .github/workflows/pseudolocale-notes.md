@@ -24,6 +24,17 @@ Status: device-stack blockers resolved; structural coverage landed, rendering co
 - Android debug builds set `isPseudoLocalesEnabled = true`, so every debug
   APK ships `en-rXA` (accented/expanded) and `ar-rXB` (RTL) variants —
   verified via `aapt2 dump resources`. Release builds stay clean.
+- `tools/i18n/check-swiftui-catalog-coverage.mjs` + the `ios-strings` CI
+  job — the SwiftUI equivalent of Android's `ComposeHardcodedText` rule:
+  every literal in a LocalizedStringKey position (`Text`, `Button`,
+  `navigationTitle`, `alert`, `String(localized:)`, …) must have a matching
+  `Localizable.xcstrings` entry. Failures name `file:line` + the literal,
+  which is also the screen/string failure-report mechanism below for the
+  author-time case. Letterless literals (bullets, markdown templates) are
+  skipped like the Android detector skips them; `// inkwell:i18n-verbatim`
+  suppresses lines that must never be translated. Landing it immediately
+  caught six live gaps from recent PRs (`Play video`, `. %@` /
+  `. Verified account`, `Links`, `Pinned post`, `Real-time Notifications`).
 
 ## Blocker update (2026-11-02)
 
@@ -48,7 +59,18 @@ Status: device-stack blockers resolved; structural coverage landed, rendering co
   Writer, Settings/moderation, notifications, and accessibility labels under
   both pseudo-locales.
 - A failure-report mechanism that names the screen/string rather than only
-  producing an image diff.
-- New-user-facing-string detection for SwiftUI (Android has the lint rule;
-  iOS has no equivalent check yet).
+  producing an image diff. (Author-time half done via the `ios-strings`
+  job above; the screenshot-diff half is still open.)
+- New-user-facing-string detection for SwiftUI — DONE (see `ios-strings`).
 - Failures must compose with the accessibility-size coverage from #83.
+
+## Known iOS gaps the catalog check does not cover (deliberate v1 scope)
+
+- Custom views taking `String` (not `LocalizedStringKey`) params bypass
+  localization entirely — e.g. `FormatButton(label:)` feeds
+  `.accessibilityLabel`, so the Writer toolbar labels (Bold, Italic,
+  Heading, Quote, Code, Link, Image) are English-only for VoiceOver. Fix
+  by taking `LocalizedStringKey`/`Text` params instead; then they fall
+  under the check automatically.
+- Runtime-built keys (`Text(someVariable)`) are invisible to static
+  analysis; prefer literals in copy positions so they stay covered.
