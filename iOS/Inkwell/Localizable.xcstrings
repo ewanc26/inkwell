@@ -1842,6 +1842,16 @@
         }
       }
     },
+    "No Bookmarks Yet": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "No Bookmarks Yet"
+          }
+        }
+      }
+    },
     "No comments yet.": {
       "localizations": {
         "en": {
@@ -1978,6 +1988,16 @@
           "stringUnit": {
             "state": "new",
             "value": "Only newer local choices will be changed."
+          }
+        }
+      }
+    },
+    "Open an article and tap Bookmark to keep it here.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Open an article and tap Bookmark to keep it here."
           }
         }
       }
@@ -2462,6 +2482,16 @@
         }
       }
     },
+    "Remove Bookmark": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Remove Bookmark"
+          }
+        }
+      }
+    },
     "Remove Cover Image": {
       "localizations": {
         "en": {
@@ -2618,6 +2648,16 @@
           "stringUnit": {
             "state": "new",
             "value": "Sans-Serif"
+          }
+        }
+      }
+    },
+    "Saved %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Saved %@"
           }
         }
       }
@@ -3568,6 +3608,66 @@
           "stringUnit": {
             "state": "new",
             "value": "yourname.bsky.social"
+          }
+        }
+      }
+    },
+    ". %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": ". %@"
+          }
+        }
+      }
+    },
+    ". Verified account": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": ". Verified account"
+          }
+        }
+      }
+    },
+    "Play video": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Play video"
+          }
+        }
+      }
+    },
+    "Links": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Links"
+          }
+        }
+      }
+    },
+    "Pinned post": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Pinned post"
+          }
+        }
+      }
+    },
+    "Real-time Notifications": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Real-time Notifications"
           }
         }
       }
