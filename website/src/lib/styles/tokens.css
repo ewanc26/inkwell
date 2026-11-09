@@ -264,7 +264,7 @@
       transparent 34rem
     );
     background-repeat: no-repeat;
-    color: var(--text-800);
+    color: var(--text-700);
     font-family: var(--font-family);
     font-size: var(--text-md);
     line-height: 1.65;
@@ -283,7 +283,7 @@
   h4,
   h5,
   h6 {
-    color: var(--text-900);
+    color: var(--text-800);
     font-family: var(--font-family);
     line-height: 1.1;
     margin-top: var(--space-lg);
@@ -347,11 +347,11 @@
   /* ── Links ──────────────────────────────────────────────────── */
 
   a {
-    color: var(--primary-500);
+    color: var(--primary-600);
     text-decoration: underline;
     text-decoration-color: color-mix(
       in oklch,
-      var(--primary-500) 35%,
+      var(--primary-600) 35%,
       transparent
     );
     text-underline-offset: 3px;
@@ -363,7 +363,7 @@
 
   a:hover {
     color: var(--primary-700);
-    text-decoration-color: var(--primary-500);
+    text-decoration-color: var(--primary-600);
     text-underline-offset: 4px;
   }
 
@@ -376,7 +376,7 @@
   strong,
   b {
     font-weight: 700;
-    color: var(--text-900);
+    color: var(--text-800);
   }
 
   em,

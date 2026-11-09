@@ -381,7 +381,7 @@
     display: inline-flex;
     align-items: center;
     min-height: var(--control-size);
-    color: var(--color-text-700);
+    color: var(--primary-600);
     text-decoration: none;
     white-space: nowrap;
     padding: var(--space-sm) 0;
@@ -391,7 +391,7 @@
   }
 
   .footer-link:hover {
-    color: var(--color-primary-500);
+    color: var(--color-primary-700);
     text-decoration: none;
   }
 
@@ -918,11 +918,11 @@
   }
 
   .prose a {
-    color: var(--color-primary-500);
+    color: var(--primary-600);
     text-decoration: underline;
     text-decoration-color: color-mix(
       in oklch,
-      var(--color-primary-500) 35%,
+      var(--primary-600) 35%,
       transparent
     );
     text-underline-offset: 0.2em;
@@ -930,7 +930,7 @@
 
   .prose a:hover {
     color: var(--color-primary-700);
-    text-decoration-color: var(--color-primary-500);
+    text-decoration-color: var(--primary-600);
   }
 
   .prose code {
