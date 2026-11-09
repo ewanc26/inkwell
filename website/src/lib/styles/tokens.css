@@ -264,7 +264,7 @@
       transparent 34rem
     );
     background-repeat: no-repeat;
-    color: var(--text-900);
+    color: var(--text-800);
     font-family: var(--font-family);
     font-size: var(--text-md);
     line-height: 1.65;
@@ -283,7 +283,7 @@
   h4,
   h5,
   h6 {
-    color: var(--text-950);
+    color: var(--text-900);
     font-family: var(--font-family);
     line-height: 1.1;
     margin-top: var(--space-lg);
@@ -376,7 +376,7 @@
   strong,
   b {
     font-weight: 700;
-    color: var(--text-950);
+    color: var(--text-900);
   }
 
   em,
