@@ -80,7 +80,7 @@
   </p>
 </section>
 
-<section class="site-container py-12">
+<section class="site-container section">
   <div class="feature-grid">
     <div class="feature-card">
       <div class="feature-icon"><Download class="h-5 w-5" /></div>

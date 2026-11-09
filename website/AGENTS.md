@@ -41,7 +41,7 @@ AI tools may be used when contributing. Add `Co-authored-by:` trailers crediting
 
 ## Design and Accessibility
 
-- Preserve the calm, cool-toned editorial system: typography-first hierarchy, a single restrained `#139500`-family accent, light/dark parity via `light-dark()`, app-matched card elevation only, and functional header blur only. Respect the explicit anti-pattern list.
+- Preserve the calm, dark-only editorial system: typography-first hierarchy, near-black teal surfaces, a single mint accent (`#2DD4BF`), tonal gradients on bordered cards, no shadows or header blur, and no light/dark parity. Respect the explicit anti-pattern list in `DESIGN.md`.
 - Keep semantic landmarks/headings, skip link, 44px mobile target, focus-visible rings, contrast, responsive nav, reduced-motion overrides, keyboard Escape/dismissal, and readable 65ch legal prose.
 - Mobile-nav focus is not trapped or restored and route changes do not explicitly close it except link clicks; test these lifecycle details when editing the shell.
 - Favor server-rendered/static markup and CSS. The OAuth endpoint must remain dynamic/available; do not globally prerender without verifying the resulting deployment semantics.
@@ -51,12 +51,12 @@ AI tools may be used when contributing. Add `Co-authored-by:` trailers crediting
 - pnpm is authoritative (`pnpm-lock.yaml` and `pnpm-workspace.yaml`; no npm lock). Vercel installs with `pnpm install` on Node 22. Run `pnpm install --frozen-lockfile`, `pnpm check`, and `pnpm build`.
 - `pnpm og` re-renders the social cover through headless Chromium; it needs a Chrome/Chromium binary (set `CHROME_PATH` if it isn't in a standard location) but no extra dependencies. It is not part of `pnpm build` — the PNG is committed, so the site builds and deploys without a browser.
 - There is no `lint` or test script. `pnpm format` writes files, so use `pnpm exec prettier --check --ignore-unknown .` for a non-mutating formatting check.
-- Preview home/privacy/terms, inspect `/client-metadata.json`, check all external/CTA/legal links, production metadata, 404s, missing font/network requests, light/dark contrast, reduced motion, keyboard/mobile navigation, and narrow/zoomed layouts.
+- Preview home/privacy/terms, inspect `/client-metadata.json`, check all external/CTA/legal links, production metadata, 404s, missing font/network requests, dark contrast, reduced motion, keyboard/mobile navigation, and narrow/zoomed layouts.
 - The site is British English only: preview the pages, confirm canonical/`og:locale`/`Content-Language` are `en-GB`, check that `/fr`, `/es`, and `/gd` are 404s, and that `/client-metadata.json` is byte-identical and unprefixed. There is no language switcher or `hreflang` alternate table to test.
 - Do not commit `node_modules/`, `.svelte-kit/`, `.vercel/`, build output, `.env`, local design-tool settings, or generated deployment state.
 
 ## Things that look wrong but are not
 
 - **Website links to self-hosted AltStore and F-Droid** rather than App Store / Play Store listings — those stores do not have published listings yet.
-- **`static/og-cover.png` is a committed binary** that duplicates what `tools/og-cover/template.html` describes — social scrapers don't run CSS, webfonts, or `light-dark()`, so the card has to ship as pixels.
+- **`static/og-cover.png` is a committed binary** that duplicates what `tools/og-cover/template.html` describes — social scrapers don't run CSS or webfonts, so the card has to ship as pixels.
 - **`static/` carries release artefacts as well as site assets** — the self-hosted AltStore IPAs and F-Droid repository live there because those channels are served from the same origin; they are not build output.

@@ -66,7 +66,7 @@
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 400 952"
     fill="none"
-    class="hero-mark mb-8 h-28 w-auto sm:h-36"
+    class="hero-mark mb-6 h-16 w-auto sm:h-20"
     aria-label={m.markLabel}
     role="img"
   >
@@ -78,21 +78,21 @@
       cx="200"
       cy="880"
       r="32"
-      fill="var(--color-accent, #64BB44)"
+      fill="var(--color-accent, #2dd4bf)"
     />
   </svg>
 
-  <h1 class="page-title page-title--hero hero-item" style="--i: 0">
-    {heroTitle[0]}<span class="text-accent">{m.hero.brand}</span>{heroTitle[1]}
-  </h1>
-
-  <p class="page-desc hero-item" style="--i: 1">{m.hero.description}</p>
-
-  <div class="page-meta hero-item" style="--i: 2" role="group" aria-label={m.hero.metaLabel}>
+  <div class="page-meta hero-item" style="--i: 0" role="group" aria-label={m.hero.metaLabel}>
     {#each m.hero.meta as item (item)}
       <span>{item}</span>
     {/each}
   </div>
+
+  <h1 class="page-title page-title--hero hero-item" style="--i: 1">
+    {heroTitle[0]}<span class="text-accent">{m.hero.brand}</span>{heroTitle[1]}
+  </h1>
+
+  <p class="page-desc hero-item" style="--i: 2">{m.hero.description}</p>
 
   <div class="hero-item flex flex-wrap items-center gap-4" style="--i: 3">
     <a href="#download" class="btn btn-primary active-press">
@@ -110,7 +110,7 @@
 </div>
 
 <!-- Download -->
-<section id="download" class="site-container scroll-mt-24 pb-12">
+<section id="download" class="site-container section scroll-mt-24">
   <h2 class="section-title">{m.download.heading}</h2>
   <p class="mb-12 max-w-[42rem] text-lg leading-relaxed text-pretty">
     {m.download.intro}
@@ -156,7 +156,7 @@
 </section>
 
 <!-- Screenshots -->
-<section class="site-container py-12">
+<section class="site-container section">
   <h2 class="section-title">{m.screenshots.heading}</h2>
   <p class="mb-12 max-w-[42rem] text-lg leading-relaxed text-pretty">
     {m.screenshots.intro}
@@ -188,7 +188,7 @@
 </section>
 
 <!-- Features (compressed) -->
-<section class="site-container pb-12">
+<section class="site-container section">
   <h2 class="section-title">{m.what.heading}</h2>
 
   <div class="feature-grid">
@@ -215,7 +215,7 @@
 </section>
 
 <!-- Secure by design (teaser) -->
-<section class="site-container py-12">
+<section class="site-container section">
   <div class="callout reveal" use:reveal={2}>
     <h2>{m.secure.heading}</h2>
     <p>{m.secure.body}</p>
@@ -226,7 +226,7 @@
 </section>
 
 <!-- Why not just the browser -->
-<section class="site-container py-12">
+<section class="site-container section">
   <h2 class="section-title">{m.compare.heading}</h2>
   <p class="mb-6 max-w-[42rem] text-lg leading-relaxed text-pretty">
     {m.compare.intro}
@@ -254,7 +254,7 @@
 </section>
 
 <!-- FAQ -->
-<section class="site-container py-12">
+<section class="site-container section">
   <h2 class="section-title">{m.faq.heading}</h2>
   <div class="faq-list">
     {#each m.faq.items as item (item.question)}
@@ -267,7 +267,7 @@
 </section>
 
 <!-- Availability -->
-<section class="site-container py-12">
+<section class="site-container section">
   <h2 class="section-title">{m.availability.heading}</h2>
   <div class="callout">
     <h3>{m.availability.cardHeading}</h3>
@@ -279,7 +279,7 @@
 <UserCarousel users={data.users} messages={shared} />
 
 <!-- Final CTA -->
-<section class="site-container pb-16 text-center">
+<section class="site-container section text-center">
   <a href="#download" class="btn btn-primary active-press">
     <Download class="h-4 w-4" />
     {m.finalCta}

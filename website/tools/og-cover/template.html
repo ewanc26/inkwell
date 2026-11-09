@@ -5,8 +5,8 @@
 
   This is the *source*, not a served page: it is rendered once to a PNG by
   tools/og-cover/render.mjs, and the PNG is what ships in static/. Social
-  scrapers won't run CSS custom properties, webfonts, or light-dark(), so
-  the design has to be baked into pixels.
+  scrapers won't run CSS custom properties or webfonts, so the design has to
+  be baked into pixels.
 
   It pulls the real token file rather than restating the palette, so the
   card can't drift from the site's colours. Fonts are re-declared here with
@@ -42,11 +42,11 @@
         Fixed 1200×630 (1.91:1) — the size every major scraper crops to.
         Everything below is unlayered, so it wins over tokens.css's
         @layer base defaults without needing !important. The card is a
-        light-theme rendering: a social image can't respond to the
-        viewer's colour scheme, and paper-on-ink is Inkwell's default.
+        dark-theme rendering, matching the site's near-black teal and
+        mint accent.
       */
       html {
-        color-scheme: light;
+        color-scheme: dark;
       }
 
       body {
@@ -59,7 +59,13 @@
         padding: 72px 80px 64px;
         display: flex;
         flex-direction: column;
-        background: var(--background-50);
+        background:
+          radial-gradient(
+            circle at 15% -10%,
+            rgba(45, 212, 191, 0.18),
+            transparent 34rem
+          ),
+          var(--background-50);
         color: var(--text-950);
         font-family: "Inter", sans-serif;
         -webkit-font-smoothing: antialiased;
@@ -130,7 +136,7 @@
       }
 
       /*
-        The only accent green besides the ink drop: a flat bar on the bottom
+        The only accent besides the ink drop: a flat mint bar on the bottom
         edge, so the card still reads as Inkwell's when a client renders it
         against dark chrome. Absolute, not fixed — headless Chromium's
         viewport is shorter than the page, and fixed would ride it up.
@@ -148,7 +154,7 @@
     <div class="masthead">
       <!--
         The Inkwell mark, geometry-identical to static/wordmark.svg and
-        InkwellMark.swift: serif I letterform above a brand-green ink drop.
+        InkwellMark.swift: serif I letterform above a mint ink drop.
       -->
       <svg
         xmlns="http://www.w3.org/2000/svg"

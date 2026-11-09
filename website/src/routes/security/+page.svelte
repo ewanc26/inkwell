@@ -36,7 +36,7 @@
   <p class="page-desc">{m.description}</p>
 </section>
 
-<section class="site-container py-12">
+<section class="site-container section">
   <div class="feature-grid">
     {#each CARDS as card (card.key)}
       {@const copy = m.cards[card.key]}
@@ -49,7 +49,7 @@
   </div>
 </section>
 
-<section class="site-container py-12">
+<section class="site-container section">
   <div class="callout reveal" use:reveal={2}>
     <h2>{m.legal.heading}</h2>
     <p>{m.legal.body}</p>

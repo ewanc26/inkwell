@@ -23,7 +23,7 @@
   const m = $derived(messages.users);
 </script>
 
-<section class="site-container py-12">
+<section class="site-container section">
   <h2 class="section-title">{m.heading}</h2>
   <p class="mb-6 max-w-[42rem] text-lg leading-relaxed text-pretty">
     {@html rich(m.intro)}

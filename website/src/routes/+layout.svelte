@@ -122,7 +122,7 @@
           <rect x="40" y="40" width="320" height="80" rx="16" fill="currentColor" />
           <rect x="125" y="120" width="150" height="640" fill="currentColor" />
           <rect x="40" y="760" width="320" height="80" rx="16" fill="currentColor" />
-          <circle cx="200" cy="880" r="32" fill="var(--color-accent, #64BB44)" />
+          <circle cx="200" cy="880" r="32" fill="var(--color-accent, #2dd4bf)" />
         </g>
       </svg>
       {SITE.title}

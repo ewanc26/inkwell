@@ -24,7 +24,7 @@
   <p class="page-desc">{m.description}</p>
 </section>
 
-<section class="site-container prose py-12">
+<section class="site-container prose section">
   <h2>{m.protocol.heading}</h2>
   <p>{@html rich(m.protocol.atproto)}</p>
   <p>{@html rich(m.protocol.standardSite)}</p>
@@ -41,7 +41,7 @@
 </section>
 
 <section
-  class="site-container contributors-section"
+  class="site-container section contributors-section"
   aria-labelledby="contributors-heading"
 >
   <div class="contributors-heading">
@@ -100,7 +100,7 @@
   {/if}
 </section>
 
-<section class="site-container py-12">
+<section class="site-container section">
   <div class="callout reveal" use:reveal={0}>
     <h2>{m.openSource.heading}</h2>
     <p>{m.openSource.body}</p>
@@ -110,7 +110,7 @@
   </div>
 </section>
 
-<section class="site-container pb-16">
+<section class="site-container section">
   <div class="callout reveal" use:reveal={1}>
     <h2>
       <Heart class="mr-1 inline h-4 w-4" aria-hidden="true" />
@@ -146,7 +146,7 @@
   .contributors-heading p {
     max-width: var(--measure-copy);
     margin: 0;
-    color: var(--color-text-800);
+    color: var(--color-text-700);
     line-height: 1.65;
     text-wrap: pretty;
   }
@@ -157,8 +157,7 @@
     gap: var(--space-xs);
     flex-shrink: 0;
     min-height: var(--control-size);
-    color: var(--color-primary-800);
-    font-family: var(--font-mono);
+    color: var(--color-primary-500);
     font-size: var(--text-xs);
     text-decoration: none;
   }
@@ -196,7 +195,7 @@
   }
 
   .contributor-row:hover {
-    background: var(--surface-sunken);
+    background: var(--color-background-300);
     color: var(--color-text-950);
     text-decoration: none;
   }
@@ -206,7 +205,7 @@
     height: 3rem;
     border-radius: 50%;
     object-fit: cover;
-    background: var(--color-background-200);
+    background: var(--color-background-300);
   }
 
   .contributor-copy {
@@ -226,7 +225,7 @@
   }
 
   .contributor-meta {
-    color: var(--color-text-800);
+    color: var(--color-text-700);
     font-family: var(--font-mono);
     font-size: var(--text-xs);
     line-height: 1.5;
@@ -235,7 +234,7 @@
   .contributor-arrow {
     display: inline-flex;
     flex-shrink: 0;
-    color: var(--color-primary-800);
+    color: var(--color-primary-500);
   }
 
   .contributors-unavailable {
@@ -244,7 +243,7 @@
     padding: var(--space-lg);
     border: 1px dashed var(--surface-color);
     border-radius: var(--radius-lg);
-    color: var(--color-text-800);
+    color: var(--color-text-700);
     line-height: 1.65;
   }
 
@@ -253,7 +252,7 @@
      markup and would prune a plain descendant selector. Still scoped by
      the class, so it can't leak past this block. */
   .contributors-unavailable :global(a) {
-    color: var(--color-primary-800);
+    color: var(--color-primary-500);
   }
 
   @media (max-width: 700px) {

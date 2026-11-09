@@ -4,8 +4,8 @@
  *   node tools/og-cover/render.mjs
  *
  * The card has to be a raster image: social scrapers don't run CSS custom
- * properties, webfonts, or light-dark(), so the design is baked to pixels
- * once, here, and the PNG is committed alongside its source.
+ * properties or webfonts, so the design is baked to pixels once, here, and
+ * the PNG is committed alongside its source.
  *
  * Chromium is the renderer because it's the engine the site is designed
  * against — no second layout implementation to keep honest. Two details are

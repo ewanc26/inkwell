@@ -1,124 +1,124 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-08-16T00:00:00.000Z",
+  "generatedAt": "2026-11-09T00:00:00.000Z",
   "title": "Design System: Inkwell",
   "extensions": {
     "colorMeta": {
       "text": {
         "role": "primary-text",
         "displayName": "Text",
-        "canonical": "#162211",
+        "canonical": "#CFE2DE",
         "tonalRamp": [
-          "#F1F6EE",
-          "#E2EEDD",
-          "#C5DDBB",
-          "#A8CC99",
-          "#8CBB77",
-          "#6FAA55",
-          "#598844",
-          "#162211"
+          "#E7F4F1",
+          "#CFE2DE",
+          "#A9C2BE",
+          "#8CA6A3",
+          "#78928F",
+          "#416066",
+          "#2A474C",
+          "#061012"
         ]
       },
       "background": {
         "role": "primary-bg",
         "displayName": "Background",
-        "canonical": "#EFF9EC",
+        "canonical": "#0B1416",
         "tonalRamp": [
-          "#EFF9EC",
-          "#E0F2D9",
-          "#C1E6B3",
-          "#A2D98C",
-          "#83CC66",
-          "#64BF40",
-          "#509933",
-          "#0A1306"
+          "#0B1416",
+          "#121F24",
+          "#1A2B31",
+          "#24383E",
+          "#2F4A50",
+          "#3F5A60",
+          "#567176",
+          "#E7F4F1"
         ]
       },
       "primary": {
         "role": "primary-accent",
-        "displayName": "Primary Green",
-        "canonical": "#68B34D",
+        "displayName": "Primary Teal",
+        "canonical": "#2DD4BF",
         "tonalRamp": [
-          "#F0F7ED",
-          "#E1F0DB",
-          "#C2E0B8",
-          "#A4D194",
-          "#86C270",
-          "#68B34D",
-          "#538F3D",
-          "#29471F"
+          "#0F766E",
+          "#14B8A6",
+          "#2DD4BF",
+          "#5EEAD4",
+          "#99F6E4",
+          "#CCFBF1",
+          "#E6FFFB",
+          "#F2FFFD"
         ]
       },
       "accent": {
         "role": "secondary-accent",
-        "displayName": "Accent Green",
-        "canonical": "#64BB44",
+        "displayName": "Accent Mint",
+        "canonical": "#2DD4BF",
         "tonalRamp": [
-          "#EFF8EC",
-          "#E0F1DA",
-          "#C1E4B4",
-          "#A2D68F",
-          "#83C969",
-          "#64BB44",
-          "#509636",
-          "#284B1B"
+          "#0F766E",
+          "#14B8A6",
+          "#2DD4BF",
+          "#5EEAD4",
+          "#99F6E4",
+          "#CCFBF1",
+          "#E6FFFB",
+          "#F2FFFD"
         ]
       },
       "surface": {
         "role": "surface-bg",
-        "displayName": "Surface",
-        "canonical": "#C1E6B3",
+        "displayName": "Raised Surface",
+        "canonical": "#121F24",
         "tonalRamp": [
-          "#EFF9EC",
-          "#E0F2D9",
-          "#C1E6B3",
-          "#A2D98C",
-          "#83CC66",
-          "#64BF40",
-          "#509933",
-          "#0A1306"
+          "#0B1416",
+          "#121F24",
+          "#1A2B31",
+          "#24383E",
+          "#2F4A50",
+          "#3F5A60",
+          "#567176",
+          "#E7F4F1"
         ]
       },
       "muted": {
         "role": "muted-text",
         "displayName": "Muted",
-        "canonical": "#598844",
+        "canonical": "#8CA6A3",
         "tonalRamp": [
-          "#C5DDBB",
-          "#A8CC99",
-          "#8CBB77",
-          "#6FAA55",
-          "#598844",
-          "#426633",
-          "#2C4422",
-          "#162211"
+          "#E7F4F1",
+          "#CFE2DE",
+          "#A9C2BE",
+          "#8CA6A3",
+          "#78928F",
+          "#416066",
+          "#2A474C",
+          "#061012"
         ]
       }
     },
     "typographyMeta": {
       "display": {
         "displayName": "Display",
-        "purpose": "Hero h1 only. One per page at 800 weight, fluid clamp(2.5rem, 6vw, 4.5rem), -0.05em tracking."
+        "purpose": "Hero h1 only. One per page at 700 weight, fluid clamp(2.8rem, 7.5vw, 5.2rem), -0.045em tracking."
       },
       "headline": {
         "displayName": "Headline",
-        "purpose": "Card and callout headings (800 weight, fluid clamp(1.25rem, 1.5vw + 1rem, 2rem))."
+        "purpose": "Feature-card headings (700 weight, 1.12rem, 1.3 line-height)."
       },
       "section": {
         "displayName": "Section Title",
-        "purpose": "Landing-page section h2 (700 weight, fluid clamp(1.6rem, 3.5vw, 2.4rem), -0.035em)."
+        "purpose": "Landing-page section h2 and callout headings (700 weight, fluid clamp(1.7rem, 3.5vw, 2.7rem), -0.035em)."
       },
       "body": {
         "displayName": "Body",
-        "purpose": "Default prose, text-900 on background-50, capped at 60–70ch."
+        "purpose": "Default prose, text-900 on background-50, capped at 70ch for legal copy and 42rem for marketing leads."
       },
       "label": {
         "displayName": "Label",
-        "purpose": "Button text, semibold at small sizes."
+        "purpose": "Button text, 700 weight at 0.9rem."
       },
       "mono": {
         "displayName": "Mono",
-        "purpose": "Navigation, footer, page metadata, captions, and code — JetBrains Mono."
+        "purpose": "Code, compact row metadata, comparison headers, and raw URLs — JetBrains Mono."
       }
     },
     "shadows": [],
@@ -135,9 +135,18 @@
       }
     ],
     "breakpoints": [
-      { "name": "sm", "value": "640px" },
-      { "name": "md", "value": "800px" },
-      { "name": "lg", "value": "1024px" }
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "800px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
     ]
   },
   "components": [
@@ -145,101 +154,106 @@
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "The single most important action on the page — high-contrast inverse (text-950 fill, background-50 text). Used sparingly: hero CTA and one per download card.",
+      "description": "The single most important action on the page. Mint fill with a dark teal label, fully rounded. Used sparingly: hero CTA and one per download card.",
       "html": "<a class=\"ds-btn-primary\"><svg class=\"ds-btn-icon\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 20h9\"/><path d=\"M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z\"/></svg>Get Inkwell</a>",
-      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; font-weight: 600; font-size: clamp(0.8rem, 0.75vw + 0.6rem, 1rem); line-height: 1.4; color: #EFF9EC; background-color: #0B1109; border: 1px solid transparent; border-radius: 12px; text-decoration: none; cursor: pointer; transition: background-color 0.2s cubic-bezier(0.25, 1, 0.5, 1), color 0.2s cubic-bezier(0.25, 1, 0.5, 1); } .ds-btn-primary:hover { background-color: #29471F; } .ds-btn-primary:focus-visible { outline: 3px solid #68B34D; outline-offset: 2px; } .ds-btn-icon { width: 1rem; height: 1rem; flex-shrink: 0; }"
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 2.9rem; padding: 0.7rem 1.15rem; font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; font-weight: 700; font-size: 0.9rem; line-height: 1; color: #042F2E; background-color: #2DD4BF; border: 1px solid #2DD4BF; border-radius: 9999px; text-decoration: none; cursor: pointer; transition: background-color 0.2s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.2s cubic-bezier(0.25, 1, 0.5, 1), transform 0.2s cubic-bezier(0.25, 1, 0.5, 1); } .ds-btn-primary:hover { background-color: #0F766E; border-color: #0F766E; } .ds-btn-primary:active { transform: scale(0.98); } .ds-btn-primary:focus-visible { outline: 3px solid #5EEAD4; outline-offset: 3px; } .ds-btn-icon { width: 1rem; height: 1rem; flex-shrink: 0; }"
     },
     {
       "name": "Outline Button",
       "kind": "button",
       "refersTo": "button-outline",
-      "description": "Secondary action alongside the primary button. Raised surface, hairline border.",
+      "description": "Secondary action alongside the primary button. Transparent surface, hairline border, mint-tinted hover.",
       "html": "<a class=\"ds-btn-outline\"><svg class=\"ds-btn-icon\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M8 12h8\"/><path d=\"M12 8v8\"/></svg>Learn More</a>",
-      "css": ".ds-btn-outline { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; font-weight: 600; font-size: clamp(0.8rem, 0.75vw + 0.6rem, 1rem); line-height: 1.4; color: #0B1109; background-color: #E0F2D9; border: 1px solid #C1E6B3; border-radius: 12px; text-decoration: none; cursor: pointer; transition: background-color 0.2s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.2s cubic-bezier(0.25, 1, 0.5, 1), color 0.2s cubic-bezier(0.25, 1, 0.5, 1); } .ds-btn-outline:hover { background-color: #EFF9EC; border-color: #68B34D; color: #3E6B2E; } .ds-btn-outline:focus-visible { outline: 3px solid #68B34D; outline-offset: 2px; } .ds-btn-icon { width: 1rem; height: 1rem; flex-shrink: 0; }"
+      "css": ".ds-btn-outline { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 2.9rem; padding: 0.7rem 1.15rem; font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; font-weight: 700; font-size: 0.9rem; line-height: 1; color: #E7F4F1; background-color: transparent; border: 1px solid #24383E; border-radius: 9999px; text-decoration: none; cursor: pointer; transition: background-color 0.2s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.2s cubic-bezier(0.25, 1, 0.5, 1); } .ds-btn-outline:hover { background-color: rgba(45, 212, 191, 0.1); border-color: #2DD4BF; } .ds-btn-outline:focus-visible { outline: 3px solid #5EEAD4; outline-offset: 3px; } .ds-btn-icon { width: 1rem; height: 1rem; flex-shrink: 0; }"
     },
     {
       "name": "Feature Card",
       "kind": "card",
       "refersTo": "feature-card",
-      "description": "Raised surface with a hairline border — tonal differentiation only, no drop shadow. Icon + heading + body.",
+      "description": "Tonal gradient surface with a hairline border and 20px radius. Icon + heading + body; hover lifts 2px and shifts the border toward mint.",
       "html": "<div class=\"ds-feature-card\"><div class=\"ds-feature-icon\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 19.5A2.5 2.5 0 0 1 6.5 17H20\"/><path d=\"M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z\"/></svg></div><h3 class=\"ds-feature-heading\">Feature Name</h3><p class=\"ds-feature-text\">Description of what this feature does and why it matters to the user.</p></div>",
-      "css": ".ds-feature-card { padding: 2rem; border-radius: 16px; background-color: #E0F2D9; border: 1px solid #C1E6B3; } .ds-feature-card:hover { background-color: #EFF9EC; border-color: #A2D98C; } .ds-feature-icon { width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center; border-radius: 6px; background-color: #F0F7ED; color: #538F3D; margin-bottom: 1rem; } .ds-feature-heading { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; font-size: clamp(1rem, 1vw + 0.8rem, 1.25rem); font-weight: 700; line-height: 1.3; margin: 0 0 0.5rem 0; color: #0B1109; } .ds-feature-text { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; font-size: 1rem; font-weight: 400; line-height: 1.65; margin: 0; color: #2C4422; }"
+      "css": ".ds-feature-card { padding: 1.5rem; border-radius: 20px; background: linear-gradient(180deg, #121F24, #0B1416); border: 1px solid #24383E; transition: background 0.2s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.2s cubic-bezier(0.25, 1, 0.5, 1), transform 0.2s cubic-bezier(0.25, 1, 0.5, 1); } .ds-feature-card:hover { background: linear-gradient(180deg, #1A2B31, #0B1416); border-color: #2F6F6A; transform: translateY(-2px); } .ds-feature-icon { width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center; border-radius: 10px; background-color: rgba(45, 212, 191, 0.12); border: 1px solid rgba(45, 212, 191, 0.2); color: #2DD4BF; margin-bottom: 1rem; } .ds-feature-heading { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; font-size: 1.12rem; font-weight: 700; line-height: 1.3; margin: 0 0 0.5rem 0; color: #E7F4F1; } .ds-feature-text { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; font-size: 1rem; font-weight: 400; line-height: 1.65; margin: 0; color: #8CA6A3; }"
     },
     {
       "name": "Feature Icon",
       "kind": "custom",
       "refersTo": "feature-icon",
-      "description": "Small primary-tinted square with an SVG icon. Visual anchor inside feature cards.",
+      "description": "Small mint-tinted square with an SVG icon. Visual anchor inside feature cards.",
       "html": "<div class=\"ds-feature-icon-standalone\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><polygon points=\"16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76z\"/></svg></div>",
-      "css": ".ds-feature-icon-standalone { width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center; border-radius: 6px; background-color: #F0F7ED; color: #538F3D; }"
+      "css": ".ds-feature-icon-standalone { width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center; border-radius: 10px; background-color: rgba(45, 212, 191, 0.12); border: 1px solid rgba(45, 212, 191, 0.2); color: #2DD4BF; }"
     },
     {
       "name": "Navigation Link",
       "kind": "nav",
       "refersTo": "nav-link",
-      "description": "Desktop navigation item — JetBrains Mono, muted by default, primary underline on hover/active.",
+      "description": "Desktop navigation item — sans-serif, muted by default, heading-white on hover/active with a mint underline.",
       "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-link\" href=\"#\">Home</a><a class=\"ds-nav-link\" href=\"#\">Privacy</a><a class=\"ds-nav-link\" href=\"#\">Terms</a><a class=\"ds-nav-link\" href=\"#\">Source</a></nav>",
-      "css": ".ds-nav { display: flex; align-items: center; gap: 1rem; } .ds-nav-link { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: clamp(0.64rem, 0.6vw + 0.5rem, 0.8rem); font-weight: 400; letter-spacing: 0.03em; line-height: 1.4; color: #598844; text-decoration: none; padding: 0.5rem 0; box-shadow: inset 0 -2px transparent; transition: color 0.2s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s cubic-bezier(0.25, 1, 0.5, 1); } .ds-nav-link:hover, .ds-nav-link.active { color: #3E6B2E; box-shadow: inset 0 -2px #68B34D; } .ds-nav-link:focus-visible { outline: 3px solid #68B34D; outline-offset: 2px; border-radius: 16px; }"
+      "css": ".ds-nav { display: flex; align-items: center; gap: 1rem; } .ds-nav-link { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; font-size: 0.9rem; font-weight: 400; line-height: 1.4; color: #8CA6A3; text-decoration: none; padding: 0.5rem 0; box-shadow: inset 0 -2px transparent; transition: color 0.2s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s cubic-bezier(0.25, 1, 0.5, 1); } .ds-nav-link:hover, .ds-nav-link.active { color: #E7F4F1; box-shadow: inset 0 -2px #2DD4BF; } .ds-nav-link:focus-visible { outline: 3px solid #5EEAD4; outline-offset: 2px; border-radius: 4px; }"
     },
     {
       "name": "Brand Mark",
       "kind": "custom",
       "refersTo": "brand-mark",
-      "description": "Site header: ink-bottle capsule SVG (currentColor + green accent dot) + wordmark. No tagline.",
-      "html": "<a class=\"ds-brand\" href=\"#\"><svg class=\"ds-brand-icon\" width=\"32\" height=\"32\" viewBox=\"0 0 512 512\" fill=\"none\"><rect x=\"108\" y=\"64\" width=\"296\" height=\"44\" rx=\"16\" fill=\"currentColor\"/><rect x=\"189\" y=\"108\" width=\"134\" height=\"290\" fill=\"currentColor\"/><rect x=\"108\" y=\"398\" width=\"296\" height=\"44\" rx=\"16\" fill=\"currentColor\"/><circle cx=\"256\" cy=\"468\" r=\"20\" fill=\"#64BB44\"/></svg><span class=\"ds-brand-text\">Inkwell</span></a>",
-      "css": ".ds-brand { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: #0B1109; } .ds-brand:hover { color: #3E6B2E; text-decoration: none; } .ds-brand-icon { width: 1.5rem; height: 1.5rem; flex-shrink: 0; color: #0B1109; } .ds-brand-text { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; font-size: clamp(1rem, 1vw + 0.8rem, 1.25rem); font-weight: 700; line-height: 1.1; }"
+      "description": "Site header: ink-bottle capsule SVG (currentColor + mint accent dot) + wordmark. No tagline.",
+      "html": "<a class=\"ds-brand\" href=\"#\"><svg class=\"ds-brand-icon\" width=\"32\" height=\"32\" viewBox=\"0 0 400 952\" fill=\"none\"><rect x=\"40\" y=\"40\" width=\"320\" height=\"80\" rx=\"16\" fill=\"currentColor\"/><rect x=\"125\" y=\"120\" width=\"150\" height=\"640\" fill=\"currentColor\"/><rect x=\"40\" y=\"760\" width=\"320\" height=\"80\" rx=\"16\" fill=\"currentColor\"/><circle cx=\"200\" cy=\"880\" r=\"32\" fill=\"#2DD4BF\"/></svg><span class=\"ds-brand-text\">Inkwell</span></a>",
+      "css": ".ds-brand { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: #E7F4F1; } .ds-brand:hover { color: #2DD4BF; text-decoration: none; } .ds-brand-icon { width: 1.5rem; height: 1.5rem; flex-shrink: 0; color: #E7F4F1; } .ds-brand-text { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; font-size: 1.0625rem; font-weight: 700; line-height: 1.1; }"
     },
     {
       "name": "Callout Container",
       "kind": "card",
       "refersTo": "callout",
-      "description": "Narrower, centered variant of the raised surface — used for the security/privacy callout.",
+      "description": "Narrower left-aligned tonal surface used for the security, availability, and comparison callouts.",
       "html": "<div class=\"ds-callout\"><h2 class=\"ds-callout-heading\">Secure by design</h2><p class=\"ds-callout-text\">Inkwell uses OAuth 2.1 to sign in to your Personal Data Server. Your browser opens once to approve access — no password is ever seen or stored by the app.</p><a class=\"ds-callout-link\" href=\"#\">Learn more <svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></a></div>",
-      "css": ".ds-callout { max-width: 42rem; margin: 0 auto; padding: 2rem; border-radius: 16px; background-color: #E0F2D9; border: 1px solid #C1E6B3; text-align: center; } .ds-callout-heading { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; font-size: clamp(1.25rem, 1.5vw + 1rem, 2rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; margin: 0 0 1rem 0; color: #0B1109; } .ds-callout-text { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; font-size: 1rem; font-weight: 400; line-height: 1.65; margin: 0 0 1rem 0; color: #2C4422; } .ds-callout-link { display: inline-flex; align-items: center; gap: 0.25rem; font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; font-size: clamp(0.8rem, 0.75vw + 0.6rem, 1rem); font-weight: 600; color: #538F3D; text-decoration: none; transition: color 0.2s cubic-bezier(0.25, 1, 0.5, 1); } .ds-callout-link:hover { color: #3E6B2E; text-decoration: underline; text-decoration-color: #68B34D; text-underline-offset: 4px; }"
+      "css": ".ds-callout { max-width: 42rem; padding: 1.5rem; border-radius: 20px; background: linear-gradient(180deg, #121F24, #0B1416); border: 1px solid #24383E; text-align: left; } .ds-callout-heading { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; font-size: clamp(1.7rem, 3.5vw, 2.7rem); font-weight: 700; letter-spacing: -0.035em; line-height: 1.12; margin: 0 0 1rem 0; color: #E7F4F1; } .ds-callout-text { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; font-size: 1rem; font-weight: 400; line-height: 1.65; margin: 0 0 1rem 0; color: #8CA6A3; } .ds-callout-link { display: inline-flex; align-items: center; gap: 0.25rem; font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; font-size: 0.9rem; font-weight: 700; color: #2DD4BF; text-decoration: none; transition: color 0.2s cubic-bezier(0.25, 1, 0.5, 1); } .ds-callout-link:hover { color: #99F6E4; text-decoration: underline; text-decoration-color: #2DD4BF; text-underline-offset: 4px; }"
     }
   ],
   "narrative": {
     "northStar": "The Traditional Meets Technical",
-    "overview": "A high-contrast editorial register shared with ewancroft.uk. Green-tinted near-black on near-white, Variable Inter set with tight display tracking, JetBrains Mono for the technical register, and surfaces distinguished by tonal value and a hairline border rather than by decoration. This replaces the earlier cool-navy/glassmorphism system: where that reached for translucent headers and app-matched shadows, this one trusts contrast — the page is nearly white, the type is nearly black, and the single green accent is reserved for interactive signals. It feels at home in the AT Protocol ecosystem: technical without being cold, warm without being beige.",
+    "overview": "A dark, teal-tinted editorial register aligned with Fathom. Near-black teal surfaces, a soft radial mint glow, large tight-set Inter, and a single mint accent give the site a quiet, bookish confidence. Cards use a restrained gradient and a hairline border rather than shadows; buttons are pills; the shell is 1080px wide. It remains technical enough for the AT Protocol audience without becoming a protocol explainer.",
     "keyCharacteristics": [
-      "High contrast first: body text-900 on background-50, headings text-950, checked against 4.5:1",
-      "Typography-first hierarchy: weight, size, and tight tracking do the work; color is secondary",
-      "Mono as a technical register: nav, footer, metadata, captions, and section labels speak in JetBrains Mono",
-      "Tonal + border surfaces: cards and lists step up via raised surface and a 1px border — no drop shadows anywhere",
-      "Single-accent discipline: one green for links, focus rings, markers, and the wordmark dot",
-      "Light/dark parity: every color is a light-dark() pair defined once per token",
-      "Calm motion: exponential-eased entrances, decisive press feedback, reduced-motion collapse",
-      "Ecosystem-native: sits beside the personal site and the AT Protocol ecosystem's indie-web confidence"
+      "Dark-only: #0B1416 page, #121F24 raised surface, no light scheme or light-dark() tokens",
+      "High contrast: text-900 on background-50, text-950 headings, text-700 muted copy",
+      "Large editorial type: 5.2rem hero, 2.7rem section headings, tight tracking",
+      "One mint accent (#2DD4BF) for links, focus, eyebrows, active nav, the wordmark dot and primary actions",
+      "Tonal + border surfaces: 20px cards with a subtle vertical gradient, no shadows or glass",
+      "Pill buttons and a 1080px shell, matching Fathom's proportions",
+      "Sans navigation and footer; JetBrains Mono reserved for code and compact metadata",
+      "Calm motion: exponential-eased entrances, decisive press feedback, reduced-motion collapse"
     ],
     "rules": [
       {
+        "name": "The Dark-Only Rule",
+        "body": "The site has one colour scheme. Do not add a prefers-color-scheme branch, theme toggle or light-dark() token. A light version would be a separate visual system.",
+        "section": "colors"
+      },
+      {
         "name": "The High-Contrast Rule",
-        "body": "Body text is text-900 on background-50; headings are text-950. Muted text is text-600, still checked to clear 4.5:1 against background-50. Never place body text on text-700 or lighter.",
+        "body": "Body text is text-900 on background-50; headings are text-950. Muted copy is text-700 and must clear 4.5:1 against its surface. Never use text-500 or darker for body copy.",
         "section": "colors"
       },
       {
         "name": "The One Accent Rule",
-        "body": "Accent green appears on links, focus rings, list markers, the active nav underline, and the wordmark dot — as the interactive signal, not as a decorative surface. A primary button is dark (text-950), not green.",
+        "body": "Mint is the interactive signal: links, focus rings, list markers, active nav, eyebrow labels, the wordmark dot and primary buttons. Primary buttons use a dark teal #042F2E label, never white.",
         "section": "colors"
       },
       {
         "name": "The Tonal + Border Rule",
-        "body": "Cards, lists, and callouts differentiate from the page via the raised surface and a 1px border. There are no drop shadows, no gradients, no glass.",
-        "section": "colors"
+        "body": "Cards, lists and callouts step away from the page through a subtle gradient plus a 1px border. There are no drop shadows, no glass and no decorative blur.",
+        "section": "elevation"
       },
       {
         "name": "The Typography-First Rule",
-        "body": "Visual hierarchy is established through weight, size, and tracking — never through color splashes. If a heading needs a color accent to feel important, the weight or size is wrong.",
+        "body": "Visual hierarchy is established through weight, size and tracking — never through colour splashes. If a heading needs an accent colour to feel important, the weight or size is wrong.",
         "section": "typography"
       },
       {
         "name": "The One Display Rule",
-        "body": "The hero h1 is the only element at Display weight (800) on any page. Section headings step down to Section Title (700).",
+        "body": "The hero h1 is the only element at Display size (700) on any page. Section headings step down to Section Title (700, 2.7rem maximum).",
         "section": "typography"
       },
       {
         "name": "The No-Glass, No-Shadow Rule",
-        "body": "No backdrop-filter, no box-shadow, no gradients. The sticky nav is a solid background-50 bar with a bottom border — legibility comes from contrast, not blur.",
+        "body": "No box-shadow, no backdrop-filter, no glassmorphism. The only gradient is the surface treatment on cards/callouts and the radial page glow.",
         "section": "elevation"
       },
       {
@@ -249,25 +263,25 @@
       }
     ],
     "dos": [
-      "Do keep body text text-900 on background-50 and headings text-950 — high contrast is the system's signature",
-      "Do use the mono register (JetBrains Mono) for nav, footer, metadata, and captions",
-      "Do differentiate surfaces with tonal value + a 1px border, never a shadow",
+      "Do keep body text text-900 on background-50 and headings text-950 — contrast is the system's signature",
+      "Do treat the site as dark-only; update tokens rather than adding a light variant",
+      "Do use mint (primary-500) for interactive signals and primary actions",
+      "Do differentiate surfaces with a subtle gradient + 1px border, never a shadow",
       "Do use text-wrap: balance on headings and text-wrap: pretty on prose",
-      "Do cap body text lines at 60–70ch",
-      "Do test every color against its background for ≥4.5:1 contrast (body) and ≥3:1 (large text)",
+      "Do cap body text lines at 60–70ch for legal copy and 42rem for marketing leads",
+      "Do test every colour against its background for ≥4.5:1 contrast (body) and ≥3:1 (large text)",
       "Do provide a prefers-reduced-motion fallback for every animation",
-      "Do support both light and dark color schemes via light-dark()",
-      "Do reserve the accent green for interactive signals (links, focus, markers, the wordmark dot)",
+      "Do use sans for nav, footer and eyebrows; reserve JetBrains Mono for code and compact metadata",
       "Do trust the reader — the AT Protocol audience is technically literate; state the value clearly without over-explaining"
     ],
     "donts": [
-      "Don't use drop shadows, gradients, or backdrop-filter anywhere — the sticky nav is a solid bar",
-      "Don't make a primary button accent-green — primary buttons are text-950/background-50 inverse",
-      "Don't use the SaaS startup template kit: no gradient hero backgrounds, no animated metric counters, no glassmorphism",
-      "Don't set body text lighter than text-700 against the page background",
-      "Don't nest cards inside cards",
-      "Don't use position: absolute inside overflow: hidden containers for dropdowns",
-      "Don't animate CSS layout properties — use transform and opacity for compositor-only animations",
+      "Don't add a light theme, prefers-color-scheme branch or theme toggle",
+      "Don't use drop shadows, backdrop-filter or glassmorphism",
+      "Don't use the SaaS startup template kit: no gradient hero backgrounds, no animated counters, no glassmorphism",
+      "Don't make a primary button an inverse white/dark pair — primary actions are mint with dark teal labels",
+      "Don't set body copy lighter than text-700 against the page background",
+      "Don't nest cards inside cards — if a container needs a sub-container, reconsider the layout",
+      "Don't animate CSS layout properties — use transform and opacity only",
       "Don't over-explain the AT Protocol to the audience — link to atproto.com for background; the site sells the app, not the protocol"
     ]
   }

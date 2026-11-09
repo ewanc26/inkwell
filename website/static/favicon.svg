@@ -1,15 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 952 952">
-  <style>
-    .ink { fill: #111111; }
-    @media (prefers-color-scheme: dark) {
-      .ink { fill: #f5f5f5; }
-    }
-  </style>
+  <rect width="952" height="952" rx="210" fill="#0b1416" />
 
   <g transform="translate(276 0)">
-    <rect class="ink" x="40" y="40" width="320" height="80" rx="16"/>
-    <rect class="ink" x="125" y="120" width="150" height="640"/>
-    <rect class="ink" x="40" y="760" width="320" height="80" rx="16"/>
-    <circle cx="200" cy="880" r="32" fill="#139500"/>
+    <rect x="40" y="40" width="320" height="80" rx="16" fill="#e7f4f1" />
+    <rect x="125" y="120" width="150" height="640" fill="#e7f4f1" />
+    <rect x="40" y="760" width="320" height="80" rx="16" fill="#e7f4f1" />
+    <circle cx="200" cy="880" r="32" fill="#2dd4bf" />
   </g>
 </svg>

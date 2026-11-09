@@ -1,64 +1,64 @@
 ---
 name: Inkwell
-description: A high-contrast editorial brand system shared with ewancroft.uk — green-tinted near-black on near-white, Variable Inter, mono labels, tonal surfaces, and zero decorative decoration.
+description: A dark-only teal editorial system aligned with Fathom — near-black teal surfaces, a mint accent, large type, pill actions, rounded gradient-bordered cards, and a soft radial glow.
 colors:
   accent:
-    value: "rgb(100 187 68)"
-    dark: "rgb(100 187 68)"
-    canonical: "#64BB44"
+    value: "rgb(45 212 191)"
+    canonical: "#2DD4BF"
     role: primary-accent
   text-900:
-    value: "rgb(22 34 17)"
-    dark: "rgb(226 238 221)"
+    value: "rgb(207 226 222)"
     role: primary-text
   text-950:
-    value: "rgb(11 17 9)"
-    dark: "rgb(241 246 238)"
+    value: "rgb(231 244 241)"
     role: heading-text
   background-50:
-    value: "rgb(239 249 236)"
-    dark: "rgb(10 19 6)"
+    value: "rgb(11 20 22)"
     role: primary-bg
   surface:
-    value: "rgb(193 230 179)"
-    dark: "rgb(39 77 25)"
+    value: "rgb(18 31 36)"
     role: surface-bg
   muted:
-    value: "rgb(89 136 68)"
-    dark: "rgb(140 187 119)"
+    value: "rgb(140 166 163)"
     role: muted-text
 typography:
   display:
     fontFamily: "InterVariable, Inter, ui-sans-serif, system-ui, sans-serif"
-    fontWeight: 800
-    fontSize: "clamp(2.5rem, 6vw, 4.5rem)"
-    lineHeight: 0.95
-    letterSpacing: "-0.05em"
+    fontWeight: 700
+    fontSize: "clamp(2.8rem, 7.5vw, 5.2rem)"
+    lineHeight: 1.04
+    letterSpacing: "-0.045em"
   headline:
     fontFamily: "InterVariable, Inter, ui-sans-serif, system-ui, sans-serif"
-    fontWeight: 800
-    fontSize: "clamp(1.25rem, 1.5vw + 1rem, 2rem)"
-    lineHeight: 1.1
+    fontWeight: 700
+    fontSize: "1.12rem"
+    lineHeight: 1.3
+  section:
+    fontFamily: "InterVariable, Inter, ui-sans-serif, system-ui, sans-serif"
+    fontWeight: 700
+    fontSize: "clamp(1.7rem, 3.5vw, 2.7rem)"
+    lineHeight: 1.12
+    letterSpacing: "-0.035em"
   body:
     fontFamily: "InterVariable, Inter, ui-sans-serif, system-ui, sans-serif"
     fontWeight: 400
-    fontSize: "clamp(1rem, 1vw + 0.8rem, 1.25rem)"
-    lineHeight: 1.6
+    fontSize: "clamp(1.05rem, 2vw, 1.3rem)"
+    lineHeight: 1.65
   label:
     fontFamily: "InterVariable, Inter, ui-sans-serif, system-ui, sans-serif"
-    fontWeight: 600
-    fontSize: "clamp(0.8rem, 0.75vw + 0.6rem, 1rem)"
-    lineHeight: 1.4
+    fontWeight: 700
+    fontSize: "0.9rem"
+    lineHeight: 1
   mono:
     fontFamily: "JetBrains Mono, ui-monospace, monospace"
     fontWeight: 400
-    fontSize: "clamp(0.64rem, 0.6vw + 0.5rem, 0.8rem)"
+    fontSize: "clamp(0.7rem, 0.6vw + 0.58rem, 0.82rem)"
     lineHeight: 1.5
 rounded:
   xs: "4px"
-  sm: "6px"
-  md: "12px"
-  lg: "16px"
+  sm: "8px"
+  md: "14px"
+  lg: "20px"
   xl: "24px"
   full: "9999px"
 spacing:
@@ -83,30 +83,30 @@ motion:
     out-expo: "cubic-bezier(0.16, 1, 0.3, 1)"
 components:
   button-primary:
-    backgroundColor: "{colors.text-950}"
-    textColor: "{colors.background-50}"
-    rounded: "{rounded.md}"
-    padding: "0.5rem 1rem"
+    backgroundColor: "primary-500"
+    textColor: "#042F2E"
+    rounded: "{rounded.full}"
+    padding: "0.7rem 1.15rem"
     typography: "{typography.label}"
   button-primary-hover:
-    backgroundColor: "primary-800"
+    backgroundColor: "primary-700"
   button-outline:
-    backgroundColor: "surface-raised"
+    backgroundColor: "transparent"
     textColor: "{colors.text-950}"
     border: "1px solid {colors.surface}"
-    rounded: "{rounded.md}"
-    padding: "0.5rem 1rem"
+    rounded: "{rounded.full}"
+    padding: "0.7rem 1.15rem"
     typography: "{typography.label}"
   feature-card:
-    backgroundColor: "surface-raised"
+    backgroundColor: "linear-gradient(180deg, surface-raised, background-50)"
     rounded: "{rounded.lg}"
     border: "1px solid {colors.surface}"
-    padding: "2rem"
+    padding: "1.5rem"
     boxShadow: "none"
   feature-icon:
-    backgroundColor: "primary-50"
-    textColor: "primary-600"
-    rounded: "{rounded.sm}"
+    backgroundColor: "12% primary-500 tint"
+    textColor: "primary-500"
+    rounded: "10px"
     size: "2.5rem"
 ---
 
@@ -116,88 +116,88 @@ components:
 
 **Creative North Star: "The Traditional Meets Technical"**
 
-Inkwell inherits its visual system from its sibling, [ewancroft.uk](https://ewancroft.uk). The register is the same high-contrast editorial language: green-tinted near-black text on a near-white background, Variable Inter set with tight display tracking, JetBrains Mono for labels, and surfaces distinguished by tonal value and a hairline border rather than by decoration.
+Inkwell now shares Fathom's visual register: a dark, teal-tinted page, large editorial type, generous rounded surfaces and one bright mint accent. The palette is deliberately narrow — near-black teal for the page, a slightly raised teal for cards and a soft radial glow behind the top of the page. The effect is quiet and bookish rather than glossy: ink on a dark desk, with a single mint mark.
 
-This is a deliberate departure from the previous cool-navy/glassmorphism system. Where the old system reached for translucent headers and app-matched drop shadows, this one trusts contrast: the page is nearly white, the type is nearly black, and the one accent — a vivid green matching the app icon's ink-drop mark — is used sparingly for focus, hover, links, and the wordmark's dot.
+This is a deliberate departure from the previous green-on-near-white system. There is no light mode and no `light-dark()` parity: the site is dark-only, and `color-scheme: dark` is declared in the document and in the tokens. The old green accent, mono navigation and flat white cards are gone.
 
 **Key Characteristics:**
 
-- High contrast first: body text `text-900` on `background-50`, headings `text-950`, every step checked against 4.5:1 (3:1 for large text)
-- Typography-first hierarchy: weight, size, and tight tracking do the work; color is secondary
-- Mono as a technical register: navigation, footer, page metadata, captions, and section labels speak in JetBrains Mono
-- Tonal + border surfaces: cards and lists step up from the page with a raised surface and a 1px border — no drop shadows anywhere
-- Single-accent discipline: one green (`accent-500`, canonical `#64BB44`) for links, focus rings, markers, and the ink-drop mark
-- Light/dark parity: every color is a `light-dark()` pair defined once per token
+- Dark-only: `background-50` (`#0B1416`) page, with a soft mint radial glow at the top and no light scheme
+- High contrast: body `text-900`, headings `text-950`, muted copy `text-700`; every combination checked against its surface
+- Large, tight editorial type: a `5.2rem` maximum hero, `2.7rem` section headings and short, balanced measures
+- One mint accent: `primary-500` / `accent-500` (`#2DD4BF`) for links, focus rings, eyebrow labels, active nav marks, the wordmark dot and primary buttons
+- Tonal depth: 20px cards use a subtle vertical gradient and a hairline border; there are no drop shadows and no glass
+- Pill actions and a 1080px (`67.5rem`) shell, matching Fathom's proportions
 - Calm motion: exponential-eased entrances, decisive press feedback, everything collapsing under reduced motion
-- Ecosystem-native: the site sits alongside the personal site and the AT Protocol ecosystem's indie-web confidence — technical without being cold
+- Ecosystem-native: technical enough for the AT Protocol audience without turning the marketing site into a protocol explainer
 
 ## 2. Colors
 
-Five full ramps (50–950), each a `light-dark(light, dark)` pair in plain RGB, shared verbatim with ewancroft.uk. The palette is green-tinted throughout: the "neutral" text ramp and the "white" background ramp both carry a faint green cast, so foreground, background, and accent read as one world.
+Four ramps are used directly: `text-*` (mint-tinted light text), `background-*` (deep teal surfaces and borders), `primary-*` (mint/teal actions) and `accent-*` (the wordmark dot and selection). `secondary-*` is a cooler teal reserved for future use. All values are plain hex tokens; there is no light/dark pair.
 
-| Ramp           | Light (default)                                               | Dark              | Role                                                   |
-| -------------- | ------------------------------------------------------------- | ----------------- | ------------------------------------------------------ |
-| `text-*`       | dark greens → near-black (`#162211` at 900, `#0B1109` at 950) | near-white greens | Text hierarchy. `text-900` body, `text-950` headings   |
-| `background-*` | near-white greens (`#EFF9EC` at 50)                           | near-black greens | Surfaces. `background-50` page, `200` hairline borders |
-| `primary-*`    | green (`#68B34D` at 500)                                      | same              | Brand green: links, hover, focus, active nav           |
-| `secondary-*`  | green                                                         | same              | Reserved secondary ramp                                |
-| `accent-*`     | green (`#64BB44` at 500)                                      | same              | Accent ramp: wordmark dot, selection, markers          |
+| Ramp           | Key steps                                                              | Role                                                       |
+| -------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `text-*`       | `#78928F` at 600, `#8CA6A3` at 700, `#CFE2DE` at 900, `#E7F4F1` at 950 | Text hierarchy. `text-900` body, `text-950` headings       |
+| `background-*` | `#0B1416` at 50, `#121F24` at 100, `#24383E` at 200, `#1A2B31` at 300  | Page, raised surfaces, hairlines and raised hover surfaces |
+| `primary-*`    | `#2DD4BF` at 500, `#99F6E4` at 700, `#0F766E` at 300                   | Links, focus, active nav, eyebrow labels, primary buttons  |
+| `accent-*`     | `#2DD4BF` at 500                                                       | Wordmark dot, selection and the accent mark                |
 
 ### Semantic aliases
 
 Day-to-day component CSS reaches for these flat aliases rather than the raw ramp steps:
 
-| Alias                  | Resolves to              |
-| ---------------------- | ------------------------ |
-| `--color-accent`       | `accent-500` (`#64BB44`) |
-| `--color-accent-light` | `accent-400`             |
-| `--color-muted`        | `text-600`               |
-| `--color-border`       | `background-200`         |
-| `--color-surface`      | `background-200`         |
-| `--surface-color`      | `background-200`         |
-| `--surface-raised`     | `background-100`         |
-| `--surface-sunken`     | `background-50`          |
+| Alias              | Resolves to                         |
+| ------------------ | ----------------------------------- |
+| `--color-accent`   | `accent-500` (`#2DD4BF`)            |
+| `--color-muted`    | `text-700`                          |
+| `--color-border`   | `background-200`                    |
+| `--color-surface`  | `background-100`                    |
+| `--surface-color`  | `background-200` (the hairline)     |
+| `--surface-raised` | `background-100` (cards, nav panel) |
+| `--surface-sunken` | `background-50` (the page itself)   |
 
 ### Named Rules
 
-**The High-Contrast Rule.** Body text is `text-900` on `background-50`; headings are `text-950`. Muted text is `text-600` — still green-tinted, but checked to clear 4.5:1 against `background-50`. Never place body text on `text-700` or lighter.
+**The Dark-Only Rule.** The site has one colour scheme. Do not add a `prefers-color-scheme` branch, a theme toggle or a `light-dark()` token. A light version would be a separate visual system, not a variant of this one.
 
-**The One Accent Rule.** Accent green appears on links, focus rings, list markers, the active nav underline, and the wordmark dot — as the interactive signal, not as a decorative surface. A primary button is dark (`text-950`), not green.
+**The High-Contrast Rule.** Body text is `text-900` on `background-50`; headings are `text-950`. Muted copy is `text-700` and must clear 4.5:1 against the surface it sits on. Never use `text-500` or darker for body copy.
 
-**The Tonal + Border Rule.** Cards, lists, and callouts differentiate from the page via `surface-raised` background and a 1px `surface-color` border. There are no drop shadows, no gradients, no glass.
+**The One Accent Rule.** Mint is the interactive signal: links, focus rings, list markers, the active nav underline, eyebrow labels, the wordmark dot and primary buttons. It is not a decorative wash. A primary button may be mint-filled, but its label is the dark teal `#042F2E`, never white.
+
+**The Tonal + Border Rule.** Cards, lists and callouts step away from the page through a subtle gradient plus a 1px `surface-color` border. There are no drop shadows, no glass and no decorative blur. The gradient is a surface treatment, not a highlight.
 
 ## 3. Typography
 
 **Display & Body:** Inter (self-hosted variable woff2, weights 400–800) with `ui-sans-serif, system-ui, sans-serif` fallback.
-**Mono:** JetBrains Mono (self-hosted) with `ui-monospace, monospace` fallback. The mono register is visible by design: nav links, footer, page metadata, platform labels, and captions.
+**Mono:** JetBrains Mono (self-hosted) with `ui-monospace, monospace` fallback. Mono is now reserved for code, compact row metadata, comparison headers and technical fragments — not navigation, the footer or page eyebrows.
 
 ### Hierarchy
 
-- **Display** (800, fluid `clamp(2.5rem, 6vw, 4.5rem)`, line-height 0.95, -0.05em): hero `h1` only
-- **Headline** (800, fluid `clamp(1.25rem, 1.5vw + 1rem, 2rem)`, 1.1): card/callout headings
-- **Section title** (700, fluid `clamp(1.6rem, 3.5vw, 2.4rem)`, -0.035em): section `h2` on the landing page
-- **Section label** (700, `text-sm`, uppercase, +0.05em, mono not required): mono-uppercase platform labels (iOS / Android)
-- **Body** (400, `clamp(1rem, 1vw + 0.8rem, 1.25rem)`, 1.6): prose, capped at 60–70ch
-- **Label** (600, `text-sm`): buttons
-- **Mono** (400, `text-xs`): nav, footer, metadata, captions, code
+- **Display** (700, fluid `clamp(2.8rem, 7.5vw, 5.2rem)`, line-height 1.04, -0.045em): hero `h1` only
+- **Section title** (700, fluid `clamp(1.7rem, 3.5vw, 2.7rem)`, 1.12, -0.035em): landing-page section `h2`s and callout headings
+- **Card heading** (700, `1.12rem`, 1.3): feature-card `h3`s
+- **Section label** (700, `0.78rem`, uppercase, +0.12em, sans): platform labels and eyebrow-style section markers
+- **Body** (400, `clamp(1.05rem, 2vw, 1.3rem)` for leads; default `--text-md`, 1.65): prose, capped at 42rem for copy and 70ch for legal prose
+- **Label** (700, `0.9rem`): buttons
+- **Mono** (400, `--text-xs`): code, `row-meta`, comparison column labels, raw URLs
 
 ### Named Rules
 
-**The Typography-First Rule.** Hierarchy is established through weight, size, and tracking — never through color splashes. If a heading needs an accent color to feel important, the weight or size is wrong.
+**The Typography-First Rule.** Hierarchy is established through weight, size and tracking — not through colour splashes. If a heading needs a bright accent to feel important, the weight or size is wrong.
 
-**The One Display Rule.** The hero `h1` is the only element at Display weight on any page.
+**The One Display Rule.** The hero `h1` is the only element at Display size on any page.
 
 ## 4. Elevation
 
-There is no elevation. The page is flat and high-contrast: surfaces are distinguished by `surface-raised` background plus a 1px `surface-color` border, and interaction states shift tonal value (hover → `surface-sunken`) and border color (→ `background-300`) rather than lifting or casting shadows.
+There is no shadow elevation. The page is flat and tonal: cards use a restrained vertical gradient from `surface-raised` to `background-50`, a 1px `surface-color` border and a 20px radius. Interaction states lift by 2px and shift the border toward mint; they never gain a drop shadow. The sticky nav is a solid `background-50` bar with a bottom hairline.
 
 ### Named Rules
 
-**The No-Glass, No-Shadow Rule.** No `backdrop-filter`, no `box-shadow`, no gradients. The sticky nav is a solid `background-50` bar with a bottom border — legibility comes from contrast, not blur.
+**The No-Glass, No-Shadow Rule.** No `box-shadow`, no `backdrop-filter`, no glassmorphism. The only gradient is the surface treatment on cards/callouts and the radial page glow.
 
 ## 5. Motion
 
-Motion mirrors ewancroft.uk: entrance uses `--ease-out-expo` at `--duration-slow` (500ms) as a calm fade with a 12px upward drift; `.stagger-1`…`.stagger-5` delay in 100ms steps. Direct manipulation (button press, nav link underline) uses `--ease-out-quart` at `--duration-fast` (200ms). `prefers-reduced-motion: reduce` collapses everything to near-instant globally.
+Motion mirrors the shared site language: entrance uses `--ease-out-expo` at `--duration-slow` (500ms) as a calm fade with a 12px upward drift; `.stagger-1`…`.stagger-5` delay in 100ms steps. Direct manipulation (button press, nav underline) uses `--ease-out-quart` at `--duration-fast` (200ms). `prefers-reduced-motion: reduce` collapses everything to near-instant globally.
 
 ### Named Rules
 
@@ -207,48 +207,49 @@ Motion mirrors ewancroft.uk: entrance uses `--ease-out-expo` at `--duration-slow
 
 ### Navigation
 
-Solid sticky bar (`background-50`, 1px `surface-color` bottom border), brand mark (inline capsule SVG + wordmark) left, mono links right. Links are `text-600`, hover and active route → `primary-700` with a 2px `primary-500` inset underline. At `≤800px` the toggle (44×44) reveals an in-flow dropdown panel (`surface-raised`, rounded, bordered) with full-width links. Escape and route changes close it; focus returns to the toggle.
+Solid sticky bar (`background-50`, 1px `surface-color` bottom border), brand mark (inline capsule SVG + wordmark) left, sans links right. Links are `text-700`, hover/active → `text-950` with a 2px `primary-500` inset underline. At `≤800px` the toggle (44×44) reveals an in-flow dropdown panel (`surface-raised`, 20px radius, bordered) with full-width links. Escape and route changes close it; focus returns to the toggle.
 
 ### Buttons
 
-Pills with `--radius-md`. Primary = `text-950` background, `background-50` text (hover → `primary-800`); this is the high-contrast editorial choice — the darkest surface on the page carries the single most important action. Outline = `surface-raised` background, `surface-color` border, `text-950` text (hover → `primary-700` + `primary-500` border). Both press at `scale(0.98)`. Primary CTAs: hero "Get Inkwell" → `#download`; "Add AltStore source" / "Add F-Droid repo" on the download cards.
+Pills with `--radius-full`, a 2.9rem minimum height and `0.7rem 1.15rem` padding. Primary = `primary-500` fill, `#042F2E` label, hover → `primary-700`. Outline = transparent background, `surface-color` border, `text-950` label, hover → 10% mint tint + `primary-500` border. Both press at `scale(0.98)`. Primary CTAs: hero "Get Inkwell" → `#download`; "Add AltStore source" / "Add F-Droid repo" on the download cards.
 
 ### Feature cards & callouts
 
-`surface-raised` on a 1px `surface-color` border, `--radius-lg`, 2rem padding, no shadow. Icon (2.5rem `primary-50` tile, `primary-600` glyph) → heading → body. Hover darkens the surface and border. Callouts are a narrower (42rem), centered variant with an inline accent link.
+20px radius, 1.5rem padding, 1px `surface-color` border and a `linear-gradient(180deg, surface-raised, background-50)` surface. Hover → lighter gradient, mint-tinted border and a 2px lift. Icon (2.5rem tile with a 12% mint tint, mint glyph) → heading → body. Callouts are a narrower (42rem) left-aligned variant with an inline mint link.
 
 ### Editorial rows
 
-Raised list surfaces (`surface-raised` + border, `--radius-md`) containing baseline-aligned rows: title left, mono `row-meta` right. Hover → `surface-sunken`. Used for any "list of items" content.
+Raised list surfaces (`surface-raised` + border, 14px radius) containing baseline-aligned rows: title left, mono `row-meta` right. Hover → `background-300`. Used for any "list of items" content.
 
 ### Screenshot frames
 
-1px `surface-color` border, `--radius-md`, on `surface-raised`; mono caption beneath. No shadow — the mockups read as flat illustrations.
+1px `surface-color` border, 16px radius, on `surface-raised`; sans caption beneath. No shadow — the mockups read as flat illustrations.
 
 ### Prose (privacy / terms)
 
-Max-width 70ch, `text-900`, line-height 1.75. Links are `primary-600` underlined in a 35% primary tint; headings `text-950`. Code is mono on a `surface-raised` chip. List markers are `primary-500`.
+Max-width 70ch, `text-900`, line-height 1.75. Links are `primary-500` underlined in a 35% mint tint; headings `text-950`. Code is mono on a `surface-raised` chip. List markers are `primary-500`.
 
 ## 7. Do's and Don'ts
 
 ### Do:
 
-- **Do** keep body text `text-900` on `background-50` and headings `text-950` — high contrast is the system's signature
-- **Do** use the mono register (JetBrains Mono) for nav, footer, metadata, and captions
-- **Do** differentiate surfaces with tonal value + a 1px border, never a shadow
+- **Do** keep body text `text-900` on `background-50` and headings `text-950` — contrast is the system's signature
+- **Do** treat the site as dark-only; update tokens rather than adding a light variant
+- **Do** use mint (`primary-500`) for interactive signals and primary actions
+- **Do** differentiate surfaces with a subtle gradient + 1px border, never a shadow
 - **Do** use `text-wrap: balance` on headings and `text-wrap: pretty` on prose
-- **Do** cap body text at 60–70ch
-- **Do** test every color against its background for ≥4.5:1 (body) and ≥3:1 (large text ≥18px or bold ≥14px)
+- **Do** cap body text at 60–70ch for legal prose and 42rem for marketing leads
+- **Do** test every colour against its background for ≥4.5:1 (body) and ≥3:1 (large text ≥18px or bold ≥14px)
 - **Do** provide a `prefers-reduced-motion` fallback for every animation (handled globally in `system.css`)
-- **Do** support both light and dark color schemes via `light-dark()` on every token
-- **Do** reserve the accent green for interactive signals (links, focus, markers, the wordmark dot)
+- **Do** use sans for nav, footer and eyebrows; reserve JetBrains Mono for code and compact metadata
 
 ### Don't:
 
-- **Don't** use drop shadows, gradients, or `backdrop-filter` anywhere — the sticky nav is a solid bar
-- **Don't** make a primary button accent-green — primary buttons are `text-950`/`background-50` inverse
-- **Don't** use the SaaS startup template kit: no gradient heroes, no animated counters, no glassmorphism
-- **Don't** set body text lighter than `text-700` against the page background
+- **Don't** add a light theme, `prefers-color-scheme` branch or theme toggle
+- **Don't** use drop shadows, `backdrop-filter` or glassmorphism
+- **Don't** make a primary button an inverse white/dark pair — primary actions are mint with dark teal labels
+- **Don't** use the SaaS startup template kit: no gradient hero images, no animated counters, no glassmorphism
+- **Don't** set body copy lighter than `text-700` against the page background
 - **Don't** nest cards inside cards — if a container needs a sub-container, reconsider the layout
 - **Don't** animate CSS layout properties — use `transform` and `opacity` only
 - **Don't** over-explain the AT Protocol to the audience — link to atproto.com for background; the site sells the app, not the protocol

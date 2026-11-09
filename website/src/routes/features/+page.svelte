@@ -44,7 +44,7 @@
   <p class="page-desc">{m.description}</p>
 </section>
 
-<section class="site-container py-12">
+<section class="site-container section">
   <div class="feature-grid">
     {#each CARDS as card (card.key)}
       {@const copy = m.cards[card.key]}
@@ -63,7 +63,7 @@
   </a>
 </UserCarousel>
 
-<section class="site-container py-12">
+<section class="site-container section">
   <h2 class="section-title">{m.differ.heading}</h2>
   <p class="mb-6 max-w-[42rem] text-lg leading-relaxed text-pretty">
     {m.differ.body}

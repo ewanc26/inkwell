@@ -3,8 +3,8 @@
  *
  * Skip-to-content link, screen-reader-only, focus rings,
  * keyframes, and the reduced-motion override.  Mirrors the
- * accessibility register of ewancroft.uk: a high-contrast,
- * visible focus ring on the primary green.
+ * accessibility register of the dark site: a high-contrast,
+ * visible mint focus ring.
  * ================================================================ */
 
 @layer utilities {
@@ -17,8 +17,8 @@
     transform: translateY(calc(-100% - var(--space-lg)));
     z-index: 999;
     padding: var(--space-sm) var(--space-md);
-    background-color: var(--color-text-950);
-    color: var(--color-background-50);
+    background-color: var(--color-primary-500);
+    color: #042f2e;
     font-weight: 600;
     text-decoration: none;
     border-radius: var(--radius-sm);

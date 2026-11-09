@@ -1,14 +1,12 @@
 /* ================================================================
  * tokens.css — Design language tokens
  *
- * Single source of truth for every design value.  Every other
+ * Single source of truth for every design value. Every other
  * stylesheet consumes these variables; none define their own.
- * If you're hardcoding a number, it should be here.
  *
- * Shares its architecture and values with ewancroft.uk: dual
- * definition (Tailwind v4 @theme → CSS custom properties via var()),
- * light-dark() inversion on every colour step, a high-contrast
- * green-tinted ramp, Variable Inter, and a 4pt spacing scale.
+ * The site is deliberately dark-only. Its near-black teal surfaces,
+ * mint accent, large type and soft radial glow follow Fathom's
+ * visual language rather than the old green light/dark system.
  * ================================================================ */
 
 /* ── Tailwind v4 Theme — maps palette steps to utility classes ── */
@@ -39,7 +37,7 @@
   --color-background-900: var(--background-900);
   --color-background-950: var(--background-950);
 
-  /* Primary ramp (brand green, actions/links) */
+  /* Primary ramp (teal, actions/links) */
   --color-primary-50: var(--primary-50);
   --color-primary-100: var(--primary-100);
   --color-primary-200: var(--primary-200);
@@ -103,90 +101,92 @@
   --color-paper-950: var(--color-background-950);
 
   /* Flat aliases — keep existing utility classes working */
-  --color-accent: var(--accent-800);
-  --color-accent-light: var(--accent-700);
-  --color-muted: var(--text-800);
+  --color-accent: var(--accent-500);
+  --color-accent-light: var(--accent-400);
+  --color-muted: var(--text-700);
   --color-border: var(--background-200);
-  --color-surface: var(--background-200);
+  --color-surface: var(--background-100);
 
   /* Typography */
-  --font-sans: "InterVariable", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans:
+    "InterVariable", "Inter", ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono:
     "JetBrains Mono", ui-monospace, "Cascadia Code", "Fira Code", Menlo,
     monospace;
 }
 
-/* ── CSS Custom Properties (runtime, light-dark() resolution) ── */
+/* ── CSS Custom Properties (runtime) ─────────────────────────── */
 @layer base {
   :root {
-    color-scheme: light dark;
+    color-scheme: dark;
 
-    /* ── Text ramp (foreground, green-tinted near-black/white) ── */
-    --text-50: light-dark(rgb(241 246 238), rgb(11 17 9));
-    --text-100: light-dark(rgb(226 238 221), rgb(22 34 17));
-    --text-200: light-dark(rgb(197 221 187), rgb(44 68 34));
-    --text-300: light-dark(rgb(168 204 153), rgb(66 102 51));
-    --text-400: light-dark(rgb(140 187 119), rgb(89 136 68));
-    --text-500: light-dark(rgb(111 170 85), rgb(111 170 85));
-    --text-600: light-dark(rgb(89 136 68), rgb(140 187 119));
-    --text-700: light-dark(rgb(66 102 51), rgb(168 204 153));
-    --text-800: light-dark(rgb(44 68 34), rgb(197 221 187));
-    --text-900: light-dark(rgb(22 34 17), rgb(226 238 221));
-    --text-950: light-dark(rgb(11 17 9), rgb(241 246 238));
+    /* ── Text ramp (mint-tinted light on deep teal) ───────────── */
+    --text-50: #061012;
+    --text-100: #0a191b;
+    --text-200: #112326;
+    --text-300: #1b3337;
+    --text-400: #2a474c;
+    --text-500: #416066;
+    --text-600: #78928f;
+    --text-700: #8ca6a3;
+    --text-800: #a9c2be;
+    --text-900: #cfe2de;
+    --text-950: #e7f4f1;
 
-    /* ── Background ramp (surfaces) ────────────────────────────── */
-    --background-50: light-dark(rgb(239 249 236), rgb(10 19 6));
-    --background-100: light-dark(rgb(224 242 217), rgb(19 39 12));
-    --background-200: light-dark(rgb(193 230 179), rgb(39 77 25));
-    --background-300: light-dark(rgb(162 217 140), rgb(58 116 37));
-    --background-400: light-dark(rgb(131 204 102), rgb(78 154 50));
-    --background-500: light-dark(rgb(100 191 64), rgb(97 193 62));
-    --background-600: light-dark(rgb(80 153 51), rgb(129 205 101));
-    --background-700: light-dark(rgb(60 115 38), rgb(160 218 139));
-    --background-800: light-dark(rgb(40 77 25), rgb(192 230 178));
-    --background-900: light-dark(rgb(20 38 13), rgb(223 243 216));
-    --background-950: light-dark(rgb(10 19 6), rgb(239 249 236));
+    /* ── Background ramp (surfaces) ───────────────────────────── */
+    --background-50: #0b1416;
+    --background-100: #121f24;
+    --background-200: #24383e;
+    --background-300: #1a2b31;
+    --background-400: #2f4a50;
+    --background-500: #3f5a60;
+    --background-600: #567176;
+    --background-700: #6f8a8d;
+    --background-800: #92aaa9;
+    --background-900: #bed4d0;
+    --background-950: #e7f4f1;
 
-    /* ── Primary ramp (brand green) ────────────────────────────── */
-    --primary-50: light-dark(rgb(240 247 237), rgb(10 18 8));
-    --primary-100: light-dark(rgb(225 240 219), rgb(21 36 15));
-    --primary-200: light-dark(rgb(194 224 184), rgb(41 71 31));
-    --primary-300: light-dark(rgb(164 209 148), rgb(62 107 46));
-    --primary-400: light-dark(rgb(134 194 112), rgb(83 143 61));
-    --primary-500: light-dark(rgb(104 179 77), rgb(104 179 77));
-    --primary-600: light-dark(rgb(83 143 61), rgb(134 194 112));
-    --primary-700: light-dark(rgb(62 107 46), rgb(164 209 148));
-    --primary-800: light-dark(rgb(41 71 31), rgb(194 224 184));
-    --primary-900: light-dark(rgb(21 36 15), rgb(225 240 219));
-    --primary-950: light-dark(rgb(10 18 8), rgb(240 247 237));
+    /* ── Primary ramp (mint/teal) ─────────────────────────────── */
+    --primary-50: #062825;
+    --primary-100: #0a3a35;
+    --primary-200: #0d4f47;
+    --primary-300: #0f665b;
+    --primary-400: #14b8a6;
+    --primary-500: #2dd4bf;
+    --primary-600: #5eead4;
+    --primary-700: #99f6e4;
+    --primary-800: #ccfbf1;
+    --primary-900: #e6fffb;
+    --primary-950: #f2fffd;
 
-    /* ── Secondary ramp ────────────────────────────────────────── */
-    --secondary-50: light-dark(rgb(240 248 237), rgb(10 18 7));
-    --secondary-100: light-dark(rgb(224 241 218), rgb(20 37 14));
-    --secondary-200: light-dark(rgb(194 226 182), rgb(41 73 29));
-    --secondary-300: light-dark(rgb(163 212 145), rgb(61 110 43));
-    --secondary-400: light-dark(rgb(132 198 108), rgb(81 147 57));
-    --secondary-500: light-dark(rgb(101 184 71), rgb(101 184 71));
-    --secondary-600: light-dark(rgb(81 147 57), rgb(132 198 108));
-    --secondary-700: light-dark(rgb(61 110 43), rgb(163 212 145));
-    --secondary-800: light-dark(rgb(41 73 29), rgb(194 226 182));
-    --secondary-900: light-dark(rgb(20 37 14), rgb(224 241 218));
-    --secondary-950: light-dark(rgb(10 18 7), rgb(240 248 237));
+    /* ── Secondary ramp (slightly cooler teal) ────────────────── */
+    --secondary-50: #06272b;
+    --secondary-100: #0a383e;
+    --secondary-200: #0d4c53;
+    --secondary-300: #106269;
+    --secondary-400: #14a3b8;
+    --secondary-500: #22d3ee;
+    --secondary-600: #67e8f9;
+    --secondary-700: #a5f3fc;
+    --secondary-800: #cffafe;
+    --secondary-900: #ecfeff;
+    --secondary-950: #f7ffff;
 
-    /* ── Accent ramp ───────────────────────────────────────────── */
-    --accent-50: light-dark(rgb(239 248 236), rgb(10 19 7));
-    --accent-100: light-dark(rgb(224 241 218), rgb(20 37 14));
-    --accent-200: light-dark(rgb(193 228 180), rgb(40 75 27));
-    --accent-300: light-dark(rgb(162 214 143), rgb(60 112 41));
-    --accent-400: light-dark(rgb(131 201 105), rgb(80 150 54));
-    --accent-500: light-dark(rgb(100 187 68), rgb(100 187 68));
-    --accent-600: light-dark(rgb(80 150 54), rgb(131 201 105));
-    --accent-700: light-dark(rgb(60 112 41), rgb(162 214 143));
-    --accent-800: light-dark(rgb(40 75 27), rgb(193 228 180));
-    --accent-900: light-dark(rgb(20 37 14), rgb(224 241 218));
-    --accent-950: light-dark(rgb(10 19 7), rgb(239 248 236));
+    /* ── Accent ramp (mint, wordmark dot) ─────────────────────── */
+    --accent-50: #062825;
+    --accent-100: #0a3a35;
+    --accent-200: #0d4f47;
+    --accent-300: #0f766e;
+    --accent-400: #14b8a6;
+    --accent-500: #2dd4bf;
+    --accent-600: #5eead4;
+    --accent-700: #99f6e4;
+    --accent-800: #ccfbf1;
+    --accent-900: #e6fffb;
+    --accent-950: #f2fffd;
 
-    /* ── Surface semantic aliases ──────────────────────────────── */
+    /* ── Surface semantic aliases ─────────────────────────────── */
     --surface-color: var(--background-200);
     --surface-raised: var(--background-100);
     --surface-sunken: var(--background-50);
@@ -204,36 +204,38 @@
     --space-2xl: 96px;
 
     /* ── Layout geometry ──────────────────────────────────────── */
-    --shell-wide: 72rem;
+    --shell-wide: 67.5rem;
     --shell-narrow: 48rem;
     --measure-prose: 70ch;
-    --measure-copy: 60ch;
+    --measure-copy: 42rem;
     --control-size: 44px;
-    --nav-height: 68px;
-    --nav-height-compact: 60px;
+    --nav-height: 72px;
+    --nav-height-compact: 64px;
     --icon-sm: 16px;
     --icon-md: 24px;
 
     /* ── Typography ───────────────────────────────────────────── */
-    --font-family: "InterVariable", "Inter", sans-serif;
+    --font-family:
+      "InterVariable", "Inter", ui-sans-serif, system-ui, -apple-system,
+      BlinkMacSystemFont, "Segoe UI", sans-serif;
     --font-mono:
       "JetBrains Mono", ui-monospace, "Cascadia Code", "Fira Code", Menlo,
       monospace;
 
-    /* Type scale — modular 1.25 ratio, fluid */
-    --text-xs: clamp(0.64rem, 0.6vw + 0.5rem, 0.8rem);
-    --text-sm: clamp(0.8rem, 0.75vw + 0.6rem, 1rem);
-    --text-md: clamp(1rem, 1vw + 0.8rem, 1.25rem);
-    --text-lg: clamp(1.25rem, 1.5vw + 1rem, 2rem);
-    --text-xl: clamp(2rem, 2vw + 1.5rem, 3rem);
-    --text-2xl: clamp(2rem, 5vw, 3.5rem);
+    /* Type scale — fluid, Fathom-sized display */
+    --text-xs: clamp(0.7rem, 0.6vw + 0.58rem, 0.82rem);
+    --text-sm: clamp(0.84rem, 0.35vw + 0.76rem, 0.95rem);
+    --text-md: clamp(1rem, 0.35vw + 0.92rem, 1.125rem);
+    --text-lg: clamp(1.6rem, 3.5vw, 2.7rem);
+    --text-xl: clamp(2.2rem, 4.5vw, 3.8rem);
+    --text-2xl: clamp(2.6rem, 7vw, 5rem);
     --text-micro: 0.625rem;
 
     /* ── Radii ────────────────────────────────────────────────── */
     --radius-xs: 4px;
-    --radius-sm: 6px;
-    --radius-md: 12px;
-    --radius-lg: 16px;
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
     --radius-xl: 24px;
     --radius-full: 9999px;
 
@@ -255,13 +257,20 @@
   }
 
   body {
-    background-color: var(--color-background-50);
-    color: var(--color-text-900);
+    background-color: var(--background-50);
+    background-image: radial-gradient(
+      circle at 15% -10%,
+      rgba(45, 212, 191, 0.12),
+      transparent 34rem
+    );
+    background-repeat: no-repeat;
+    color: var(--text-900);
     font-family: var(--font-family);
     font-size: var(--text-md);
-    line-height: 1.6;
+    line-height: 1.65;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
     overflow-x: clip;
     margin: 0;
   }
@@ -274,7 +283,7 @@
   h4,
   h5,
   h6 {
-    color: var(--color-text-950);
+    color: var(--text-950);
     font-family: var(--font-family);
     line-height: 1.1;
     margin-top: var(--space-lg);
@@ -285,19 +294,19 @@
 
   h1 {
     font-size: var(--text-xl);
-    font-weight: 900;
-    letter-spacing: -0.04em;
+    font-weight: 700;
+    letter-spacing: -0.045em;
   }
 
   h2 {
     font-size: var(--text-lg);
-    font-weight: 800;
-    letter-spacing: -0.03em;
+    font-weight: 700;
+    letter-spacing: -0.035em;
   }
 
   h3 {
     font-size: var(--text-md);
-    font-weight: 700;
+    font-weight: 600;
     letter-spacing: -0.015em;
   }
 
@@ -305,7 +314,7 @@
     font-size: var(--text-md);
     font-weight: 600;
     letter-spacing: -0.01em;
-    color: var(--color-text-900);
+    color: var(--text-900);
   }
 
   h5 {
@@ -317,7 +326,7 @@
   h6 {
     font-size: var(--text-sm);
     font-weight: 600;
-    color: var(--color-text-800);
+    color: var(--text-800);
   }
 
   :is(h1, h2, h3, h4, h5, h6):first-child {
@@ -338,11 +347,11 @@
   /* ── Links ──────────────────────────────────────────────────── */
 
   a {
-    color: var(--color-text-950);
+    color: var(--primary-500);
     text-decoration: underline;
     text-decoration-color: color-mix(
       in oklch,
-      var(--color-text-950) 35%,
+      var(--primary-500) 35%,
       transparent
     );
     text-underline-offset: 3px;
@@ -353,8 +362,8 @@
   }
 
   a:hover {
-    color: var(--color-primary-500);
-    text-decoration-color: var(--color-primary-500);
+    color: var(--primary-700);
+    text-decoration-color: var(--primary-500);
     text-underline-offset: 4px;
   }
 
@@ -367,13 +376,13 @@
   strong,
   b {
     font-weight: 700;
-    color: var(--color-text-950);
+    color: var(--text-950);
   }
 
   em,
   i {
     font-style: italic;
-    color: var(--color-text-800);
+    color: var(--text-800);
   }
 
   code,
@@ -381,10 +390,29 @@
     font-family: var(--font-mono);
   }
 
+  code {
+    padding: 0.1em 0.35em;
+    border-radius: 5px;
+    background: var(--background-300);
+    color: var(--text-950);
+    font-size: 0.9em;
+  }
+
+  pre code {
+    padding: 0;
+    background: none;
+  }
+
+  hr {
+    border: 0;
+    border-top: 1px solid var(--surface-color);
+    margin-block: var(--space-lg);
+  }
+
   /* ── Selection ───────────────────────────────────────────────── */
 
   ::selection {
-    background-color: var(--color-primary-200);
-    color: var(--color-primary-950);
+    background-color: var(--primary-200);
+    color: var(--text-950);
   }
 }
