@@ -367,7 +367,7 @@
     line-height: 1.6;
     white-space: nowrap;
     margin: 0;
-    color: var(--color-text-700);
+    color: var(--primary-600);
   }
 
   .footer-nav {
@@ -869,6 +869,7 @@
   .prose {
     max-width: var(--measure-prose);
     text-wrap: pretty;
+    color: var(--text-600);
   }
 
   .prose h1 {
@@ -876,18 +877,21 @@
     font-weight: 700;
     letter-spacing: -0.04em;
     margin-bottom: var(--space-md);
+    color: var(--text-500);
   }
 
   .prose h2 {
     font-size: var(--text-lg);
     font-weight: 700;
     letter-spacing: -0.03em;
+    color: var(--text-500);
   }
 
   .prose h3 {
     font-size: var(--text-md);
     font-weight: 600;
     letter-spacing: -0.015em;
+    color: var(--text-500);
   }
 
   .prose p {
