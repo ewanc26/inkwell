@@ -211,6 +211,80 @@ jobs:
             sleep 10
           done
 
+      # Issue #88: an expanded LTR pseudolanguage and an RTL pseudolanguage
+      # must be exercised in CI, not just the default language. Apple's
+      # pseudolanguages are selected by writing the simulator's global
+      # language preferences before the test run — the same mechanism the
+      # Xcode scheme "Application Language" dropdown uses — so this reuses
+      # the exact test bundles from the baseline pass above and restores
+      # the device's original preferences afterwards.
+      - name: Pseudo-locale test pass (expanded LTR + RTL)
+        timeout-minutes: 30
+        working-directory: iOS
+        if: needs.changes.outputs.ios == 'true' && steps.destination.outputs.runnable == 'true'
+        run: |
+          udid=$(xcrun simctl list devices -j | jq -r --arg name "${{ steps.destination.outputs.name }}" '
+            [.devices | to_entries[] | . as $e | select($e.key | contains(".iOS-")) | $e.value[] |
+              select(.name == $name) | .udid] | first
+          ')
+          if [ -z "$udid" ] || [ "$udid" = "null" ]; then
+            echo "Could not resolve the destination device's UDID — skipping the pseudo-locale pass." >&2
+            echo "::warning::Pseudo-locale test pass skipped: no UDID for destination device."
+            exit 0
+          fi
+          echo "Destination UDID: $udid"
+
+          xcrun simctl boot "$udid" 2>/dev/null || true
+
+          # Snapshot the current language preferences so the pseudolocale
+          # runs leave the cleanest possible device behind.
+          save_pref() {
+            xcrun simctl spawn "$udid" defaults read .GlobalPreferences "$1" 2>/dev/null || true
+          }
+          saved_languages=$(save_pref AppleLanguages)
+          saved_locale=$(save_pref AppleLocale)
+
+          restore() {
+            if [ -n "$saved_languages" ]; then
+              xcrun simctl spawn "$udid" defaults write .GlobalPreferences AppleLanguages "$saved_languages"
+            else
+              xcrun simctl spawn "$udid" defaults delete .GlobalPreferences AppleLanguages 2>/dev/null || true
+            fi
+            if [ -n "$saved_locale" ]; then
+              xcrun simctl spawn "$udid" defaults write .GlobalPreferences AppleLocale "$saved_locale"
+            else
+              xcrun simctl spawn "$udid" defaults delete .GlobalPreferences AppleLocale 2>/dev/null || true
+            fi
+          }
+          trap restore EXIT
+
+          for lang in en_DEP en_RTL; do
+            echo "Running InkwellTests under the $lang pseudolanguage…"
+            xcrun simctl spawn "$udid" defaults write .GlobalPreferences AppleLanguages -array "$lang"
+            xcrun simctl spawn "$udid" defaults write .GlobalPreferences AppleLocale "$lang"
+            xcrun simctl shutdown "$udid" 2>/dev/null || true
+            xcrun simctl boot "$udid" 2>/dev/null || true
+            attempt=1
+            max_attempts=3
+            until xcodebuild \
+              -project Inkwell.xcodeproj \
+              -scheme Inkwell \
+              -destination "platform=iOS Simulator,name=${{ steps.destination.outputs.name }}" \
+              -parallel-testing-enabled NO \
+              -only-testing:InkwellTests \
+              test; do
+              status=$?
+              if [ "$attempt" -ge "$max_attempts" ]; then
+                echo "::error::xcodebuild failed under $lang after $attempt attempts (exit $status)"
+                exit "$status"
+              fi
+              echo "::warning::xcodebuild failed under $lang (exit $status, attempt $attempt/$max_attempts) — retrying, likely simulator-host flakiness"
+              attempt=$((attempt + 1))
+              sleep 10
+            done
+            echo "InkwellTests green under $lang."
+          done
+
   android:
     name: Android build + lint + test
     needs: changes
@@ -243,11 +317,20 @@ jobs:
   # recreation, on-device accessibility semantics) is unreachable from
   # Robolectric, so it is not duplicating the `test` task.
   android-instrumentation:
-    name: Android instrumentation smoke suite
+    name: Android instrumentation smoke suite (${{ matrix.locale }})
     needs: changes
     if: needs.changes.outputs.android == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    # The baseline (en-US) plus the two Android pseudolocales required by
+    # issue #88: en-XA (accented/expanded LTR) and ar-XB (RTL). This stays
+    # the single CI device stack — the matrix only parameterises the locale
+    # each boot uses, so imports, snapshots and instrumentation all run
+    # exactly as before, just under a different language.
+    strategy:
+      fail-fast: false
+      matrix:
+        locale: [en-US, en-XA, ar-XB]
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
@@ -269,7 +352,8 @@ jobs:
 
       # The AVD is deterministic for a given API level, so it is worth caching
       # the ~1GB image and a warm boot snapshot rather than recreating both on
-      # every run.
+      # every run. Keyed per locale: the boot snapshot persists whatever
+      # language the device was created with.
       - name: Cache the AVD and its boot snapshot
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         id: avd-cache
@@ -277,7 +361,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-api-34-aosp-atd
+          key: avd-api-34-aosp-atd-${{ matrix.locale }}
 
       - name: Create the AVD and snapshot a cold boot
         if: steps.avd-cache.outputs.cache-hit != 'true'
@@ -287,6 +371,7 @@ jobs:
           target: aosp_atd
           arch: x86_64
           profile: pixel_6
+          locale: ${{ matrix.locale }}
           force-avd-creation: false
           # Deliberately omits -no-snapshot-save: this step's entire purpose
           # is to produce a boot snapshot for actions/cache above to save.
@@ -307,6 +392,7 @@ jobs:
           target: aosp_atd
           arch: x86_64
           profile: pixel_6
+          locale: ${{ matrix.locale }}
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
@@ -323,7 +409,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: android-instrumentation-results
+          name: android-instrumentation-results-${{ matrix.locale }}
           path: |
             Android/app/build/reports/androidTests/connected/**
             Android/app/build/outputs/androidTest-results/**

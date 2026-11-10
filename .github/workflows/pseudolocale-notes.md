@@ -48,13 +48,17 @@ Status: device-stack blockers resolved; structural coverage landed, rendering co
 
 ## What's still needed (kept open on #88)
 
-- CI exercising an expanded LTR and an RTL pseudo-locale end to end:
-  - iOS: `xcodebuild test` with a pseudolanguage (`-testLanguage` / scheme
-    application language) over the existing `InkwellTests` plus a targeted
-    Writer/Login smoke pass;
-  - Android: boot the existing CI emulator image with `ar-XB`/`en-XA` and
-    run the existing instrumentation suite against it, comparing with the
-    `en` baseline.
+- CI exercising an expanded LTR and an RTL pseudo-locale end to end — DONE
+  (2026-11-10, see below):
+  - iOS: the `ios` job gained a "Pseudo-locale test pass" step that writes
+    `AppleLanguages`/`AppleLocale` (`en_DEP`, then `en_RTL`) on the
+    destination simulator, reruns `InkwellTests`, and restores the saved
+    preferences. Verified locally on an iOS 26.5 simulator: green under both
+    pseudolanguages.
+  - Android: the existing `android-instrumentation` job is now a
+    `locale: [en-US, en-XA, ar-XB]` matrix on the same single device stack
+    (AVD cache + artifact names suffixed per locale), so no second emulator
+    infrastructure was added.
 - Screenshot/UI fixtures covering login, Reader cards/detail, Discover,
   Writer, Settings/moderation, notifications, and accessibility labels under
   both pseudo-locales.
