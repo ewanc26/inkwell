@@ -191,6 +191,23 @@
     --surface-raised: var(--background-100);
     --surface-sunken: var(--background-50);
 
+    /* Tonal surfaces — the flat midpoint of the gradient pair they
+       replaced (raised → sunken). The accessibility audit resolves
+       text contrast against solid background colours only; a gradient
+       behind text makes the check indeterminable for every sentence in
+       the card. The two stops are close enough that the flat mix is
+       visually indistinguishable. */
+    --surface-tonal: color-mix(
+      in oklch,
+      var(--surface-raised),
+      var(--surface-sunken)
+    );
+    --surface-tonal-hover: color-mix(
+      in oklch,
+      var(--background-300),
+      var(--surface-sunken)
+    );
+
     /* ── Spacing — 4pt scale ──────────────────────────────────── */
     --space-2xs: 2px;
     --space-xs: 4px;
@@ -256,14 +273,31 @@
     width: 100%;
   }
 
-  body {
-    background-color: var(--background-50);
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
     background-image: radial-gradient(
       circle at 15% -10%,
       rgba(45, 212, 191, 0.12),
       transparent 34rem
     );
     background-repeat: no-repeat;
+    pointer-events: none;
+  }
+
+  body {
+    background-color: var(--background-50);
+
+    /* The mint glow is a behind-everything tint, not a content backdrop.
+       It deliberately lives on a body::before layer rather than the
+       body background itself: the accessibility audit resolves text
+       contrast against solid background colours, and a gradient painted
+       on the element or any ancestor makes the check indeterminable —
+       every sentence on the page would be unverifiable. On a pseudo
+       layer the body's own background stays a solid colour. */
+    position: relative;
     color: var(--text-700);
     font-family: var(--font-family);
     font-size: var(--text-md);

@@ -180,7 +180,7 @@
     background-color: color-mix(
       in oklch,
       var(--color-primary-500) 10%,
-      transparent
+      var(--surface-sunken)
     );
     border-color: var(--color-primary-500);
     color: var(--color-text-950);
@@ -325,7 +325,7 @@
       background: color-mix(
         in oklch,
         var(--color-primary-500) 10%,
-        transparent
+        var(--surface-sunken)
       );
       box-shadow: none;
     }
@@ -450,11 +450,7 @@
   .callout {
     padding: 1.5rem;
     border-radius: var(--radius-lg);
-    background: linear-gradient(
-      180deg,
-      var(--surface-raised),
-      var(--background-50)
-    );
+    background-color: var(--surface-tonal);
     border: 1px solid var(--surface-color);
   }
 
@@ -469,11 +465,7 @@
 
   /* A 2px lift, not a shadow — elevation stays tonal per DESIGN.md. */
   .feature-card:hover {
-    background: linear-gradient(
-      180deg,
-      var(--background-300),
-      var(--background-50)
-    );
+    background-color: var(--surface-tonal-hover);
     border-color: color-mix(
       in oklch,
       var(--color-primary-500) 45%,
@@ -504,7 +496,7 @@
     background-color: color-mix(
       in oklch,
       var(--color-primary-500) 12%,
-      transparent
+      var(--surface-tonal)
     );
     border: 1px solid
       color-mix(in oklch, var(--color-primary-500) 20%, transparent);
@@ -533,11 +525,7 @@
     gap: var(--space-sm);
     padding: var(--space-lg);
     border-radius: var(--radius-lg);
-    background: linear-gradient(
-      180deg,
-      var(--surface-raised),
-      var(--background-50)
-    );
+    background-color: var(--surface-tonal);
     border: 1px solid var(--surface-color);
     transition:
       background-color var(--duration-fast) var(--ease-out-quart),
@@ -700,11 +688,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-2xs);
-    background: linear-gradient(
-      180deg,
-      var(--surface-raised),
-      var(--background-50)
-    );
+    background-color: var(--surface-tonal);
     border: 1px solid var(--surface-color);
     border-radius: var(--radius-lg);
   }
@@ -877,21 +861,21 @@
     font-weight: 700;
     letter-spacing: -0.04em;
     margin-bottom: var(--space-md);
-    color: var(--text-500);
+    color: var(--text-600);
   }
 
   .prose h2 {
     font-size: var(--text-lg);
     font-weight: 700;
     letter-spacing: -0.03em;
-    color: var(--text-500);
+    color: var(--text-600);
   }
 
   .prose h3 {
     font-size: var(--text-md);
     font-weight: 600;
     letter-spacing: -0.015em;
-    color: var(--text-500);
+    color: var(--text-600);
   }
 
   .prose p {
@@ -955,11 +939,7 @@
   }
 
   .faq-item {
-    background: linear-gradient(
-      180deg,
-      var(--surface-raised),
-      var(--background-50)
-    );
+    background-color: var(--surface-tonal);
     border: 1px solid var(--surface-color);
     border-radius: var(--radius-md);
     transition: border-color var(--duration-fast) var(--ease-out-quart);
