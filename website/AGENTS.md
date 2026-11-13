@@ -60,3 +60,15 @@ AI tools may be used when contributing. Add `Co-authored-by:` trailers crediting
 - **Website links to self-hosted AltStore and F-Droid** rather than App Store / Play Store listings — those stores do not have published listings yet.
 - **`static/og-cover.png` is a committed binary** that duplicates what `tools/og-cover/template.html` describes — social scrapers don't run CSS or webfonts, so the card has to ship as pixels.
 - **`static/` carries release artefacts as well as site assets** — the self-hosted AltStore IPAs and F-Droid repository live there because those channels are served from the same origin; they are not build output.
+
+<!-- allowed-agents -->
+## Allowed agents
+
+Only **Claude** (Anthropic) and **Mistral** (Mistral AI) may be used as coding agents in this repository. This rule supersedes any earlier agent-attribution guidance in this file.
+
+- Agent-assisted commits must credit only one of those agents:
+  - `Co-Authored-By: Claude <noreply@anthropic.com>`
+  - `Co-Authored-By: Mistral Vibe <vibe@mistral.ai>`
+- Allowed agent footers are `🤖 Generated with [Claude Code](https://claude.com/claude-code)` and `🤖 Generated with [Mistral Vibe](https://mistral.ai)`.
+- Do not add `Co-Authored-By:` trailers, `Generated with` footers, author names, or committer identities for any other agent or AI tool.
+- Do not credit another agent in commit metadata.
