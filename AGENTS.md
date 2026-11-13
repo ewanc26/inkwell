@@ -125,3 +125,15 @@ Platform-specific guidance lives in:
   - Neither app has a live Apple App Store or Google Play Store listing — "the live app stores" for Inkwell means AltStore Classic and F-Droid, not Apple/Google's stores.
   - **`node tools/release/publish.mjs`** automates the steps above rather than replacing this checklist — read it first regardless. `status` (read-only) compares the version each platform's source declares against every channel and reports gaps; `android [--yes] [--push]` builds, signs, and publishes the F-Droid update plus the GitHub release; `ios --ipa <path> [--yes] [--push]` does the AltStore/GitHub side once you've exported the `.ipa` yourself (Xcode archiving needs an interactive keychain unlock, so the script can't do that part). Defaults to a dry-run plan; `--yes` performs it; `--push` (requires `--yes`) also pushes the resulting commit to `origin/main` — without `--push` the commit is local so it can be reviewed with `git show` first. Safe to run `status` any time, including in agent sessions with no signing access, since it never mutates anything.
   - **Provenance and SBOMs:** after `publish.mjs` attaches the APK/IPA to the unified release, `.github/workflows/release.yml` (triggered by the `vX.Y.Z` tag push, the GitHub Release being published, or manual dispatch) appends a per-platform SPDX SBOM and a signed `release-manifest-vX.Y.Z.json` attested with `actions/attest-build-provenance`. It deliberately does **not** attest the APK/IPA themselves, since those are still built/signed outside Actions — attesting them would misrepresent who produced the bytes. See `RELEASE_PROCESS.md`'s "Provenance and SBOMs" section for the exact `gh attestation verify` and hash-comparison commands a consumer runs, and for what a human should double-check on the first real release run.
+
+<!-- allowed-agents -->
+## Allowed agents
+
+Only **Claude** (Anthropic) and **Mistral** (Mistral AI) may be used as coding agents in this repository. This rule supersedes any earlier agent-attribution guidance in this file.
+
+- Agent-assisted commits must credit only one of those agents:
+  - `Co-Authored-By: Claude <noreply@anthropic.com>`
+  - `Co-Authored-By: Mistral Vibe <vibe@mistral.ai>`
+- Allowed agent footers are `🤖 Generated with [Claude Code](https://claude.com/claude-code)` and `🤖 Generated with [Mistral Vibe](https://mistral.ai)`.
+- Do not add `Co-Authored-By:` trailers, `Generated with` footers, author names, or committer identities for any other agent or AI tool.
+- Do not credit another agent in commit metadata.
