@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Guidance for agents working on Inkwell, a native reader and writer for the Standard.site publishing ecosystem on AT Protocol. This monorepo contains all three clients: iOS (`iOS/`), Android (`Android/`), and the marketing/legal site (`website/`).
+Guidance for AI coding agents working in **inkwell**.
 
 ## Principles
 
