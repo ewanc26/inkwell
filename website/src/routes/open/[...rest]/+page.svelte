@@ -26,7 +26,8 @@
   // *shape* check only, purely to decide whether attempting the custom
   // scheme is worthwhile; it is not, and must never be treated as, a
   // verification that the URI genuinely belongs to this content.
-  const DOCUMENT_AT_URI = /^at:\/\/did:[a-zA-Z0-9._:%-]+\/site\.standard\.document\/[^/?#]+$/;
+  const DOCUMENT_AT_URI =
+    /^at:\/\/did:[a-zA-Z0-9._:%-]+\/site\.standard\.document\/[^/?#]+$/;
 
   const rawUri = $derived(page.url.searchParams.get("uri"));
   const rawUrl = $derived(page.url.searchParams.get("url"));
@@ -54,7 +55,10 @@
 
 <svelte:head>
   <title>{SITE.title} — Open</title>
-  <meta name="description" content="Open a Standard.site document in Inkwell, or install Inkwell first." />
+  <meta
+    name="description"
+    content="Open a Standard.site document in Inkwell, or install Inkwell first."
+  />
   <meta name="robots" content="noindex" />
 </svelte:head>
 
@@ -63,19 +67,19 @@
   <p class="page-desc">
     {#if candidateDocumentUri}
       If Inkwell is installed, it should open this document automatically.
-      Didn&rsquo;t work? Install Inkwell below, then try the link again —
-      once installed, Inkwell verifies the document against its author's
-      own PDS record before showing it.
+      Didn&rsquo;t work? Install Inkwell below, then try the link again — once
+      installed, Inkwell verifies the document against its author's own PDS
+      record before showing it.
     {:else if rawUrl}
-      This link points at a Standard.site document outside Inkwell's own
-      domain, so your browser can't hand it to the app automatically.
-      Install Inkwell, then open
+      This link points at a Standard.site document outside Inkwell's own domain,
+      so your browser can't hand it to the app automatically. Install Inkwell,
+      then open
       <span class="font-mono text-sm break-all">{rawUrl}</span>
-      from inside the app — sharing or pasting a Standard.site link into
-      Inkwell resolves and verifies it the same way.
+      from inside the app — sharing or pasting a Standard.site link into Inkwell resolves
+      and verifies it the same way.
     {:else}
-      This is Inkwell's hand-off page for Standard.site document links. On
-      its own — without a document link — there's nothing for it to open.
+      This is Inkwell's hand-off page for Standard.site document links. On its
+      own — without a document link — there's nothing for it to open.
     {/if}
   </p>
 </section>
@@ -86,9 +90,8 @@
       <div class="feature-icon"><Download class="h-5 w-5" /></div>
       <h3>Don&rsquo;t have Inkwell yet?</h3>
       <p>
-        Free direct installs are available through AltStore Classic (iOS)
-        and F-Droid (Android). There is no App Store or Google Play
-        listing yet.
+        Free direct installs are available through AltStore Classic (iOS) and
+        F-Droid (Android). There is no App Store or Google Play listing yet.
       </p>
       <div class="flex flex-wrap gap-3">
         <a href={ALTSTORE_SOURCE_LINK} class="btn btn-primary active-press">
@@ -106,9 +109,9 @@
       <div class="feature-icon"><BookOpen class="h-5 w-5" /></div>
       <h3>Already have it installed?</h3>
       <p>
-        Go back and open the original link again — once App Links /
-        Associated Domains verification has propagated for this device,
-        Inkwell opens it directly without ever showing this page.
+        Go back and open the original link again — once App Links / Associated
+        Domains verification has propagated for this device, Inkwell opens it
+        directly without ever showing this page.
       </p>
       <a href="/" class="btn btn-outline active-press">
         <ExternalLink class="h-4 w-4" />

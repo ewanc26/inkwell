@@ -105,7 +105,8 @@
     <h2>{m.openSource.heading}</h2>
     <p>{m.openSource.body}</p>
     <a href="https://github.com/ewanc26/inkwell">
-      {m.openSource.link} <ArrowRight class="h-3 w-3" />
+      {m.openSource.link}
+      <ArrowRight class="h-3 w-3" />
     </a>
   </div>
 </section>
@@ -118,13 +119,16 @@
     </h2>
     <p>{m.support.body}</p>
     <a href="https://ko-fi.com/ewancroft">
-      {m.support.kofi} <ArrowRight class="h-3 w-3" />
+      {m.support.kofi}
+      <ArrowRight class="h-3 w-3" />
     </a>
     <a href="https://github.com/sponsors/ewanc26" class="ml-4">
-      {m.support.sponsors} <ArrowRight class="h-3 w-3" />
+      {m.support.sponsors}
+      <ArrowRight class="h-3 w-3" />
     </a>
     <a href="https://liberapay.com/ewanc26/" class="ml-4">
-      {m.support.liberapay} <ArrowRight class="h-3 w-3" />
+      {m.support.liberapay}
+      <ArrowRight class="h-3 w-3" />
     </a>
   </div>
 </section>

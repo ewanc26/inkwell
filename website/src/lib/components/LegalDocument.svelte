@@ -12,10 +12,7 @@
 <script lang="ts">
   import { reveal } from "$lib/motion";
   import { fmt, messages, splitAt } from "$lib/i18n";
-  import {
-    LEGAL_DOCUMENTS,
-    type LegalDocKey,
-  } from "$lib/legal/documents";
+  import { LEGAL_DOCUMENTS, type LegalDocKey } from "$lib/legal/documents";
 
   let { doc }: { doc: LegalDocKey } = $props();
 
