@@ -93,8 +93,18 @@
   <link rel="icon" href="/favicon-16x16.png" sizes="16x16" type="image/png" />
   <link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
-  <link rel="icon" href="/android-chrome-192x192.png" sizes="192x192" type="image/png" />
-  <link rel="icon" href="/android-chrome-512x512.png" sizes="512x512" type="image/png" />
+  <link
+    rel="icon"
+    href="/android-chrome-192x192.png"
+    sizes="192x192"
+    type="image/png"
+  />
+  <link
+    rel="icon"
+    href="/android-chrome-512x512.png"
+    sizes="512x512"
+    type="image/png"
+  />
 </svelte:head>
 
 <svelte:window onkeydown={onKeydown} />
@@ -119,10 +129,29 @@
         aria-hidden="true"
       >
         <g transform="translate(276 0)">
-          <rect x="40" y="40" width="320" height="80" rx="16" fill="currentColor" />
+          <rect
+            x="40"
+            y="40"
+            width="320"
+            height="80"
+            rx="16"
+            fill="currentColor"
+          />
           <rect x="125" y="120" width="150" height="640" fill="currentColor" />
-          <rect x="40" y="760" width="320" height="80" rx="16" fill="currentColor" />
-          <circle cx="200" cy="880" r="32" fill="var(--color-accent, #2dd4bf)" />
+          <rect
+            x="40"
+            y="760"
+            width="320"
+            height="80"
+            rx="16"
+            fill="currentColor"
+          />
+          <circle
+            cx="200"
+            cy="880"
+            r="32"
+            fill="var(--color-accent, #2dd4bf)"
+          />
         </g>
       </svg>
       {SITE.title}
@@ -144,12 +173,19 @@
     </button>
 
     <!-- Desktop nav + mobile dropdown panel -->
-    <nav class="nav-links" class:open={mobileOpen} id="primary-navigation" aria-label={m.nav.mainLabel}>
+    <nav
+      class="nav-links"
+      class:open={mobileOpen}
+      id="primary-navigation"
+      aria-label={m.nav.mainLabel}
+    >
       {#each NAV_LINKS as link (link.key)}
         <!-- Active state is compared against the current path. -->
         {@const isActive =
           path === link.url ||
-          (link.url !== "/" && link.url.startsWith("/") && path.startsWith(link.url))}
+          (link.url !== "/" &&
+            link.url.startsWith("/") &&
+            path.startsWith(link.url))}
         <a
           href={link.url}
           class="nav-link"

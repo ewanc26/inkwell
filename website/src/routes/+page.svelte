@@ -11,10 +11,7 @@
 
 <script lang="ts">
   import { reveal } from "$lib/motion";
-  import {
-    ALTSTORE_SOURCE_LINK,
-    FDROID_REPO_LINK,
-  } from "$lib/config";
+  import { ALTSTORE_SOURCE_LINK, FDROID_REPO_LINK } from "$lib/config";
   import { fmt, messages, rich, splitAt } from "$lib/i18n";
   import UserCarousel from "$lib/components/UserCarousel.svelte";
   import type { PageData } from "./$types";
@@ -55,58 +52,81 @@
 
 <!-- Hero -->
 <div class="hero-wrap">
-<section class="site-container page-hd">
-  <!--
+  <section class="site-container page-hd">
+    <!--
     Wordmark SVG — mirrors InkwellMark.swift in the iOS app.
     The capsule shapes and ink-drop circle are the app icon's
     defining forms, rendered here as an inline <svg> so
     currentColor and var(--color-accent) resolve in the page DOM.
   -->
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 400 952"
-    fill="none"
-    class="hero-mark mb-6 h-16 w-auto sm:h-20"
-    aria-label={m.markLabel}
-    role="img"
-  >
-    <rect x="40" y="40" width="320" height="80" rx="16" fill="currentColor" />
-    <rect x="125" y="120" width="150" height="640" fill="currentColor" />
-    <rect x="40" y="760" width="320" height="80" rx="16" fill="currentColor" />
-    <circle
-      class="ink-drop"
-      cx="200"
-      cy="880"
-      r="32"
-      fill="var(--color-accent, #2dd4bf)"
-    />
-  </svg>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 400 952"
+      fill="none"
+      class="hero-mark mb-6 h-16 w-auto sm:h-20"
+      aria-label={m.markLabel}
+      role="img"
+    >
+      <rect x="40" y="40" width="320" height="80" rx="16" fill="currentColor" />
+      <rect x="125" y="120" width="150" height="640" fill="currentColor" />
+      <rect
+        x="40"
+        y="760"
+        width="320"
+        height="80"
+        rx="16"
+        fill="currentColor"
+      />
+      <circle
+        class="ink-drop"
+        cx="200"
+        cy="880"
+        r="32"
+        fill="var(--color-accent, #2dd4bf)"
+      />
+    </svg>
 
-  <div class="page-meta hero-item" style="--i: 0" role="group" aria-label={m.hero.metaLabel}>
-    {#each m.hero.meta as item (item)}
-      <span>{item}</span>
-    {/each}
-  </div>
+    <div
+      class="page-meta hero-item"
+      style="--i: 0"
+      role="group"
+      aria-label={m.hero.metaLabel}
+    >
+      {#each m.hero.meta as item (item)}
+        <span>{item}</span>
+      {/each}
+    </div>
 
-  <h1 class="page-title page-title--hero hero-item" style="--i: 1">
-    {heroTitle[0]}<span class="text-accent">{m.hero.brand}</span>{heroTitle[1]}
-  </h1>
+    <h1 class="page-title page-title--hero hero-item" style="--i: 1">
+      {heroTitle[0]}<span class="text-accent">{m.hero.brand}</span
+      >{heroTitle[1]}
+    </h1>
 
-  <p class="page-desc hero-item" style="--i: 2">{m.hero.description}</p>
+    <p class="page-desc hero-item" style="--i: 2">{m.hero.description}</p>
 
-  <div class="hero-item flex flex-wrap items-center gap-4" style="--i: 3">
-    <a href="#download" class="btn btn-primary active-press">
-      <Download class="h-4 w-4" />
-      {m.hero.cta}
-    </a>
-    <a href="https://github.com/ewanc26/inkwell" class="btn btn-outline active-press">
-      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12 24 5.37 18.63 0 12 0z"/>
-      </svg>
-      {m.hero.viewSource}
-    </a>
-  </div>
-</section>
+    <div class="hero-item flex flex-wrap items-center gap-4" style="--i: 3">
+      <a href="#download" class="btn btn-primary active-press">
+        <Download class="h-4 w-4" />
+        {m.hero.cta}
+      </a>
+      <a
+        href="https://github.com/ewanc26/inkwell"
+        class="btn btn-outline active-press"
+      >
+        <svg
+          class="h-4 w-4"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12 24 5.37 18.63 0 12 0z"
+          />
+        </svg>
+        {m.hero.viewSource}
+      </a>
+    </div>
+  </section>
 </div>
 
 <!-- Download -->
@@ -126,7 +146,11 @@
           <Download class="h-4 w-4" />
           {m.download.ios.addSource}
         </a>
-        <button class="btn btn-outline btn-placeholder" disabled aria-label={m.download.ios.storeAria}>
+        <button
+          class="btn btn-outline btn-placeholder"
+          disabled
+          aria-label={m.download.ios.storeAria}
+        >
           <Apple class="h-4 w-4" />
           {m.download.ios.store}
         </button>
@@ -143,7 +167,11 @@
           <Download class="h-4 w-4" />
           {m.download.android.addSource}
         </a>
-        <button class="btn btn-outline btn-placeholder" disabled aria-label={m.download.android.storeAria}>
+        <button
+          class="btn btn-outline btn-placeholder"
+          disabled
+          aria-label={m.download.android.storeAria}
+        >
           <Smartphone class="h-4 w-4" />
           {m.download.android.store}
         </button>
@@ -220,7 +248,8 @@
     <h2>{m.secure.heading}</h2>
     <p>{m.secure.body}</p>
     <a href="/security" class="active-press">
-      {m.secure.link} <ArrowRight class="h-3 w-3" />
+      {m.secure.link}
+      <ArrowRight class="h-3 w-3" />
     </a>
   </div>
 </section>

@@ -62,6 +62,7 @@ AI tools may be used when contributing. Add `Co-authored-by:` trailers crediting
 - **`static/` carries release artefacts as well as site assets** — the self-hosted AltStore IPAs and F-Droid repository live there because those channels are served from the same origin; they are not build output.
 
 <!-- allowed-agents -->
+
 ## Allowed agents
 
 Only **Claude** (Anthropic) and **Mistral** (Mistral AI) may be used as coding agents in this repository. This rule supersedes any earlier agent-attribution guidance in this file.

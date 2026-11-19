@@ -54,10 +54,12 @@
     <h2>{m.legal.heading}</h2>
     <p>{m.legal.body}</p>
     <a href="/privacy">
-      {m.legal.privacy} <ArrowRight class="h-3 w-3" />
+      {m.legal.privacy}
+      <ArrowRight class="h-3 w-3" />
     </a>
     <a href="/terms" class="ml-4">
-      {m.legal.terms} <ArrowRight class="h-3 w-3" />
+      {m.legal.terms}
+      <ArrowRight class="h-3 w-3" />
     </a>
   </div>
 </section>
