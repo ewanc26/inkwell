@@ -123,6 +123,9 @@
     <a href="https://github.com/sponsors/ewanc26" class="ml-4">
       {m.support.sponsors} <ArrowRight class="h-3 w-3" />
     </a>
+    <a href="https://liberapay.com/ewanc26/" class="ml-4">
+      {m.support.liberapay} <ArrowRight class="h-3 w-3" />
+    </a>
   </div>
 </section>
 

@@ -43,6 +43,7 @@ export const enGB = {
       github: "GitHub",
       kofi: "Ko-fi",
       sponsors: "GitHub Sponsors",
+      liberapay: "Liberapay",
     },
   },
 
@@ -393,7 +394,7 @@ export const enGB = {
     },
     who: {
       heading: "Who builds it",
-      body: "Inkwell is free and open-source software, licensed under the [AGPL-3.0](agpl) with an [App Store Distribution Exception](appStoreException). The exception is a narrow additional permission for app-store distribution; it does not remove the AGPL's source-availability or copyleft requirements. The source, issues, and releases are all on [GitHub](github). If Inkwell is useful to you, you can support its development through [Ko-fi](kofi) or [GitHub Sponsors](sponsors) — entirely optional, and unrelated to any feature gate.",
+      body: "Inkwell is free and open-source software, licensed under the [AGPL-3.0](agpl) with an [App Store Distribution Exception](appStoreException). The exception is a narrow additional permission for app-store distribution; it does not remove the AGPL's source-availability or copyleft requirements. The source, issues, and releases are all on [GitHub](github). If Inkwell is useful to you, you can support its development through [Ko-fi](kofi), [Liberapay](liberapay) or [GitHub Sponsors](sponsors) — entirely optional, and unrelated to any feature gate.",
     },
     status: {
       heading: "Where things stand",
@@ -421,6 +422,7 @@ export const enGB = {
       body: "Inkwell has no ads, no paywalls, and no premium tier. If you'd like to support ongoing development, sponsorship is optional and appreciated.",
       kofi: "Ko-fi",
       sponsors: "GitHub Sponsors",
+      liberapay: "Liberapay",
     },
   },
 

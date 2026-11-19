@@ -386,6 +386,8 @@
     <string name="support_kofi_detail">Buy me a tea — £2.99 suggested</string>
     <string name="support_sponsors">GitHub Sponsors</string>
     <string name="support_sponsors_detail">Sponsor development work</string>
+    <string name="support_liberapay">Liberapay</string>
+    <string name="support_liberapay_detail">Recurring donations</string>
     <string name="support_share">Share Inkwell</string>
     <string name="support_share_detail">Word of mouth is the best support</string>
     <string name="support_contribute">Contribute</string>
