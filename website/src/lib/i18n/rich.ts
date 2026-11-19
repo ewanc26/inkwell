@@ -41,6 +41,7 @@ export const LINKS = {
   },
   kofi: { href: "https://ko-fi.com/ewancroft" },
   sponsors: { href: "https://github.com/sponsors/ewanc26" },
+  liberapay: { href: "https://liberapay.com/ewanc26/" },
   agpl: {
     href: "https://www.gnu.org/licenses/agpl-3.0.en.html",
   },

@@ -3,8 +3,8 @@
 //  Inkwell
 //
 //  Tip jar + alternate support methods. Inkwell is free on both
-//  platforms — these are external links (ko-fi, GitHub Sponsors),
-//  not in-app purchases, since AltStore distribution has no App
+//  platforms — these are external links (ko-fi, GitHub Sponsors,
+//  Liberapay), not in-app purchases, since AltStore distribution has no App
 //  Store billing to hook StoreKit into.
 //
 
@@ -29,6 +29,14 @@ struct SupportView: View {
                             icon: "heart.circle.fill",
                             title: "GitHub Sponsors",
                             detail: "Sponsor development work"
+                        )
+                    }
+
+                    Link(destination: URL(string: "https://liberapay.com/ewanc26/")!) {
+                        supportRow(
+                            icon: "sterlingsign.circle.fill",
+                            title: "Liberapay",
+                            detail: "Recurring donations"
                         )
                     }
                 } header: {

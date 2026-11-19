@@ -389,6 +389,8 @@
     <string name="support_kofi_detail">Offrez-moi un thé — 2,99 £ suggérés</string>
     <string name="support_sponsors">GitHub Sponsors</string>
     <string name="support_sponsors_detail">Sponsorisez le développement</string>
+    <string name="support_liberapay">Liberapay</string>
+    <string name="support_liberapay_detail">Dons récurrents</string>
     <string name="support_share">Partager Inkwell</string>
     <string name="support_share_detail">Le bouche-à-oreille est le meilleur soutien</string>
     <string name="support_contribute">Contribuer</string>

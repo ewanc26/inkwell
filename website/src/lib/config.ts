@@ -58,6 +58,7 @@ export const FOOTER_LINKS = [
     url: "https://github.com/sponsors/ewanc26",
     external: true,
   },
+  { key: "liberapay", url: "https://liberapay.com/ewanc26/", external: true },
 ] as const;
 
 // ── Install sources ──────────────────────────────────────────────

@@ -11,6 +11,7 @@ import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocalCafe
+import androidx.compose.material.icons.filled.VolunteerActivism
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -30,7 +31,8 @@ import uk.ewancroft.inkwell.R
 /**
  * Tip jar + alternate support methods, opened from [CreditsView] and
  * mirroring iOS `SupportView.swift` row for row. Inkwell is free on both
- * platforms — these are external links (Ko-fi, GitHub Sponsors), not
+ * platforms — these are external links (Ko-fi, GitHub Sponsors,
+ * Liberapay), not
  * in-app purchases, since a self-hosted F-Droid repo has no store
  * billing to hook Play Billing into.
  */
@@ -71,6 +73,12 @@ fun SupportDialog(onDismiss: () -> Unit) {
                     title = stringResource(R.string.support_sponsors),
                     detail = stringResource(R.string.support_sponsors_detail),
                     onClick = { openUrl("https://github.com/sponsors/ewanc26") },
+                )
+                SupportMethodRow(
+                    icon = Icons.Filled.VolunteerActivism,
+                    title = stringResource(R.string.support_liberapay),
+                    detail = stringResource(R.string.support_liberapay_detail),
+                    onClick = { openUrl("https://liberapay.com/ewanc26/") },
                 )
 
                 Spacer(Modifier.height(16.dp))
