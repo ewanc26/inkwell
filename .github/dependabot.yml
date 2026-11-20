@@ -1,0 +1,55 @@
+version: 2
+# Dependabot version-update config for inkwell.
+#
+# A 7-day cooldown lets newly published releases age so compromised
+# versions are usually yanked before we adopt them. Security updates
+# are never delayed. Auto-merge is intentionally disabled.
+
+updates:
+  - package-ecosystem: gradle
+    directories:
+      - "/Android"
+      - "/Android/app"
+      - "/Android/lint-rules"
+      - "/shared"
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 5
+  - package-ecosystem: npm
+    directory: "/website"
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 5
+    groups:
+      production:
+        dependency-type: production
+        update-types: [minor, patch]
+      development:
+        dependency-type: development
+        update-types: [minor, patch]
+  - package-ecosystem: swift
+    directory: "/SharedKMP_Package"
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 5
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 3
+    groups:
+      actions:
+        patterns: ["*"]
+        update-types: [minor, patch]
