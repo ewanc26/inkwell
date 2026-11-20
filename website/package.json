@@ -12,20 +12,20 @@
     "format": "prettier --write --ignore-unknown ."
   },
   "devDependencies": {
-    "@lucide/svelte": "^1.21.0",
+    "@lucide/svelte": "^1.72.0",
     "@sveltejs/adapter-vercel": "^6.3.4",
     "@sveltejs/kit": "^2.66.0",
-    "@sveltejs/vite-plugin-svelte": "^7.1.2",
-    "@tailwindcss/vite": "^4.3.1",
-    "@types/node": "^26.0.0",
+    "@sveltejs/vite-plugin-svelte": "^7.3.1",
+    "@tailwindcss/vite": "^4.3.5",
+    "@types/node": "^26.6.6",
     "pa11y-ci": "4.1.1",
-    "prettier": "^3.8.4",
+    "prettier": "^3.10.1",
     "prettier-plugin-svelte": "^4.1.1",
-    "prettier-plugin-tailwindcss": "^0.8.0",
-    "svelte": "^5.56.3",
-    "svelte-check": "^4.6.0",
-    "tailwindcss": "^4.3.1",
+    "prettier-plugin-tailwindcss": "^0.8.1",
+    "svelte": "^5.57.3",
+    "svelte-check": "^4.7.8",
+    "tailwindcss": "^4.3.5",
     "typescript": "^6.0.3",
-    "vite": "^8.0.16"
+    "vite": "^8.3.8"
   }
 }
