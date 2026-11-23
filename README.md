@@ -158,6 +158,8 @@ The exception allows otherwise AGPL-compliant builds to be distributed through t
 
 Inkwell is not currently distributed through the App Store or Google Play. The existing free AltStore Classic and F-Droid distribution channels remain available, including if paid mainstream-store builds are introduced later.
 
+Copyright (C) 2026 Ewan Croft (ewanc26).
+
 ## Star History
 
 <a href="https://www.star-history.com/?repos=ewanc26%2Finkwell&type=date&legend=bottom-right">
