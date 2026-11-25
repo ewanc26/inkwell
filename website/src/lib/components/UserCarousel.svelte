@@ -6,8 +6,8 @@
 
 <script lang="ts">
   import type { Snippet } from "svelte";
-  import { fmt, rich, type Messages } from "$lib/i18n";
-  import type { InkwellUser } from "$lib/inkwellUser";
+  import { fmt, rich, type Messages } from "#lib/i18n/index.ts";
+  import type { InkwellUser } from "#lib/inkwellUser.ts";
 
   let {
     users,

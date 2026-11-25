@@ -10,8 +10,8 @@
 
 <script lang="ts">
   import type { PageData } from "./$types";
-  import { reveal } from "$lib/motion";
-  import { fmt, messages, rich } from "$lib/i18n";
+  import { reveal } from "#lib/motion.ts";
+  import { fmt, messages, rich } from "#lib/i18n/index.ts";
   import { Heart, ArrowRight, ArrowUpRight } from "@lucide/svelte";
 
   let { data }: { data: PageData } = $props();

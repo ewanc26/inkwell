@@ -1,5 +1,5 @@
 import type { PageServerLoad } from "./$types";
-import { loadInkwellUsers } from "$lib/server/inkwellUsers";
+import { loadInkwellUsers } from "#lib/server/inkwellUsers.ts";
 
 // Live third-party data, so the page is rendered per request rather than
 // prerendered.

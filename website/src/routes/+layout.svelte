@@ -11,8 +11,8 @@
 
 <script lang="ts">
   import "../routes/layout.css";
-  import { SITE, NAV_LINKS, FOOTER_LINKS, OG_IMAGE } from "$lib/config";
-  import { absoluteUrl, fmt, messages, rich, routeMeta } from "$lib/i18n";
+  import { SITE, NAV_LINKS, FOOTER_LINKS, OG_IMAGE } from "#lib/config.ts";
+  import { absoluteUrl, fmt, messages, rich, routeMeta } from "#lib/i18n/index.ts";
   import { page } from "$app/state";
   import { Menu, X } from "@lucide/svelte";
 

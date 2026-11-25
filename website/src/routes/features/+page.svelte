@@ -9,9 +9,9 @@
 -->
 
 <script lang="ts">
-  import { reveal } from "$lib/motion";
-  import { messages, rich } from "$lib/i18n";
-  import UserCarousel from "$lib/components/UserCarousel.svelte";
+  import { reveal } from "#lib/motion.ts";
+  import { messages, rich } from "#lib/i18n/index.ts";
+  import UserCarousel from "#lib/components/UserCarousel.svelte";
   import type { PageData } from "./$types";
   import {
     BookOpen,

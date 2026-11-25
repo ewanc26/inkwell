@@ -8,7 +8,7 @@
 // not a page) and the static release artefacts under /altstore and
 // /fdroid.
 
-import { SITE_ROUTES, absoluteUrl } from "$lib/i18n";
+import { SITE_ROUTES, absoluteUrl } from "#lib/i18n/index.ts";
 
 export const prerender = true;
 

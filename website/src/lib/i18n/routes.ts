@@ -9,7 +9,7 @@
 //   /sitemap.xml           one document describing the pages.
 //   /altstore, /fdroid, …  static release artefacts served from static/.
 
-import { SITE } from "$lib/config";
+import { SITE } from "#lib/config.ts";
 
 export const SITE_ROUTES = [
   { path: "/", priority: "1.0" },

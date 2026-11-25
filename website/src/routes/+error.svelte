@@ -5,7 +5,7 @@
 
 <script lang="ts">
   import { page } from "$app/state";
-  import { fmt, messages } from "$lib/i18n";
+  import { fmt, messages } from "#lib/i18n/index.ts";
 
   const m = messages;
   const copy = $derived(
