@@ -8,14 +8,9 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
 plugins {
-    alias(libs.plugins.android.library)
     id("org.jetbrains.kotlin.multiplatform")
+    alias(libs.plugins.android.kotlin.multiplatform.library)
     id("org.jetbrains.kotlin.plugin.serialization")
-}
-
-android {
-    namespace = "uk.ewancroft.inkwell.shared"
-    compileSdk = 36
 }
 
 kotlin {
@@ -29,7 +24,15 @@ kotlin {
     // ── Targets ─────────────────────────────────────────────────────────
 
     jvm()
-    androidTarget()
+    android {
+        namespace = "uk.ewancroft.inkwell.shared"
+        compileSdk = 37
+        minSdk = 26
+
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
+    }
 
     listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach { target ->
         target.binaries.framework {

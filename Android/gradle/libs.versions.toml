@@ -1,7 +1,7 @@
 [versions]
-agp = "8.13.2"
+agp = "9.5.2"
 kotlin = "2.4.21"
-android-lint = "31.13.2"
+android-lint = "32.5.2"
 
 atproto-kotlin = "9.6.0"
 
@@ -11,8 +11,8 @@ activity-compose = "1.10.0"
 navigation-compose = "2.9.8"
 lifecycle = "2.9.0"
 
-okhttp = "4.12.0"
-ktor = "3.1.2"
+okhttp = "5.5.1"
+ktor = "3.6.1"
 
 kotlinx-serialization = "1.7.3"
 kotlinx-coroutines = "1.11.0"
@@ -24,7 +24,7 @@ androidx-test-ext-junit = "1.2.1"
 
 coil = "2.7.0"
 
-hilt = "2.57.2"
+hilt = "2.60.1"
 hilt-navigation-compose = "1.2.0"
 
 browser = "1.8.0"
@@ -76,6 +76,7 @@ kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
+kotlin-test-junit = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
 
 androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "androidx-test" }
 androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "androidx-test-core" }
@@ -115,8 +116,7 @@ lint-tests = { group = "com.android.tools.lint", name = "lint-tests", version.re
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-android-library = { id = "com.android.library", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

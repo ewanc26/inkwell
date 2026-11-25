@@ -9,7 +9,6 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
@@ -29,7 +28,7 @@ if (hasReleaseSigning) {
 
 android {
     namespace = "uk.ewancroft.inkwell"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "uk.ewancroft.inkwell"
@@ -117,6 +116,36 @@ android {
 
 // ── Dependencies ────────────────────────────────────────────────────────
 
+// Robolectric would otherwise download its android-all jars from inside the test
+// JVM, where a failed request fails every test that needs that SDK. Gradle
+// resolves them instead (cached and retried) and the tests run offline.
+// Add the matching jar here when a test needs another SDK or Robolectric moves.
+val robolectricSdkJars = listOf(
+    "14-robolectric-10818077-i7", // SDK 34: @Config(sdk = [34])
+    "5.0.2_r3-robolectric-r0-i7", // SDK 21: what unpinned tests run on
+    "15-robolectric-12650502-i7", // SDK 35: loaded to parse the app package
+).map { version ->
+    // One configuration per jar, so that Gradle does not resolve them as
+    // conflicting versions of a single module.
+    configurations.detachedConfiguration(
+        dependencies.create("org.robolectric:android-all-instrumented:$version"),
+    ).apply { isTransitive = false }
+}
+
+val prepareRobolectricSdkJars by tasks.registering(Sync::class) {
+    from(robolectricSdkJars)
+    into(layout.buildDirectory.dir("robolectric-sdk-jars"))
+}
+
+tasks.withType<Test>().configureEach {
+    dependsOn(prepareRobolectricSdkJars)
+    systemProperty("robolectric.offline", "true")
+    systemProperty(
+        "robolectric.dependency.dir",
+        layout.buildDirectory.dir("robolectric-sdk-jars").get().asFile.absolutePath,
+    )
+}
+
 dependencies {
     // -- Compose BOM --
     // Single BOM import controls all Compose library versions
@@ -194,7 +223,7 @@ dependencies {
 
     // -- JVM unit tests --
     testImplementation(libs.junit)
-    testImplementation(kotlin("test"))
+    testImplementation(libs.kotlin.test.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation("org.robolectric:robolectric:4.14.1")
 
