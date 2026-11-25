@@ -10,9 +10,9 @@
 -->
 
 <script lang="ts">
-  import { reveal } from "$lib/motion";
-  import { fmt, messages, splitAt } from "$lib/i18n";
-  import { LEGAL_DOCUMENTS, type LegalDocKey } from "$lib/legal/documents";
+  import { reveal } from "#lib/motion.ts";
+  import { fmt, messages, splitAt } from "#lib/i18n/index.ts";
+  import { LEGAL_DOCUMENTS, type LegalDocKey } from "#lib/legal/documents.ts";
 
   let { doc }: { doc: LegalDocKey } = $props();
 

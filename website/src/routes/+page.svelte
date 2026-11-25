@@ -10,10 +10,10 @@
 -->
 
 <script lang="ts">
-  import { reveal } from "$lib/motion";
-  import { ALTSTORE_SOURCE_LINK, FDROID_REPO_LINK } from "$lib/config";
-  import { fmt, messages, rich, splitAt } from "$lib/i18n";
-  import UserCarousel from "$lib/components/UserCarousel.svelte";
+  import { reveal } from "#lib/motion.ts";
+  import { ALTSTORE_SOURCE_LINK, FDROID_REPO_LINK } from "#lib/config.ts";
+  import { fmt, messages, rich, splitAt } from "#lib/i18n/index.ts";
+  import UserCarousel from "#lib/components/UserCarousel.svelte";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();

@@ -7,7 +7,7 @@ Inkwell marketing, legal, and OAuth-metadata site — `inkwell.ewancroft.uk`.
 - `src/` — SvelteKit app source (landing page, legal routes, OAuth metadata)
 - `static/` — favicon, fonts, AltStore metadata, F-Droid repo
 - `package.json` / `pnpm-lock.yaml` / `pnpm-workspace.yaml` — Node/pnpm config
-- `svelte.config.ts` / `vite.config.ts` — build config
+- `vite.config.ts` — build and SvelteKit config
 - `vercel.json` — Vercel deployment config
 
 ## Development

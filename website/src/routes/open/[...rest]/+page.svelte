@@ -18,7 +18,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { page } from "$app/state";
-  import { SITE, ALTSTORE_SOURCE_LINK, FDROID_REPO_LINK } from "$lib/config";
+  import { SITE, ALTSTORE_SOURCE_LINK, FDROID_REPO_LINK } from "#lib/config.ts";
   import { Download, ExternalLink, BookOpen } from "@lucide/svelte";
 
   // Mirrors the document-AT-URI shape both platforms' HttpsDeepLinkPolicy

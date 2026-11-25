@@ -21,7 +21,7 @@ const BACKLINK_SOURCE = "uk.ewancroft.inkwell.user:app";
 const MAX_USERS = 48;
 const CACHE_TTL_MS = 10 * 60 * 1000;
 
-import type { InkwellUser } from "$lib/inkwellUser";
+import type { InkwellUser } from "#lib/inkwellUser.ts";
 
 export type { InkwellUser };
 
