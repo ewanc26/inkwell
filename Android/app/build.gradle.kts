@@ -9,7 +9,6 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
@@ -29,7 +28,7 @@ if (hasReleaseSigning) {
 
 android {
     namespace = "uk.ewancroft.inkwell"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "uk.ewancroft.inkwell"
@@ -194,7 +193,7 @@ dependencies {
 
     // -- JVM unit tests --
     testImplementation(libs.junit)
-    testImplementation(kotlin("test"))
+    testImplementation(libs.kotlin.test.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation("org.robolectric:robolectric:4.14.1")
 
