@@ -115,6 +115,16 @@
 
   /* ── Section title — large Fathom-style section heading ────── */
 
+  /* The paragraph under a section title. Not Tailwind's `text-lg`: this
+     site's --text-lg is a heading size and overrides that utility. */
+  .section-lead {
+    max-width: var(--measure-copy);
+    color: var(--color-text-700);
+    font-size: clamp(1.05rem, 2vw, 1.3rem);
+    line-height: 1.65;
+    text-wrap: pretty;
+  }
+
   .section-title {
     max-width: 44rem;
     margin: 0 0 var(--space-md);
@@ -186,10 +196,6 @@
     color: var(--color-text-950);
   }
 
-  /* Placeholder buttons (store listings not yet live) — rendered as
-     disabled buttons, so they are non-interactive but still visible.
-     Reduced opacity signals "coming soon" without removing context. */
-  .btn-placeholder,
   button[disabled].btn-outline {
     opacity: 0.5;
     cursor: not-allowed;
@@ -224,6 +230,7 @@
   .nav-brand {
     display: inline-flex;
     align-items: center;
+    min-height: 44px;
     gap: var(--space-sm);
     font-weight: 700;
     color: var(--color-text-950);

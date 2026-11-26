@@ -25,7 +25,7 @@
 
 <section class="site-container section">
   <h2 class="section-title">{m.heading}</h2>
-  <p class="mb-6 max-w-[42rem] text-lg leading-relaxed text-pretty">
+  <p class="section-lead mb-6">
     {@html rich(m.intro)}
   </p>
 

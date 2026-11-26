@@ -104,7 +104,7 @@ export const enGB = {
   users: {
     heading: "Users already using Inkwell",
     intro:
-      "Inkwell users across the network. This carousel is generated from Constellation backlinks to the `uk.ewancroft.inkwell.user` lexicon record, resolving DIDs to Bluesky avatars and handle aliases via Slingshot.",
+      "People who have chosen to appear here. The list is built from public records in each person's own repository.",
     avatarAlt: "{handle} avatar",
     empty:
       "No one has declared themselves an Inkwell user yet. Flip **Declare me as an Inkwell user** in the app's Settings and you'll show up here — the record lives in your own PDS, and the list is built entirely from public Constellation backlinks.",
@@ -134,22 +134,18 @@ export const enGB = {
     download: {
       heading: "Get Inkwell",
       intro:
-        "Free direct installs are available now through AltStore Classic and F-Droid. £5 App Store and Google Play builds are planned; the store links below are placeholders until those listings go live.",
+        "Inkwell is free, and installs directly from this site: through AltStore Classic on iOS, or its own F-Droid repository on Android. It is not in the App Store or Google Play.",
       ios: {
         heading: "iOS",
-        body: "Install Inkwell free through its self-hosted AltStore Classic source. A £5 App Store build is planned as an optional mainstream install route.",
+        body: "For iOS 18 and later. Add Inkwell's source to AltStore Classic and install it from there.",
         addSource: "Add AltStore source",
-        store: "App Store — planned £5",
-        storeAria: "App Store listing placeholder — planned £5 build",
-        note: "This source works with [AltStore Classic](altstore) — the free, worldwide sideloading AltStore (requires a computer for the first install, apps refresh every 7 days). The App Store button currently points at a placeholder listing URL and will be replaced when the paid listing exists.",
+        note: "[AltStore Classic](altstore) is free and works worldwide. It needs a computer for the first install, and apps need refreshing every seven days.",
       },
       android: {
         heading: "Android",
-        body: "Install the experimental Android build free from Inkwell's self-hosted F-Droid repository. A £5 Google Play build is planned as an optional mainstream install route.",
+        body: "For Android 8.0 and later. Add Inkwell's repository to F-Droid and install it from there. The Android app is still labelled experimental.",
         addSource: "Add F-Droid repo",
-        store: "Google Play — planned £5",
-        storeAria: "Google Play listing placeholder — planned £5 build",
-        note: "Or open [inkwell.ewancroft.uk/fdroid/repo](fdroidRepo) directly to browse it or scan its QR code. The Google Play button uses the expected package URL as a placeholder until the listing is live. Source on [GitHub](github).",
+        note: "Or open [inkwell.ewancroft.uk/fdroid/repo](fdroidRepo) to browse the repository or scan its QR code. Source on [GitHub](github).",
       },
     },
     screenshots: {
@@ -231,7 +227,7 @@ export const enGB = {
         {
           question: "Is Inkwell in the App Store or Play Store?",
           answer:
-            "Not yet. Inkwell installs from its own self-hosted AltStore source (iOS) or F-Droid repository (Android). The [download section](download) includes the planned £5 App Store and Google Play routes too, but those buttons currently use placeholder listing URLs until the real store pages exist. AltStore Classic and F-Droid remain the free install routes.",
+            "Not yet. Inkwell installs from its own AltStore source (iOS) or F-Droid repository (Android): see the [download section](download). Paid £5 store listings are planned as an extra route, and the direct installs will stay free.",
         },
         {
           question: "Do I need a Bluesky account?",
