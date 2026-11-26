@@ -132,7 +132,7 @@
 <!-- Download -->
 <section id="download" class="site-container section scroll-mt-24">
   <h2 class="section-title">{m.download.heading}</h2>
-  <p class="mb-12 max-w-[42rem] text-lg leading-relaxed text-pretty">
+  <p class="section-lead mb-12">
     {m.download.intro}
   </p>
 
@@ -146,14 +146,6 @@
           <Download class="h-4 w-4" />
           {m.download.ios.addSource}
         </a>
-        <button
-          class="btn btn-outline btn-placeholder"
-          disabled
-          aria-label={m.download.ios.storeAria}
-        >
-          <Apple class="h-4 w-4" />
-          {m.download.ios.store}
-        </button>
       </div>
       <p class="mt-3 text-sm text-muted">{@html rich(m.download.ios.note)}</p>
     </div>
@@ -167,14 +159,6 @@
           <Download class="h-4 w-4" />
           {m.download.android.addSource}
         </a>
-        <button
-          class="btn btn-outline btn-placeholder"
-          disabled
-          aria-label={m.download.android.storeAria}
-        >
-          <Smartphone class="h-4 w-4" />
-          {m.download.android.store}
-        </button>
       </div>
       <p class="mt-3 text-sm text-muted">
         {@html rich(m.download.android.note)}
@@ -186,7 +170,7 @@
 <!-- Screenshots -->
 <section class="site-container section">
   <h2 class="section-title">{m.screenshots.heading}</h2>
-  <p class="mb-12 max-w-[42rem] text-lg leading-relaxed text-pretty">
+  <p class="section-lead mb-12">
     {m.screenshots.intro}
   </p>
 
@@ -257,7 +241,7 @@
 <!-- Why not just the browser -->
 <section class="site-container section">
   <h2 class="section-title">{m.compare.heading}</h2>
-  <p class="mb-6 max-w-[42rem] text-lg leading-relaxed text-pretty">
+  <p class="section-lead mb-6">
     {m.compare.intro}
   </p>
   <dl class="compare">

@@ -40,7 +40,7 @@ Deployed to Vercel. The `vercel.json` configures pnpm as the install command and
 
 Availability copy must describe distribution channels that actually exist. App Store and Google Play builds are planned, but the site should continue to present AltStore Classic and F-Droid as the current install routes until mainstream-store listings are live.
 
-`src/lib/config.ts` contains clearly named placeholder App Store and Google Play URLs so the planned links can be rendered now without pretending the listings exist. Replace those constants with the real listing URLs when the £5 store builds launch, and remove the placeholder wording from the landing page in the same change.
+The site shows no App Store or Google Play buttons: add them only once real listings exist.
 
 ## AI-assisted contributions
 
